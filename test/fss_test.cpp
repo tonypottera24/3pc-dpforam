@@ -20,8 +20,8 @@ int main() {
             generator.gen(alpha, m, keys);
             uchar *share0 = new uchar[range];
             uchar *share1 = new uchar[range];
-            evaluators[0].eval_all(keys[0], m, share0);
-            evaluators[1].eval_all(keys[1], m, share1);
+            evaluators[0].EvalAll(keys[0], m, share0);
+            evaluators[1].EvalAll(keys[1], m, share1);
 
             for (unsigned long x = 0; x < range; x++) {
                 uchar output = share0[x] ^ share1[x];

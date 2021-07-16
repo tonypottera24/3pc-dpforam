@@ -109,8 +109,8 @@ int main(int argc, char *argv[]) {
 
     cout << "Closing connections... " << flush;
     sleep(1);
-    cons[0]->close();
-    cons[1]->close();
+    cons[0]->Close();
+    cons[1]->Close();
     delete cons[0];
     delete cons[1];
     cout << "done" << endl;

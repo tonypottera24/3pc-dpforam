@@ -9,7 +9,7 @@ void Connection::WriteInt(int n, bool count_band) {
 
 int Connection::ReadInt() {
     int n;
-    read((uchar*)&n, 4);
+    Read((uchar*)&n, 4);
     return n;
 }
 
@@ -19,6 +19,6 @@ void Connection::WriteLong(long n, bool count_band) {
 
 long Connection::ReadLong() {
     long n;
-    read((uchar*)&n, 8);
+    Read((uchar*)&n, 8);
     return n;
 }

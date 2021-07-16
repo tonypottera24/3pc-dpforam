@@ -51,7 +51,7 @@ void SimpleSocket::InitServer(int port) {
     }
     ::close(server_fd);
     set_stream();
-    set_no_delay();
+    SetNoDelay();
 }
 
 void SimpleSocket::InitClient(const char *ip, int port) {
@@ -70,13 +70,13 @@ void SimpleSocket::InitClient(const char *ip, int port) {
         error("InitClient: connect failed");
     }
     set_stream();
-    set_no_delay();
+    SetNoDelay();
 }
 
-void SimpleSocket::set_no_delay() {
+void SimpleSocket::SetNoDelay() {
     int opt = 1;
     if (setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)) < 0) {
-        error("set_no_delay: setsockopt failed");
+        error("SetNoDelay: setsockopt failed");
     }
 }
 
@@ -95,7 +95,7 @@ void SimpleSocket::Write(const uchar *data, unsigned long bytes, bool count_band
     }
 }
 
-void SimpleSocket::read(uchar *data, unsigned long bytes) {
+void SimpleSocket::Read(uchar *data, unsigned long bytes) {
     long read_bytes;
     unsigned long offset = 0ul;
     while (offset < bytes) {
@@ -143,11 +143,11 @@ void SimpleSocket::read(uchar *data, unsigned long bytes) {
 //     }
 // }
 
-void SimpleSocket::flush() {
+void SimpleSocket::Flush() {
     fflush(stream);
 }
 
-void SimpleSocket::close() {
+void SimpleSocket::Close() {
     fclose(stream);
     delete[] buffer;
     ::close(socket_fd);

@@ -76,7 +76,7 @@ uint FSS1Bit::gen(unsigned long alpha, uint m, uchar *keys[2]) {
     return GEN(&aes_key, alpha, m, keys, keys + 1);
 }
 
-void FSS1Bit::eval_all(const uchar *key, uint m, uchar *out) {
+void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
     block *res = EVALFULL(&aes_key, key);
     if (m <= 6) {
         to_byte_vector(((unsigned long *)res)[0], out, (1 << m));

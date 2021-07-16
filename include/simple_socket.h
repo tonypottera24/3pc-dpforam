@@ -16,13 +16,13 @@ private:
 public:
     void InitServer(int port);
     void InitClient(const char *ip, int port);
-    void set_no_delay();
+    void SetNoDelay();
     void Write(const uchar *data, unsigned long bytes, bool count_band = true);
-    void read(uchar *data, unsigned long bytes);
+    void Read(uchar *data, unsigned long bytes);
     // void fwrite(const uchar *data, unsigned long bytes, bool count_band = true);
     // void fread(uchar *data, unsigned long bytes);
-    void flush();
-    void close();
+    void Flush();
+    void Close();
 };
 
 #endif /* SIMPLE_SOCKET_H_ */

@@ -55,8 +55,8 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
     uint keyBytes = fss.gen(addr_23[0] ^ addr_23[1], logN, keys);
     cons[0]->Write(keys[0], keyBytes);
     cons[1]->Write(keys[1], keyBytes);
-    cons[0]->read(keys[1], keyBytes);
-    cons[1]->read(keys[0], keyBytes);
+    cons[0]->Read(keys[1], keyBytes);
+    cons[1]->Read(keys[0], keyBytes);
 
     uint quo = DBytes / 16;
     uint rem = DBytes % 16;
@@ -101,7 +101,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
     }
 
     cons[0]->Write(block_23[0], DBytes);
-    cons[1]->read(block_23[1], DBytes);
+    cons[1]->Read(block_23[1], DBytes);
 
     delete[] keys[0];
     delete[] keys[1];
@@ -113,13 +113,13 @@ void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
     uint keyBytes = fss.gen(idx_23[0] ^ idx_23[1], tau, keys);
     cons[0]->Write(keys[0], keyBytes);
     cons[1]->Write(keys[1], keyBytes);
-    cons[0]->read(keys[1], keyBytes);
-    cons[1]->read(keys[0], keyBytes);
+    cons[0]->Read(keys[1], keyBytes);
+    cons[1]->Read(keys[0], keyBytes);
 
     memset(rec_23[0], 0, nextLogNBytes);
     for (uint i = 0; i < 2; i++) {
         uchar fss_out[ttp];
-        fss.eval_all(keys[i], tau, fss_out);
+        fss.EvalAll(keys[i], tau, fss_out);
         for (uint j = 0; j < ttp; j++) {
             if (fss_out[j ^ idx_23[i]]) {
                 cal_xor(rec_23[0], block_23[i] + j * nextLogNBytes,
@@ -129,7 +129,7 @@ void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
     }
 
     cons[0]->Write(rec_23[0], nextLogNBytes);
-    cons[1]->read(rec_23[1], nextLogNBytes);
+    cons[1]->Read(rec_23[1], nextLogNBytes);
 
     delete[] keys[0];
     delete[] keys[1];
@@ -176,9 +176,9 @@ void DPFORAM::WOM2ROM() {
         cons[0]->Write(wom[i], DBytes);
         //		cons[0]->fwrite(wom[i], DBytes);
     }
-    //	cons[0]->flush();
+    //	cons[0]->Flush();
     for (unsigned long i = 0; i < N; i++) {
-        cons[1]->read(rom[1][i], DBytes);
+        cons[1]->Read(rom[1][i], DBytes);
         //		cons[1]->fread(rom[1][i], DBytes);
     }
 }
@@ -418,7 +418,7 @@ void DPFORAM::Test(uint iter) {
             party_wc += current_timestamp() - wc;
 
             uchar rec_out[nextLogNBytes];
-            cons[0]->read(rec_out, nextLogNBytes);
+            cons[0]->Read(rec_out, nextLogNBytes);
             cal_xor(rec_out, rec_23[0], nextLogNBytes, rec_out);
             cal_xor(rec_out, rec_23[1], nextLogNBytes, rec_out);
 
@@ -432,7 +432,7 @@ void DPFORAM::Test(uint iter) {
 
             memcpy(rec_exp, new_rec_23[0], nextLogNBytes);
         } else if (strcmp(party, "debbie") == 0) {
-            cons[1]->read(new_rec_23[1], nextLogNBytes);
+            cons[1]->Read(new_rec_23[1], nextLogNBytes);
 
             sync();
             wc = current_timestamp();
