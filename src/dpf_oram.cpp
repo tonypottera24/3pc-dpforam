@@ -9,13 +9,13 @@
 
 FSS1Bit DPFORAM::fss;
 
-void DPFORAM::init() {
+void DPFORAM::Init() {
     InitCtr();
-    set_zero(rom[0]);
-    set_zero(rom[1]);
-    set_zero(wom);
+    SetZero(rom[0]);
+    SetZero(rom[1]);
+    SetZero(wom);
     if (!isFirst) {
-        pos_map->init();
+        pos_map->Init();
     }
 }
 
@@ -23,7 +23,7 @@ void DPFORAM::InitCtr() {
     stash_ctr = 1;
 }
 
-void DPFORAM::set_zero(uchar **mem) {
+void DPFORAM::SetZero(uchar **mem) {
     if (mem == NULL) {
         return;
     }
@@ -33,14 +33,14 @@ void DPFORAM::set_zero(uchar **mem) {
     }
 }
 
-void DPFORAM::init_mem(uchar **&mem) {
+void DPFORAM::InitMem(uchar **&mem) {
     mem = new uchar *[N];
     for (unsigned long i = 0; i < N; i++) {
         mem[i] = new uchar[DBytes];
     }
 }
 
-void DPFORAM::delete_mem(uchar **mem) {
+void DPFORAM::DeleteMem(uchar **mem) {
     for (unsigned long i = 0; i < N; i++) {
         delete[] mem[i];
     }
@@ -48,9 +48,9 @@ void DPFORAM::delete_mem(uchar **mem) {
 }
 
 // private
-void DPFORAM::block_pir(const unsigned long addr_23[2],
-                        const uchar *const *const mem_23[2], unsigned long size, uchar *block_23[2],
-                        uchar *fss_out[2]) {
+void DPFORAM::BlockPIR(const unsigned long addr_23[2],
+                       const uchar *const *const mem_23[2], unsigned long size, uchar *block_23[2],
+                       uchar *fss_out[2]) {
     uchar *keys[2];
     uint keyBytes = fss.gen(addr_23[0] ^ addr_23[1], logN, keys);
     cons[0]->write(keys[0], keyBytes);
@@ -107,8 +107,8 @@ void DPFORAM::block_pir(const unsigned long addr_23[2],
     delete[] keys[1];
 }
 
-void DPFORAM::rec_pir(const uint idx_23[2], const uchar *const block_23[2],
-                      uchar *rec_23[2]) {
+void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
+                     uchar *rec_23[2]) {
     uchar *keys[2];
     uint keyBytes = fss.gen(idx_23[0] ^ idx_23[1], tau, keys);
     cons[0]->write(keys[0], keyBytes);
@@ -135,8 +135,8 @@ void DPFORAM::rec_pir(const uint idx_23[2], const uchar *const block_23[2],
     delete[] keys[1];
 }
 
-void DPFORAM::update_wom(const uchar *const delta_block_23[2],
-                         const uchar *const fss_out[2]) {
+void DPFORAM::UpdateWOM(const uchar *const delta_block_23[2],
+                        const uchar *const fss_out[2]) {
     uint quo = DBytes / 16;
     uint rem = DBytes % 16;
 #pragma omp parallel for
@@ -151,21 +151,21 @@ void DPFORAM::update_wom(const uchar *const delta_block_23[2],
     }
 }
 
-void DPFORAM::append_stash(const uchar *const block_23[2],
-                           const uchar *const delta_block_23[2]) {
+void DPFORAM::AppendStash(const uchar *const block_23[2],
+                          const uchar *const delta_block_23[2]) {
     for (uint i = 0; i < 2; i++) {
         cal_xor(block_23[i], delta_block_23[i], DBytes, stash[i][stash_ctr]);
     }
     stash_ctr++;
     if (stash_ctr == N) {
         InitCtr();
-        wom_to_rom();
-        pos_map->init();
+        WOM2ROM();
+        pos_map->Init();
     }
 }
 
 // TODO: buffered read/write
-void DPFORAM::wom_to_rom() {
+void DPFORAM::WOM2ROM() {
     if (isFirst) {
         return;
     }
@@ -198,37 +198,37 @@ DPFORAM::DPFORAM(const char *party, Connection *cons[2],
     N = 1ul << this->logN;
     isFirst = this->logN < 2 * tau;
 
-    init_mem(rom[0]);
-    init_mem(rom[1]);
+    InitMem(rom[0]);
+    InitMem(rom[1]);
     if (isFirst) {
         wom = NULL;
         pos_map = NULL;
     } else {
-        init_mem(wom);
-        init_mem(stash[0]);
-        init_mem(stash[1]);
+        InitMem(wom);
+        InitMem(stash[0]);
+        InitMem(stash[1]);
         pos_map = new DPFORAM(party, cons, rnd, prgs, tau, this->logN - tau, 0,
                               false);
     }
     InitCtr();
 
     if (isLast) {
-        init();
+        Init();
     }
 }
 
 DPFORAM::~DPFORAM() {
     if (!isFirst) {
         delete pos_map;
-        delete_mem(stash[0]);
-        delete_mem(stash[1]);
-        delete_mem(wom);
+        DeleteMem(stash[0]);
+        DeleteMem(stash[1]);
+        DeleteMem(wom);
     }
-    delete_mem(rom[0]);
-    delete_mem(rom[1]);
+    DeleteMem(rom[0]);
+    DeleteMem(rom[1]);
 }
 
-void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
+void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
                      bool isRead, uchar *rec_23[2]) {
     uint mask = ttp - 1;
     unsigned long addrPre_23[2];
@@ -251,8 +251,8 @@ void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_
             delta_block_23[i] = new uchar[DBytes];
             delta_rom_23[i] = new uchar[N * DBytes];
         }
-        block_pir(addrPre_23, rom, N, block_23, fss_out);
-        rec_pir(addrSuf_23, block_23, rec_23);
+        BlockPIR(addrPre_23, rom, N, block_23, fss_out);
+        RecPIR(addrSuf_23, block_23, rec_23);
 
         for (uint i = 0; i < 2; i++) {
             if (isRead) {
@@ -299,7 +299,7 @@ void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_
         stash_ptr_23[i] = new uchar[logNBytes];
         new_stash_ptr_23[i] = new_stash_ptr;
     }
-    pos_map->access(addrPre_23, new_stash_ptr_23, false, stash_ptr_23);
+    pos_map->Access(addrPre_23, new_stash_ptr_23, false, stash_ptr_23);
 
     unsigned long mask2 = N - 1;
     unsigned long stash_addrPre_23[2];
@@ -318,14 +318,14 @@ void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_
         stash_fss_out[i] = new uchar[N];
         block_23[i] = new uchar[DBytes];
     }
-    block_pir(addrPre_23, rom, N, rom_block_23, rom_fss_out);
-    block_pir(stash_addrPre_23, stash, stash_ctr, stash_block_23,
-              stash_fss_out);
+    BlockPIR(addrPre_23, rom, N, rom_block_23, rom_fss_out);
+    BlockPIR(stash_addrPre_23, stash, stash_ctr, stash_block_23,
+             stash_fss_out);
 
     uchar indicator_23[2] = {stash_ptr_23[0][0], stash_ptr_23[1][0]};
     // obliv_select(rom_block_23, stash_block_23, indicator_23, block_23);
 
-    rec_pir(addrSuf_23, block_23, rec_23);
+    RecPIR(addrSuf_23, block_23, rec_23);
     uchar *delta_rec_23[2];
     uchar *delta_block_23[2];
     for (uint i = 0; i < 2; i++) {
@@ -340,8 +340,8 @@ void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_
     // gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
     //                 delta_block_23);
 
-    update_wom(delta_block_23, rom_fss_out);
-    append_stash(block_23, delta_block_23);
+    UpdateWOM(delta_block_23, rom_fss_out);
+    AppendStash(block_23, delta_block_23);
 
     for (uint i = 0; i < 2; i++) {
         delete[] stash_ptr_23[i];
@@ -355,7 +355,7 @@ void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_
     }
 }
 
-void DPFORAM::print_metadata() {
+void DPFORAM::PrintMetadata() {
     std::cout << "===================" << std::endl;
     std::cout << "Party: " << party << std::endl;
     std::cout << "Last level: " << isLast << std::endl;
@@ -377,15 +377,15 @@ void DPFORAM::print_metadata() {
               << std::endl;
 
     if (!isFirst) {
-        pos_map->print_metadata();
+        pos_map->PrintMetadata();
     }
 }
 
-void DPFORAM::test(uint iter) {
+void DPFORAM::Test(uint iter) {
     unsigned long party_wc = 0;
     unsigned long wc;
 
-    print_metadata();
+    PrintMetadata();
 
     bool isRead = false;
     unsigned long range = 1ul << (logN + tau);
@@ -414,7 +414,7 @@ void DPFORAM::test(uint iter) {
 
             sync();
             wc = current_timestamp();
-            access(addr_23, new_rec_23, isRead, rec_23);
+            Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
 
             uchar rec_out[nextLogNBytes];
@@ -436,14 +436,14 @@ void DPFORAM::test(uint iter) {
 
             sync();
             wc = current_timestamp();
-            access(addr_23, new_rec_23, isRead, rec_23);
+            Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
 
             cons[1]->write(rec_23[0], nextLogNBytes, false);
         } else if (strcmp(party, "charlie") == 0) {
             sync();
             wc = current_timestamp();
-            access(addr_23, new_rec_23, isRead, rec_23);
+            Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
         } else {
             std::cout << "Incorrect party: " << party << std::endl;

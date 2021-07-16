@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
     if (test_proto != NULL) {
         test_proto->sync();
-        test_proto->test(iters);
+        test_proto->Test(iters);
         test_proto->sync();
         delete test_proto;
     }

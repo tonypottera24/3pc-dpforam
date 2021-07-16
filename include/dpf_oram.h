@@ -26,20 +26,20 @@ public:
     bool isLast;
 
 private:
-    void init();
+    void Init();
     void InitCtr();
-    void set_zero(uchar **mem);
-    void init_mem(uchar **&mem);
-    void delete_mem(uchar **mem);
-    void block_pir(const unsigned long addr_23[2], const uchar *const *const mem_23[2],
-                   unsigned long size, uchar *block_23[2], uchar *fss_out[2]);
-    void rec_pir(const uint idx_23[2], const uchar *const block_23[2],
-                 uchar *rec_23[2]);
-    void update_wom(const uchar *const delta_block_23[2],
-                    const uchar *const fss_out[2]);
-    void append_stash(const uchar *const block_23[2],
-                      const uchar *const delta_block_23[2]);
-    void wom_to_rom();
+    void SetZero(uchar **mem);
+    void InitMem(uchar **&mem);
+    void DeleteMem(uchar **mem);
+    void BlockPIR(const unsigned long addr_23[2], const uchar *const *const mem_23[2],
+                  unsigned long size, uchar *block_23[2], uchar *fss_out[2]);
+    void RecPIR(const uint idx_23[2], const uchar *const block_23[2],
+                uchar *rec_23[2]);
+    void UpdateWOM(const uchar *const delta_block_23[2],
+                   const uchar *const fss_out[2]);
+    void AppendStash(const uchar *const block_23[2],
+                     const uchar *const delta_block_23[2]);
+    void WOM2ROM();
 
 public:
     DPFORAM(const char *party, Connection *cons[2],
@@ -47,10 +47,10 @@ public:
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
             uint logN, uint DBytes, bool isLast);
     ~DPFORAM();
-    void access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
+    void Access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
                 bool isRead, uchar *rec_23[2]);
-    void print_metadata();
-    void test(uint iter);
+    void PrintMetadata();
+    void Test(uint iter);
 };
 
 #endif /* DPFORAM_H_ */

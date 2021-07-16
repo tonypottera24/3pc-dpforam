@@ -22,7 +22,7 @@ public:
     virtual ~Protocol();
     void sync();
     unsigned long bandwidth();
-    virtual void test(uint iter) = 0;
+    virtual void Test(uint iter) = 0;
 };
 
 #endif /* PROTOCOL_H_ */
