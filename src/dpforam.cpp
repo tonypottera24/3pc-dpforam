@@ -5,13 +5,11 @@
 
 #include <iostream>
 
-#include "insert_label.h"
-#include "ssot.h"
 #include "util.h"
 
-fss1bit dpforam::fss;
+fss1bit DPFORAM::fss;
 
-void dpforam::init() {
+void DPFORAM::init() {
     init_ctr();
     set_zero(rom[0]);
     set_zero(rom[1]);
@@ -21,11 +19,11 @@ void dpforam::init() {
     }
 }
 
-void dpforam::init_ctr() {
+void DPFORAM::init_ctr() {
     stash_ctr = 1;
 }
 
-void dpforam::set_zero(uchar **mem) {
+void DPFORAM::set_zero(uchar **mem) {
     if (mem == NULL) {
         return;
     }
@@ -35,21 +33,21 @@ void dpforam::set_zero(uchar **mem) {
     }
 }
 
-void dpforam::init_mem(uchar **&mem) {
+void DPFORAM::init_mem(uchar **&mem) {
     mem = new uchar *[N];
     for (unsigned long i = 0; i < N; i++) {
         mem[i] = new uchar[DBytes];
     }
 }
 
-void dpforam::delete_mem(uchar **mem) {
+void DPFORAM::delete_mem(uchar **mem) {
     for (unsigned long i = 0; i < N; i++) {
         delete[] mem[i];
     }
     delete[] mem;
 }
 
-void dpforam::block_pir(const unsigned long addr_23[2],
+void DPFORAM::block_pir(const unsigned long addr_23[2],
                         const uchar *const *const mem_23[2], unsigned long size, uchar *block_23[2],
                         uchar *fss_out[2]) {
     uchar *keys[2];
@@ -108,7 +106,7 @@ void dpforam::block_pir(const unsigned long addr_23[2],
     delete[] keys[1];
 }
 
-void dpforam::rec_pir(const uint idx_23[2], const uchar *const block_23[2],
+void DPFORAM::rec_pir(const uint idx_23[2], const uchar *const block_23[2],
                       uchar *rec_23[2]) {
     uchar *keys[2];
     uint keyBytes = fss.gen(idx_23[0] ^ idx_23[1], tau, keys);
@@ -136,77 +134,7 @@ void dpforam::rec_pir(const uint idx_23[2], const uchar *const block_23[2],
     delete[] keys[1];
 }
 
-void dpforam::gen_delta_array(const uint idx_23[2], uint numChunk,
-                              uint chunkBytes, const uchar *const delta_23[2],
-                              uchar *delta_array_23[2]) {
-    uint arrayBytes = numChunk * chunkBytes;
-    insert_label il(party, cons, rnd, prgs);
-    if (strcmp(party, "eddie") == 0) {
-        uchar L1[chunkBytes];
-        cal_xor(delta_23[0], delta_23[1], chunkBytes, L1);
-        il.runE(idx_23[0] ^ idx_23[1], L1, numChunk, chunkBytes);
-        prgs[0].GenerateBlock(delta_array_23[0], arrayBytes);
-        prgs[1].GenerateBlock(delta_array_23[1], arrayBytes);
-    } else if (strcmp(party, "debbie") == 0) {
-        il.runD(idx_23[0], delta_23[0], numChunk, chunkBytes,
-                delta_array_23[0]);
-        prgs[1].GenerateBlock(delta_array_23[1], arrayBytes);
-        cal_xor(delta_array_23[0], delta_array_23[1], arrayBytes,
-                delta_array_23[0]);
-        cons[0]->write(delta_array_23[0], arrayBytes);
-        uchar tmp[arrayBytes];
-        cons[0]->read(tmp, arrayBytes);
-        cal_xor(delta_array_23[0], tmp, arrayBytes, delta_array_23[0]);
-    } else if (strcmp(party, "charlie") == 0) {
-        il.runC(numChunk, chunkBytes, delta_array_23[1]);
-        prgs[0].GenerateBlock(delta_array_23[0], arrayBytes);
-        cal_xor(delta_array_23[0], delta_array_23[1], arrayBytes,
-                delta_array_23[1]);
-        cons[1]->write(delta_array_23[1], arrayBytes);
-        uchar tmp[arrayBytes];
-        cons[1]->read(tmp, arrayBytes);
-        cal_xor(delta_array_23[1], tmp, arrayBytes, delta_array_23[1]);
-    } else {
-    }
-}
-
-void dpforam::obliv_select(const uchar *const rom_block_23[2],
-                           const uchar *const stash_block_23[2], const uchar indicator_23[2],
-                           uchar *block_23[2]) {
-    ssot ot(party, cons, rnd, prgs);
-    if (strcmp(party, "eddie") == 0) {
-        uint b1 = (indicator_23[0] ^ indicator_23[1]) & 1;
-        uchar *v01[2] = {new uchar[DBytes], new uchar[DBytes]};
-        cal_xor(rom_block_23[0], rom_block_23[1], DBytes, v01[0]);
-        cal_xor(stash_block_23[0], stash_block_23[1], DBytes, v01[1]);
-        ot.runE(b1, v01, DBytes, block_23[1]);
-        prgs[0].GenerateBlock(block_23[0], DBytes);
-        cal_xor(block_23[0], block_23[1], DBytes, block_23[1]);
-        cons[1]->write(block_23[1], DBytes);
-        uchar tmp[DBytes];
-        cons[1]->read(tmp, DBytes);
-        cal_xor(block_23[1], tmp, DBytes, block_23[1]);
-        delete[] v01[0];
-        delete[] v01[1];
-    } else if (strcmp(party, "debbie") == 0) {
-        ot.runD(DBytes);
-        prgs[0].GenerateBlock(block_23[0], DBytes);
-        prgs[1].GenerateBlock(block_23[1], DBytes);
-    } else if (strcmp(party, "charlie") == 0) {
-        int b0 = indicator_23[1] & 1;
-        const uchar *u01[2] = {rom_block_23[1], stash_block_23[1]};
-        ot.runC(b0, u01, DBytes, block_23[0]);
-        prgs[1].GenerateBlock(block_23[1], DBytes);
-        cal_xor(block_23[0], block_23[1], DBytes, block_23[0]);
-        cons[0]->write(block_23[0], DBytes);
-        uchar tmp[DBytes];
-        cons[0]->read(tmp, DBytes);
-        cal_xor(block_23[0], tmp, DBytes, block_23[0]);
-    } else {
-    }
-}
-
-void dpforam::update_wom(const uchar *const delta_block_23[2],
+void DPFORAM::update_wom(const uchar *const delta_block_23[2],
                          const uchar *const fss_out[2]) {
     uint quo = DBytes / 16;
     uint rem = DBytes % 16;
@@ -222,7 +150,7 @@ void dpforam::update_wom(const uchar *const delta_block_23[2],
     }
 }
 
-void dpforam::append_stash(const uchar *const block_23[2],
+void DPFORAM::append_stash(const uchar *const block_23[2],
                            const uchar *const delta_block_23[2]) {
     for (uint i = 0; i < 2; i++) {
         cal_xor(block_23[i], delta_block_23[i], DBytes, stash[i][stash_ctr]);
@@ -236,7 +164,7 @@ void dpforam::append_stash(const uchar *const block_23[2],
 }
 
 // TODO: buffered read/write
-void dpforam::wom_to_rom() {
+void DPFORAM::wom_to_rom() {
     if (isFirst) {
         return;
     }
@@ -254,7 +182,7 @@ void dpforam::wom_to_rom() {
     }
 }
 
-dpforam::dpforam(const char *party, connection *cons[2],
+DPFORAM::DPFORAM(const char *party, connection *cons[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
                  uint logN, uint DBytes, bool isLast) : protocol(party, cons, rnd, prgs) {
@@ -278,7 +206,7 @@ dpforam::dpforam(const char *party, connection *cons[2],
         init_mem(wom);
         init_mem(stash[0]);
         init_mem(stash[1]);
-        pos_map = new dpforam(party, cons, rnd, prgs, tau, this->logN - tau, 0,
+        pos_map = new DPFORAM(party, cons, rnd, prgs, tau, this->logN - tau, 0,
                               false);
     }
     init_ctr();
@@ -288,7 +216,7 @@ dpforam::dpforam(const char *party, connection *cons[2],
     }
 }
 
-dpforam::~dpforam() {
+DPFORAM::~DPFORAM() {
     if (!isFirst) {
         delete pos_map;
         delete_mem(stash[0]);
@@ -299,7 +227,7 @@ dpforam::~dpforam() {
     delete_mem(rom[1]);
 }
 
-void dpforam::access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
+void DPFORAM::access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
                      bool isRead, uchar *rec_23[2]) {
     uint mask = ttp - 1;
     unsigned long addrPre_23[2];
@@ -333,12 +261,12 @@ void dpforam::access(const unsigned long addr_23[2], const uchar *const new_rec_
                         delta_rec_23[i]);
             }
         }
-        gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
-                        delta_block_23);
+        // gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
+        //                 delta_block_23);
 
         uint int_addrPre_23[2] = {(uint)addrPre_23[0], (uint)addrPre_23[1]};
-        gen_delta_array(int_addrPre_23, (uint)N, DBytes, delta_block_23,
-                        delta_rom_23);
+        // gen_delta_array(int_addrPre_23, (uint)N, DBytes, delta_block_23,
+        //                 delta_rom_23);
 
         for (uint i = 0; i < 2; i++) {
             for (unsigned long j = 0; j < N; j++) {
@@ -394,7 +322,7 @@ void dpforam::access(const unsigned long addr_23[2], const uchar *const new_rec_
               stash_fss_out);
 
     uchar indicator_23[2] = {stash_ptr_23[0][0], stash_ptr_23[1][0]};
-    obliv_select(rom_block_23, stash_block_23, indicator_23, block_23);
+    // obliv_select(rom_block_23, stash_block_23, indicator_23, block_23);
 
     rec_pir(addrSuf_23, block_23, rec_23);
     uchar *delta_rec_23[2];
@@ -408,8 +336,8 @@ void dpforam::access(const unsigned long addr_23[2], const uchar *const new_rec_
         }
         delta_block_23[i] = new uchar[DBytes];
     }
-    gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
-                    delta_block_23);
+    // gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
+    //                 delta_block_23);
 
     update_wom(delta_block_23, rom_fss_out);
     append_stash(block_23, delta_block_23);
@@ -426,7 +354,7 @@ void dpforam::access(const unsigned long addr_23[2], const uchar *const new_rec_
     }
 }
 
-void dpforam::print_metadata() {
+void DPFORAM::print_metadata() {
     std::cout << "===================" << std::endl;
     std::cout << "Party: " << party << std::endl;
     std::cout << "Last level: " << isLast << std::endl;
@@ -452,7 +380,7 @@ void dpforam::print_metadata() {
     }
 }
 
-void dpforam::test(uint iter) {
+void DPFORAM::test(uint iter) {
     unsigned long party_wc = 0;
     unsigned long wc;
 
