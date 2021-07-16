@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "cxxopts.hpp"
-#include "dpforam.h"
+#include "dpf_oram.h"
 #include "simple_socket.h"
 #include "util.h"
 

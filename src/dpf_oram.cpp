@@ -1,4 +1,4 @@
-#include "dpforam.h"
+#include "dpf_oram.h"
 
 #include <assert.h>
 #include <omp.h>

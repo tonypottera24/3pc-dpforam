@@ -9,7 +9,7 @@ Usage:
 $ cd build
 $ ./proto_test [OPTION...]
       --par arg    Party:[eddie|debbie|charlie]
-      --proto arg  Protocol:[dpforam|ssot|insert_label] (default: dpforam)
+      --proto arg  Protocol:[dpforam] (default: dpforam)
       --eip arg    Eddie's ip (default: 127.0.0.1)
       --dip arg    Debbie's ip (default: 127.0.0.1)
       --tau arg    Tau (default: 3)
