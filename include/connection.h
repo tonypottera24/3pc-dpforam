@@ -3,11 +3,11 @@
 
 #include "typedef.h"
 
-class connection {
+class Connection {
 public:
     unsigned long bandwidth = 0u;
 
-    virtual ~connection();
+    virtual ~Connection();
     virtual void init_server(int port) = 0;
     virtual void init_client(const char *ip, int port) = 0;
     virtual void set_no_delay() = 0;

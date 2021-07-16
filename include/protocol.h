@@ -9,14 +9,14 @@
 
 class protocol {
 protected:
-    connection **cons;
+    Connection **cons;
     CryptoPP::AutoSeededRandomPool *rnd;
     CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs;
 
 public:
     const char *party;
 
-    protocol(const char *party, connection *cons[2],
+    protocol(const char *party, Connection *cons[2],
              CryptoPP::AutoSeededRandomPool *rnd,
              CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs);
     virtual ~protocol();

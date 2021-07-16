@@ -47,6 +47,7 @@ void DPFORAM::delete_mem(uchar **mem) {
     delete[] mem;
 }
 
+// private
 void DPFORAM::block_pir(const unsigned long addr_23[2],
                         const uchar *const *const mem_23[2], unsigned long size, uchar *block_23[2],
                         uchar *fss_out[2]) {
@@ -182,7 +183,7 @@ void DPFORAM::wom_to_rom() {
     }
 }
 
-DPFORAM::DPFORAM(const char *party, connection *cons[2],
+DPFORAM::DPFORAM(const char *party, Connection *cons[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
                  uint logN, uint DBytes, bool isLast) : protocol(party, cons, rnd, prgs) {
