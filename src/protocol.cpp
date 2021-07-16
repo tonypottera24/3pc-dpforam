@@ -1,21 +1,18 @@
 #include "protocol.h"
 
-protocol::protocol(const char *party, connection *cons[2],
+Protocol::Protocol(const char *party, Connection *cons[2],
                    CryptoPP::AutoSeededRandomPool *rnd,
-                   CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs)
-{
+                   CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) {
     this->party = party;
     this->cons = cons;
     this->rnd = rnd;
     this->prgs = prgs;
 }
 
-protocol::~protocol()
-{
+Protocol::~Protocol() {
 }
 
-void protocol::sync()
-{
+void Protocol::sync() {
     uchar z = 0;
     cons[0]->write(&z, 1, false);
     cons[1]->write(&z, 1, false);
@@ -23,7 +20,6 @@ void protocol::sync()
     cons[1]->read(&z, 1);
 }
 
-unsigned long protocol::bandwidth()
-{
+unsigned long Protocol::bandwidth() {
     return cons[0]->bandwidth + cons[1]->bandwidth;
 }

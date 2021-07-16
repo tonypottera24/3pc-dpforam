@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    protocol *test_proto = NULL;
+    Protocol *test_proto = NULL;
     if (proto == "dpforam") {
         unsigned long init_wc = current_timestamp();
         test_proto = new DPFORAM(party.c_str(), cons, &rnd, prgs, tau, logN,

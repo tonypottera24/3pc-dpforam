@@ -186,7 +186,7 @@ void DPFORAM::wom_to_rom() {
 DPFORAM::DPFORAM(const char *party, Connection *cons[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
-                 uint logN, uint DBytes, bool isLast) : protocol(party, cons, rnd, prgs) {
+                 uint logN, uint DBytes, bool isLast) : Protocol(party, cons, rnd, prgs) {
     this->isLast = isLast;
     this->tau = isLast ? std::max(5 - (int)log2(DBytes), 0) : tau;
     this->logN = (logN <= this->tau || !isLast) ? logN : (logN - this->tau);

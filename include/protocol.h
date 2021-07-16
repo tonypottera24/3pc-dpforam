@@ -7,7 +7,7 @@
 
 #include "connection.h"
 
-class protocol {
+class Protocol {
 protected:
     Connection **cons;
     CryptoPP::AutoSeededRandomPool *rnd;
@@ -16,10 +16,10 @@ protected:
 public:
     const char *party;
 
-    protocol(const char *party, Connection *cons[2],
+    Protocol(const char *party, Connection *cons[2],
              CryptoPP::AutoSeededRandomPool *rnd,
              CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs);
-    virtual ~protocol();
+    virtual ~Protocol();
     void sync();
     unsigned long bandwidth();
     virtual void test(uint iter) = 0;

@@ -7,8 +7,8 @@
 using namespace std;
 
 int main() {
-    fss1bit generator;
-    fss1bit evaluators[2];
+    FSS1Bit generator;
+    FSS1Bit evaluators[2];
 
     for (uint m = 1; m <= 20; m++) {
         unsigned long range = 1ul << m;

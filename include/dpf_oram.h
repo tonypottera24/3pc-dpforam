@@ -4,9 +4,9 @@
 #include "fss.h"
 #include "protocol.h"
 
-class DPFORAM : public protocol {
+class DPFORAM : public Protocol {
 private:
-    static fss1bit fss;
+    static FSS1Bit fss;
     uchar **rom[2];
     uchar **wom;
     uchar **stash[2];
@@ -42,7 +42,7 @@ private:
     void wom_to_rom();
 
 public:
-    DPFORAM(const char *party, connection *cons[2],
+    DPFORAM(const char *party, Connection *cons[2],
             CryptoPP::AutoSeededRandomPool *rnd,
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
             uint logN, uint DBytes, bool isLast);
