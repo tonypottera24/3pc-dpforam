@@ -1,9 +1,11 @@
 #ifndef SIMPLE_SOCKET_H_
 #define SIMPLE_SOCKET_H_
 
+#include <stdio.h>
+
 #include "connection.h"
 
-class simple_socket : public Connection {
+class SimpleSocket : public Connection {
 private:
     int socket_fd;
     FILE *stream;

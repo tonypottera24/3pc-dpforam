@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     omp_set_num_threads(threads);
     int port = 8000;
 
-    Connection *cons[2] = {new simple_socket(), new simple_socket()};
+    Connection *cons[2] = {new SimpleSocket(), new SimpleSocket()};
     AutoSeededRandomPool rnd;
     CTR_Mode<AES>::Encryption prgs[2];
     uchar bytes[96];
