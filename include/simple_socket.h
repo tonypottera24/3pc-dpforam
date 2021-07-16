@@ -14,10 +14,10 @@ private:
     void set_stream();
 
 public:
-    void init_server(int port);
-    void init_client(const char *ip, int port);
+    void InitServer(int port);
+    void InitClient(const char *ip, int port);
     void set_no_delay();
-    void write(const uchar *data, unsigned long bytes, bool count_band = true);
+    void Write(const uchar *data, unsigned long bytes, bool count_band = true);
     void read(uchar *data, unsigned long bytes);
     // void fwrite(const uchar *data, unsigned long bytes, bool count_band = true);
     // void fread(uchar *data, unsigned long bytes);

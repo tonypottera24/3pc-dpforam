@@ -8,10 +8,10 @@ public:
     unsigned long bandwidth = 0u;
 
     virtual ~Connection();
-    virtual void init_server(int port) = 0;
-    virtual void init_client(const char *ip, int port) = 0;
+    virtual void InitServer(int port) = 0;
+    virtual void InitClient(const char *ip, int port) = 0;
     virtual void set_no_delay() = 0;
-    virtual void write(const uchar *data, unsigned long bytes,
+    virtual void Write(const uchar *data, unsigned long bytes,
                        bool count_band = true) = 0;
     virtual void read(uchar *data, unsigned long bytes) = 0;
     // virtual void fwrite(const uchar *data, unsigned long bytes,
@@ -19,10 +19,10 @@ public:
     // virtual void fread(uchar *data, unsigned long bytes) = 0;
     virtual void flush() = 0;
     virtual void close() = 0;
-    void write_int(int n, bool count_band = true);
-    int read_int();
-    void write_long(long n, bool count_band = true);
-    long read_long();
+    void WriteInt(int n, bool count_band = true);
+    int ReadInt();
+    void WriteLong(long n, bool count_band = true);
+    long ReadLong();
 };
 
 #endif /* CONNECTION_H_ */

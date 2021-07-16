@@ -24,50 +24,50 @@ void SimpleSocket::set_stream() {
     setvbuf(stream, buffer, _IOFBF, BUFF_BYTES);
 }
 
-void SimpleSocket::init_server(int port) {
+void SimpleSocket::InitServer(int port) {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
-        error("init_server: socket failed");
+        error("InitServer: socket failed");
     }
     int opt = 1;
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-        error("init_server: setsockopt failed");
+        error("InitServer: setsockopt failed");
     }
     struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port);
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        error("init_server: bind failed");
+        error("InitServer: bind failed");
     }
     if (listen(server_fd, 1) < 0) {
-        error("init_server: listen failed");
+        error("InitServer: listen failed");
     }
     int addr_len = sizeof(address);
     socket_fd = accept(server_fd, (struct sockaddr *)&address,
                        (socklen_t *)&addr_len);
     if (socket_fd < 0) {
-        error("init_server: accept failed");
+        error("InitServer: accept failed");
     }
     ::close(server_fd);
     set_stream();
     set_no_delay();
 }
 
-void SimpleSocket::init_client(const char *ip, int port) {
+void SimpleSocket::InitClient(const char *ip, int port) {
     socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_fd < 0) {
-        error("init_client: socket failed");
+        error("InitClient: socket failed");
     }
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
     if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
-        error("init_client: inet_pton failed");
+        error("InitClient: inet_pton failed");
     }
     if (connect(socket_fd, (struct sockaddr *)&server_addr,
                 sizeof(server_addr)) < 0) {
-        error("init_client: connect failed");
+        error("InitClient: connect failed");
     }
     set_stream();
     set_no_delay();
@@ -80,7 +80,7 @@ void SimpleSocket::set_no_delay() {
     }
 }
 
-void SimpleSocket::write(const uchar *data, unsigned long bytes, bool count_band) {
+void SimpleSocket::Write(const uchar *data, unsigned long bytes, bool count_band) {
     long write_bytes;
     unsigned long offset = 0ul;
     while (offset < bytes) {

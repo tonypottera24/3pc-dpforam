@@ -53,8 +53,8 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
                        uchar *fss_out[2]) {
     uchar *keys[2];
     uint keyBytes = fss.gen(addr_23[0] ^ addr_23[1], logN, keys);
-    cons[0]->write(keys[0], keyBytes);
-    cons[1]->write(keys[1], keyBytes);
+    cons[0]->Write(keys[0], keyBytes);
+    cons[1]->Write(keys[1], keyBytes);
     cons[0]->read(keys[1], keyBytes);
     cons[1]->read(keys[0], keyBytes);
 
@@ -100,7 +100,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
         }
     }
 
-    cons[0]->write(block_23[0], DBytes);
+    cons[0]->Write(block_23[0], DBytes);
     cons[1]->read(block_23[1], DBytes);
 
     delete[] keys[0];
@@ -111,8 +111,8 @@ void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
                      uchar *rec_23[2]) {
     uchar *keys[2];
     uint keyBytes = fss.gen(idx_23[0] ^ idx_23[1], tau, keys);
-    cons[0]->write(keys[0], keyBytes);
-    cons[1]->write(keys[1], keyBytes);
+    cons[0]->Write(keys[0], keyBytes);
+    cons[1]->Write(keys[1], keyBytes);
     cons[0]->read(keys[1], keyBytes);
     cons[1]->read(keys[0], keyBytes);
 
@@ -128,7 +128,7 @@ void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
         }
     }
 
-    cons[0]->write(rec_23[0], nextLogNBytes);
+    cons[0]->Write(rec_23[0], nextLogNBytes);
     cons[1]->read(rec_23[1], nextLogNBytes);
 
     delete[] keys[0];
@@ -173,7 +173,7 @@ void DPFORAM::WOM2ROM() {
         memcpy(rom[0][i], wom[i], DBytes);
     }
     for (unsigned long i = 0; i < N; i++) {
-        cons[0]->write(wom[i], DBytes);
+        cons[0]->Write(wom[i], DBytes);
         //		cons[0]->fwrite(wom[i], DBytes);
     }
     //	cons[0]->flush();
@@ -402,15 +402,15 @@ void DPFORAM::Test(uint iter) {
     memset(rec_exp, 0, nextLogNBytes * sizeof(uchar));
     if (strcmp(party, "eddie") == 0) {
         addr_23[0] = rand_long(range);
-        cons[0]->write_long(addr_23[0], false);
+        cons[0]->WriteLong(addr_23[0], false);
     } else if (strcmp(party, "debbie") == 0) {
-        addr_23[1] = cons[1]->read_long();
+        addr_23[1] = cons[1]->ReadLong();
     }
 
     for (uint t = 0; t < iter; t++) {
         if (strcmp(party, "eddie") == 0) {
             rnd->GenerateBlock(new_rec_23[0], nextLogNBytes);
-            cons[0]->write(new_rec_23[0], nextLogNBytes, false);
+            cons[0]->Write(new_rec_23[0], nextLogNBytes, false);
 
             sync();
             wc = current_timestamp();
@@ -439,7 +439,7 @@ void DPFORAM::Test(uint iter) {
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
 
-            cons[1]->write(rec_23[0], nextLogNBytes, false);
+            cons[1]->Write(rec_23[0], nextLogNBytes, false);
         } else if (strcmp(party, "charlie") == 0) {
             sync();
             wc = current_timestamp();
@@ -456,17 +456,17 @@ void DPFORAM::Test(uint iter) {
     }
 
     unsigned long party_band = bandwidth();
-    cons[0]->write_long(party_band, false);
-    cons[1]->write_long(party_band, false);
+    cons[0]->WriteLong(party_band, false);
+    cons[1]->WriteLong(party_band, false);
     unsigned long total_band = party_band;
-    total_band += (unsigned long)cons[0]->read_long();
-    total_band += (unsigned long)cons[1]->read_long();
+    total_band += (unsigned long)cons[0]->ReadLong();
+    total_band += (unsigned long)cons[1]->ReadLong();
 
-    cons[0]->write_long(party_wc, false);
-    cons[1]->write_long(party_wc, false);
+    cons[0]->WriteLong(party_wc, false);
+    cons[1]->WriteLong(party_wc, false);
     unsigned long max_wc = party_wc;
-    max_wc = std::max(max_wc, (unsigned long)cons[0]->read_long());
-    max_wc = std::max(max_wc, (unsigned long)cons[1]->read_long());
+    max_wc = std::max(max_wc, (unsigned long)cons[0]->ReadLong());
+    max_wc = std::max(max_wc, (unsigned long)cons[1]->ReadLong());
 
     std::cout << std::endl;
     std::cout << "Party Bandwidth(byte): " << (party_band / iter) << std::endl;

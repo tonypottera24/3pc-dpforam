@@ -51,33 +51,33 @@ int main(int argc, char *argv[]) {
 
     if (party == "eddie") {
         cout << "Establishing connection with debbie... " << flush;
-        cons[0]->init_server(port);
+        cons[0]->InitServer(port);
         cout << "done" << endl;
 
         cout << "Establishing connection with charlie... " << flush;
-        cons[1]->init_server(port + 1);
+        cons[1]->InitServer(port + 1);
         cout << "done" << endl;
 
         prgs[0].SetKeyWithIV(bytes + offset_DE, 16, bytes + offset_DE + 16);
         prgs[1].SetKeyWithIV(bytes + offset_CE, 16, bytes + offset_CE + 16);
     } else if (party == "debbie") {
         cout << "Connecting with eddie... " << flush;
-        cons[1]->init_client(eddie_ip.c_str(), port);
+        cons[1]->InitClient(eddie_ip.c_str(), port);
         cout << "done" << endl;
 
         cout << "Establishing connection with charlie... " << flush;
-        cons[0]->init_server(port + 2);
+        cons[0]->InitServer(port + 2);
         cout << "done" << endl;
 
         prgs[0].SetKeyWithIV(bytes + offset_CD, 16, bytes + offset_CD + 16);
         prgs[1].SetKeyWithIV(bytes + offset_DE, 16, bytes + offset_DE + 16);
     } else if (party == "charlie") {
         cout << "Connecting with eddie... " << flush;
-        cons[0]->init_client(eddie_ip.c_str(), port + 1);
+        cons[0]->InitClient(eddie_ip.c_str(), port + 1);
         cout << "done" << endl;
 
         cout << "Connecting with debbie... " << flush;
-        cons[1]->init_client(debbie_ip.c_str(), port + 2);
+        cons[1]->InitClient(debbie_ip.c_str(), port + 2);
         cout << "done" << endl;
 
         prgs[0].SetKeyWithIV(bytes + offset_CE, 16, bytes + offset_CE + 16);

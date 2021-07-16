@@ -14,8 +14,8 @@ Protocol::~Protocol() {
 
 void Protocol::sync() {
     uchar z = 0;
-    cons[0]->write(&z, 1, false);
-    cons[1]->write(&z, 1, false);
+    cons[0]->Write(&z, 1, false);
+    cons[1]->Write(&z, 1, false);
     cons[0]->read(&z, 1);
     cons[1]->read(&z, 1);
 }
