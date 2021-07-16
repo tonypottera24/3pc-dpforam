@@ -27,7 +27,7 @@ public:
 
 private:
     void init();
-    void init_ctr();
+    void InitCtr();
     void set_zero(uchar **mem);
     void init_mem(uchar **&mem);
     void delete_mem(uchar **mem);

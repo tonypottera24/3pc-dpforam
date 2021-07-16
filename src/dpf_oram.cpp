@@ -10,7 +10,7 @@
 FSS1Bit DPFORAM::fss;
 
 void DPFORAM::init() {
-    init_ctr();
+    InitCtr();
     set_zero(rom[0]);
     set_zero(rom[1]);
     set_zero(wom);
@@ -19,7 +19,7 @@ void DPFORAM::init() {
     }
 }
 
-void DPFORAM::init_ctr() {
+void DPFORAM::InitCtr() {
     stash_ctr = 1;
 }
 
@@ -158,7 +158,7 @@ void DPFORAM::append_stash(const uchar *const block_23[2],
     }
     stash_ctr++;
     if (stash_ctr == N) {
-        init_ctr();
+        InitCtr();
         wom_to_rom();
         pos_map->init();
     }
@@ -210,7 +210,7 @@ DPFORAM::DPFORAM(const char *party, Connection *cons[2],
         pos_map = new DPFORAM(party, cons, rnd, prgs, tau, this->logN - tau, 0,
                               false);
     }
-    init_ctr();
+    InitCtr();
 
     if (isLast) {
         init();
