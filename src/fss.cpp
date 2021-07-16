@@ -72,7 +72,7 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key);
 }
 
-uint FSS1Bit::gen(unsigned long alpha, uint m, uchar *keys[2]) {
+uint FSS1Bit::Gen(unsigned long alpha, uint m, uchar *keys[2]) {
     return GEN(&aes_key, alpha, m, keys, keys + 1);
 }
 
@@ -90,8 +90,8 @@ void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
     free(res);
 }
 
-void FSS1Bit::eval_all_with_perm(const uchar *key, uint m, unsigned long perm,
-                                 uchar *out) {
+void FSS1Bit::EvalAllWithPerm(const uchar *key, uint m, unsigned long perm,
+                              uchar *out) {
     block *res = EVALFULL(&aes_key, key);
     unsigned long *ptr = (unsigned long *)res;
     uint index_perm = perm & 63;

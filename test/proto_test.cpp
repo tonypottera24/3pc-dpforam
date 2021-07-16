@@ -101,9 +101,9 @@ int main(int argc, char *argv[]) {
     }
 
     if (test_proto != NULL) {
-        test_proto->sync();
+        test_proto->Sync();
         test_proto->Test(iters);
-        test_proto->sync();
+        test_proto->Sync();
         delete test_proto;
     }
 

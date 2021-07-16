@@ -52,7 +52,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
                        const uchar *const *const mem_23[2], unsigned long size, uchar *block_23[2],
                        uchar *fss_out[2]) {
     uchar *keys[2];
-    uint keyBytes = fss.gen(addr_23[0] ^ addr_23[1], logN, keys);
+    uint keyBytes = fss.Gen(addr_23[0] ^ addr_23[1], logN, keys);
     cons[0]->Write(keys[0], keyBytes);
     cons[1]->Write(keys[1], keyBytes);
     cons[0]->Read(keys[1], keyBytes);
@@ -64,7 +64,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
 
     if (omp_get_max_threads() == 1) {
         for (uint i = 0; i < 2; i++) {
-            fss.eval_all_with_perm(keys[i], logN, addr_23[i], fss_out[i]);
+            fss.EvalAllWithPerm(keys[i], logN, addr_23[i], fss_out[i]);
             for (unsigned long j = 0; j < size; j++) {
                 //				if (fss_out[i][j])
                 {
@@ -78,7 +78,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
         {
 #pragma omp for
             for (uint i = 0; i < 2; i++) {
-                fss.eval_all_with_perm(keys[i], logN, addr_23[i], fss_out[i]);
+                fss.EvalAllWithPerm(keys[i], logN, addr_23[i], fss_out[i]);
             }
 
             uchar tmp[DBytes];
@@ -110,7 +110,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
 void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
                      uchar *rec_23[2]) {
     uchar *keys[2];
-    uint keyBytes = fss.gen(idx_23[0] ^ idx_23[1], tau, keys);
+    uint keyBytes = fss.Gen(idx_23[0] ^ idx_23[1], tau, keys);
     cons[0]->Write(keys[0], keyBytes);
     cons[1]->Write(keys[1], keyBytes);
     cons[0]->Read(keys[1], keyBytes);
@@ -412,7 +412,7 @@ void DPFORAM::Test(uint iter) {
             rnd->GenerateBlock(new_rec_23[0], nextLogNBytes);
             cons[0]->Write(new_rec_23[0], nextLogNBytes, false);
 
-            sync();
+            Sync();
             wc = current_timestamp();
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
@@ -434,14 +434,14 @@ void DPFORAM::Test(uint iter) {
         } else if (strcmp(party, "debbie") == 0) {
             cons[1]->Read(new_rec_23[1], nextLogNBytes);
 
-            sync();
+            Sync();
             wc = current_timestamp();
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
 
             cons[1]->Write(rec_23[0], nextLogNBytes, false);
         } else if (strcmp(party, "charlie") == 0) {
-            sync();
+            Sync();
             wc = current_timestamp();
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
@@ -455,7 +455,7 @@ void DPFORAM::Test(uint iter) {
         delete[] new_rec_23[i];
     }
 
-    unsigned long party_band = bandwidth();
+    unsigned long party_band = Bandwidth();
     cons[0]->WriteLong(party_band, false);
     cons[1]->WriteLong(party_band, false);
     unsigned long total_band = party_band;

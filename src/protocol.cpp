@@ -12,7 +12,7 @@ Protocol::Protocol(const char *party, Connection *cons[2],
 Protocol::~Protocol() {
 }
 
-void Protocol::sync() {
+void Protocol::Sync() {
     uchar z = 0;
     cons[0]->Write(&z, 1, false);
     cons[1]->Write(&z, 1, false);
@@ -20,6 +20,6 @@ void Protocol::sync() {
     cons[1]->Read(&z, 1);
 }
 
-unsigned long Protocol::bandwidth() {
+unsigned long Protocol::Bandwidth() {
     return cons[0]->bandwidth + cons[1]->bandwidth;
 }
