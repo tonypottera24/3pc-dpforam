@@ -63,7 +63,7 @@ void to_byte_vector_with_perm(unsigned long input, uchar *output, uint size,
     //#endif
 }
 
-fss1bit::fss1bit() {
+FSS1Bit::FSS1Bit() {
     long long userkey1 = 597349;
     long long userkey2 = 121379;
     block userkey = dpf_make_block(userkey1, userkey2);
@@ -72,11 +72,11 @@ fss1bit::fss1bit() {
     AES_set_encrypt_key(userkey, &aes_key);
 }
 
-uint fss1bit::gen(unsigned long alpha, uint m, uchar *keys[2]) {
+uint FSS1Bit::gen(unsigned long alpha, uint m, uchar *keys[2]) {
     return GEN(&aes_key, alpha, m, keys, keys + 1);
 }
 
-void fss1bit::eval_all(const uchar *key, uint m, uchar *out) {
+void FSS1Bit::eval_all(const uchar *key, uint m, uchar *out) {
     block *res = EVALFULL(&aes_key, key);
     if (m <= 6) {
         to_byte_vector(((unsigned long *)res)[0], out, (1 << m));
@@ -90,7 +90,7 @@ void fss1bit::eval_all(const uchar *key, uint m, uchar *out) {
     free(res);
 }
 
-void fss1bit::eval_all_with_perm(const uchar *key, uint m, unsigned long perm,
+void FSS1Bit::eval_all_with_perm(const uchar *key, uint m, unsigned long perm,
                                  uchar *out) {
     block *res = EVALFULL(&aes_key, key);
     unsigned long *ptr = (unsigned long *)res;

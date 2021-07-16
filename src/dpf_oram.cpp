@@ -7,7 +7,7 @@
 
 #include "util.h"
 
-fss1bit DPFORAM::fss;
+FSS1Bit DPFORAM::fss;
 
 void DPFORAM::init() {
     init_ctr();
