@@ -6,7 +6,7 @@
 
 class FSS1Bit {
 private:
-    AES_KEY aes_key;
+    AES_KEY aes_key_;
 
 public:
     FSS1Bit();

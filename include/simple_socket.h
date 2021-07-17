@@ -7,8 +7,8 @@
 
 class SimpleSocket : public Connection {
 private:
-    int socket_fd;
-    FILE *stream;
+    int socket_fd_;
+    FILE *stream_;
     char *buffer_;
 
     void SetStream();

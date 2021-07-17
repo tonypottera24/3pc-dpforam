@@ -69,15 +69,15 @@ FSS1Bit::FSS1Bit() {
     block userkey = dpf_make_block(userkey1, userkey2);
     uchar seed[] = "abcdefghijklmnop";
     dpf_seed((block *)seed);
-    AES_set_encrypt_key(userkey, &aes_key);
+    AES_set_encrypt_key(userkey, &aes_key_);
 }
 
 uint FSS1Bit::Gen(unsigned long alpha, uint m, uchar *keys[2]) {
-    return GEN(&aes_key, alpha, m, keys, keys + 1);
+    return GEN(&aes_key_, alpha, m, keys, keys + 1);
 }
 
 void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
-    block *res = EVALFULL(&aes_key, key);
+    block *res = EVALFULL(&aes_key_, key);
     if (m <= 6) {
         to_byte_vector(((unsigned long *)res)[0], out, (1 << m));
     } else {
@@ -92,7 +92,7 @@ void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
 
 void FSS1Bit::EvalAllWithPerm(const uchar *key, uint m, unsigned long perm,
                               uchar *out) {
-    block *res = EVALFULL(&aes_key, key);
+    block *res = EVALFULL(&aes_key_, key);
     unsigned long *ptr = (unsigned long *)res;
     uint index_perm = perm & 63;
     if (m <= 6) {

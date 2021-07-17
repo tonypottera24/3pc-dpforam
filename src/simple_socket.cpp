@@ -18,10 +18,10 @@ void error(const char *msg) {
 }
 
 void SimpleSocket::SetStream() {
-    stream = fdopen(socket_fd, "wb+");
+    stream_ = fdopen(socket_fd_, "wb+");
     buffer_ = new char[BUFF_BYTES];
     memset(buffer_, 0, BUFF_BYTES);
-    setvbuf(stream, buffer_, _IOFBF, BUFF_BYTES);
+    setvbuf(stream_, buffer_, _IOFBF, BUFF_BYTES);
 }
 
 void SimpleSocket::InitServer(int port) {
@@ -44,9 +44,9 @@ void SimpleSocket::InitServer(int port) {
         error("InitServer: listen failed");
     }
     int addr_len = sizeof(address);
-    socket_fd = accept(server_fd, (struct sockaddr *)&address,
-                       (socklen_t *)&addr_len);
-    if (socket_fd < 0) {
+    socket_fd_ = accept(server_fd, (struct sockaddr *)&address,
+                        (socklen_t *)&addr_len);
+    if (socket_fd_ < 0) {
         error("InitServer: accept failed");
     }
     ::close(server_fd);
@@ -55,8 +55,8 @@ void SimpleSocket::InitServer(int port) {
 }
 
 void SimpleSocket::InitClient(const char *ip, int port) {
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd < 0) {
+    socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd_ < 0) {
         error("InitClient: socket failed");
     }
     struct sockaddr_in server_addr;
@@ -65,7 +65,7 @@ void SimpleSocket::InitClient(const char *ip, int port) {
     if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
         error("InitClient: inet_pton failed");
     }
-    if (connect(socket_fd, (struct sockaddr *)&server_addr,
+    if (connect(socket_fd_, (struct sockaddr *)&server_addr,
                 sizeof(server_addr)) < 0) {
         error("InitClient: connect failed");
     }
@@ -75,7 +75,7 @@ void SimpleSocket::InitClient(const char *ip, int port) {
 
 void SimpleSocket::SetNoDelay() {
     int opt = 1;
-    if (setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)) < 0) {
+    if (setsockopt(socket_fd_, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)) < 0) {
         error("SetNoDelay: setsockopt failed");
     }
 }
@@ -84,7 +84,7 @@ void SimpleSocket::Write(const uchar *data, unsigned long bytes, bool count_band
     long write_bytes;
     unsigned long offset = 0ul;
     while (offset < bytes) {
-        write_bytes = ::write(socket_fd, data + offset, bytes - offset);
+        write_bytes = ::write(socket_fd_, data + offset, bytes - offset);
         if (write_bytes < 0) {
             error("write failed");
         }
@@ -99,7 +99,7 @@ void SimpleSocket::Read(uchar *data, unsigned long bytes) {
     long read_bytes;
     unsigned long offset = 0ul;
     while (offset < bytes) {
-        read_bytes = ::read(socket_fd, data + offset, bytes - offset);
+        read_bytes = ::read(socket_fd_, data + offset, bytes - offset);
         if (read_bytes < 0) {
             error("read failed");
         }
@@ -144,11 +144,11 @@ void SimpleSocket::Read(uchar *data, unsigned long bytes) {
 // }
 
 void SimpleSocket::Flush() {
-    fflush(stream);
+    fflush(stream_);
 }
 
 void SimpleSocket::Close() {
-    fclose(stream);
+    fclose(stream_);
     delete[] buffer_;
-    ::close(socket_fd);
+    ::close(socket_fd_);
 }
