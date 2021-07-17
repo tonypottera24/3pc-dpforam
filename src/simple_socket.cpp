@@ -91,7 +91,7 @@ void SimpleSocket::Write(const uchar *data, unsigned long bytes, bool count_band
         offset += write_bytes;
     }
     if (count_band) {
-        bandwidth += bytes;
+        bandwidth_ += bytes;
     }
 }
 

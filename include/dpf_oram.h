@@ -1,29 +1,29 @@
 #ifndef DPFORAM_H_
 #define DPFORAM_H_
 
-#include "fss.h"
+#include "fss1bit.h"
 #include "protocol.h"
 
 class DPFORAM : public Protocol {
 private:
-    static FSS1Bit fss;
-    uchar **rom[2];
-    uchar **wom;
-    uchar **stash[2];
-    DPFORAM *pos_map;
-    unsigned long stash_ctr;
+    static FSS1Bit fss_;
+    uchar **rom_[2];
+    uchar **wom_;
+    uchar **stash_[2];
+    DPFORAM *pos_map_;
+    unsigned long stash_ctr_;
 
 public:
-    uint logN;
-    uint logNBytes;
-    uint nextLogN;
-    uint nextLogNBytes;
-    uint tau;
-    uint ttp;
-    uint DBytes;
-    unsigned long N;
-    bool isFirst;
-    bool isLast;
+    uint log_n_;
+    uint log_n_bytes_;
+    uint next_log_n_;
+    uint next_log_n_bytes_;
+    uint tau_;
+    uint ttp_;
+    uint d_bytes_;
+    unsigned long n_;
+    bool is_first_;
+    bool is_last_;
 
 private:
     void Init();

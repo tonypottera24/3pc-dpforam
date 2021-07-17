@@ -5,7 +5,7 @@
 
 class Connection {
 public:
-    unsigned long bandwidth = 0u;
+    unsigned long bandwidth_ = 0u;
 
     virtual ~Connection();
     virtual void InitServer(int port) = 0;

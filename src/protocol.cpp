@@ -21,5 +21,5 @@ void Protocol::Sync() {
 }
 
 unsigned long Protocol::Bandwidth() {
-    return cons_[0]->bandwidth + cons_[1]->bandwidth;
+    return cons_[0]->bandwidth_ + cons_[1]->bandwidth_;
 }

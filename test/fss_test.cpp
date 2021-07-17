@@ -1,7 +1,6 @@
-#include "fss.h"
-
 #include <iostream>
 
+#include "fss1bit.h"
 #include "util.h"
 
 using namespace std;
