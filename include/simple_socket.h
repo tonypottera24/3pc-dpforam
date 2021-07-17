@@ -9,9 +9,9 @@ class SimpleSocket : public Connection {
 private:
     int socket_fd;
     FILE *stream;
-    char *buffer;
+    char *buffer_;
 
-    void set_stream();
+    void SetStream();
 
 public:
     void InitServer(int port);

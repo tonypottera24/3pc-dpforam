@@ -9,12 +9,12 @@
 
 class Protocol {
 protected:
-    Connection **cons;
-    CryptoPP::AutoSeededRandomPool *rnd;
-    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs;
+    Connection **cons_;
+    CryptoPP::AutoSeededRandomPool *rnd_;
+    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs_;
 
 public:
-    const char *party;
+    const char *kParty;
 
     Protocol(const char *party, Connection *cons[2],
              CryptoPP::AutoSeededRandomPool *rnd,

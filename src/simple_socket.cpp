@@ -17,11 +17,11 @@ void error(const char *msg) {
     exit(EXIT_FAILURE);
 }
 
-void SimpleSocket::set_stream() {
+void SimpleSocket::SetStream() {
     stream = fdopen(socket_fd, "wb+");
-    buffer = new char[BUFF_BYTES];
-    memset(buffer, 0, BUFF_BYTES);
-    setvbuf(stream, buffer, _IOFBF, BUFF_BYTES);
+    buffer_ = new char[BUFF_BYTES];
+    memset(buffer_, 0, BUFF_BYTES);
+    setvbuf(stream, buffer_, _IOFBF, BUFF_BYTES);
 }
 
 void SimpleSocket::InitServer(int port) {
@@ -50,7 +50,7 @@ void SimpleSocket::InitServer(int port) {
         error("InitServer: accept failed");
     }
     ::close(server_fd);
-    set_stream();
+    SetStream();
     SetNoDelay();
 }
 
@@ -69,7 +69,7 @@ void SimpleSocket::InitClient(const char *ip, int port) {
                 sizeof(server_addr)) < 0) {
         error("InitClient: connect failed");
     }
-    set_stream();
+    SetStream();
     SetNoDelay();
 }
 
@@ -149,6 +149,6 @@ void SimpleSocket::Flush() {
 
 void SimpleSocket::Close() {
     fclose(stream);
-    delete[] buffer;
+    delete[] buffer_;
     ::close(socket_fd);
 }
