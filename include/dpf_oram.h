@@ -9,9 +9,9 @@ private:
     static FSS1Bit fss_;
     uchar **rom_[2];
     uchar **wom_;
-    uchar **stash_[2];
+    uchar **cache_[2];
     DPFORAM *pos_map_;
-    unsigned long stash_ctr_;
+    unsigned long cache_ctr_;
 
 public:
     uint log_n_;
@@ -20,15 +20,15 @@ public:
     uint next_log_n_bytes_;
     uint tau_;
     uint ttp_;
-    uint d_bytes_;
+    uint data_bytes_;
     unsigned long n_;
     bool is_first_;
     bool is_last_;
 
 private:
     void Init();
-    void InitCtr();
-    void SetZero(uchar **mem);
+    void InitCacheCtr();
+    void SetMemZero(uchar **mem);
     void InitMem(uchar **&mem);
     void DeleteMem(uchar **mem);
     void BlockPIR(const unsigned long addr_23[2], const uchar *const *const mem_23[2],
@@ -37,7 +37,7 @@ private:
                 uchar *rec_23[2]);
     void UpdateWOM(const uchar *const delta_block_23[2],
                    const uchar *const fss_out[2]);
-    void AppendStash(const uchar *const block_23[2],
+    void AppendCache(const uchar *const block_23[2],
                      const uchar *const delta_block_23[2]);
     void WOM2ROM();
 
