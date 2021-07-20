@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
     string eddie_ip = result["eip"].as<string>();
     string debbie_ip = result["dip"].as<string>();
     uint tau = result["tau"].as<uint>();
-    uint logN = result["logn"].as<uint>();
-    uint DBytes = result["db"].as<uint>();
+    uint log_n = result["logn"].as<uint>();
+    uint d_bytes = result["db"].as<uint>();
     uint threads = result["thr"].as<uint>();
     uint iters = result["iter"].as<uint>();
 
@@ -92,8 +92,8 @@ int main(int argc, char *argv[]) {
     Protocol *test_proto = NULL;
     if (proto == "dpforam") {
         unsigned long init_wc = current_timestamp();
-        test_proto = new DPFORAM(party.c_str(), cons, &rnd, prgs, tau, logN,
-                                 DBytes, true);
+        test_proto = new DPFORAM(party.c_str(), cons, &rnd, prgs, tau, log_n,
+                                 d_bytes, true);
         init_wc = current_timestamp() - init_wc;
         std::cout << "Init Wallclock(microsec): " << init_wc << std::endl;
     } else {

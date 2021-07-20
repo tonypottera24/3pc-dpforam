@@ -14,12 +14,12 @@ Protocol::~Protocol() {
 
 void Protocol::Sync() {
     uchar z = 0;
-    cons_[0]->Write(&z, 1, false);
-    cons_[1]->Write(&z, 1, false);
-    cons_[0]->Read(&z, 1);
-    cons_[1]->Read(&z, 1);
+    this->cons_[0]->Write(&z, 1, false);
+    this->cons_[1]->Write(&z, 1, false);
+    this->cons_[0]->Read(&z, 1);
+    this->cons_[1]->Read(&z, 1);
 }
 
 unsigned long Protocol::Bandwidth() {
-    return cons_[0]->bandwidth_ + cons_[1]->bandwidth_;
+    return this->cons_[0]->bandwidth_ + this->cons_[1]->bandwidth_;
 }

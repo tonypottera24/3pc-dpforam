@@ -58,13 +58,13 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
     cons_[0]->Read(keys[1], keyBytes);
     cons_[1]->Read(keys[0], keyBytes);
 
-    uint quo = d_bytes_ / 16;
-    uint rem = d_bytes_ % 16;
-    memset(block_23[0], 0, d_bytes_);
+    uint quo = this->d_bytes_ / 16;
+    uint rem = this->d_bytes_ % 16;
+    memset(block_23[0], 0, this->d_bytes_);
 
     if (omp_get_max_threads() == 1) {
         for (uint i = 0; i < 2; i++) {
-            fss_.EvalAllWithPerm(keys[i], log_n_, addr_23[i], fss_out[i]);
+            this->fss_.EvalAllWithPerm(keys[i], log_n_, addr_23[i], fss_out[i]);
             for (unsigned long j = 0; j < size; j++) {
                 //				if (fss_out[i][j])
                 {
@@ -78,7 +78,7 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
         {
 #pragma omp for
             for (uint i = 0; i < 2; i++) {
-                fss_.EvalAllWithPerm(keys[i], log_n_, addr_23[i], fss_out[i]);
+                this->fss_.EvalAllWithPerm(keys[i], log_n_, addr_23[i], fss_out[i]);
             }
 
             uchar tmp[d_bytes_];
@@ -186,55 +186,55 @@ void DPFORAM::WOM2ROM() {
 DPFORAM::DPFORAM(const char *party, Connection *cons[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
-                 uint logN, uint DBytes, bool isLast) : Protocol(party, cons, rnd, prgs) {
-    this->is_last_ = isLast;
-    this->tau_ = isLast ? std::max(5 - (int)log2(DBytes), 0) : tau;
-    this->log_n_ = (logN <= this->tau_ || !isLast) ? logN : (logN - this->tau_);
-    ttp_ = 1 << this->tau_;
-    log_n_bytes_ = (this->log_n_ + 7) / 8 + 1;
-    next_log_n_ = isLast ? 0 : logN + tau;
-    next_log_n_bytes_ = isLast ? DBytes : (next_log_n_ + 7) / 8 + 1;
-    this->d_bytes_ = next_log_n_bytes_ * ttp_;
-    n_ = 1ul << this->log_n_;
-    is_first_ = this->log_n_ < 2 * tau;
+                 uint logN, uint d_bytes, bool is_last) : Protocol(party, cons, rnd, prgs) {
+    this->is_last_ = is_last;
+    this->tau_ = is_last ? std::max(5 - (int)log2(d_bytes), 0) : tau;
+    this->log_n_ = (logN <= this->tau_ || !is_last) ? logN : (logN - this->tau_);
+    this->ttp_ = 1 << this->tau_;
+    this->log_n_bytes_ = (this->log_n_ + 7) / 8 + 1;
+    this->next_log_n_ = is_last ? 0 : logN + tau;
+    this->next_log_n_bytes_ = is_last ? d_bytes : (this->next_log_n_ + 7) / 8 + 1;
+    this->d_bytes_ = this->next_log_n_bytes_ * ttp_;
+    this->n_ = 1ul << this->log_n_;
+    this->is_first_ = this->log_n_ < 2 * tau;
 
-    InitMem(rom_[0]);
-    InitMem(rom_[1]);
+    InitMem(this->rom_[0]);
+    InitMem(this->rom_[1]);
     if (is_first_) {
-        wom_ = NULL;
-        pos_map_ = NULL;
+        this->wom_ = NULL;
+        this->pos_map_ = NULL;
     } else {
-        InitMem(wom_);
-        InitMem(stash_[0]);
-        InitMem(stash_[1]);
-        pos_map_ = new DPFORAM(party, cons, rnd, prgs, tau, this->log_n_ - tau, 0,
-                               false);
+        InitMem(this->wom_);
+        InitMem(this->stash_[0]);
+        InitMem(this->stash_[1]);
+        this->pos_map_ = new DPFORAM(party, cons, rnd, prgs, tau, this->log_n_ - tau, 0,
+                                     false);
     }
     InitCtr();
 
-    if (isLast) {
+    if (is_last) {
         Init();
     }
 }
 
 DPFORAM::~DPFORAM() {
-    if (!is_first_) {
-        delete pos_map_;
-        DeleteMem(stash_[0]);
-        DeleteMem(stash_[1]);
-        DeleteMem(wom_);
+    if (!this->is_first_) {
+        delete this->pos_map_;
+        DeleteMem(this->stash_[0]);
+        DeleteMem(this->stash_[1]);
+        DeleteMem(this->wom_);
     }
-    DeleteMem(rom_[0]);
-    DeleteMem(rom_[1]);
+    DeleteMem(this->rom_[0]);
+    DeleteMem(this->rom_[1]);
 }
 
 void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
-                     bool isRead, uchar *rec_23[2]) {
-    uint mask = ttp_ - 1;
-    unsigned long addrPre_23[2];
+                     bool is_read, uchar *rec_23[2]) {
+    uint mask = this->ttp_ - 1;
+    unsigned long addr_pre_23[2];
     uint addrSuf_23[2];
     for (uint i = 0; i < 2; i++) {
-        addrPre_23[i] = addr_23[i] >> tau_;
+        addr_pre_23[i] = addr_23[i] >> this->tau_;
         addrSuf_23[i] = (uint)addr_23[i] & mask;
     }
 
@@ -245,33 +245,33 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
         uchar *delta_block_23[2];
         uchar *delta_rom_23[2];
         for (uint i = 0; i < 2; i++) {
-            block_23[i] = new uchar[d_bytes_];
-            fss_out[i] = new uchar[n_];
-            delta_rec_23[i] = new uchar[next_log_n_bytes_];
-            delta_block_23[i] = new uchar[d_bytes_];
-            delta_rom_23[i] = new uchar[n_ * d_bytes_];
+            block_23[i] = new uchar[this->d_bytes_];
+            fss_out[i] = new uchar[this->n_];
+            delta_rec_23[i] = new uchar[this->next_log_n_bytes_];
+            delta_block_23[i] = new uchar[this->d_bytes_];
+            delta_rom_23[i] = new uchar[this->n_ * this->d_bytes_];
         }
-        BlockPIR(addrPre_23, rom_, n_, block_23, fss_out);
+        BlockPIR(addr_pre_23, this->rom_, this->n_, block_23, fss_out);
         RecPIR(addrSuf_23, block_23, rec_23);
 
         for (uint i = 0; i < 2; i++) {
-            if (isRead) {
-                memset(delta_rec_23[i], 0, next_log_n_bytes_);
+            if (is_read) {
+                memset(delta_rec_23[i], 0, this->next_log_n_bytes_);
             } else {
-                cal_xor(rec_23[i], new_rec_23[i], next_log_n_bytes_,
+                cal_xor(rec_23[i], new_rec_23[i], this->next_log_n_bytes_,
                         delta_rec_23[i]);
             }
         }
         // gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
         //                 delta_block_23);
 
-        uint int_addrPre_23[2] = {(uint)addrPre_23[0], (uint)addrPre_23[1]};
+        uint int_addrPre_23[2] = {(uint)addr_pre_23[0], (uint)addr_pre_23[1]};
         // gen_delta_array(int_addrPre_23, (uint)N, DBytes, delta_block_23,
         //                 delta_rom_23);
 
         for (uint i = 0; i < 2; i++) {
             for (unsigned long j = 0; j < n_; j++) {
-                cal_xor(rom_[i][j], delta_rom_23[i] + j * d_bytes_, d_bytes_,
+                cal_xor(rom_[i][j], delta_rom_23[i] + j * this->d_bytes_, this->d_bytes_,
                         rom_[i][j]);
             }
         }
@@ -289,22 +289,22 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
 
     ////////////////////////////////////////////////////////////////////
 
-    uchar new_stash_ptr[log_n_bytes_];
-    long_to_bytes(stash_ctr_, new_stash_ptr, log_n_bytes_);
+    uchar new_stash_ptr[this->log_n_bytes_];
+    long_to_bytes(this->stash_ctr_, new_stash_ptr, this->log_n_bytes_);
     new_stash_ptr[0] = 1;
 
     uchar *stash_ptr_23[2];
     uchar *new_stash_ptr_23[2];
     for (uint i = 0; i < 2; i++) {
-        stash_ptr_23[i] = new uchar[log_n_bytes_];
+        stash_ptr_23[i] = new uchar[this->log_n_bytes_];
         new_stash_ptr_23[i] = new_stash_ptr;
     }
-    pos_map_->Access(addrPre_23, new_stash_ptr_23, false, stash_ptr_23);
+    pos_map_->Access(addr_pre_23, new_stash_ptr_23, false, stash_ptr_23);
 
     unsigned long mask2 = n_ - 1;
     unsigned long stash_addrPre_23[2];
-    stash_addrPre_23[0] = bytes_to_long(stash_ptr_23[0], log_n_bytes_) & mask2;
-    stash_addrPre_23[1] = bytes_to_long(stash_ptr_23[1], log_n_bytes_) & mask2;
+    stash_addrPre_23[0] = bytes_to_long(stash_ptr_23[0], this->log_n_bytes_) & mask2;
+    stash_addrPre_23[1] = bytes_to_long(stash_ptr_23[1], this->log_n_bytes_) & mask2;
 
     uchar *rom_block_23[2];
     uchar *stash_block_23[2];
@@ -312,14 +312,14 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
     uchar *stash_fss_out[2];
     uchar *block_23[2];
     for (uint i = 0; i < 2; i++) {
-        rom_block_23[i] = new uchar[d_bytes_];
-        stash_block_23[i] = new uchar[d_bytes_];
-        rom_fss_out[i] = new uchar[n_];
-        stash_fss_out[i] = new uchar[n_];
-        block_23[i] = new uchar[d_bytes_];
+        rom_block_23[i] = new uchar[this->d_bytes_];
+        stash_block_23[i] = new uchar[this->d_bytes_];
+        rom_fss_out[i] = new uchar[this->n_];
+        stash_fss_out[i] = new uchar[this->n_];
+        block_23[i] = new uchar[this->d_bytes_];
     }
-    BlockPIR(addrPre_23, rom_, n_, rom_block_23, rom_fss_out);
-    BlockPIR(stash_addrPre_23, stash_, stash_ctr_, stash_block_23,
+    BlockPIR(addr_pre_23, rom_, n_, rom_block_23, rom_fss_out);
+    BlockPIR(stash_addrPre_23, this->stash_, this->stash_ctr_, stash_block_23,
              stash_fss_out);
 
     uchar indicator_23[2] = {stash_ptr_23[0][0], stash_ptr_23[1][0]};
@@ -329,13 +329,13 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
     uchar *delta_rec_23[2];
     uchar *delta_block_23[2];
     for (uint i = 0; i < 2; i++) {
-        delta_rec_23[i] = new uchar[next_log_n_bytes_];
-        if (isRead) {
-            memset(delta_rec_23[i], 0, next_log_n_bytes_);
+        delta_rec_23[i] = new uchar[this->next_log_n_bytes_];
+        if (is_read) {
+            memset(delta_rec_23[i], 0, this->next_log_n_bytes_);
         } else {
-            cal_xor(rec_23[i], new_rec_23[i], next_log_n_bytes_, delta_rec_23[i]);
+            cal_xor(rec_23[i], new_rec_23[i], this->next_log_n_bytes_, delta_rec_23[i]);
         }
-        delta_block_23[i] = new uchar[d_bytes_];
+        delta_block_23[i] = new uchar[this->d_bytes_];
     }
     // gen_delta_array(addrSuf_23, ttp, nextLogNBytes, delta_rec_23,
     //                 delta_block_23);
@@ -358,26 +358,26 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
 void DPFORAM::PrintMetadata() {
     std::cout << "===================" << std::endl;
     std::cout << "Party: " << kParty << std::endl;
-    std::cout << "Last level: " << is_last_ << std::endl;
-    std::cout << "First level: " << is_first_ << std::endl;
-    std::cout << "tau: " << tau_ << std::endl;
-    std::cout << "2^tau: " << ttp_ << std::endl;
-    std::cout << "logN: " << log_n_ << std::endl;
-    std::cout << "N: " << n_ << std::endl;
-    std::cout << "logNBytes: " << log_n_bytes_ << std::endl;
-    std::cout << "next_log_n_: " << next_log_n_ << std::endl;
-    std::cout << "nextLogNBytes: " << next_log_n_bytes_ << std::endl;
-    std::cout << "DBytes: " << d_bytes_ << std::endl;
-    std::cout << "Stash counter: " << stash_ctr_ << std::endl;
-    std::cout << "ROM: " << (rom_ != NULL) << std::endl;
-    std::cout << "WOM: " << (wom_ != NULL) << std::endl;
-    std::cout << "stash: " << (stash_ != NULL) << std::endl;
-    std::cout << "posMap: " << (pos_map_ != NULL) << std::endl;
+    std::cout << "Last level: " << this->is_last_ << std::endl;
+    std::cout << "First level: " << this->is_first_ << std::endl;
+    std::cout << "tau: " << this->tau_ << std::endl;
+    std::cout << "2^tau: " << this->ttp_ << std::endl;
+    std::cout << "logN: " << this->log_n_ << std::endl;
+    std::cout << "N: " << this->n_ << std::endl;
+    std::cout << "logNBytes: " << this->log_n_bytes_ << std::endl;
+    std::cout << "next_log_n_: " << this->next_log_n_ << std::endl;
+    std::cout << "nextLogNBytes: " << this->next_log_n_bytes_ << std::endl;
+    std::cout << "DBytes: " << this->d_bytes_ << std::endl;
+    std::cout << "Stash counter: " << this->stash_ctr_ << std::endl;
+    std::cout << "ROM: " << (this->rom_ != NULL) << std::endl;
+    std::cout << "WOM: " << (this->wom_ != NULL) << std::endl;
+    std::cout << "stash: " << (this->stash_ != NULL) << std::endl;
+    std::cout << "posMap: " << (this->pos_map_ != NULL) << std::endl;
     std::cout << "===================\n"
               << std::endl;
 
-    if (!is_first_) {
-        pos_map_->PrintMetadata();
+    if (!this->is_first_) {
+        this->pos_map_->PrintMetadata();
     }
 }
 
@@ -388,41 +388,41 @@ void DPFORAM::Test(uint iter) {
     PrintMetadata();
 
     bool isRead = false;
-    unsigned long range = 1ul << (log_n_ + tau_);
+    unsigned long range = 1ul << (this->log_n_ + this->tau_);
     unsigned long addr_23[2] = {10, 10};
     uchar *rec_23[2];
     uchar *new_rec_23[2];
     for (uint i = 0; i < 2; i++) {
-        rec_23[i] = new uchar[next_log_n_bytes_];
-        new_rec_23[i] = new uchar[next_log_n_bytes_];
-        memset(rec_23[i], 0, next_log_n_bytes_);
-        memset(new_rec_23[i], 0, next_log_n_bytes_);
+        rec_23[i] = new uchar[this->next_log_n_bytes_];
+        new_rec_23[i] = new uchar[this->next_log_n_bytes_];
+        memset(rec_23[i], 0, this->next_log_n_bytes_);
+        memset(new_rec_23[i], 0, this->next_log_n_bytes_);
     }
-    uchar rec_exp[next_log_n_bytes_];
-    memset(rec_exp, 0, next_log_n_bytes_ * sizeof(uchar));
+    uchar rec_exp[this->next_log_n_bytes_];
+    memset(rec_exp, 0, this->next_log_n_bytes_ * sizeof(uchar));
     if (strcmp(kParty, "eddie") == 0) {
         addr_23[0] = rand_long(range);
-        cons_[0]->WriteLong(addr_23[0], false);
+        this->cons_[0]->WriteLong(addr_23[0], false);
     } else if (strcmp(kParty, "debbie") == 0) {
-        addr_23[1] = cons_[1]->ReadLong();
+        addr_23[1] = this->cons_[1]->ReadLong();
     }
 
     for (uint t = 0; t < iter; t++) {
         if (strcmp(kParty, "eddie") == 0) {
-            rnd_->GenerateBlock(new_rec_23[0], next_log_n_bytes_);
-            cons_[0]->Write(new_rec_23[0], next_log_n_bytes_, false);
+            this->rnd_->GenerateBlock(new_rec_23[0], this->next_log_n_bytes_);
+            this->cons_[0]->Write(new_rec_23[0], this->next_log_n_bytes_, false);
 
             Sync();
             wc = current_timestamp();
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
 
-            uchar rec_out[next_log_n_bytes_];
-            cons_[0]->Read(rec_out, next_log_n_bytes_);
-            cal_xor(rec_out, rec_23[0], next_log_n_bytes_, rec_out);
-            cal_xor(rec_out, rec_23[1], next_log_n_bytes_, rec_out);
+            uchar rec_out[this->next_log_n_bytes_];
+            cons_[0]->Read(rec_out, this->next_log_n_bytes_);
+            cal_xor(rec_out, rec_23[0], this->next_log_n_bytes_, rec_out);
+            cal_xor(rec_out, rec_23[1], this->next_log_n_bytes_, rec_out);
 
-            if (memcmp(rec_exp, rec_out, next_log_n_bytes_) == 0) {
+            if (memcmp(rec_exp, rec_out, this->next_log_n_bytes_) == 0) {
                 std::cout << "addr=" << addr_23[0] << ", t=" << t << ": Pass"
                           << std::endl;
             } else {
@@ -430,16 +430,16 @@ void DPFORAM::Test(uint iter) {
                           << ": Fail !!!" << std::endl;
             }
 
-            memcpy(rec_exp, new_rec_23[0], next_log_n_bytes_);
+            memcpy(rec_exp, new_rec_23[0], this->next_log_n_bytes_);
         } else if (strcmp(kParty, "debbie") == 0) {
-            cons_[1]->Read(new_rec_23[1], next_log_n_bytes_);
+            cons_[1]->Read(new_rec_23[1], this->next_log_n_bytes_);
 
             Sync();
             wc = current_timestamp();
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
 
-            cons_[1]->Write(rec_23[0], next_log_n_bytes_, false);
+            cons_[1]->Write(rec_23[0], this->next_log_n_bytes_, false);
         } else if (strcmp(kParty, "charlie") == 0) {
             Sync();
             wc = current_timestamp();
@@ -456,11 +456,11 @@ void DPFORAM::Test(uint iter) {
     }
 
     unsigned long party_band = Bandwidth();
-    cons_[0]->WriteLong(party_band, false);
-    cons_[1]->WriteLong(party_band, false);
+    this->cons_[0]->WriteLong(party_band, false);
+    this->cons_[1]->WriteLong(party_band, false);
     unsigned long total_band = party_band;
-    total_band += (unsigned long)cons_[0]->ReadLong();
-    total_band += (unsigned long)cons_[1]->ReadLong();
+    total_band += (unsigned long)this->cons_[0]->ReadLong();
+    total_band += (unsigned long)this->cons_[1]->ReadLong();
 
     cons_[0]->WriteLong(party_wc, false);
     cons_[1]->WriteLong(party_wc, false);
