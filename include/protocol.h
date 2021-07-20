@@ -9,7 +9,7 @@
 
 class Protocol {
 protected:
-    Connection **cons_;
+    Connection **connnections_;
     CryptoPP::AutoSeededRandomPool *rnd_;
     CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs_;
 
