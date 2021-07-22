@@ -81,8 +81,8 @@ void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
     if (m <= 6) {
         to_byte_vector(((unsigned long *)res)[0], out, (1 << m));
     } else {
-        uint maxlayer = std::max((int)m - 7, 0);
-        unsigned long groups = 1ul << maxlayer;
+        uint max_layer = std::max((int)m - 7, 0);
+        unsigned long groups = 1ul << max_layer;
         for (unsigned long i = 0; i < groups; i++) {
             to_byte_vector(res[i], out + (i << 7));
         }
