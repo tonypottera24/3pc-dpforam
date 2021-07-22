@@ -17,9 +17,9 @@ DPFORAM::DPFORAM(const char *party, Connection *connections[2],
     this->tau_ = is_last ? std::max(5 - (int)log2(data_bytes), 0) : tau;
     this->log_n_ = (log_n <= this->tau_ || !is_last) ? log_n : (log_n - this->tau_);
     this->ttp_ = 1 << this->tau_;
-    this->log_n_bytes_ = (this->log_n_ + 7) / 8 + 1;
+    this->log_n_bytes_ = (this->log_n_ + 7) / 8 + 1;  // size of this->log_n_ in bytes + 1
     this->next_log_n_ = is_last ? 0 : log_n + tau;
-    this->next_log_n_bytes_ = is_last ? data_bytes : (this->next_log_n_ + 7) / 8 + 1;
+    this->next_log_n_bytes_ = is_last ? data_bytes : (this->next_log_n_ + 7) / 8 + 1;  // size of this->next_log_n_ in bytes + 1
     this->d_bytes_ = this->next_log_n_bytes_ * this->ttp_;
     this->n_ = 1ul << this->log_n_;
     this->is_first_ = this->log_n_ < 2 * tau;
@@ -56,10 +56,10 @@ DPFORAM::~DPFORAM() {
 
 void DPFORAM::Init() {
     this->InitCacheCtr();
-    this->SetMemZero(rom_[0]);
-    this->SetMemZero(rom_[1]);
-    this->SetMemZero(wom_);
-    if (!is_first_) {
+    this->SetMemZero(this->rom_[0]);
+    this->SetMemZero(this->rom_[1]);
+    this->SetMemZero(this->wom_);
+    if (!this->is_first_) {
         this->position_map_->Init();
     }
 }
@@ -185,11 +185,7 @@ void DPFORAM::UpdateWOM(const uchar *const delta_block_23[2],
 #pragma omp parallel for
     for (unsigned long j = 0; j < n_; j++) {
         for (uint i = 0; i < 2; i++) {
-            //			if (fss_out[i][j])
-            {
-                //set_xor_128(delta_block_23[i], quo, rem, wom[j]);
-                select_xor_128(delta_block_23[i], fss_out[i][j], quo, rem, wom_[j]);
-            }
+            select_xor_128(delta_block_23[i], fss_out[i][j], quo, rem, this->wom_[j]);
         }
     }
 }
@@ -228,12 +224,11 @@ void DPFORAM::WOM2ROM() {
 
 void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
                      bool is_read, uchar *rec_23[2]) {
-    uint mask = this->ttp_ - 1;
     unsigned long addr_pre_23[2];
     uint addr_suf_23[2];
     for (uint i = 0; i < 2; i++) {
         addr_pre_23[i] = addr_23[i] >> this->tau_;
-        addr_suf_23[i] = (uint)addr_23[i] & mask;
+        addr_suf_23[i] = (uint)addr_23[i] & (1u << this->tau_ - 1u);
     }
 
     if (is_first_) {
