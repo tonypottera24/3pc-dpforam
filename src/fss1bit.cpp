@@ -99,8 +99,8 @@ void FSS1Bit::EvalAllWithPerm(const uchar *key, uint m, unsigned long perm,
         to_byte_vector_with_perm(ptr[0], out, (1 << m), index_perm);
     } else {
         unsigned long group_perm = perm >> 6;
-        uint maxlayer = std::max((int)m - 6, 0);
-        unsigned long groups = 1ul << maxlayer;
+        uint max_layer = std::max((int)m - 6, 0);
+        unsigned long groups = 1ul << max_layer;
         //#pragma omp parallel for
         for (unsigned long i = 0; i < groups; i++) {
             to_byte_vector_with_perm(ptr[i ^ group_perm], out + (i << 6), 64,

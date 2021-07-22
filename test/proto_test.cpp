@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
     cxxopts::Options options(argv[0], "3PC DPF-ORAM IMPLEMENTATION");
     options.positional_help("[optional args]").show_positional_help();
-    options.add_options()("par", "Party:[eddie|debbie|charlie]", cxxopts::value<string>())("eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("tau", "Tau", cxxopts::value<uint>()->default_value("3"))("logn", "LogN", cxxopts::value<uint>()->default_value("12"))("db", "DBytes", cxxopts::value<uint>()->default_value("4"))("thr", "Threads", cxxopts::value<uint>()->default_value("1"))("iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
+    options.add_options()("par", "Party:[eddie|debbie|charlie]", cxxopts::value<string>())("eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("tau", "Tau", cxxopts::value<uint>()->default_value("3"))("logn", "LogN", cxxopts::value<uint>()->default_value("12"))("d_bytes", "d_bytes", cxxopts::value<uint>()->default_value("4"))("thr", "Threads", cxxopts::value<uint>()->default_value("1"))("iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
 
     auto result = options.parse(argc, argv);
     if (result.count("par") == 0) {
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     string debbie_ip = result["dip"].as<string>();
     uint tau = result["tau"].as<uint>();
     uint log_n = result["logn"].as<uint>();
-    uint d_bytes = result["db"].as<uint>();
+    uint d_bytes = result["d_bytes"].as<uint>();
     uint threads = result["thr"].as<uint>();
     uint iters = result["iter"].as<uint>();
 

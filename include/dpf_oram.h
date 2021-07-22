@@ -20,7 +20,7 @@ public:
     uint next_log_n_bytes_;
     uint tau_;
     uint ttp_;
-    uint data_bytes_;
+    uint d_bytes_;
     unsigned long n_;
     bool is_first_;
     bool is_last_;
@@ -45,7 +45,7 @@ public:
     DPFORAM(const char *party, Connection *cons[2],
             CryptoPP::AutoSeededRandomPool *rnd,
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
-            uint logN, uint DBytes, bool isLast);
+            uint log_n, uint d_bytes, bool is_last);
     ~DPFORAM();
     void Access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
                 bool isRead, uchar *rec_23[2]);

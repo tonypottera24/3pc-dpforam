@@ -20,7 +20,7 @@ DPFORAM::DPFORAM(const char *party, Connection *connections[2],
     this->log_n_bytes_ = (this->log_n_ + 7) / 8 + 1;
     this->next_log_n_ = is_last ? 0 : log_n + tau;
     this->next_log_n_bytes_ = is_last ? data_bytes : (this->next_log_n_ + 7) / 8 + 1;
-    this->data_bytes_ = this->next_log_n_bytes_ * this->ttp_;
+    this->d_bytes_ = this->next_log_n_bytes_ * this->ttp_;
     this->n_ = 1ul << this->log_n_;
     this->is_first_ = this->log_n_ < 2 * tau;
 
@@ -71,7 +71,7 @@ void DPFORAM::InitCacheCtr() {
 void DPFORAM::InitMem(uchar **&mem) {
     mem = new uchar *[this->n_];
     for (unsigned long i = 0; i < this->n_; i++) {
-        mem[i] = new uchar[this->data_bytes_];
+        mem[i] = new uchar[this->d_bytes_];
     }
 }
 
@@ -86,13 +86,13 @@ void DPFORAM::SetMemZero(uchar **mem) {
     if (mem == NULL) return;
 #pragma omp parallel for
     for (unsigned long i = 0; i < this->n_; i++) {
-        memset(mem[i], 0, this->data_bytes_);
+        memset(mem[i], 0, this->d_bytes_);
     }
 }
 
 // private
 void DPFORAM::BlockPIR(const unsigned long addr_23[2],
-                       const uchar *const *const mem_23[2], unsigned long size, uchar *block_23[2],
+                       const uchar *const *const mem_23[2], unsigned long mem_size, uchar *block_23[2],
                        uchar *fss_out[2]) {
     uchar *keys[2];
     uint key_bytes = fss_.Gen(addr_23[0] ^ addr_23[1], this->log_n_, keys);
@@ -101,18 +101,18 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
     this->connnections_[0]->Read(keys[1], key_bytes);
     this->connnections_[1]->Read(keys[0], key_bytes);
 
-    uint quo = this->data_bytes_ / 16;
-    uint rem = this->data_bytes_ % 16;
-    memset(block_23[0], 0, this->data_bytes_);
+    uint quo = this->d_bytes_ / 16;
+    uint reminder = this->d_bytes_ % 16;
+    memset(block_23[0], 0, this->d_bytes_);
 
     if (omp_get_max_threads() == 1) {
         for (uint i = 0; i < 2; i++) {
             this->fss_.EvalAllWithPerm(keys[i], log_n_, addr_23[i], fss_out[i]);
-            for (unsigned long j = 0; j < size; j++) {
+            for (unsigned long j = 0; j < mem_size; j++) {
                 // if (fss_out[i][j])
                 {
                     // set_xor_128(mem_23[i][j], quo, rem, block_23[0]);
-                    select_xor_128(mem_23[i][j], fss_out[i][j], quo, rem, block_23[0]);
+                    select_xor_128(mem_23[i][j], fss_out[i][j], quo, reminder, block_23[0]);
                 }
             }
         }
@@ -124,27 +124,27 @@ void DPFORAM::BlockPIR(const unsigned long addr_23[2],
                 this->fss_.EvalAllWithPerm(keys[i], log_n_, addr_23[i], fss_out[i]);
             }
 
-            uchar tmp[data_bytes_];
-            memset(tmp, 0, data_bytes_ * sizeof(uchar));
+            uchar tmp[d_bytes_];
+            memset(tmp, 0, d_bytes_ * sizeof(uchar));
 #pragma omp for collapse(2)
             for (uint i = 0; i < 2; i++) {
-                for (unsigned long j = 0; j < size; j++) {
+                for (unsigned long j = 0; j < mem_size; j++) {
                     //					if (fss_out[i][j])
                     {
                         //						set_xor_128(mem_23[i][j], quo, rem, tmp);
-                        select_xor_128(mem_23[i][j], fss_out[i][j], quo, rem, tmp);
+                        select_xor_128(mem_23[i][j], fss_out[i][j], quo, reminder, tmp);
                     }
                 }
             }
 #pragma omp critical
             {
-                set_xor_128(tmp, quo, rem, block_23[0]);
+                set_xor_128(tmp, quo, reminder, block_23[0]);
             }
         }
     }
 
-    connnections_[0]->Write(block_23[0], data_bytes_);
-    connnections_[1]->Read(block_23[1], data_bytes_);
+    connnections_[0]->Write(block_23[0], d_bytes_);
+    connnections_[1]->Read(block_23[1], d_bytes_);
 
     delete[] keys[0];
     delete[] keys[1];
@@ -180,8 +180,8 @@ void DPFORAM::RecPIR(const uint idx_23[2], const uchar *const block_23[2],
 
 void DPFORAM::UpdateWOM(const uchar *const delta_block_23[2],
                         const uchar *const fss_out[2]) {
-    uint quo = data_bytes_ / 16;
-    uint rem = data_bytes_ % 16;
+    uint quo = d_bytes_ / 16;
+    uint rem = d_bytes_ % 16;
 #pragma omp parallel for
     for (unsigned long j = 0; j < n_; j++) {
         for (uint i = 0; i < 2; i++) {
@@ -197,7 +197,7 @@ void DPFORAM::UpdateWOM(const uchar *const delta_block_23[2],
 void DPFORAM::AppendCache(const uchar *const block_23[2],
                           const uchar *const delta_block_23[2]) {
     for (uint i = 0; i < 2; i++) {
-        cal_xor(block_23[i], delta_block_23[i], data_bytes_, read_cache_[i][read_cache_ctr_]);
+        cal_xor(block_23[i], delta_block_23[i], d_bytes_, read_cache_[i][read_cache_ctr_]);
     }
     read_cache_ctr_++;
     if (read_cache_ctr_ == n_) {
@@ -213,15 +213,15 @@ void DPFORAM::WOM2ROM() {
         return;
     }
     for (unsigned long i = 0; i < n_; i++) {
-        memcpy(this->rom_[0][i], this->wom_[i], this->data_bytes_);
+        memcpy(this->rom_[0][i], this->wom_[i], this->d_bytes_);
     }
     for (unsigned long i = 0; i < n_; i++) {
-        this->connnections_[0]->Write(this->wom_[i], this->data_bytes_);
+        this->connnections_[0]->Write(this->wom_[i], this->d_bytes_);
         //		cons[0]->fwrite(wom[i], DBytes);
     }
     //	cons[0]->Flush();
     for (unsigned long i = 0; i < n_; i++) {
-        this->connnections_[1]->Read(this->rom_[1][i], this->data_bytes_);
+        this->connnections_[1]->Read(this->rom_[1][i], this->d_bytes_);
         //		cons[1]->fread(rom[1][i], DBytes);
     }
 }
@@ -243,11 +243,11 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
         uchar *delta_block_23[2];
         uchar *delta_rom_23[2];
         for (uint i = 0; i < 2; i++) {
-            block_23[i] = new uchar[this->data_bytes_];
+            block_23[i] = new uchar[this->d_bytes_];
             fss_out[i] = new uchar[this->n_];
             delta_rec_23[i] = new uchar[this->next_log_n_bytes_];
-            delta_block_23[i] = new uchar[this->data_bytes_];
-            delta_rom_23[i] = new uchar[this->n_ * this->data_bytes_];
+            delta_block_23[i] = new uchar[this->d_bytes_];
+            delta_rom_23[i] = new uchar[this->n_ * this->d_bytes_];
         }
         BlockPIR(addr_pre_23, this->rom_, this->n_, block_23, fss_out);
         RecPIR(addr_suf_23, block_23, rec_23);
@@ -269,7 +269,7 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
 
         for (uint i = 0; i < 2; i++) {
             for (unsigned long j = 0; j < n_; j++) {
-                cal_xor(rom_[i][j], delta_rom_23[i] + j * this->data_bytes_, this->data_bytes_,
+                cal_xor(rom_[i][j], delta_rom_23[i] + j * this->d_bytes_, this->d_bytes_,
                         rom_[i][j]);
             }
         }
@@ -300,9 +300,9 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
     position_map_->Access(addr_pre_23, new_stash_ptr_23, false, stash_ptr_23);
 
     unsigned long mask2 = n_ - 1;
-    unsigned long stash_addrPre_23[2];
-    stash_addrPre_23[0] = bytes_to_long(stash_ptr_23[0], this->log_n_bytes_) & mask2;
-    stash_addrPre_23[1] = bytes_to_long(stash_ptr_23[1], this->log_n_bytes_) & mask2;
+    unsigned long stash_addr_pre_23[2];
+    stash_addr_pre_23[0] = bytes_to_long(stash_ptr_23[0], this->log_n_bytes_) & mask2;
+    stash_addr_pre_23[1] = bytes_to_long(stash_ptr_23[1], this->log_n_bytes_) & mask2;
 
     uchar *rom_block_23[2];
     uchar *stash_block_23[2];
@@ -310,14 +310,14 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
     uchar *stash_fss_out[2];
     uchar *block_23[2];
     for (uint i = 0; i < 2; i++) {
-        rom_block_23[i] = new uchar[this->data_bytes_];
-        stash_block_23[i] = new uchar[this->data_bytes_];
+        rom_block_23[i] = new uchar[this->d_bytes_];
+        stash_block_23[i] = new uchar[this->d_bytes_];
         rom_fss_out[i] = new uchar[this->n_];
         stash_fss_out[i] = new uchar[this->n_];
-        block_23[i] = new uchar[this->data_bytes_];
+        block_23[i] = new uchar[this->d_bytes_];
     }
     BlockPIR(addr_pre_23, rom_, n_, rom_block_23, rom_fss_out);
-    BlockPIR(stash_addrPre_23, this->read_cache_, this->read_cache_ctr_, stash_block_23,
+    BlockPIR(stash_addr_pre_23, this->read_cache_, this->read_cache_ctr_, stash_block_23,
              stash_fss_out);
 
     uchar indicator_23[2] = {stash_ptr_23[0][0], stash_ptr_23[1][0]};
@@ -333,7 +333,7 @@ void DPFORAM::Access(const unsigned long addr_23[2], const uchar *const new_rec_
         } else {
             cal_xor(rec_23[i], new_rec_23[i], this->next_log_n_bytes_, delta_rec_23[i]);
         }
-        delta_block_23[i] = new uchar[this->data_bytes_];
+        delta_block_23[i] = new uchar[this->d_bytes_];
     }
     // gen_delta_array(addr_suf_23, ttp, nextLogNBytes, delta_rec_23,
     //                 delta_block_23);
@@ -365,7 +365,7 @@ void DPFORAM::PrintMetadata() {
     std::cout << "logNBytes: " << this->log_n_bytes_ << std::endl;
     std::cout << "next_log_n_: " << this->next_log_n_ << std::endl;
     std::cout << "nextLogNBytes: " << this->next_log_n_bytes_ << std::endl;
-    std::cout << "DBytes: " << this->data_bytes_ << std::endl;
+    std::cout << "DBytes: " << this->d_bytes_ << std::endl;
     std::cout << "Stash counter: " << this->read_cache_ctr_ << std::endl;
     std::cout << "ROM: " << (this->rom_ != NULL) << std::endl;
     std::cout << "WOM: " << (this->wom_ != NULL) << std::endl;

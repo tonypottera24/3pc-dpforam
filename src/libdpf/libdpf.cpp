@@ -183,29 +183,29 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
 
 block EVAL(AES_KEY *key, unsigned char *k, long x) {
     int n = k[0];
-    int maxlayer = max(n - 7, 0);
+    int max_layer = max(n - 7, 0);
 
-    block s[maxlayer + 1];
-    int t[maxlayer + 1];
-    block sCW[maxlayer];
-    int tCW[maxlayer][2];
-    block finalblock;
+    block s[max_layer + 1];
+    int t[max_layer + 1];
+    block sCW[max_layer];
+    int tCW[max_layer][2];
+    block final_block;
 
     memcpy(&s[0], &k[1], 16);
     t[0] = k[17];
 
     int i;
-    for (i = 1; i <= maxlayer; i++) {
+    for (i = 1; i <= max_layer; i++) {
         memcpy(&sCW[i - 1], &k[18 * i], 16);
         tCW[i - 1][0] = k[18 * i + 16];
         tCW[i - 1][1] = k[18 * i + 17];
     }
 
-    memcpy(&finalblock, &k[18 * (maxlayer + 1)], 16);
+    memcpy(&final_block, &k[18 * (max_layer + 1)], 16);
 
     block sL, sR;
     int tL, tR;
-    for (i = 1; i <= maxlayer; i++) {
+    for (i = 1; i <= max_layer; i++) {
         PRG(key, s[i - 1], &sL, &sR, &tL, &tR);
 
         if (t[i - 1] == 1) {
@@ -226,13 +226,13 @@ block EVAL(AES_KEY *key, unsigned char *k, long x) {
     }
 
     block res;
-    res = s[maxlayer];
-    if (t[maxlayer] == 1) {
+    res = s[max_layer];
+    if (t[max_layer] == 1) {
         res = dpf_reverse_lsb(res);
     }
 
-    if (t[maxlayer] == 1) {
-        res = dpf_xor(res, finalblock);
+    if (t[max_layer] == 1) {
+        res = dpf_xor(res, final_block);
     }
 
     return res;
