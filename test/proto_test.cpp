@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
     cxxopts::Options options(argv[0], "3PC DPF-ORAM IMPLEMENTATION");
     options.positional_help("[optional args]").show_positional_help();
-    options.add_options()("par", "Party:[eddie|debbie|charlie]", cxxopts::value<string>())("proto", "Protocol:[dpforam]", cxxopts::value<string>()->default_value("dpforam"))("eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("tau", "Tau", cxxopts::value<uint>()->default_value("3"))("logn", "LogN", cxxopts::value<uint>()->default_value("12"))("db", "DBytes", cxxopts::value<uint>()->default_value("4"))("thr", "Threads", cxxopts::value<uint>()->default_value("1"))("iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
+    options.add_options()("par", "Party:[eddie|debbie|charlie]", cxxopts::value<string>())("eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("tau", "Tau", cxxopts::value<uint>()->default_value("3"))("logn", "LogN", cxxopts::value<uint>()->default_value("12"))("db", "DBytes", cxxopts::value<uint>()->default_value("4"))("thr", "Threads", cxxopts::value<uint>()->default_value("1"))("iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
 
     auto result = options.parse(argc, argv);
     if (result.count("par") == 0) {
@@ -26,7 +26,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     string party = result["par"].as<string>();
-    string proto = result["proto"].as<string>();
     string eddie_ip = result["eip"].as<string>();
     string debbie_ip = result["dip"].as<string>();
     uint tau = result["tau"].as<uint>();
@@ -90,15 +89,11 @@ int main(int argc, char *argv[]) {
     }
 
     Protocol *test_proto = NULL;
-    if (proto == "dpforam") {
-        unsigned long init_wc = current_timestamp();
-        test_proto = new DPFORAM(party.c_str(), cons, &rnd, prgs, tau, log_n,
-                                 d_bytes, true);
-        init_wc = current_timestamp() - init_wc;
-        std::cout << "Init Wallclock(microsec): " << init_wc << std::endl;
-    } else {
-        cout << "Incorrect protocol: " << proto << endl;
-    }
+    unsigned long init_wc = current_timestamp();
+    test_proto = new DPFORAM(party.c_str(), cons, &rnd, prgs, tau, log_n,
+                             d_bytes, true);
+    init_wc = current_timestamp() - init_wc;
+    std::cout << "Init Wallclock(microsec): " << init_wc << std::endl;
 
     if (test_proto != NULL) {
         test_proto->Sync();

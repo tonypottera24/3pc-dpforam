@@ -7,8 +7,8 @@
 class DPFORAM : public Protocol {
 private:
     static FSS1Bit fss_;
-    uchar **read_array_[2];
-    uchar **write_array_;
+    uchar **rom_[2];
+    uchar **wom_;
     uchar **read_cache_[2];
     DPFORAM *position_map_;
     unsigned long read_cache_ctr_;
