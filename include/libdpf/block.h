@@ -6,9 +6,9 @@
 #include <wmmintrin.h>
 #include <xmmintrin.h>
 
-typedef __m128i block;
+typedef __m128i uint128;
 
-#define dpf_xor(x, y) _mm_xor_si128(x, y)
+#define uint128_xor(x, y) _mm_xor_si128(x, y)
 #define dpf_zero_block() _mm_setzero_si128()
 #define dpf_equal(x, y) (_mm_movemask_epi8(_mm_cmpeq_epi8(x, y)) == 0xffff)
 #define dpf_unequal(x, y) (_mm_movemask_epi8(_mm_cmpeq_epi8(x, y)) != 0xffff)
@@ -34,11 +34,11 @@ typedef __m128i block;
             v1;                                    \
         })
 
-block dpf_seed(block *seed);
-block dpf_random_block(void);
-block *dpf_allocate_blocks(size_t nblocks);
+uint128 dpf_seed(uint128 *seed);
+uint128 dpf_random_block(void);
+uint128 *dpf_allocate_blocks(size_t nblocks);
 
-void dpf_cb(block input);
+void dpf_cb(uint128 input);
 // void dpf_cbnotnewline(block input);
 
 #endif

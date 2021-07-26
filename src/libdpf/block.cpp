@@ -11,8 +11,8 @@
 static AES_KEY rand_aes_key;
 static uint64_t current_rand_index;
 
-block dpf_seed(block *seed) {
-    block cur_seed;
+uint128 dpf_seed(uint128 *seed) {
+    uint128 cur_seed;
     current_rand_index = 0;
     if (seed) {
         cur_seed = *seed;
@@ -27,8 +27,8 @@ block dpf_seed(block *seed) {
 }
 
 // inline
-block dpf_random_block(void) {
-    block out;
+uint128 dpf_random_block(void) {
+    uint128 out;
     uint64_t *val;
     int i;
 
@@ -41,10 +41,10 @@ block dpf_random_block(void) {
     return _mm_aesenclast_si128(out, rand_aes_key.rd_key[i]);
 }
 
-block *dpf_allocate_blocks(size_t nblocks) {
+uint128 *dpf_allocate_blocks(size_t nblocks) {
     //int res;
-    block *blks = NULL;
-    blks = (block *)calloc(nblocks, sizeof(block));
+    uint128 *blks = NULL;
+    blks = (uint128 *)calloc(nblocks, sizeof(uint128));
     /* res = posix_memalign((void **) &blks, 128, sizeof(block) * nblocks); */
     /* if (res == 0) { */
     /*     return blks; */
@@ -64,7 +64,7 @@ void _output_bit_to_bit(uint64_t input) {
     }
 }
 
-void dpf_cb(block input) {
+void dpf_cb(uint128 input) {
     uint64_t *val = (uint64_t *)&input;
 
     //printf("%016lx%016lx\n", val[0], val[1]);

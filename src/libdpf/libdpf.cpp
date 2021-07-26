@@ -14,14 +14,14 @@
             _a > _b ? _a : _b;      \
         })
 
-block dpf_reverse_lsb(block input) {
+uint128 dpf_reverse_lsb(uint128 input) {
     static long long b1 = 0;
     static long long b2 = 1;
-    block _xor = dpf_make_block(b1, b2);
-    return dpf_xor(input, _xor);
+    uint128 _xor = dpf_make_block(b1, b2);
+    return uint128_xor(input, _xor);
 }
 
-block dpf_set_lsb_zero(block input) {
+uint128 dpf_set_lsb_zero(uint128 input) {
     int lsb = dpf_lsb(input);
 
     if (lsb == 1) {
@@ -31,18 +31,18 @@ block dpf_set_lsb_zero(block input) {
     }
 }
 
-void PRG(AES_KEY *key, block input, block *output1, block *output2, int *bit1,
+void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *bit1,
          int *bit2) {
     input = dpf_set_lsb_zero(input);
 
-    block stash[2];
+    uint128 stash[2];
     stash[0] = input;
     stash[1] = dpf_reverse_lsb(input);
 
     AES_ecb_encrypt_blks(stash, 2, key);
 
-    stash[0] = dpf_xor(stash[0], input);
-    stash[1] = dpf_xor(stash[1], input);
+    stash[0] = uint128_xor(stash[0], input);
+    stash[1] = uint128_xor(stash[1], input);
     stash[1] = dpf_reverse_lsb(stash[1]);
 
     *bit1 = dpf_lsb(stash[0]);
@@ -61,9 +61,9 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
     int maxlayer = max(n - 7, 0);
     //int maxlayer = n;
 
-    block s[maxlayer + 1][2];
+    uint128 s[maxlayer + 1][2];
     int t[maxlayer + 1][2];
-    block sCW[maxlayer];
+    uint128 sCW[maxlayer];
     int tCW[maxlayer][2];
 
     s[0][0] = dpf_random_block();
@@ -74,7 +74,7 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
     s[0][1] = dpf_set_lsb_zero(s[0][1]);
 
     int i;
-    block s0[2], s1[2];  // 0=L,1=R
+    uint128 s0[2], s1[2];  // 0=L,1=R
 #define LEFT 0
 #define RIGHT 1
     int t0[2], t1[2];
@@ -92,13 +92,13 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
             lose = LEFT;
         }
 
-        sCW[i - 1] = dpf_xor(s0[lose], s1[lose]);
+        sCW[i - 1] = uint128_xor(s0[lose], s1[lose]);
 
         tCW[i - 1][LEFT] = t0[LEFT] ^ t1[LEFT] ^ alphabit ^ 1;
         tCW[i - 1][RIGHT] = t0[RIGHT] ^ t1[RIGHT] ^ alphabit;
 
         if (t[i - 1][0] == 1) {
-            s[i][0] = dpf_xor(s0[keep], sCW[i - 1]);
+            s[i][0] = uint128_xor(s0[keep], sCW[i - 1]);
             t[i][0] = t0[keep] ^ tCW[i - 1][keep];
         } else {
             s[i][0] = s0[keep];
@@ -106,7 +106,7 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
         }
 
         if (t[i - 1][1] == 1) {
-            s[i][1] = dpf_xor(s1[keep], sCW[i - 1]);
+            s[i][1] = uint128_xor(s1[keep], sCW[i - 1]);
             t[i][1] = t1[keep] ^ tCW[i - 1][keep];
         } else {
             s[i][1] = s1[keep];
@@ -114,7 +114,7 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
         }
     }
 
-    block finalblock;
+    uint128 finalblock;
     finalblock = dpf_zero_block();
     finalblock = dpf_reverse_lsb(finalblock);
 
@@ -143,8 +143,8 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
     //dpf_cb(finalblock);
     finalblock = dpf_reverse_lsb(finalblock);
 
-    finalblock = dpf_xor(finalblock, s[maxlayer][0]);
-    finalblock = dpf_xor(finalblock, s[maxlayer][1]);
+    finalblock = uint128_xor(finalblock, s[maxlayer][0]);
+    finalblock = uint128_xor(finalblock, s[maxlayer][1]);
 
     unsigned char *buff0;
     unsigned char *buff1;
@@ -181,15 +181,15 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
     return size;
 }
 
-block EVAL(AES_KEY *key, unsigned char *k, long x) {
+uint128 EVAL(AES_KEY *key, unsigned char *k, long x) {
     int n = k[0];
     int max_layer = max(n - 7, 0);
 
-    block s[max_layer + 1];
+    uint128 s[max_layer + 1];
     int t[max_layer + 1];
-    block sCW[max_layer];
+    uint128 sCW[max_layer];
     int tCW[max_layer][2];
-    block final_block;
+    uint128 final_block;
 
     memcpy(&s[0], &k[1], 16);
     t[0] = k[17];
@@ -203,14 +203,14 @@ block EVAL(AES_KEY *key, unsigned char *k, long x) {
 
     memcpy(&final_block, &k[18 * (max_layer + 1)], 16);
 
-    block sL, sR;
+    uint128 sL, sR;
     int tL, tR;
     for (i = 1; i <= max_layer; i++) {
         PRG(key, s[i - 1], &sL, &sR, &tL, &tR);
 
         if (t[i - 1] == 1) {
-            sL = dpf_xor(sL, sCW[i - 1]);
-            sR = dpf_xor(sR, sCW[i - 1]);
+            sL = uint128_xor(sL, sCW[i - 1]);
+            sR = uint128_xor(sR, sCW[i - 1]);
             tL = tL ^ tCW[i - 1][0];
             tR = tR ^ tCW[i - 1][1];
         }
@@ -225,38 +225,38 @@ block EVAL(AES_KEY *key, unsigned char *k, long x) {
         }
     }
 
-    block res;
+    uint128 res;
     res = s[max_layer];
     if (t[max_layer] == 1) {
         res = dpf_reverse_lsb(res);
     }
 
     if (t[max_layer] == 1) {
-        res = dpf_xor(res, final_block);
+        res = uint128_xor(res, final_block);
     }
 
     return res;
 }
 
-block *EVALFULL(AES_KEY *key, const unsigned char *k) {
+uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
     int n = k[0];
     int maxlayer = max(n - 7, 0);
     long maxlayeritem = 1 << maxlayer;
 
     //block s[2][maxlayeritem];
     //int t[2][maxlayeritem];
-    block *s[2];
+    uint128 *s[2];
     int *t[2];
     for (int ii = 0; ii < 2; ii++) {
-        s[ii] = new block[maxlayeritem];
+        s[ii] = new uint128[maxlayeritem];
         t[ii] = new int[maxlayeritem];
     }
 
     int curlayer = 1;
 
-    block sCW[maxlayer];
+    uint128 sCW[maxlayer];
     int tCW[maxlayer][2];
-    block finalblock;
+    uint128 finalblock;
 
     memcpy(&s[0][0], &k[1], 16);
     t[0][0] = k[17];
@@ -277,13 +277,13 @@ block *EVALFULL(AES_KEY *key, const unsigned char *k) {
         long itemnumber = 1 << (i - 1);
         //#pragma omp parallel for
         for (j = 0; j < itemnumber; j++) {
-            block sL, sR;
+            uint128 sL, sR;
             int tL, tR;
             PRG(key, s[1 - curlayer][j], &sL, &sR, &tL, &tR);
 
             if (t[1 - curlayer][j] == 1) {
-                sL = dpf_xor(sL, sCW[i - 1]);
-                sR = dpf_xor(sR, sCW[i - 1]);
+                sL = uint128_xor(sL, sCW[i - 1]);
+                sR = uint128_xor(sR, sCW[i - 1]);
                 tL = tL ^ tCW[i - 1][0];
                 tR = tR ^ tCW[i - 1][1];
             }
@@ -297,7 +297,7 @@ block *EVALFULL(AES_KEY *key, const unsigned char *k) {
     }
 
     long itemnumber = 1 << maxlayer;
-    block *res = (block *)malloc(sizeof(block) * itemnumber);
+    uint128 *res = (uint128 *)malloc(sizeof(uint128) * itemnumber);
 
     //#pragma omp parallel for
     for (j = 0; j < itemnumber; j++) {
@@ -308,7 +308,7 @@ block *EVALFULL(AES_KEY *key, const unsigned char *k) {
         }
 
         if (t[1 - curlayer][j] == 1) {
-            res[j] = dpf_xor(res[j], finalblock);
+            res[j] = uint128_xor(res[j], finalblock);
         }
     }
 
@@ -323,7 +323,7 @@ block *EVALFULL(AES_KEY *key, const unsigned char *k) {
 void test_libdpf() {
     long long userkey1 = 597349;
     long long userkey2 = 121379;
-    block userkey = dpf_make_block(userkey1, userkey2);
+    uint128 userkey = dpf_make_block(userkey1, userkey2);
 
     dpf_seed(NULL);
 
@@ -335,22 +335,22 @@ void test_libdpf() {
 
     GEN(&key, 1, 1, &k0, &k1);
 
-    block res1;
-    block res2;
+    uint128 res1;
+    uint128 res2;
 
     res1 = EVAL(&key, k0, 0);
     res2 = EVAL(&key, k1, 0);
     dpf_cb(res1);
     dpf_cb(res2);
-    dpf_cb(dpf_xor(res1, res2));
+    dpf_cb(uint128_xor(res1, res2));
 
     res1 = EVAL(&key, k0, 128);
     res2 = EVAL(&key, k1, 128);
     dpf_cb(res1);
     dpf_cb(res2);
-    dpf_cb(dpf_xor(res1, res2));
+    dpf_cb(uint128_xor(res1, res2));
 
-    block *resf0, *resf1;
+    uint128 *resf0, *resf1;
     resf0 = EVALFULL(&key, k0);
     resf1 = EVALFULL(&key, k1);
 
@@ -360,6 +360,6 @@ void test_libdpf() {
 
         dpf_cb(resf0[j]);
         dpf_cb(resf1[j]);
-        dpf_cb(dpf_xor(resf0[j], resf1[j]));
+        dpf_cb(uint128_xor(resf0[j], resf1[j]));
     }
 }

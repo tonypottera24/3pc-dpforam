@@ -7,20 +7,20 @@
 class DPFORAM : public Protocol {
 private:
     static FSS1Bit fss_;
-    uchar **rom_[2];
-    uchar **wom_;
+    uchar **read_array_[2];
+    uchar **write_array_;
     uchar **read_cache_[2];
     DPFORAM *position_map_;
     unsigned long read_cache_ctr_;
 
 public:
     uint log_n_;
-    uint log_n_bytes_;
+    uint log_n_size_;
     uint next_log_n_;
-    uint next_log_n_bytes_;
+    uint next_log_n_size_;
     uint tau_;
-    uint ttp_;
-    uint d_bytes_;
+    uint data_per_block_;
+    uint data_size_;
     unsigned long n_;
     bool is_first_;
     bool is_last_;
