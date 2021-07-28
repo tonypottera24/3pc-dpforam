@@ -14,10 +14,10 @@ private:
     unsigned long read_cache_ctr_;
 
 public:
-    uint log_n_;
-    uint log_n_size_;
-    uint next_log_n_;
-    uint next_log_n_size_;
+    uint pos_log_n_;
+    uint pos_log_n_size_;
+    uint oram_log_n_;
+    uint oram_log_n_size_;
     uint tau_;
     uint data_per_block_;
     uint data_size_;
