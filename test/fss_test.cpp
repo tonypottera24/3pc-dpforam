@@ -10,11 +10,11 @@ int main() {
     FSS1Bit evaluators[2];
 
     for (uint m = 1; m <= 20; m++) {
-        unsigned long range = 1ul << m;
+        uint64_t range = 1ULL << m;
 
         for (uint i = 0; i < 100; i++) {
             bool pass = true;
-            unsigned long alpha = rand_long(range);
+            uint64_t alpha = rand_long(range);
             uchar *keys[2];
             generator.Gen(alpha, m, keys);
             uchar *share0 = new uchar[range];
@@ -22,7 +22,7 @@ int main() {
             evaluators[0].EvalAll(keys[0], m, share0);
             evaluators[1].EvalAll(keys[1], m, share1);
 
-            for (unsigned long x = 0; x < range; x++) {
+            for (uint64_t x = 0; x < range; x++) {
                 uchar output = share0[x] ^ share1[x];
                 if (x == alpha) {
                     if (output == 0) {

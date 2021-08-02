@@ -13,12 +13,12 @@ int Connection::ReadInt() {
     return n;
 }
 
-void Connection::WriteLong(long n, bool count_band) {
+void Connection::WriteLong(uint64_t n, bool count_band) {
     Write((uchar*)&n, 8, count_band);
 }
 
-long Connection::ReadLong() {
-    long n;
+uint64_t Connection::ReadLong() {
+    uint64_t n;
     Read((uchar*)&n, 8);
     return n;
 }

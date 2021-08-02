@@ -48,11 +48,11 @@ inline void select_xor_128(const uchar *__restrict__ a, bool bit, uint quo, uint
 
 void int_to_bytes(uint n, uchar *b);
 uint bytes_to_int(const uchar *b);
-void long_to_bytes(unsigned long n, uchar *b);
-void long_to_bytes(unsigned long n, uchar *b, uint len);
-unsigned long bytes_to_long(const uchar *b);
-unsigned long bytes_to_long(const uchar *b, uint len);
-unsigned long rand_long(long range);
-unsigned long current_timestamp();
+void long_to_bytes(uint64_t n, uchar *b);
+void long_to_bytes(uint64_t n, uchar *b, uint len);
+uint64_t bytes_to_long(const uchar *b);
+uint64_t bytes_to_long(const uchar *b, uint len);
+uint64_t rand_long(uint64_t range);
+uint64_t current_timestamp();
 
 #endif /* UTIL_H_ */

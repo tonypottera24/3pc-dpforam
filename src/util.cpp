@@ -53,7 +53,7 @@ uint bytes_to_int(const uchar *b) {
     return num;
 }
 
-void long_to_bytes(unsigned long n, uchar *b) {
+void long_to_bytes(uint64_t n, uchar *b) {
     b[0] = (n >> 56) & 0xFF;
     b[1] = (n >> 48) & 0xFF;
     b[2] = (n >> 40) & 0xFF;
@@ -64,7 +64,7 @@ void long_to_bytes(unsigned long n, uchar *b) {
     b[7] = n & 0xFF;
 }
 
-void long_to_bytes(unsigned long n, uchar *b, uint len) {
+void long_to_bytes(uint64_t n, uchar *b, uint len) {
     for (uint i = 0; i < std::min(len, 8u); i++) {
         b[len - 1 - i] = n & 0xFF;
         n >>= 8;
@@ -74,8 +74,8 @@ void long_to_bytes(unsigned long n, uchar *b, uint len) {
     }
 }
 
-unsigned long bytes_to_long(const uchar *b) {
-    unsigned long num = 0;
+uint64_t bytes_to_long(const uchar *b) {
+    uint64_t num = 0;
     for (uint i = 0; i < 8; i++) {
         num <<= 8;
         num |= b[i];
@@ -83,8 +83,8 @@ unsigned long bytes_to_long(const uchar *b) {
     return num;
 }
 
-unsigned long bytes_to_long(const uchar *b, uint len) {
-    unsigned long num = 0;
+uint64_t bytes_to_long(const uchar *b, uint len) {
+    uint64_t num = 0;
     uint min = std::min(len, 8u);
     for (uint i = 0; i < min; i++) {
         num <<= 8;
@@ -93,22 +93,22 @@ unsigned long bytes_to_long(const uchar *b, uint len) {
     return num;
 }
 
-unsigned long rand_long(long range) {
+int64_t rand_long(int64_t range) {
     assert(range > 0);
-    unsigned long bits;
-    long val;
+    uint64_t bits;
+    int64_t val;
     uchar bytes[8];
     do {
         RAND_bytes(bytes, 8);
         bits = bytes_to_long(bytes);
         bits = (bits << 1) >> 1;
         val = bits % range;
-    } while ((long)bits - val + (range - 1L) < 0L);
+    } while ((int64_t)bits - val + (range - 1LL) < 0LL);
     return val;
 }
 
-unsigned long current_timestamp() {
+uint64_t current_timestamp() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return (unsigned long)tv.tv_sec * (unsigned long)1000000 + (unsigned long)tv.tv_usec;
+    return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
 }

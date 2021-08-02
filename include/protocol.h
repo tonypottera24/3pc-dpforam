@@ -21,7 +21,7 @@ public:
              CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs);
     virtual ~Protocol();
     void Sync();
-    unsigned long Bandwidth();
+    uint64_t Bandwidth();
     virtual void Test(uint iter) = 0;
 };
 

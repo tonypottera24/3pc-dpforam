@@ -80,26 +80,26 @@ void SimpleSocket::SetNoDelay() {
     }
 }
 
-void SimpleSocket::Write(const uchar *data, unsigned long bytes, bool count_band) {
-    long write_bytes;
-    unsigned long offset = 0ul;
-    while (offset < bytes) {
-        write_bytes = ::write(socket_fd_, data + offset, bytes - offset);
-        if (write_bytes < 0) {
+void SimpleSocket::Write(const uchar *data, uint64_t data_size, bool count_band) {
+    uint64_t write_size;
+    uint64_t offset = 0ULL;
+    while (offset < data_size) {
+        write_size = ::write(socket_fd_, data + offset, data_size - offset);
+        if (write_size < 0) {
             error("write failed");
         }
-        offset += write_bytes;
+        offset += write_size;
     }
     if (count_band) {
-        bandwidth_ += bytes;
+        bandwidth_ += data_size;
     }
 }
 
-void SimpleSocket::Read(uchar *data, unsigned long bytes) {
-    long read_bytes;
-    unsigned long offset = 0ul;
-    while (offset < bytes) {
-        read_bytes = ::read(socket_fd_, data + offset, bytes - offset);
+void SimpleSocket::Read(uchar *data, uint64_t data_size) {
+    uint64_t read_bytes;
+    uint64_t offset = 0ULL;
+    while (offset < data_size) {
+        read_bytes = ::read(socket_fd_, data + offset, data_size - offset);
         if (read_bytes < 0) {
             error("read failed");
         }
@@ -108,10 +108,10 @@ void SimpleSocket::Read(uchar *data, unsigned long bytes) {
 }
 
 // TODO: debug
-// void SimpleSocket::fwrite(const uchar *data, unsigned long bytes, bool count_band)
+// void SimpleSocket::fwrite(const uchar *data, uint64_t bytes, bool count_band)
 // {
 //     long write_bytes;
-//     unsigned long offset = 0ul;
+//     uint64_t offset = 0ULL;
 //     while (offset < bytes)
 //     {
 //         write_bytes = ::fwrite(data + offset, 1, bytes - offset, stream);
@@ -128,10 +128,10 @@ void SimpleSocket::Read(uchar *data, unsigned long bytes) {
 // }
 
 // TODO: debug
-// void SimpleSocket::fread(uchar *data, unsigned long bytes)
+// void SimpleSocket::fread(uchar *data, uint64_t bytes)
 // {
 //     long read_bytes;
-//     unsigned long offset = 0ul;
+//     uint64_t offset = 0ULL;
 //     while (offset < bytes)
 //     {
 //         read_bytes = ::fread(data + offset, 1, bytes - offset, stream);

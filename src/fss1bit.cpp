@@ -7,102 +7,102 @@
 
 #include "bit_perm.h"
 
-const unsigned long masks[64] = {0x0000000000000001ul, 0x0000000000000002ul,
-                                 0x0000000000000004ul, 0x0000000000000008ul, 0x0000000000000010ul,
-                                 0x0000000000000020ul, 0x0000000000000040ul, 0x0000000000000080ul,
-                                 0x0000000000000100ul, 0x0000000000000200ul, 0x0000000000000400ul,
-                                 0x0000000000000800ul, 0x0000000000001000ul, 0x0000000000002000ul,
-                                 0x0000000000004000ul, 0x0000000000008000ul, 0x0000000000010000ul,
-                                 0x0000000000020000ul, 0x0000000000040000ul, 0x0000000000080000ul,
-                                 0x0000000000100000ul, 0x0000000000200000ul, 0x0000000000400000ul,
-                                 0x0000000000800000ul, 0x0000000001000000ul, 0x0000000002000000ul,
-                                 0x0000000004000000ul, 0x0000000008000000ul, 0x0000000010000000ul,
-                                 0x0000000020000000ul, 0x0000000040000000ul, 0x0000000080000000ul,
-                                 0x0000000100000000ul, 0x0000000200000000ul, 0x0000000400000000ul,
-                                 0x0000000800000000ul, 0x0000001000000000ul, 0x0000002000000000ul,
-                                 0x0000004000000000ul, 0x0000008000000000ul, 0x0000010000000000ul,
-                                 0x0000020000000000ul, 0x0000040000000000ul, 0x0000080000000000ul,
-                                 0x0000100000000000ul, 0x0000200000000000ul, 0x0000400000000000ul,
-                                 0x0000800000000000ul, 0x0001000000000000ul, 0x0002000000000000ul,
-                                 0x0004000000000000ul, 0x0008000000000000ul, 0x0010000000000000ul,
-                                 0x0020000000000000ul, 0x0040000000000000ul, 0x0080000000000000ul,
-                                 0x0100000000000000ul, 0x0200000000000000ul, 0x0400000000000000ul,
-                                 0x0800000000000000ul, 0x1000000000000000ul, 0x2000000000000000ul,
-                                 0x4000000000000000ul, 0x8000000000000000ul};
+const uint64_t masks[64] = {0x0000000000000001ULL, 0x0000000000000002ULL,
+                            0x0000000000000004ULL, 0x0000000000000008ULL, 0x0000000000000010ULL,
+                            0x0000000000000020ULL, 0x0000000000000040ULL, 0x0000000000000080ULL,
+                            0x0000000000000100ULL, 0x0000000000000200ULL, 0x0000000000000400ULL,
+                            0x0000000000000800ULL, 0x0000000000001000ULL, 0x0000000000002000ULL,
+                            0x0000000000004000ULL, 0x0000000000008000ULL, 0x0000000000010000ULL,
+                            0x0000000000020000ULL, 0x0000000000040000ULL, 0x0000000000080000ULL,
+                            0x0000000000100000ULL, 0x0000000000200000ULL, 0x0000000000400000ULL,
+                            0x0000000000800000ULL, 0x0000000001000000ULL, 0x0000000002000000ULL,
+                            0x0000000004000000ULL, 0x0000000008000000ULL, 0x0000000010000000ULL,
+                            0x0000000020000000ULL, 0x0000000040000000ULL, 0x0000000080000000ULL,
+                            0x0000000100000000ULL, 0x0000000200000000ULL, 0x0000000400000000ULL,
+                            0x0000000800000000ULL, 0x0000001000000000ULL, 0x0000002000000000ULL,
+                            0x0000004000000000ULL, 0x0000008000000000ULL, 0x0000010000000000ULL,
+                            0x0000020000000000ULL, 0x0000040000000000ULL, 0x0000080000000000ULL,
+                            0x0000100000000000ULL, 0x0000200000000000ULL, 0x0000400000000000ULL,
+                            0x0000800000000000ULL, 0x0001000000000000ULL, 0x0002000000000000ULL,
+                            0x0004000000000000ULL, 0x0008000000000000ULL, 0x0010000000000000ULL,
+                            0x0020000000000000ULL, 0x0040000000000000ULL, 0x0080000000000000ULL,
+                            0x0100000000000000ULL, 0x0200000000000000ULL, 0x0400000000000000ULL,
+                            0x0800000000000000ULL, 0x1000000000000000ULL, 0x2000000000000000ULL,
+                            0x4000000000000000ULL, 0x8000000000000000ULL};
 
-void to_byte_vector(unsigned long input, uchar *output, uint size) {
+void to_byte_vector(uint64_t input, uchar *output, uint size) {
 #pragma omp simd aligned(output, masks : 16)
     for (uint i = 0; i < size; i++) {
-        output[i] = (input & masks[i]) != 0ul;
+        output[i] = (input & masks[i]) != 0ULL;
     }
 }
 
 void to_byte_vector(uint128 input, uchar *output) {
-    unsigned long *val = (unsigned long *)&input;
+    uint64_t *val = (uint64_t *)&input;
     to_byte_vector(val[0], output, 64);
     to_byte_vector(val[1], output + 64, 64);
 }
 
 // TODO: find supported cpu to test BMI2
-void to_byte_vector_with_perm(unsigned long input, uchar *output, uint size,
+void to_byte_vector_with_perm(uint64_t input, uchar *output, uint size,
                               uint perm) {
 //#if defined(__BMI2__)
 //	input = general_reverse_bits(input, perm ^ 63);
 //	uchar* addr = (uchar*) &input;
-//	unsigned long long * data64 = (unsigned long long *) output;
+//	uint64_t * data64 = (uint64_t *) output;
 //	for (uint i = 0; i < size/8; ++i) {
-//		unsigned long long tmp = 0;
+//		uint64_t tmp = 0;
 //		memcpy(&tmp, addr+i, 1);
-//		data64[i] = _pdep_u64(tmp, (unsigned long long) 0x0101010101010101ULL);
+//		data64[i] = _pdep_u64(tmp, (uint64_t) 0x0101010101010101ULL);
 //	}
 //#else
 #pragma omp simd aligned(output, masks : 16)
     for (uint i = 0; i < size; i++) {
-        output[i] = (input & masks[i ^ perm]) != 0ul;
+        output[i] = (input & masks[i ^ perm]) != 0ULL;
     }
     //#endif
 }
 
 FSS1Bit::FSS1Bit() {
-    long long userkey1 = 597349;
-    long long userkey2 = 121379;
+    uint64_t userkey1 = 597349ULL;
+    uint64_t userkey2 = 121379ULL;
     uint128 userkey = dpf_make_block(userkey1, userkey2);
     uchar seed[] = "abcdefghijklmnop";
     dpf_seed((uint128 *)seed);
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-uint FSS1Bit::Gen(unsigned long alpha, uint m, uchar *keys[2]) {
+uint FSS1Bit::Gen(uint64_t alpha, uint m, uchar *keys[2]) {
     return GEN(&aes_key_, alpha, m, keys, keys + 1);
 }
 
 void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
     uint128 *res = EVALFULL(&aes_key_, key);
     if (m <= 6) {
-        to_byte_vector(((unsigned long *)res)[0], out, (1 << m));
+        to_byte_vector(((uint64_t *)res)[0], out, (1 << m));
     } else {
         uint max_layer = std::max((int)m - 7, 0);
-        unsigned long groups = 1ul << max_layer;
-        for (unsigned long i = 0; i < groups; i++) {
+        uint64_t groups = 1ULL << max_layer;
+        for (uint64_t i = 0; i < groups; i++) {
             to_byte_vector(res[i], out + (i << 7));
         }
     }
     free(res);
 }
 
-void FSS1Bit::EvalAllWithPerm(const uchar *key, uint m, unsigned long perm,
+void FSS1Bit::EvalAllWithPerm(const uchar *key, uint m, uint64_t perm,
                               uchar *out) {
     uint128 *res = EVALFULL(&aes_key_, key);
-    unsigned long *ptr = (unsigned long *)res;
+    uint64_t *ptr = (uint64_t *)res;
     uint index_perm = perm & 63;
     if (m <= 6) {
         to_byte_vector_with_perm(ptr[0], out, (1 << m), index_perm);
     } else {
-        unsigned long group_perm = perm >> 6;
+        uint64_t group_perm = perm >> 6;
         uint max_layer = std::max((int)m - 6, 0);
-        unsigned long groups = 1ul << max_layer;
+        uint64_t groups = 1ULL << max_layer;
         //#pragma omp parallel for
-        for (unsigned long i = 0; i < groups; i++) {
+        for (uint64_t i = 0; i < groups; i++) {
             to_byte_vector_with_perm(ptr[i ^ group_perm], out + (i << 6), 64,
                                      index_perm);
         }

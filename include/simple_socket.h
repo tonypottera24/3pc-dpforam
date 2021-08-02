@@ -17,10 +17,10 @@ public:
     void InitServer(int port);
     void InitClient(const char *ip, int port);
     void SetNoDelay();
-    void Write(const uchar *data, unsigned long bytes, bool count_band = true);
-    void Read(uchar *data, unsigned long bytes);
-    // void fwrite(const uchar *data, unsigned long bytes, bool count_band = true);
-    // void fread(uchar *data, unsigned long bytes);
+    void Write(const uchar *data, uint64_t bytes, bool count_band = true);
+    void Read(uchar *data, uint64_t bytes);
+    // void fwrite(const uchar *data, uint64_t bytes, bool count_band = true);
+    // void fread(uchar *data, uint64_t bytes);
     void Flush();
     void Close();
 };

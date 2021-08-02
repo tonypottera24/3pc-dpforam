@@ -4,6 +4,5 @@
 #include <sys/types.h>
 
 typedef unsigned char uchar;
-typedef unsigned long ulong;
 
 #endif /* TYPEDEF_H_ */
