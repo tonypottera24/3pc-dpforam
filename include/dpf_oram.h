@@ -1,5 +1,5 @@
-#ifndef DPFORAM_H_
-#define DPFORAM_H_
+#ifndef DPF_ORAM_H_
+#define DPF_ORAM_H_
 
 #include "fss1bit.h"
 #include "protocol.h"
@@ -11,7 +11,7 @@ private:
     uchar **write_array_;
     uchar **read_cache_[2];
     DPFORAM *position_map_;
-    unsigned long read_cache_ctr_;
+    uint64_t read_cache_ctr_;
 
 public:
     uint pos_log_n_;
@@ -21,7 +21,7 @@ public:
     uint tau_;
     uint data_per_block_;
     uint data_size_;
-    unsigned long n_;
+    uint64_t n_;
     bool is_first_;
     bool is_last_;
 
@@ -31,12 +31,12 @@ private:
     void SetMemZero(uchar **mem);
     void InitMem(uchar **&mem);
     void DeleteMem(uchar **mem);
-    void BlockPIR(const unsigned long addr_23[2], const uchar *const *const mem_23[2],
-                  unsigned long size, uchar *block_23[2], uchar *fss_out[2]);
-    void RecPIR(const uint idx_23[2], const uchar *const block_23[2],
-                uchar *rec_23[2]);
-    void UpdateWOM(const uchar *const delta_block_23[2],
-                   const uchar *const fss_out[2]);
+    void BlockPIR(const uint64_t addr_23[2], const uchar *const *const mem_23[2],
+                  uint64_t size, uchar *block_23[2], uchar *fss_out[2]);
+    void DataPIR(const uint idx_23[2], const uchar *const block_23[2],
+                 uchar *rec_23[2]);
+    void UpdateWriteArray(const uchar *const delta_block_23[2],
+                          const uchar *const fss_out[2]);
     void AppendCache(const uchar *const block_23[2],
                      const uchar *const delta_block_23[2]);
     void WOM2ROM();
@@ -47,10 +47,10 @@ public:
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
             uint log_n, uint d_bytes, bool is_last);
     ~DPFORAM();
-    void Access(const unsigned long addr_23[2], const uchar *const new_rec_23[2],
+    void Access(const uint64_t addr_23[2], const uchar *const new_rec_23[2],
                 bool isRead, uchar *rec_23[2]);
     void PrintMetadata();
     void Test(uint iter);
 };
 
-#endif /* DPFORAM_H_ */
+#endif /* DPF_ORAM_H_ */
