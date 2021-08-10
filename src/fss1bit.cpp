@@ -72,39 +72,19 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-uint FSS1Bit::Gen(uint64_t alpha, uint m, uchar *keys[2]) {
-    return GEN(&aes_key_, alpha, m, keys, keys + 1);
+uint FSS1Bit::Gen(uint64_t alpha, uint log_n, uchar *keys[2]) {
+    return GEN(&aes_key_, alpha, log_n, keys, keys + 1);
 }
 
-void FSS1Bit::EvalAll(const uchar *key, uint m, uchar *out) {
+void FSS1Bit::EvalAll(const uchar *key, uint log_n, uchar *out) {
     uint128 *res = EVALFULL(&aes_key_, key);
-    if (m <= 6) {
-        to_byte_vector(((uint64_t *)res)[0], out, (1 << m));
+    if (log_n <= 6) {
+        to_byte_vector(((uint64_t *)res)[0], out, (1 << log_n));
     } else {
-        uint max_layer = std::max((int)m - 7, 0);
+        uint max_layer = std::max((int)log_n - 7, 0);
         uint64_t groups = 1ULL << max_layer;
         for (uint64_t i = 0; i < groups; i++) {
             to_byte_vector(res[i], out + (i << 7));
-        }
-    }
-    free(res);
-}
-
-void FSS1Bit::EvalAllWithPerm(const uchar *key, uint m, uint64_t perm,
-                              uchar *out) {
-    uint128 *res = EVALFULL(&aes_key_, key);
-    uint64_t *ptr = (uint64_t *)res;
-    uint index_perm = perm & 63;
-    if (m <= 6) {
-        to_byte_vector_with_perm(ptr[0], out, (1 << m), index_perm);
-    } else {
-        uint64_t group_perm = perm >> 6;
-        uint max_layer = std::max((int)m - 6, 0);
-        uint64_t groups = 1ULL << max_layer;
-        //#pragma omp parallel for
-        for (uint64_t i = 0; i < groups; i++) {
-            to_byte_vector_with_perm(ptr[i ^ group_perm], out + (i << 6), 64,
-                                     index_perm);
         }
     }
     free(res);

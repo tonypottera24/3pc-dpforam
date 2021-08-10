@@ -8,8 +8,8 @@
 
 #include <algorithm>
 
-void cal_xor(const uchar *a, const uchar *b, uint bytes, uchar *c) {
-    for (uint i = 0; i < bytes; i++) {
+void cal_xor(const uchar *a, const uchar *b, uint length, uchar *c) {
+    for (uint i = 0; i < length; i++) {
         c[i] = a[i] ^ b[i];
     }
 }
