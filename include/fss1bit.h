@@ -10,8 +10,8 @@ private:
 
 public:
     FSS1Bit();
-    uint Gen(uint64_t alpha, uint m, uchar *keys[2]);
-    void EvalAll(const uchar *key, uint m, uchar *out);
+    uint Gen(uint64_t index, uint log_n, uchar *keys[2]);
+    void EvalAll(const uchar *key, uint log_n, uchar *out);
 };
 
 #endif /* FSS_H_ */

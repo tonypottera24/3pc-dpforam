@@ -43,26 +43,6 @@ void to_byte_vector(uint128 input, uchar *output) {
     to_byte_vector(val[1], output + 64, 64);
 }
 
-// TODO: find supported cpu to test BMI2
-void to_byte_vector_with_perm(uint64_t input, uchar *output, uint size,
-                              uint perm) {
-//#if defined(__BMI2__)
-//	input = general_reverse_bits(input, perm ^ 63);
-//	uchar* addr = (uchar*) &input;
-//	uint64_t * data64 = (uint64_t *) output;
-//	for (uint i = 0; i < size/8; ++i) {
-//		uint64_t tmp = 0;
-//		memcpy(&tmp, addr+i, 1);
-//		data64[i] = _pdep_u64(tmp, (uint64_t) 0x0101010101010101ULL);
-//	}
-//#else
-#pragma omp simd aligned(output, masks : 16)
-    for (uint i = 0; i < size; i++) {
-        output[i] = (input & masks[i ^ perm]) != 0ULL;
-    }
-    //#endif
-}
-
 FSS1Bit::FSS1Bit() {
     uint64_t userkey1 = 597349ULL;
     uint64_t userkey2 = 121379ULL;
@@ -72,8 +52,8 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-uint FSS1Bit::Gen(uint64_t alpha, uint log_n, uchar *keys[2]) {
-    return GEN(&aes_key_, alpha, log_n, keys, keys + 1);
+uint FSS1Bit::Gen(uint64_t index, uint log_n, uchar *keys[2]) {
+    return GEN(&aes_key_, index, log_n, keys, keys + 1);
 }
 
 void FSS1Bit::EvalAll(const uchar *key, uint log_n, uchar *out) {

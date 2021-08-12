@@ -12,47 +12,53 @@ FSS1Bit DPFORAM::fss_;
 DPFORAM::DPFORAM(const char *party, Connection *connections[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
-                 uint n, uint data_size) : Protocol(party, connections, rnd, prgs) {
-    this->n_ = n;
+                 uint array_length, uint data_size) : Protocol(party, connections, rnd, prgs) {
+    this->array_length_ = array_length;
     this->data_size_ = data_size;
 
     this->tau_ = tau;
-    // this->data_per_block_ = 1 << this->tau_;
 
-    // this->block_ct_ = (this->data_ct_ + this->data_per_block_ - 1) / this->data_per_block_;
-    // this->block_ct_size_ = (this->block_ct_ + 7) / 8;
-
-    // this->log_block_ct_ = ceil(log2(this->block_ct_));
-    // this->log_block_ct_size_ = (this->log_block_ct_ + 7) / 8;
-
-    this->is_first_ = this->n_ <= 2;
+    this->is_first_ = this->array_length_ <= 2;
     // first level position map, can be contained by two blocks.
 
     for (uint i = 0; i < 2; i++) {
         this->InitArray(this->read_array_[i]);
         this->InitArray(this->read_cache_[i]);
+        this->InitArray(this->write_array_[i]);
     }
-    this->InitArray(this->write_array_);
     this->InitCacheCtr();
 
     if (this->is_first_) {
         this->position_map_ = NULL;
     } else {
-        uint pos_n = this->n_ >> this->tau_;
-        uint pos_data_size = ceil(log2(this->n_)) * (1U << this->tau_);
-        this->position_map_ = new DPFORAM(party, connections, rnd, prgs, tau, pos_n, pos_data_size);
+        uint pos_array_length = this->array_length_ >> this->tau_;
+        uint pos_data_size = ceil(log2(this->array_length_)) * (1U << this->tau_);
+        this->position_map_ = new DPFORAM(party, connections, rnd, prgs, tau, pos_array_length, pos_data_size);
     }
 }
 
 DPFORAM::~DPFORAM() {
-    if (!this->is_first_) {
-        delete this->position_map_;
-        this->DeleteArray(this->read_cache_[0]);
-        this->DeleteArray(this->read_cache_[1]);
-        this->DeleteArray(this->write_array_);
+    if (this->position_map_ != NULL) delete this->position_map_;
+    for (uint i = 0; i < 2; i++) {
+        this->DeleteArray(this->read_array_[i]);
+        this->DeleteArray(this->read_cache_[i]);
+        this->DeleteArray(this->write_array_[i]);
     }
-    this->DeleteArray(this->read_array_[0]);
-    this->DeleteArray(this->read_array_[1]);
+}
+
+void DPFORAM::InitArray(uchar **&array) {
+    array = new uchar *[this->array_length_];
+    for (uint i = 0; i < this->array_length_; i++) {
+        array[i] = new uchar[this->data_size_]();  // init to zero
+    }
+}
+
+void DPFORAM::DeleteArray(uchar **array) {
+    if (array == NULL) return;
+    for (uint i = 0; i < this->array_length_; i++) {
+        delete[] array[i];
+    }
+    delete[] array;
 }
 
 void DPFORAM::InitCacheCtr() {
@@ -152,12 +158,47 @@ void DPFORAM::DataPIR(const uint index_23[2], const uchar *const block_23[2],
     delete[] keys[1];
 }
 
+void DPFORAM::PIR(const uchar *array[2], const uchar array_length, const uint index[2], uchar *data_23[2]) {
+    uchar *query[2];
+    uint key_size = this->fss_.Gen(index[0] ^ index[1], this->tau_, query);
+
+    // Make sure query[0] has one more 1 than query[1].
+    uchar dpf_out[this->array_length_];
+    this->fss_.EvalAll(query[0], ceil(log2(this->array_length_)), dpf_out);
+    if (dpf_out[index[0] ^ index[1]] == 0) {
+        std::swap(query[0], query[1]);
+    }
+    this->conn_[0]->Write(query[0], key_size);
+    this->conn_[1]->Write(query[1], key_size);
+
+    this->conn_[0]->Read(query[1], key_size);
+    this->conn_[1]->Read(query[0], key_size);
+
+    memset(data_23[0], 0, this->next_log_n_size_);
+    for (uint i = 0; i < 2; i++) {
+        uchar dpf_out[this->array_length_];
+        this->fss_.EvalAll(query[i], ceil(log2(this->array_length_)), dpf_out);
+        for (uint j = 0; j < data_per_block_; j++) {
+            if (dpf_out[j ^ index[i]]) {
+                cal_xor(data_23[0], block_23[i] + j * next_log_n_size_,
+                        next_log_n_size_, data_23[0]);
+            }
+        }
+    }
+
+    this->conn_[0]->Write(data_23[0], next_log_n_size_);
+    this->conn_[1]->Read(data_23[1], next_log_n_size_);
+
+    delete[] query[0];
+    delete[] query[1];
+}
+
 void DPFORAM::UpdateWriteArray(const uchar *const delta_block_23[2],
                                const uchar *const dpf_out[2]) {
     uint quo = this->data_size_ / 16;
     uint rem = this->data_size_ % 16;
 #pragma omp parallel for
-    for (uint64_t j = 0; j < n_; j++) {
+    for (uint64_t j = 0; j < array_length_; j++) {
         for (uint i = 0; i < 2; i++) {
             select_xor_128(delta_block_23[i], dpf_out[i][j], quo, rem, this->write_array_[j]);
         }
@@ -170,7 +211,7 @@ void DPFORAM::AppendCache(const uchar *const block_23[2],
         cal_xor(block_23[i], delta_block_23[i], this->data_size_, this->read_cache_[i][this->read_cache_ctr_]);
     }
     this->read_cache_ctr_++;
-    if (this->read_cache_ctr_ == this->n_) {
+    if (this->read_cache_ctr_ == this->array_length_) {
         this->InitCacheCtr();
         this->WriteArrayToReadArray();
         // this->position_map_->Init();
@@ -180,15 +221,15 @@ void DPFORAM::AppendCache(const uchar *const block_23[2],
 // TODO: buffered read/write
 void DPFORAM::WriteArrayToReadArray() {
     if (this->is_first_) return;
-    for (uint64_t i = 0; i < this->n_; i++) {
+    for (uint64_t i = 0; i < this->array_length_; i++) {
         memcpy(this->read_array_[0][i], this->write_array_[i], this->data_size_);
     }
-    for (uint64_t i = 0; i < this->n_; i++) {
+    for (uint64_t i = 0; i < this->array_length_; i++) {
         this->conn_[0]->Write(this->write_array_[i], this->data_size_);
         //		cons[0]->fwrite(wom[i], DBytes);
     }
     //	cons[0]->Flush();
-    for (uint64_t i = 0; i < this->n_; i++) {
+    for (uint64_t i = 0; i < this->array_length_; i++) {
         this->conn_[1]->Read(this->read_array_[1][i], this->data_size_);
         //		cons[1]->fread(rom[1][i], DBytes);
     }
@@ -212,12 +253,12 @@ void DPFORAM::Access(const uint64_t index_23[2], const uchar *const new_data_23[
         uchar *delta_read_array_23[2];
         for (uint i = 0; i < 2; i++) {
             block_23[i] = new uchar[this->data_size_];
-            dpf_out[i] = new uchar[this->n_];
+            dpf_out[i] = new uchar[this->array_length_];
             delta_data_23[i] = new uchar[this->next_log_n_size_];
             delta_block_23[i] = new uchar[this->data_size_];
-            delta_read_array_23[i] = new uchar[this->n_ * this->data_size_];
+            delta_read_array_23[i] = new uchar[this->array_length_ * this->data_size_];
         }
-        BlockPIR(block_index_23, this->read_array_, this->n_, block_23, dpf_out);
+        BlockPIR(block_index_23, this->read_array_, this->array_length_, block_23, dpf_out);
         DataPIR(data_index_23, block_23, data_23);
 
         for (uint i = 0; i < 2; i++) {
@@ -236,7 +277,7 @@ void DPFORAM::Access(const uint64_t index_23[2], const uchar *const new_data_23[
         //                 delta_rom_23);
 
         for (uint i = 0; i < 2; i++) {
-            for (uint64_t j = 0; j < this->n_; j++) {
+            for (uint64_t j = 0; j < this->array_length_; j++) {
                 cal_xor(read_array_[i][j], delta_read_array_23[i] + j * this->data_size_, this->data_size_,
                         read_array_[i][j]);
             }
@@ -267,7 +308,7 @@ void DPFORAM::Access(const uint64_t index_23[2], const uchar *const new_data_23[
 
         this->position_map_->Access(block_index_23, new_cache_index_23, false, cache_index_23);
 
-        uint64_t mask2 = this->n_ - 1;
+        uint64_t mask2 = this->array_length_ - 1;
         uint64_t cache_block_index_23[2];
         for (uint i = 0; i < 2; i++) {
             cache_block_index_23[i] = bytes_to_long(cache_index_23[i], this->log_block_ct_size_) & mask2;
@@ -281,12 +322,12 @@ void DPFORAM::Access(const uint64_t index_23[2], const uchar *const new_data_23[
         for (uint i = 0; i < 2; i++) {
             read_array_block_23[i] = new uchar[this->data_size_];
             cache_block_23[i] = new uchar[this->data_size_];
-            read_array_dpf_out[i] = new uchar[this->n_];
-            cache_dpf_out[i] = new uchar[this->n_];
+            read_array_dpf_out[i] = new uchar[this->array_length_];
+            cache_dpf_out[i] = new uchar[this->array_length_];
             block_23[i] = new uchar[this->data_size_];
         }
 
-        BlockPIR(block_index_23, this->read_array_, this->n_, read_array_block_23, read_array_dpf_out);
+        BlockPIR(block_index_23, this->read_array_, this->array_length_, read_array_block_23, read_array_dpf_out);
         BlockPIR(cache_block_index_23, this->read_cache_, this->read_cache_ctr_, cache_block_23,
                  cache_dpf_out);
 
@@ -366,7 +407,7 @@ void DPFORAM::PrintMetadata() {
     std::cout << "tau: " << this->tau_ << std::endl;
     std::cout << "2^tau: " << this->data_per_block_ << std::endl;
     std::cout << "logN: " << this->log_block_ct_ << std::endl;
-    std::cout << "N: " << this->n_ << std::endl;
+    std::cout << "N: " << this->array_length_ << std::endl;
     std::cout << "logNBytes: " << this->log_block_ct_size_ << std::endl;
     std::cout << "next_log_n_: " << this->next_log_n_ << std::endl;
     std::cout << "nextLogNBytes: " << this->next_log_n_size_ << std::endl;
@@ -478,18 +519,4 @@ void DPFORAM::Test(uint iter) {
     std::cout << "Total Bandwidth(byte): " << (total_band / iter) << std::endl;
     std::cout << "Max Wallclock(microsec): " << (max_wc / iter) << std::endl;
     std::cout << std::endl;
-}
-
-void DPFORAM::InitArray(uchar **&array) {
-    array = new uchar *[this->block_ct_];
-    for (uint i = 0; i < this->block_ct_; i++) {
-        array[i] = new uchar[this->data_size_]();  // init to zero
-    }
-}
-
-void DPFORAM::DeleteArray(uchar **array) {
-    for (uint i = 0; i < this->block_ct_; i++) {
-        delete[] array[i];
-    }
-    delete[] array;
 }
