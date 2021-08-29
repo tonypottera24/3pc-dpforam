@@ -15,8 +15,8 @@
         })
 
 uint128 dpf_reverse_lsb(uint128 input) {
-    static long long b1 = 0;
-    static long long b2 = 1;
+    static uint64_t b1 = 0;
+    static uint64_t b2 = 1;
     uint128 _xor = dpf_make_block(b1, b2);
     return uint128_xor(input, _xor);
 }
@@ -52,11 +52,11 @@ void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *b
     *output2 = dpf_set_lsb_zero(stash[1]);
 }
 
-static int getbit(long x, int n, int b) {
+static int getbit(uint64_t x, int n, int b) {
     return (x >> (n - b)) & 1;
 }
 
-int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
+int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
         unsigned char **k1) {
     int maxlayer = max(n - 7, 0);
     //int maxlayer = n;
@@ -181,7 +181,7 @@ int GEN(AES_KEY *key, long alpha, int n, unsigned char **k0,
     return size;
 }
 
-uint128 EVAL(AES_KEY *key, unsigned char *k, long x) {
+uint128 EVAL(AES_KEY *key, unsigned char *k, uint64_t x) {
     int n = k[0];
     int max_layer = max(n - 7, 0);
 
@@ -241,7 +241,7 @@ uint128 EVAL(AES_KEY *key, unsigned char *k, long x) {
 uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
     int n = k[0];
     int maxlayer = max(n - 7, 0);
-    long maxlayeritem = 1 << maxlayer;
+    uint64_t maxlayeritem = 1 << maxlayer;
 
     //block s[2][maxlayeritem];
     //int t[2][maxlayeritem];
@@ -262,7 +262,7 @@ uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
     t[0][0] = k[17];
 
     int i;
-    long j;
+    uint64_t j;
     for (i = 1; i <= maxlayer; i++) {
         memcpy(&sCW[i - 1], &k[18 * i], 16);
         tCW[i - 1][0] = k[18 * i + 16];
@@ -274,7 +274,7 @@ uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
     //block sL, sR;
     //int tL, tR;
     for (i = 1; i <= maxlayer; i++) {
-        long itemnumber = 1 << (i - 1);
+        uint64_t itemnumber = 1 << (i - 1);
         //#pragma omp parallel for
         for (j = 0; j < itemnumber; j++) {
             uint128 sL, sR;
@@ -296,7 +296,7 @@ uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
         curlayer = 1 - curlayer;
     }
 
-    long itemnumber = 1 << maxlayer;
+    uint64_t itemnumber = 1 << maxlayer;
     uint128 *res = (uint128 *)malloc(sizeof(uint128) * itemnumber);
 
     //#pragma omp parallel for
@@ -321,8 +321,8 @@ uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
 }
 
 void test_libdpf() {
-    long long userkey1 = 597349;
-    long long userkey2 = 121379;
+    uint64_t userkey1 = 597349;
+    uint64_t userkey2 = 121379;
     uint128 userkey = dpf_make_block(userkey1, userkey2);
 
     dpf_seed(NULL);
@@ -354,7 +354,7 @@ void test_libdpf() {
     resf0 = EVALFULL(&key, k0);
     resf1 = EVALFULL(&key, k1);
 
-    long j;
+    uint64_t j;
     for (j = 0; j < 1; j++) {
         printf("Group %ld\n", j);
 

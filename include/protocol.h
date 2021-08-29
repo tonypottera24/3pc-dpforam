@@ -14,7 +14,7 @@ protected:
     CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs_;
 
 public:
-    const char *kParty;
+    const uint party;
 
     Protocol(const char *party, Connection *cons[2],
              CryptoPP::AutoSeededRandomPool *rnd,

@@ -1,9 +1,9 @@
 #include "protocol.h"
 
-Protocol::Protocol(const char *party, Connection *connections[2],
+Protocol::Protocol(const uint party, Connection *connections[2],
                    CryptoPP::AutoSeededRandomPool *rnd,
                    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) {
-    this->kParty = party;
+    this->party = party;
     this->conn_ = connections;
     this->rnd_ = rnd;
     this->prgs_ = prgs;
