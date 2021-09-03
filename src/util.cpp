@@ -70,17 +70,16 @@ uint64_t bytes_to_uint64(const uchar *bytes, uint len) {
     return value;
 }
 
-void bytes_to_two_uint64(uchar *input, uint len, uint64_t output[2]) {
-    uchar *a = new uchar[len];
-    uchar *b = new uchar[len];
-    RAND_bytes(a, len);
-    xor_bytes(input, a, len, b);
-    output[0] = bytes_to_uint64(a);
-    output[1] = bytes_to_uint64(b);
-}
-
 uint64_t current_timestamp() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
+}
+
+void bytes_to_bytes_array(const uchar *input, const uint input_size, const uint output_size, uchar **output) {
+    uint bytes_per_block = (input_size + output_size - 1) / output_size;
+    for (uint i = 0; i < output_size; i++) {
+        output[i] = new uchar[bytes_per_block];
+        memcpy(output[i], &input[i * bytes_per_block], bytes_per_block);
+    }
 }

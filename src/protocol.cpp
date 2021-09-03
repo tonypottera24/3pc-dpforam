@@ -3,7 +3,7 @@
 Protocol::Protocol(const uint party, Connection *connections[2],
                    CryptoPP::AutoSeededRandomPool *rnd,
                    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) {
-    this->party = party;
+    this->party_ = party;
     this->conn_ = connections;
     this->rnd_ = rnd;
     this->prgs_ = prgs;

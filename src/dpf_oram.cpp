@@ -17,15 +17,15 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
     for (uint i = 0; i < 2; i++) {
         this->InitArray(this->read_array_[i]);
         this->InitArray(this->cache_[i]);
-        this->InitArray(this->write_array_[i]);
     }
+    this->InitArray(this->write_array_);
     this->InitCacheCtr();
 
     if (this->is_first_) {
         this->position_map_ = NULL;
     } else {
         uint pos_n = this->n_ >> this->tau_;
-        uint pos_data_size = ceil(log2(this->n_)) * (1U << this->tau_);
+        uint pos_data_size = (ceil(log2(this->n_)) + 1) * (1U << this->tau_);
         this->position_map_ = new DPFORAM(party, connections, rnd, prgs, tau, pos_n, pos_data_size);
     }
 }
@@ -35,8 +35,8 @@ DPFORAM::~DPFORAM() {
     for (uint i = 0; i < 2; i++) {
         this->DeleteArray(this->read_array_[i]);
         this->DeleteArray(this->cache_[i]);
-        this->DeleteArray(this->write_array_[i]);
     }
+    this->DeleteArray(this->write_array_);
 }
 
 void DPFORAM::InitArray(uchar **&array) {
@@ -58,44 +58,43 @@ void DPFORAM::InitCacheCtr() {
     this->cache_ctr_ = 1;
 }
 
-void DPFORAM::CheckPositionMap(const uchar *const rom_block_23[2],
-                               const uchar *const stash_block_23[2], const uchar indicator_23[2],
-                               uchar *block_23[2]) {
-    SSOT *ssot = new SSOT(this->party, this->conn_, this->rnd_, this->prgs_);
-    // SSOT ot(this->party, this->conn_, this->rnd_, this->prgs_);
-    if (this->party == 3) {
-        // P3
+void DPFORAM::GetLatestData(const uchar *v_read,
+                            const uchar *v_cache, const bool is_used,
+                            uchar *v_old[2]) {
+    SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
+    if (this->party_ == 3) {
+        // conn 0:P1, 1:P2
         ssot->P3(this->data_size_);
-        this->prgs_[0].GenerateBlock(block_23[0], this->data_size_);
-        this->prgs_[1].GenerateBlock(block_23[1], this->data_size_);
-    } else if (this->party == 1) {
-        // P1
-        int b0 = indicator_23[1] & 1;
-        const uchar *u01[2] = {rom_block_23[1], stash_block_23[1]};
-        ssot->P1(b0, u01, this->data_size_, block_23[0]);
-        this->prgs_[1].GenerateBlock(block_23[1], this->data_size_);
-        xor_bytes(block_23[0], block_23[1], this->data_size_, block_23[0]);
-        this->conn_[0]->Write(block_23[0], this->data_size_);
-        uchar tmp[this->data_size_];
-        this->conn_[0]->Read(tmp, this->data_size_);
-        xor_bytes(block_23[0], tmp, this->data_size_, block_23[0]);
-    } else if (this->party == 2) {
-        // P2
-        uint b1 = (indicator_23[0] ^ indicator_23[1]) & 1;
-        uchar *v01[2] = {new uchar[this->data_size_], new uchar[this->data_size_]};
-        xor_bytes(rom_block_23[0], rom_block_23[1], this->data_size_, v01[0]);
-        xor_bytes(stash_block_23[0], stash_block_23[1], this->data_size_, v01[1]);
-        ssot->P2(b1, v01, this->data_size_, block_23[1]);
-        this->prgs_[0].GenerateBlock(block_23[0], this->data_size_);
-        xor_bytes(block_23[0], block_23[1], this->data_size_, block_23[1]);
-        this->conn_[1]->Write(block_23[1], this->data_size_);
-        uchar tmp[this->data_size_];
-        this->conn_[1]->Read(tmp, this->data_size_);
-        xor_bytes(block_23[1], tmp, this->data_size_, block_23[1]);
-        delete[] v01[0];
-        delete[] v01[1];
+        this->ShareTwoThird(NULL, this->data_size_, v_old);
+    } else if (this->party_ == 1) {
+        // conn 0:P2, 1:P3
+        const uchar *u01[2] = {v_read, v_cache};
+        ssot->P1(is_used, u01, this->data_size_, v_old[0]);
+        this->ShareTwoThird(v_old[0], this->data_size_, v_old);
+    } else if (this->party_ == 2) {
+        // conn 0:P3, 1:P1
+        const uchar *v01[2] = {v_read, v_cache};
+        ssot->P2(is_used, v01, this->data_size_, v_old[1]);
+        this->ShareTwoThird(v_old[1], this->data_size_, v_old);
     }
     delete ssot;
+}
+
+void DPFORAM::ShareTwoThird(const uchar *v_in, const uint data_size, uchar *v_out[2]) {
+    this->prgs_[0].GenerateBlock(v_out[0], data_size);
+    this->prgs_[1].GenerateBlock(v_out[1], data_size);
+    if (v_in != NULL) {
+        xor_bytes(v_in, v_out[0], data_size, v_out[1]);
+    }
+
+    this->conn_[0]->Write(v_out[0], data_size);
+    this->conn_[1]->Write(v_out[1], data_size);
+
+    uchar tmp[data_size];
+    this->conn_[0]->Read(tmp, data_size);
+    xor_bytes(v_out[0], tmp, data_size, v_out[0]);
+    this->conn_[1]->Read(tmp, data_size);
+    xor_bytes(v_out[1], tmp, data_size, v_out[1]);
 }
 
 void DPFORAM::PIR(const uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *output) {
@@ -110,6 +109,7 @@ void DPFORAM::PIR(const uchar **array[2], const uint64_t n, const uint data_size
         // Make sure query[0] has one more 1 than query[1].
         std::swap(query[0], query[1]);
     }
+
     this->conn_[0]->Write(query[0], query_size);
     this->conn_[1]->Write(query[1], query_size);
 
@@ -130,24 +130,47 @@ void DPFORAM::PIR(const uchar **array[2], const uint64_t n, const uint data_size
     xor_bytes(v[0], v[1], data_size, output);
 
     for (uint i = 0; i < 2; i++) {
+        delete[] query[i];
         delete[] v[i];
     }
 }
 
-void DPFORAM::PIW(const uchar *const delta_block_23[2],
-                  const uchar *const dpf_out[2]) {
-    uint quo = this->data_size_ / 16;
-    uint rem = this->data_size_ % 16;
-#pragma omp parallel for
-    for (uint64_t j = 0; j < n_; j++) {
-        for (uint i = 0; i < 2; i++) {
-            select_xor_128(delta_block_23[i], dpf_out[i][j], quo, rem, this->write_array_);
+void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index[2], const uchar *data) {
+    uint log_n = ceil(log2(n));
+
+    uchar *query[2];
+    uint query_size = this->fss_.Gen(index[0] ^ index[1], log_n, query);
+
+    uchar dpf_out[n];
+    this->fss_.EvalAll(query[0], log_n, dpf_out);
+    if (dpf_out[index[0] ^ index[1]] == 0) {
+        // Make sure query[0] has one more 1 than query[1].
+        std::swap(query[0], query[1]);
+    }
+
+    this->conn_[0]->Write(query[0], query_size);
+    this->conn_[1]->Write(query[1], query_size);
+
+    this->conn_[0]->Read(query[1], query_size);
+    this->conn_[1]->Read(query[0], query_size);
+
+    for (uint i = 0; i < 2; i++) {
+        uchar dpf_out[n];
+        this->fss_.EvalAll(query[i], log_n, dpf_out);
+        for (uint j = 0; j < n; j++) {
+            if (dpf_out[j ^ index[i]]) {
+                xor_bytes(array[j], data, data_size, array[j]);
+            }
         }
+    }
+
+    for (uint i = 0; i < 2; i++) {
+        delete[] query[i];
     }
 }
 
-void DPFORAM::AppendCache(const uchar *const block_23[2],
-                          const uchar *const delta_block_23[2]) {
+void DPFORAM::AppendCache(const uchar block_23[2],
+                          const uchar delta_block_23[2]) {
     for (uint i = 0; i < 2; i++) {
         xor_bytes(block_23[i], delta_block_23[i], this->data_size_, this->cache_[i][this->cache_ctr_]);
     }
@@ -176,34 +199,82 @@ void DPFORAM::Flush() {
     }
 }
 
-void DPFORAM::ReadPositionMap(uint64_t cache_index[2]) {
-    uchar *pos_input = new uchar[this->position_map_->data_size_]();
-    uchar *pos_output = new uchar[this->position_map_->data_size_]();
-    this->position_map_->Access(index, pos_input, true, pos_output);
+void DPFORAM::ReadPositionMap(const uint64_t index[2], uint64_t cache_index[2], bool *is_used) {
+    uint data_size = ceil(log2(this->n_)) + 1;
+    uint data_per_block = 1 << this->tau_;
+    uint64_t block_index[2];
+    uint64_t data_index[2];
+    uchar *block[2];
+    uchar data[data_size];
 
-    bytes_to_two_uint64(pos_output, this->position_map_->data_size_, cache_index);
+    for (uint i = 0; i < 2; i++) {
+        block_index[i] = index[i] / data_per_block;
+        data_index[i] = index[i] % data_per_block;
+        block[i] = new uchar[this->position_map_->data_size_];
+    }
 
-    delete[] pos_input;
-    delete[] pos_output;
+    this->position_map_->Read(block_index, block);
+    uchar **data_array[2];
+    for (uint i = 0; i < 2; i++) {
+        bytes_to_bytes_array(block[i], this->position_map_->data_size_, data_per_block, data_array[i]);
+    }
+    PIR(data_array, data_per_block, data_size, data_index, data);
+
+    *is_used = data[0] & 1;
+    this->ShareTwoThird(&data[1], data_size - 1, cache_index);
+
+    PIW(data_array, data_per_block, data_size, data_index, data);
+
+    uchar *new_position = new uchar[this->position_map_->data_size_];
+    uint64_to_bytes(this->cache_ctr_, new_position);
+
+    this->position_map_->Write(index, new_position);
+
+    for (uint i = 0; i < 2; i++) {
+        // this->ShareTwoThird();
+        // bytes_to_two_uint64(old_position[i], this->position_map_->data_size_, cache_index[i]);
+    }
+
+    delete[] new_position;
+    for (uint i = 0; i < 2; i++) {
+        // delete[] data_array[i];
+    }
 }
 
-void DPFORAM::Access(const uint64_t index[2], const uchar *new_data,
-                     const bool read_only, uchar *output) {
+void DPFORAM::Read(const uint64_t index[2], uchar *v_old[2]) {
+    // TODO: make sure each two party have same input index and output.
+    // TODO: the case there's no position map.
+
     // read v_r from the read array.
+    // Assume index is 2/3 shared.
     uchar *v_read = new uchar[this->data_size_];
     PIR(this->read_array_, this->n_, this->data_size_, index, v_read);
 
     // read the position map.
+    // NOTE: cache_indexes are 2/3 shared.
     uint64_t cache_indexes[2];
-    ReadPositionMap(cache_indexes);
+    bool is_used;
+    ReadPositionMap(index, cache_indexes, is_used);
 
     // read the cache.
-    // TODO: make sure each two party have same index.
+    // Assume cache_index is 2/3 shared.
     uchar *v_cache = new uchar[this->data_size_];
     PIR(this->cache_, this->cache_ctr_, this->data_size_, cache_indexes, v_cache);
 
-    // write to the write array.
+    // Use SSOT to select v_r and v_cache by is_used
+    GetLatestData(v_read, v_cache, is_used, v_old);
+}
 
+void DPFORAM::Write(const uint64_t index[2], const uchar *new_data) {
+    // read data from block?
+    // PIR();
+
+    // write to the write array.
+    // PIW();
+}
+
+void DPFORAM::Access(const uint64_t index[2], const uchar *new_data,
+                     const bool read_only, uchar *v_old[2]) {
     uint64_t block_index_23[2];
     uint data_index_23[2];
     for (uint i = 0; i < 2; i++) {
@@ -368,7 +439,7 @@ void DPFORAM::Access(const uint64_t index[2], const uchar *new_data,
 
 void DPFORAM::PrintMetadata() {
     std::cout << "===================" << std::endl;
-    std::cout << "Party: " << party << std::endl;
+    std::cout << "Party: " << party_ << std::endl;
     std::cout << "Last level: " << this->is_last_ << std::endl;
     std::cout << "First level: " << this->is_first_ << std::endl;
     std::cout << "tau: " << this->tau_ << std::endl;
@@ -411,15 +482,15 @@ void DPFORAM::Test(uint iter) {
     }
     uchar rec_exp[this->next_log_n_size_];
     memset(rec_exp, 0, this->next_log_n_size_ * sizeof(uchar));
-    if (strcmp(party, "eddie") == 0) {
+    if (strcmp(party_, "eddie") == 0) {
         addr_23[0] = rand_long(range);
         this->conn_[0]->WriteLong(addr_23[0], false);
-    } else if (strcmp(party, "debbie") == 0) {
+    } else if (strcmp(party_, "debbie") == 0) {
         addr_23[1] = this->conn_[1]->ReadLong();
     }
 
     for (uint t = 0; t < iter; t++) {
-        if (strcmp(party, "eddie") == 0) {
+        if (strcmp(party_, "eddie") == 0) {
             this->rnd_->GenerateBlock(new_rec_23[0], this->next_log_n_size_);
             this->conn_[0]->Write(new_rec_23[0], this->next_log_n_size_, false);
 
@@ -442,7 +513,7 @@ void DPFORAM::Test(uint iter) {
             }
 
             memcpy(rec_exp, new_rec_23[0], this->next_log_n_size_);
-        } else if (strcmp(party, "debbie") == 0) {
+        } else if (strcmp(party_, "debbie") == 0) {
             conn_[1]->Read(new_rec_23[1], this->next_log_n_size_);
 
             Sync();
@@ -451,13 +522,13 @@ void DPFORAM::Test(uint iter) {
             party_wc += current_timestamp() - wc;
 
             conn_[1]->Write(rec_23[0], this->next_log_n_size_, false);
-        } else if (strcmp(party, "charlie") == 0) {
+        } else if (strcmp(party_, "charlie") == 0) {
             Sync();
             wc = current_timestamp();
             Access(addr_23, new_rec_23, isRead, rec_23);
             party_wc += current_timestamp() - wc;
         } else {
-            std::cout << "Incorrect party: " << party << std::endl;
+            std::cout << "Incorrect party: " << party_ << std::endl;
         }
     }
 

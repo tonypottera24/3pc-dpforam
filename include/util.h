@@ -52,8 +52,7 @@ void uint64_to_bytes(uint64_t n, uchar *b);
 void uint64_to_bytes(uint64_t n, uchar *b, uint len);
 uint64_t bytes_to_uint64(const uchar *b);
 uint64_t bytes_to_uint64(const uchar *b, uint len);
-// void rand_bytes(uchar *bytes, uint len);
-void bytes_to_two_uint64(uchar *input, uint len, uint64_t output[2]);
+void bytes_to_bytes_array(const uchar *input, const uint input_size, const uint output_size, uchar **output);
 uint64_t current_timestamp();
 
 #endif /* UTIL_H_ */

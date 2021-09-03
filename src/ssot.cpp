@@ -1,12 +1,12 @@
 #include "ssot.h"
 
-SSOT::SSOT(const char *party, Connection *cons[2],
+SSOT::SSOT(const uint party, Connection *cons[2],
            CryptoPP::AutoSeededRandomPool *rnd,
            CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) : Protocol(party, cons, rnd, prgs) {
 }
 
-void SSOT::P3(uint data_size) {
-    // conn: 0=P1, 1=P2
+void SSOT::P3(const uint data_size) {
+    // conn 0:P1, 1:P2
     uchar x01[2][data_size];
     this->prgs_[0].GenerateBlock(x01[0], data_size);
     this->prgs_[0].GenerateBlock(x01[1], data_size);
@@ -32,8 +32,8 @@ void SSOT::P3(uint data_size) {
     this->conn_[1]->Write(x, data_size);
 }
 
-void SSOT::P1(uint b0, const uchar *const u01[2], uint data_size, uchar *p0) {
-    // conn: 0=P2, 1=P3
+void SSOT::P1(const uint b0, const uchar *u01[2], const uint data_size, uchar *p0) {
+    // conn 0:P2, 1:P3
     // Receive x0, x1, y, alpha from P3
     uchar x01[2][data_size];
     this->prgs_[1].GenerateBlock(x01[0], data_size);
@@ -67,8 +67,8 @@ void SSOT::P1(uint b0, const uchar *const u01[2], uint data_size, uchar *p0) {
     xor_bytes(v01_p[b0], y, data_size, p0);
 }
 
-void SSOT::P2(uint b1, const uchar *const v01[2], uint data_size, uchar *p1) {
-    // conn: 0=P3, 1=P1
+void SSOT::P2(const uint b1, const uchar *v01[2], const uint data_size, uchar *p1) {
+    // conn 0:P3, 1:P1
     // Receive y0, y1, x, beta from P3
     uchar y01[2][data_size];
     this->prgs_[0].GenerateBlock(y01[0], data_size);
@@ -115,15 +115,15 @@ void SSOT::Test(uint iter) {
         }
         uchar p0[data_size];
         uchar p1[data_size];
-        if (this->party == 3) {
+        if (this->party_ == 3) {
             P3(data_size);
-        } else if (this->party == 1) {
+        } else if (this->party_ == 1) {
             P1(b0, u01, data_size, p0);
             this->conn_[0]->WriteInt(b0);
             this->conn_[0]->Write(p0, data_size);
             this->conn_[0]->Write(u01[0], data_size);
             this->conn_[0]->Write(u01[1], data_size);
-        } else if (this->party == 2) {
+        } else if (this->party_ == 2) {
             P2(b1, v01, data_size, p1);
             b0 = this->conn_[1]->ReadInt();
             this->conn_[1]->Read(p0, data_size);
@@ -140,7 +140,7 @@ void SSOT::Test(uint iter) {
                 std::cerr << "!!!!! SSOT failed: " << test << std::endl;
             }
         } else {
-            std::cout << "Incorrect party: " << this->party << std::endl;
+            std::cout << "Incorrect party: " << this->party_ << std::endl;
         }
 
         for (uint i = 0; i < 2; i++) {
