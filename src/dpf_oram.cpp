@@ -11,32 +11,49 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
 
     this->tau_ = tau;
 
-    this->is_first_ = this->n_ <= 2;
     // first level position map, can be contained by two blocks.
 
     for (uint i = 0; i < 2; i++) {
-        this->InitArray(this->read_array_[i]);
-        this->InitArray(this->cache_[i]);
+        this->InitArray(this->read_array_23_[i]);
+        this->InitArray(this->cache_23_[i]);
     }
-    this->InitArray(this->write_array_);
-    this->InitCacheCtr();
+    this->InitArray(this->write_array_13_);
+    this->cache_ctr_ = 0;
 
-    if (this->is_first_) {
+    if (this->n_ < 2) {
         this->position_map_ = NULL;
     } else {
         uint pos_n = this->n_ >> this->tau_;
-        uint pos_data_size = (ceil(log2(this->n_)) + 1) * (1U << this->tau_);
+        uint pos_data_per_block = 1ULL << this->tau_;
+        uint pos_data_size = (((uint)ceil(log2(this->n_)) + 7) / 8 + 1) * pos_data_per_block;
         this->position_map_ = new DPFORAM(party, connections, rnd, prgs, tau, pos_n, pos_data_size);
     }
 }
 
 DPFORAM::~DPFORAM() {
-    if (this->position_map_ != NULL) delete this->position_map_;
-    for (uint i = 0; i < 2; i++) {
-        this->DeleteArray(this->read_array_[i]);
-        this->DeleteArray(this->cache_[i]);
+    if (this->position_map_ != NULL) {
+        delete this->position_map_;
     }
-    this->DeleteArray(this->write_array_);
+    for (uint i = 0; i < 2; i++) {
+        this->DeleteArray(this->read_array_23_[i]);
+        this->DeleteArray(this->cache_23_[i]);
+    }
+    this->DeleteArray(this->write_array_13_);
+}
+
+void DPFORAM::Reset() {
+    for (uint i = 0; i < 2; i++) {
+        this->DeleteArray(this->read_array_23_[i]);
+        this->InitArray(this->read_array_23_[i]);
+        this->DeleteArray(this->cache_23_[i]);
+        this->InitArray(this->cache_23_[i]);
+    }
+    this->DeleteArray(this->write_array_13_);
+    this->InitArray(this->write_array_13_);
+    this->cache_ctr_ = 0;
+    if (this->position_map_ != NULL) {
+        this->position_map_->Reset();
+    }
 }
 
 void DPFORAM::InitArray(uchar **&array) {
@@ -54,413 +71,298 @@ void DPFORAM::DeleteArray(uchar **array) {
     delete[] array;
 }
 
-void DPFORAM::InitCacheCtr() {
-    this->cache_ctr_ = 1;
-}
-
-void DPFORAM::GetLatestData(const uchar *v_read,
-                            const uchar *v_cache, const bool is_used,
-                            uchar *v_old[2]) {
-    SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
-    if (this->party_ == 3) {
-        // conn 0:P1, 1:P2
-        ssot->P3(this->data_size_);
-        this->ShareTwoThird(NULL, this->data_size_, v_old);
-    } else if (this->party_ == 1) {
-        // conn 0:P2, 1:P3
-        const uchar *u01[2] = {v_read, v_cache};
-        ssot->P1(is_used, u01, this->data_size_, v_old[0]);
-        this->ShareTwoThird(v_old[0], this->data_size_, v_old);
-    } else if (this->party_ == 2) {
-        // conn 0:P3, 1:P1
-        const uchar *v01[2] = {v_read, v_cache};
-        ssot->P2(is_used, v01, this->data_size_, v_old[1]);
-        this->ShareTwoThird(v_old[1], this->data_size_, v_old);
-    }
-    delete ssot;
-}
-
-void DPFORAM::ShareTwoThird(const uchar *v_in, const uint data_size, uchar *v_out[2]) {
-    this->prgs_[0].GenerateBlock(v_out[0], data_size);
-    this->prgs_[1].GenerateBlock(v_out[1], data_size);
-    if (v_in != NULL) {
-        xor_bytes(v_in, v_out[0], data_size, v_out[1]);
-    }
-
-    this->conn_[0]->Write(v_out[0], data_size);
-    this->conn_[1]->Write(v_out[1], data_size);
-
-    uchar tmp[data_size];
-    this->conn_[0]->Read(tmp, data_size);
-    xor_bytes(v_out[0], tmp, data_size, v_out[0]);
-    this->conn_[1]->Read(tmp, data_size);
-    xor_bytes(v_out[1], tmp, data_size, v_out[1]);
-}
-
-void DPFORAM::PIR(const uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *output) {
+void DPFORAM::PIR(const uchar **array_23[2], const uint64_t n, const uint data_size, const uint64_t index_23[2], uchar *v_out) {
     uint log_n = ceil(log2(n));
 
-    uchar *query[2];
-    uint query_size = this->fss_.Gen(index[0] ^ index[1], log_n, query);
+    uchar *query_23[2];
+    uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
 
     uchar dpf_out[n];
-    this->fss_.EvalAll(query[0], log_n, dpf_out);
-    if (dpf_out[index[0] ^ index[1]] == 0) {
+    this->fss_.EvalAll(query_23[0], log_n, dpf_out);
+    if (dpf_out[index_23[0] ^ index_23[1]] == 0) {
         // Make sure query[0] has one more 1 than query[1].
-        std::swap(query[0], query[1]);
+        std::swap(query_23[0], query_23[1]);
     }
 
-    this->conn_[0]->Write(query[0], query_size);
-    this->conn_[1]->Write(query[1], query_size);
+    this->conn_[0]->Write(query_23[0], query_size);
+    this->conn_[1]->Write(query_23[1], query_size);
 
-    this->conn_[0]->Read(query[1], query_size);
-    this->conn_[1]->Read(query[0], query_size);
+    this->conn_[0]->Read(query_23[1], query_size);
+    this->conn_[1]->Read(query_23[0], query_size);
 
     uchar *v[2];
     for (uint i = 0; i < 2; i++) {
         uchar dpf_out[n];
-        this->fss_.EvalAll(query[i], log_n, dpf_out);
+        this->fss_.EvalAll(query_23[i], log_n, dpf_out);
         v[i] = new uchar[data_size]();
         for (uint j = 0; j < n; j++) {
-            if (dpf_out[j ^ index[i]]) {
-                xor_bytes(v[i], array[i][j], data_size, v[i]);
+            if (dpf_out[j ^ index_23[i]]) {
+                xor_bytes(v[i], array_23[i][j], data_size, v[i]);
             }
         }
     }
-    xor_bytes(v[0], v[1], data_size, output);
+    xor_bytes(v[0], v[1], data_size, v_out);
 
     for (uint i = 0; i < 2; i++) {
-        delete[] query[i];
+        delete[] query_23[i];
         delete[] v[i];
     }
 }
 
-void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index[2], const uchar *data) {
+void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], const uchar *v_delta) {
     uint log_n = ceil(log2(n));
 
-    uchar *query[2];
-    uint query_size = this->fss_.Gen(index[0] ^ index[1], log_n, query);
+    uchar *query_23[2];
+    uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
 
     uchar dpf_out[n];
-    this->fss_.EvalAll(query[0], log_n, dpf_out);
-    if (dpf_out[index[0] ^ index[1]] == 0) {
+    this->fss_.EvalAll(query_23[0], log_n, dpf_out);
+    if (dpf_out[index_23[0] ^ index_23[1]] == 0) {
         // Make sure query[0] has one more 1 than query[1].
-        std::swap(query[0], query[1]);
+        std::swap(query_23[0], query_23[1]);
     }
 
-    this->conn_[0]->Write(query[0], query_size);
-    this->conn_[1]->Write(query[1], query_size);
+    this->conn_[0]->Write(query_23[0], query_size);
+    this->conn_[1]->Write(query_23[1], query_size);
 
-    this->conn_[0]->Read(query[1], query_size);
-    this->conn_[1]->Read(query[0], query_size);
+    this->conn_[0]->Read(query_23[1], query_size);
+    this->conn_[1]->Read(query_23[0], query_size);
 
     for (uint i = 0; i < 2; i++) {
         uchar dpf_out[n];
-        this->fss_.EvalAll(query[i], log_n, dpf_out);
+        this->fss_.EvalAll(query_23[i], log_n, dpf_out);
         for (uint j = 0; j < n; j++) {
-            if (dpf_out[j ^ index[i]]) {
-                xor_bytes(array[j], data, data_size, array[j]);
+            if (dpf_out[j ^ index_23[i]]) {
+                xor_bytes(array[j], v_delta, data_size, array[j]);
             }
         }
     }
 
     for (uint i = 0; i < 2; i++) {
-        delete[] query[i];
+        delete[] query_23[i];
     }
 }
 
-void DPFORAM::AppendCache(const uchar block_23[2],
-                          const uchar delta_block_23[2]) {
+void DPFORAM::GetLatestData(const uchar *v_read_13,
+                            const uchar *v_cache_13, const uchar *v_meta_13,
+                            uchar *v_out_13) {
+    uchar *v_read_23[2];
+    uchar *v_cache_23[2];
+    uchar *v_meta_23[2];
     for (uint i = 0; i < 2; i++) {
-        xor_bytes(block_23[i], delta_block_23[i], this->data_size_, this->cache_[i][this->cache_ctr_]);
+        v_read_23[i] = new uchar[this->data_size_];
+        v_cache_23[i] = new uchar[this->data_size_];
+        v_meta_23[i] = new uchar[1];
     }
-    this->cache_ctr_++;
-    if (this->cache_ctr_ == this->n_) {
-        this->InitCacheCtr();
-        this->Flush();
-        // this->position_map_->Init();
+    this->ShareTwoThird(v_read_13, this->data_size_, v_read_23);
+    this->ShareTwoThird(v_cache_13, this->data_size_, v_cache_23);
+    this->ShareTwoThird(v_meta_13, 1, v_meta_23);
+
+    SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
+    if (this->party_ == 3) {
+        // conn 0:P1, 1:P2
+        ssot->P3(this->data_size_);
+        memset(v_out_13, 0, this->data_size_);
+    } else if (this->party_ == 1) {
+        // conn 0:P2, 1:P3
+        uchar v_read_12[this->data_size_];
+        xor_bytes(v_read_23[0], v_read_23[1], this->data_size_, v_read_12);
+
+        uchar v_cache_12[this->data_size_];
+        xor_bytes(v_cache_23[0], v_cache_23[1], this->data_size_, v_cache_12);
+
+        uchar v_meta_12[1];
+        xor_bytes(v_meta_23[0], v_meta_23[1], 1, v_meta_12);
+
+        const uchar *u01[2] = {v_read_12, v_cache_12};
+        ssot->P1(v_meta_12[0], u01, this->data_size_, v_out_13);
+    } else if (this->party_ == 2) {
+        // conn 0:P3, 1:P1
+        const uchar *v01[2] = {v_read_23[0], v_cache_23[0]};
+        ssot->P2(v_meta_23[0][0], v01, this->data_size_, v_out_13);
+    }
+
+    delete ssot;
+    for (uint i = 0; i < 2; i++) {
+        delete[] v_read_23[i];
+        delete[] v_cache_23[i];
+        delete[] v_meta_23[i];
     }
 }
 
-// TODO: buffered read/write
-void DPFORAM::Flush() {
-    if (this->is_first_) return;
-    for (uint64_t i = 0; i < this->n_; i++) {
-        memcpy(this->read_array_[0][i], this->write_array_[i], this->data_size_);
+void DPFORAM::ShareTwoThird(const uchar *v_in_13, const uint data_size, uchar *v_out_23[2]) {
+    this->prgs_[0].GenerateBlock(v_out_23[0], data_size);
+    this->prgs_[1].GenerateBlock(v_out_23[1], data_size);
+    xor_bytes(v_in_13, v_out_23[0], data_size, v_out_23[1]);
+
+    this->conn_[0]->Write(v_out_23[0], data_size);
+    this->conn_[1]->Write(v_out_23[1], data_size);
+
+    uchar tmp[data_size];
+    this->conn_[0]->Read(tmp, data_size);
+    xor_bytes(v_out_23[0], tmp, data_size, v_out_23[0]);
+    this->conn_[1]->Read(tmp, data_size);
+    xor_bytes(v_out_23[1], tmp, data_size, v_out_23[1]);
+}
+
+void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], uchar v_meta_13[1]) {
+    uint data_size = ((uint)ceil(log2(this->n_)) + 7) / 8 + 1;
+    uint data_per_block = 1U << this->tau_;
+
+    uint64_t block_index_23[2];
+    uint64_t data_index_23[2];
+    uchar *old_block_23[2];
+    for (uint i = 0; i < 2; i++) {
+        block_index_23[i] = index_23[i] / data_per_block;
+        data_index_23[i] = index_23[i] % data_per_block;
+        old_block_23[i] = new uchar[this->position_map_->data_size_];
     }
-    for (uint64_t i = 0; i < this->n_; i++) {
-        this->conn_[0]->Write(this->write_array_, this->data_size_);
-        //		cons[0]->fwrite(wom[i], DBytes);
+
+    // read block from array
+    this->position_map_->Read(block_index_23, old_block_23);
+
+    // read data from block
+    uchar **old_data_array_23[2];
+    for (uint i = 0; i < 2; i++) {
+        old_data_array_23[i] = new uchar *[data_per_block];
+        for (uint j = 0; j < data_per_block; j++) {
+            old_data_array_23[i][j] = new uchar[data_size];
+        }
+        bytes_to_bytes_array(old_block_23[i], this->position_map_->data_size_, data_per_block, old_data_array_23[i]);
     }
-    //	cons[0]->Flush();
-    for (uint64_t i = 0; i < this->n_; i++) {
-        this->conn_[1]->Read(this->read_array_[1][i], this->data_size_);
-        //		cons[1]->fread(rom[1][i], DBytes);
+    uchar old_data_13[data_size];
+    PIR(old_data_array_23, data_per_block, data_size, data_index_23, old_data_13);
+
+    // parse data
+    memcpy(v_meta_13, old_data_13, 1);
+    uchar *data_23[2];
+    for (uint i = 0; i < 2; i++) {
+        data_23[i] = new uchar[data_size - 1];
+    }
+    this->ShareTwoThird(&old_data_13[1], data_size - 1, data_23);
+    for (uint i = 0; i < 2; i++) {
+        cache_index_23[i] = bytes_to_uint64(data_23[i], data_size - 1);
+    }
+
+    // write data to block
+    uchar *data_array_13[data_per_block];
+    for (uint i = 0; i < data_per_block; i++) {
+        data_array_13[i] = new uchar[data_size];
+        xor_bytes(old_data_array_23[0][i], old_data_array_23[1][i], data_size, data_array_13[i]);
+    }
+    uchar new_data_13[data_size];
+    new_data_13[0] = 1;
+    uint64_to_bytes(this->cache_ctr_, &new_data_13[1], data_size - 1);
+    uchar delta_data_13[data_size];
+    xor_bytes(old_data_13, new_data_13, data_size, delta_data_13);
+    PIW(data_array_13, data_per_block, data_size, data_index_23, delta_data_13);
+
+    // write block back to array
+    uchar new_block_13[this->position_map_->data_size_];
+    bytes_array_to_bytes(data_array_13, data_per_block, data_size, new_block_13);
+
+    uchar old_block_13[this->position_map_->data_size_];
+    xor_bytes(old_block_23[0], old_block_23[1], this->position_map_->data_size_, old_block_13);
+
+    uchar delta_block_13[this->position_map_->data_size_];
+    xor_bytes(old_block_13, new_block_13, this->position_map_->data_size_, delta_block_13);
+
+    this->position_map_->Write(block_index_23, delta_block_13);
+
+    // append cache
+    this->position_map_->AppendCache(new_block_13);
+
+    // cleanup
+    for (uint i = 0; i < 2; i++) {
+        delete[] old_block_23[i];
+        for (uint j = 0; j < data_per_block; j++) {
+            delete[] old_data_array_23[i][j];
+        }
+        delete[] old_data_array_23[i];
+        delete[] data_23[i];
+    }
+    for (uint i = 0; i < data_per_block; i++) {
+        delete[] data_array_13[i];
     }
 }
 
-void DPFORAM::ReadPositionMap(const uint64_t index[2], uint64_t cache_index[2], bool *is_used) {
-    uint data_size = ceil(log2(this->n_)) + 1;
-    uint data_per_block = 1 << this->tau_;
-    uint64_t block_index[2];
-    uint64_t data_index[2];
-    uchar *block[2];
-    uchar data[data_size];
-
-    for (uint i = 0; i < 2; i++) {
-        block_index[i] = index[i] / data_per_block;
-        data_index[i] = index[i] % data_per_block;
-        block[i] = new uchar[this->position_map_->data_size_];
-    }
-
-    this->position_map_->Read(block_index, block);
-    uchar **data_array[2];
-    for (uint i = 0; i < 2; i++) {
-        bytes_to_bytes_array(block[i], this->position_map_->data_size_, data_per_block, data_array[i]);
-    }
-    PIR(data_array, data_per_block, data_size, data_index, data);
-
-    *is_used = data[0] & 1;
-    this->ShareTwoThird(&data[1], data_size - 1, cache_index);
-
-    PIW(data_array, data_per_block, data_size, data_index, data);
-
-    uchar *new_position = new uchar[this->position_map_->data_size_];
-    uint64_to_bytes(this->cache_ctr_, new_position);
-
-    this->position_map_->Write(index, new_position);
-
-    for (uint i = 0; i < 2; i++) {
-        // this->ShareTwoThird();
-        // bytes_to_two_uint64(old_position[i], this->position_map_->data_size_, cache_index[i]);
-    }
-
-    delete[] new_position;
-    for (uint i = 0; i < 2; i++) {
-        // delete[] data_array[i];
-    }
-}
-
-void DPFORAM::Read(const uint64_t index[2], uchar *v_old[2]) {
-    // TODO: make sure each two party have same input index and output.
+void DPFORAM::Read(const uint64_t index_23[2], uchar *v_out_23[2]) {
     // TODO: the case there's no position map.
 
     // read v_r from the read array.
-    // Assume index is 2/3 shared.
-    uchar *v_read = new uchar[this->data_size_];
-    PIR(this->read_array_, this->n_, this->data_size_, index, v_read);
+    uchar v_read_13[this->data_size_];
+    PIR(this->read_array_23_, this->n_, this->data_size_, index_23, v_read_13);
 
     // read the position map.
-    // NOTE: cache_indexes are 2/3 shared.
-    uint64_t cache_indexes[2];
-    bool is_used;
-    ReadPositionMap(index, cache_indexes, is_used);
+    uint64_t cache_index_23[2];
+    uchar v_meta_13[1];
+    if (this->position_map_ != NULL) {
+        ReadPositionMap(index_23, cache_index_23, v_meta_13);
+    } else {
+        // TODO
+    }
 
     // read the cache.
-    // Assume cache_index is 2/3 shared.
-    uchar *v_cache = new uchar[this->data_size_];
-    PIR(this->cache_, this->cache_ctr_, this->data_size_, cache_indexes, v_cache);
+    uchar v_cache_13[this->data_size_];
+    PIR(this->cache_23_, this->cache_ctr_, this->data_size_, cache_index_23, v_cache_13);
 
     // Use SSOT to select v_r and v_cache by is_used
-    GetLatestData(v_read, v_cache, is_used, v_old);
+    uchar v_out_13[this->data_size_];
+    GetLatestData(v_read_13, v_cache_13, v_meta_13, v_out_13);
+    this->ShareTwoThird(v_out_13, this->data_size_, v_out_23);
 }
 
-void DPFORAM::Write(const uint64_t index[2], const uchar *new_data) {
-    // read data from block?
-    // PIR();
-
-    // write to the write array.
-    // PIW();
+void DPFORAM::Write(const uint64_t index_23[2], const uchar *v_delta) {
+    PIW(this->write_array_13_, this->n_, this->data_size_, index_23, v_delta);
 }
 
-void DPFORAM::Access(const uint64_t index[2], const uchar *new_data,
-                     const bool read_only, uchar *v_old[2]) {
-    uint64_t block_index_23[2];
-    uint data_index_23[2];
+void DPFORAM::AppendCache(const uchar *v_new_13) {
+    uchar *v_new_23[2];
     for (uint i = 0; i < 2; i++) {
-        block_index_23[i] = index[i] / this->data_per_block_;
-        data_index_23[i] = index[i] % this->data_per_block_;
+        v_new_23[i] = new uchar[this->data_size_];
     }
+    this->ShareTwoThird(v_new_13, this->data_size_, v_new_23);
+    for (uint i = 0; i < 2; i++) {
+        memcpy(this->cache_23_[i][this->cache_ctr_], v_new_23[i], this->data_size_);
+    }
+    this->cache_ctr_++;
 
-    if (is_first_) {
-        // first level, no position map.
-        uchar *block_23[2];
-        uchar *dpf_out[2];
-        uchar *delta_data_23[2];
-        uchar *delta_block_23[2];
-        uchar *delta_read_array_23[2];
-        for (uint i = 0; i < 2; i++) {
-            block_23[i] = new uchar[this->data_size_];
-            dpf_out[i] = new uchar[this->n_];
-            delta_data_23[i] = new uchar[this->next_log_n_size_];
-            delta_block_23[i] = new uchar[this->data_size_];
-            delta_read_array_23[i] = new uchar[this->n_ * this->data_size_];
+    if (this->cache_ctr_ == this->n_) {
+        this->cache_ctr_ = 0;
+        this->Flush();
+        if (this->position_map_ != NULL) {
+            this->position_map_->Reset();
         }
-        BlockPIR(block_index_23, this->read_array_, this->n_, block_23, dpf_out);
-        DataPIR(data_index_23, block_23, output);
-
-        for (uint i = 0; i < 2; i++) {
-            if (read_only) {
-                memset(delta_data_23[i], 0, this->next_log_n_size_);
-            } else {
-                xor_bytes(output[i], new_data[i], this->next_log_n_size_,
-                          delta_data_23[i]);
-            }
-        }
-        // gen_delta_array(addr_suf_23, ttp, nextLogNBytes, delta_rec_23,
-        //                 delta_block_23);
-
-        // uint int_addr_pre_23[2] = {(uint)addr_pre_23[0], (uint)addr_pre_23[1]};
-        // gen_delta_array(int_addr_pre_23, (uint)N, DBytes, delta_block_23,
-        //                 delta_rom_23);
-
-        for (uint i = 0; i < 2; i++) {
-            for (uint64_t j = 0; j < this->n_; j++) {
-                xor_bytes(read_array_[i][j], delta_read_array_23[i] + j * this->data_size_, this->data_size_,
-                          read_array_[i][j]);
-            }
-        }
-
-        for (uint i = 0; i < 2; i++) {
-            delete[] block_23[i];
-            delete[] dpf_out[i];
-            delete[] delta_data_23[i];
-            delete[] delta_block_23[i];
-            delete[] delta_read_array_23[i];
-        }
-    } else {
-        // not first round, need to access position map.
-        uchar *cache_index_23[2];
-        for (uint i = 0; i < 2; i++) {
-            cache_index_23[i] = new uchar[this->log_block_ct_size_];
-        }
-
-        uchar new_cache_index[this->log_block_ct_size_];
-        uint64_to_bytes(this->cache_ctr_, new_cache_index, this->log_block_ct_size_);
-        new_cache_index[0] = 1;  // + 1 to the ctr?
-
-        uchar *new_cache_index_23[2];
-        for (uint i = 0; i < 2; i++) {
-            new_cache_index_23[i] = new_cache_index;
-        }
-
-        this->position_map_->Access(block_index_23, new_cache_index_23, false, cache_index_23);
-
-        uint64_t mask2 = this->n_ - 1;
-        uint64_t cache_block_index_23[2];
-        for (uint i = 0; i < 2; i++) {
-            cache_block_index_23[i] = bytes_to_uint64(cache_index_23[i], this->log_block_ct_size_) & mask2;
-        }
-
-        uchar *read_array_block_23[2];
-        uchar *cache_block_23[2];
-        uchar *read_array_dpf_out[2];
-        uchar *cache_dpf_out[2];
-        uchar *block_23[2];
-        for (uint i = 0; i < 2; i++) {
-            read_array_block_23[i] = new uchar[this->data_size_];
-            cache_block_23[i] = new uchar[this->data_size_];
-            read_array_dpf_out[i] = new uchar[this->n_];
-            cache_dpf_out[i] = new uchar[this->n_];
-            block_23[i] = new uchar[this->data_size_];
-        }
-
-        BlockPIR(block_index_23, this->read_array_, this->n_, read_array_block_23, read_array_dpf_out);
-        BlockPIR(cache_block_index_23, this->cache_, this->cache_ctr_, cache_block_23,
-                 cache_dpf_out);
-
-        // uchar indicator_23[2] = {cache_index_23[0][0], cache_index_23[1][0]};
-        // obliv_select(read_array_block_23, stash_block_23, indicator_23, block_23);
-
-        DataPIR(data_index_23, block_23, output);
-        uchar *delta_data_23[2];
-        uchar *delta_block_23[2];
-        for (uint i = 0; i < 2; i++) {
-            delta_data_23[i] = new uchar[this->next_log_n_size_];
-            if (read_only) {
-                memset(delta_data_23[i], 0, this->next_log_n_size_);
-            } else {
-                xor_bytes(output[i], new_data[i], this->next_log_n_size_, delta_data_23[i]);
-            }
-            delta_block_23[i] = new uchar[this->data_size_];
-        }
-        // gen_delta_array(addr_suf_23, ttp, nextLogNBytes, delta_rec_23,
-        //                 delta_block_23);
-
-        PIW(delta_block_23, read_array_dpf_out);
-        AppendCache(block_23, delta_block_23);
-
-        for (uint i = 0; i < 2; i++) {
-            delete[] cache_index_23[i];
-            delete[] read_array_block_23[i];
-            delete[] cache_block_23[i];
-            delete[] read_array_dpf_out[i];
-            delete[] cache_dpf_out[i];
-            delete[] block_23[i];
-            delete[] delta_data_23[i];
-            delete[] delta_block_23[i];
-        }
+    }
+    for (uint i = 0; i < 2; i++) {
+        delete[] v_new_23[i];
     }
 }
 
-// void DPFORAM::GenDeltaArray(const uint idx_23[2], uint numChunk,
-//                               uint chunkBytes, const uchar *const delta_23[2],
-//                               uchar *delta_array_23[2]) {
-//     uint arrayBytes = numChunk * chunkBytes;
-//     insert_label il(party, cons, rnd, prgs);
-//     if (strcmp(party, "eddie") == 0) {
-//         uchar L1[chunkBytes];
-//         cal_xor(delta_23[0], delta_23[1], chunkBytes, L1);
-//         il.P2(idx_23[0] ^ idx_23[1], L1, numChunk, chunkBytes);
-//         prgs[0].GenerateBlock(delta_array_23[0], arrayBytes);
-//         prgs[1].GenerateBlock(delta_array_23[1], arrayBytes);
-//     } else if (strcmp(party, "debbie") == 0) {
-//         il.P3(idx_23[0], delta_23[0], numChunk, chunkBytes,
-//                 delta_array_23[0]);
-//         prgs[1].GenerateBlock(delta_array_23[1], arrayBytes);
-//         cal_xor(delta_array_23[0], delta_array_23[1], arrayBytes,
-//                 delta_array_23[0]);
-//         cons[0]->write(delta_array_23[0], arrayBytes);
-//         uchar tmp[arrayBytes];
-//         cons[0]->read(tmp, arrayBytes);
-//         cal_xor(delta_array_23[0], tmp, arrayBytes, delta_array_23[0]);
-//     } else if (strcmp(party, "charlie") == 0) {
-//         il.P1(numChunk, chunkBytes, delta_array_23[1]);
-//         prgs[0].GenerateBlock(delta_array_23[0], arrayBytes);
-//         cal_xor(delta_array_23[0], delta_array_23[1], arrayBytes,
-//                 delta_array_23[1]);
-//         cons[1]->write(delta_array_23[1], arrayBytes);
-//         uchar tmp[arrayBytes];
-//         cons[1]->read(tmp, arrayBytes);
-//         cal_xor(delta_array_23[1], tmp, arrayBytes, delta_array_23[1]);
-//     } else {
-//     }
-// }
+void DPFORAM::Flush() {
+    uchar *tmp[2];
+    for (uint64_t i = 0; i < this->n_; i++) {
+        for (uint j = 0; j < 2; j++) {
+            tmp[j] = this->read_array_23_[j][i];
+        }
+        this->ShareTwoThird(this->write_array_13_[i], this->data_size_, tmp);
+        memset(this->write_array_13_[i], 0, this->data_size_);
+    }
+}
 
 void DPFORAM::PrintMetadata() {
     std::cout << "===================" << std::endl;
-    std::cout << "Party: " << party_ << std::endl;
-    std::cout << "Last level: " << this->is_last_ << std::endl;
-    std::cout << "First level: " << this->is_first_ << std::endl;
-    std::cout << "tau: " << this->tau_ << std::endl;
-    std::cout << "2^tau: " << this->data_per_block_ << std::endl;
-    std::cout << "logN: " << this->log_block_ct_ << std::endl;
-    std::cout << "N: " << this->n_ << std::endl;
-    std::cout << "logNBytes: " << this->log_block_ct_size_ << std::endl;
-    std::cout << "next_log_n_: " << this->next_log_n_ << std::endl;
-    std::cout << "nextLogNBytes: " << this->next_log_n_size_ << std::endl;
-    std::cout << "DBytes: " << this->data_size_ << std::endl;
-    std::cout << "Stash counter: " << this->cache_ctr_ << std::endl;
-    std::cout << "ROM: " << (this->read_array_ != NULL) << std::endl;
-    std::cout << "WOM: " << (this->write_array_ != NULL) << std::endl;
-    std::cout << "stash: " << (this->cache_ != NULL) << std::endl;
-    std::cout << "posMap: " << (this->position_map_ != NULL) << std::endl;
+    std::cout << "party_: " << this->party_ << std::endl;
+    std::cout << "tau_: " << this->tau_ << std::endl;
+    std::cout << "n_: " << this->n_ << std::endl;
+    std::cout << "data_size_: " << this->data_size_ << std::endl;
+    std::cout << "cache_ctr_: " << this->cache_ctr_ << std::endl;
+    std::cout << "read_array_23_: " << (this->read_array_23_ != NULL) << std::endl;
+    std::cout << "write_array_: " << (this->write_array_13_ != NULL) << std::endl;
+    std::cout << "cache_23_: " << (this->cache_23_ != NULL) << std::endl;
+    std::cout << "position_map_: " << (this->position_map_ != NULL) << std::endl;
     std::cout << "===================\n"
               << std::endl;
-
-    if (!this->is_first_) {
-        this->position_map_->PrintMetadata();
-    }
 }
 
 void DPFORAM::Test(uint iter) {

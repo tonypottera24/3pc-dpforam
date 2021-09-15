@@ -53,6 +53,7 @@ void uint64_to_bytes(uint64_t n, uchar *b, uint len);
 uint64_t bytes_to_uint64(const uchar *b);
 uint64_t bytes_to_uint64(const uchar *b, uint len);
 void bytes_to_bytes_array(const uchar *input, const uint input_size, const uint output_size, uchar **output);
+void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes_per_block, uchar *output);
 uint64_t current_timestamp();
 
 #endif /* UTIL_H_ */

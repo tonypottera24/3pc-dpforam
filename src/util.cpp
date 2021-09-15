@@ -76,10 +76,15 @@ uint64_t current_timestamp() {
     return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
 }
 
-void bytes_to_bytes_array(const uchar *input, const uint input_size, const uint output_size, uchar **output) {
+void bytes_to_bytes_array(uchar *input, const uint input_size, const uint output_size, uchar **output) {
     uint bytes_per_block = (input_size + output_size - 1) / output_size;
     for (uint i = 0; i < output_size; i++) {
-        output[i] = new uchar[bytes_per_block];
         memcpy(output[i], &input[i * bytes_per_block], bytes_per_block);
+    }
+}
+
+void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes_per_block, uchar *output) {
+    for (uint i = 0; i < input_size; i++) {
+        memcpy(&output[i * bytes_per_block], input[i], bytes_per_block);
     }
 }
