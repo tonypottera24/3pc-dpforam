@@ -44,10 +44,10 @@ private:
     void Reset();
 
 public:
-    DPFORAM(const uint party, Connection *cons[2],
+    DPFORAM(const uint party, Connection *connections[2],
             CryptoPP::AutoSeededRandomPool *rnd,
-            CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
-            uint64_t n, uint data_size);
+            CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
+            uint64_t n, uint data_size, uint tau);
     ~DPFORAM();
     void Access(const uint64_t index[2], const uchar *new_data,
                 const bool read_only, uchar *output[2]);

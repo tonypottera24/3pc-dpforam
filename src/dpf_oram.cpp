@@ -4,8 +4,8 @@ FSS1Bit DPFORAM::fss_;
 
 DPFORAM::DPFORAM(const uint party, Connection *connections[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
-                 CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs, uint tau,
-                 uint64_t n, uint data_size) : Protocol(party, connections, rnd, prgs) {
+                 CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
+                 uint64_t n, uint data_size, uint tau) : Protocol(party, connections, rnd, prgs) {
     this->n_ = n;
     this->data_size_ = data_size;
 
@@ -159,12 +159,12 @@ void DPFORAM::GetLatestData(const uchar *v_read_13,
     this->ShareTwoThird(v_meta_13, 1, v_meta_23);
 
     SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
-    if (this->party_ == 3) {
-        // conn 0:P1, 1:P2
-        ssot->P3(this->data_size_);
+    if (this->party_ == 2) {
+        // conn 0:P0, 1:P1
+        ssot->P2(this->data_size_);
         memset(v_out_13, 0, this->data_size_);
-    } else if (this->party_ == 1) {
-        // conn 0:P2, 1:P3
+    } else if (this->party_ == 0) {
+        // conn 0:P1, 1:P2
         uchar v_read_12[this->data_size_];
         xor_bytes(v_read_23[0], v_read_23[1], this->data_size_, v_read_12);
 
@@ -175,11 +175,11 @@ void DPFORAM::GetLatestData(const uchar *v_read_13,
         xor_bytes(v_meta_23[0], v_meta_23[1], 1, v_meta_12);
 
         const uchar *u01[2] = {v_read_12, v_cache_12};
-        ssot->P1(v_meta_12[0], u01, this->data_size_, v_out_13);
-    } else if (this->party_ == 2) {
-        // conn 0:P3, 1:P1
+        ssot->P0(v_meta_12[0], u01, this->data_size_, v_out_13);
+    } else if (this->party_ == 1) {
+        // conn 0:P2, 1:P0
         const uchar *v01[2] = {v_read_23[0], v_cache_23[0]};
-        ssot->P2(v_meta_23[0][0], v01, this->data_size_, v_out_13);
+        ssot->P1(v_meta_23[0][0], v01, this->data_size_, v_out_13);
     }
 
     delete ssot;
@@ -371,42 +371,41 @@ void DPFORAM::Test(uint iter) {
 
     PrintMetadata();
 
-    bool isRead = false;
     uint64_t range = 1ULL << (this->log_block_ct_ + this->tau_);
     uint64_t addr_23[2] = {10, 10};
     uchar *rec_23[2];
     uchar *new_rec_23[2];
     for (uint i = 0; i < 2; i++) {
-        rec_23[i] = new uchar[this->next_log_n_size_];
-        new_rec_23[i] = new uchar[this->next_log_n_size_];
-        memset(rec_23[i], 0, this->next_log_n_size_);
-        memset(new_rec_23[i], 0, this->next_log_n_size_);
+        rec_23[i] = new uchar[this->data_size_];
+        new_rec_23[i] = new uchar[this->data_size_];
+        memset(rec_23[i], 0, this->data_size_);
+        memset(new_rec_23[i], 0, this->data_size_);
     }
-    uchar rec_exp[this->next_log_n_size_];
-    memset(rec_exp, 0, this->next_log_n_size_ * sizeof(uchar));
-    if (strcmp(party_, "eddie") == 0) {
-        addr_23[0] = rand_long(range);
+    uchar rec_exp[this->data_size_];
+    memset(rec_exp, 0, this->data_size_ * sizeof(uchar));
+    if (this->party_ == 1) {
+        addr_23[0] = rand_uint64(range);
         this->conn_[0]->WriteLong(addr_23[0], false);
-    } else if (strcmp(party_, "debbie") == 0) {
+    } else if (this->party_ == 2) {
         addr_23[1] = this->conn_[1]->ReadLong();
     }
 
     for (uint t = 0; t < iter; t++) {
-        if (strcmp(party_, "eddie") == 0) {
-            this->rnd_->GenerateBlock(new_rec_23[0], this->next_log_n_size_);
-            this->conn_[0]->Write(new_rec_23[0], this->next_log_n_size_, false);
+        if (this->party_ == 1) {
+            this->rnd_->GenerateBlock(new_rec_23[0], this->data_size_);
+            this->conn_[0]->Write(new_rec_23[0], this->data_size_, false);
 
-            Sync();
+            this->Sync();
             wc = current_timestamp();
-            Access(addr_23, new_rec_23, isRead, rec_23);
+            this->Access(addr_23, new_rec_23, rec_23);
             party_wc += current_timestamp() - wc;
 
-            uchar rec_out[this->next_log_n_size_];
-            conn_[0]->Read(rec_out, this->next_log_n_size_);
-            xor_bytes(rec_out, rec_23[0], this->next_log_n_size_, rec_out);
-            xor_bytes(rec_out, rec_23[1], this->next_log_n_size_, rec_out);
+            uchar rec_out[this->data_size_];
+            conn_[0]->Read(rec_out, this->data_size_);
+            xor_bytes(rec_out, rec_23[0], this->data_size_, rec_out);
+            xor_bytes(rec_out, rec_23[1], this->data_size_, rec_out);
 
-            if (memcmp(rec_exp, rec_out, this->next_log_n_size_) == 0) {
+            if (memcmp(rec_exp, rec_out, this->data_size_) == 0) {
                 std::cout << "addr=" << addr_23[0] << ", t=" << t << ": Pass"
                           << std::endl;
             } else {
@@ -414,20 +413,20 @@ void DPFORAM::Test(uint iter) {
                           << ": Fail !!!" << std::endl;
             }
 
-            memcpy(rec_exp, new_rec_23[0], this->next_log_n_size_);
-        } else if (strcmp(party_, "debbie") == 0) {
-            conn_[1]->Read(new_rec_23[1], this->next_log_n_size_);
+            memcpy(rec_exp, new_rec_23[0], this->data_size_);
+        } else if (this->party_ == 2) {
+            conn_[1]->Read(new_rec_23[1], this->data_size_);
 
-            Sync();
+            this->Sync();
             wc = current_timestamp();
-            Access(addr_23, new_rec_23, isRead, rec_23);
+            this->Access(addr_23, new_rec_23, rec_23);
             party_wc += current_timestamp() - wc;
 
             conn_[1]->Write(rec_23[0], this->next_log_n_size_, false);
-        } else if (strcmp(party_, "charlie") == 0) {
-            Sync();
+        } else if (this->party_ == 0) {
+            this->Sync();
             wc = current_timestamp();
-            Access(addr_23, new_rec_23, isRead, rec_23);
+            this->Access(addr_23, new_rec_23, rec_23);
             party_wc += current_timestamp() - wc;
         } else {
             std::cout << "Incorrect party: " << party_ << std::endl;

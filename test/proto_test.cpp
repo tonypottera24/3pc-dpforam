@@ -15,9 +15,17 @@ using namespace CryptoPP;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    cxxopts::Options options(argv[0], "3PC DPF-ORAM IMPLEMENTATION");
+    cxxopts::Options options(argv[0], "3PC DPF-ORAM");
     options.positional_help("[optional args]").show_positional_help();
-    options.add_options()("party", "Party:[1|2|3]", cxxopts::value<string>())("eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))("tau", "Tau", cxxopts::value<uint>()->default_value("3"))("logn", "LogN", cxxopts::value<uint>()->default_value("12"))("d_bytes", "d_bytes", cxxopts::value<uint>()->default_value("4"))("thr", "Threads", cxxopts::value<uint>()->default_value("1"))("iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
+    options.add_options()(
+        "party", "Party:[0|1|2]", cxxopts::value<string>())(
+        "eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))(
+        "dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))(
+        "tau", "Tau", cxxopts::value<uint>()->default_value("3"))(
+        "logn", "LogN", cxxopts::value<uint>()->default_value("12"))(
+        "data_size", "data_size", cxxopts::value<uint>()->default_value("4"))(
+        "thr", "Threads", cxxopts::value<uint>()->default_value("1"))(
+        "iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
 
     auto result = options.parse(argc, argv);
     if (result.count("party") == 0) {
@@ -30,7 +38,7 @@ int main(int argc, char *argv[]) {
     string debbie_ip = result["dip"].as<string>();
     uint tau = result["tau"].as<uint>();
     uint log_n = result["logn"].as<uint>();
-    uint d_bytes = result["d_bytes"].as<uint>();
+    uint data_size = result["data_size"].as<uint>();
     uint threads = result["thr"].as<uint>();
     uint iters = result["iter"].as<uint>();
 
@@ -91,7 +99,7 @@ int main(int argc, char *argv[]) {
     Protocol *test_proto = NULL;
     unsigned long init_wc = current_timestamp();
     test_proto = new DPFORAM(party, cons, &rnd, prgs, tau, log_n,
-                             d_bytes, true);
+                             data_size, true);
     init_wc = current_timestamp() - init_wc;
     std::cout << "Init Wallclock(microsec): " << init_wc << std::endl;
 

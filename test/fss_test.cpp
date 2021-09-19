@@ -14,7 +14,7 @@ int main() {
 
         for (uint i = 0; i < 100; i++) {
             bool pass = true;
-            uint64_t alpha = rand_long(range);
+            uint64_t alpha = rand_uint64(range);
             uchar *keys[2];
             generator.Gen(alpha, m, keys);
             uchar *share0 = new uchar[range];

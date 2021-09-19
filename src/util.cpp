@@ -70,6 +70,14 @@ uint64_t bytes_to_uint64(const uchar *bytes, uint len) {
     return value;
 }
 
+uint64_t rand_uint64(int64_t range) {
+    assert(range > 0);
+    uchar bytes[8];
+    RAND_bytes(bytes, 8);
+    uint64_t value = bytes_to_uint64(bytes);
+    return value % range;
+}
+
 uint64_t current_timestamp() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
