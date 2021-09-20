@@ -399,7 +399,6 @@ void DPFORAM::Test(uint iter) {
             this->rnd_->GenerateBlock(new_rec_23[0], this->data_size_);
             this->conn_[0]->Write(new_rec_23[0], this->data_size_, false);
 
-            this->Sync();
             time = timestamp();
             this->Access(index_23, new_rec_23, rec_23);
             party_time += timestamp() - time;
@@ -420,7 +419,6 @@ void DPFORAM::Test(uint iter) {
             // conn 0:P0, 1:P1
             conn_[1]->Read(new_rec_23[1], this->data_size_);
 
-            this->Sync();
             time = timestamp();
             this->Access(index_23, new_rec_23, rec_23);
             party_time += timestamp() - time;
@@ -428,7 +426,6 @@ void DPFORAM::Test(uint iter) {
             conn_[1]->Write(rec_23[0], this->next_log_n_size_, false);
         } else if (this->party_ == 0) {
             // conn 0:P1, 1:P2
-            this->Sync();
             time = timestamp();
             this->Access(index_23, new_rec_23, rec_23);
             party_time += timestamp() - time;

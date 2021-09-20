@@ -87,9 +87,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Time to initilize DPF ORAM: %" PRIu64 "\n", end_time - start_time);
 
     if (dpf_oram != NULL) {
-        dpf_oram->Sync();
         dpf_oram->Test(iters);
-        dpf_oram->Sync();
         delete dpf_oram;
     }
 

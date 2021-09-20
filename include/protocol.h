@@ -19,7 +19,6 @@ public:
              CryptoPP::AutoSeededRandomPool *rnd,
              CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs);
     virtual ~Protocol();
-    void Sync();
     uint64_t Bandwidth();
     virtual void Test(uint iter) = 0;
 };
