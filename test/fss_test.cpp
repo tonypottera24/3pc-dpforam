@@ -1,3 +1,5 @@
+#include <inttypes.h>
+
 #include <iostream>
 
 #include "fss1bit.h"
@@ -26,30 +28,29 @@ int main() {
                 uchar output = share0[x] ^ share1[x];
                 if (x == alpha) {
                     if (output == 0) {
-                        cout << "Failed: alpha=" << alpha << ", x=" << x
-                             << ", outValue=" << output << endl;
+                        fprintf(stderr, "Failed: alpha = %" PRIu64 ", x = %" PRIu64 ", outValue = %c\n", alpha, x, output);
                         pass = false;
                     }
                 } else {
                     if (output != 0) {
-                        cout << "Failed: alpha=" << alpha << ", x=" << x
-                             << ", outValue=" << output << endl;
+                        fprintf(stderr, "Failed: alpha = %" PRIu64 ", x = %" PRIu64 ", outValue = %c\n", alpha, x, output);
                         pass = false;
                     }
                 }
             }
 
-            if (pass)
-                cout << "m=" << m << ", i=" << i << ": passed" << endl;
-            else
-                cout << "m=" << m << ", i=" << i << ": failed" << endl;
+            if (pass) {
+                fprintf(stderr, "m = %u, i = %u, passed\n", m, i);
+            } else {
+                fprintf(stderr, "m = %u, i = %u, failed\n", m, i);
+            }
 
             delete[] keys[0];
             delete[] keys[1];
             delete[] share0;
             delete[] share1;
         }
-        cout << endl;
+        fprintf(stderr, "\n");
     }
 
     return 0;

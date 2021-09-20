@@ -155,7 +155,7 @@ int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
     buff1 = new unsigned char[size];
 
     if (buff0 == NULL || buff1 == NULL) {
-        printf("Memory allocation failed\n");
+        fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
 
@@ -356,7 +356,7 @@ void test_libdpf() {
 
     uint64_t j;
     for (j = 0; j < 1; j++) {
-        printf("Group %ld\n", j);
+        fprintf(stderr, "Group %ld\n", j);
 
         dpf_cb(resf0[j]);
         dpf_cb(resf1[j]);

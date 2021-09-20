@@ -78,7 +78,7 @@ uint64_t rand_uint64(int64_t range) {
     return value % range;
 }
 
-uint64_t current_timestamp() {
+uint64_t timestamp() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;

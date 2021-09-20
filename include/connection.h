@@ -5,11 +5,11 @@
 
 class Connection {
 public:
-    uint64_t bandwidth_ = 0ULL;
+    uint64_t bandwidth_ = 0;
 
     virtual ~Connection();
-    virtual void InitServer(int port) = 0;
-    virtual void InitClient(const char *ip, int port) = 0;
+    virtual void InitServer(uint port) = 0;
+    virtual void InitClient(const char *ip, uint port) = 0;
     virtual void SetNoDelay() = 0;
     virtual void Write(const uchar *data, uint64_t bytes,
                        bool count_band = true) = 0;

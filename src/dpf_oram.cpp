@@ -328,7 +328,6 @@ void DPFORAM::AppendCache(const uchar *v_new_13) {
     this->cache_ctr_++;
 
     if (this->cache_ctr_ == this->n_) {
-        this->cache_ctr_ = 0;
         this->Flush();
         if (this->position_map_ != NULL) {
             this->position_map_->Reset();
@@ -340,65 +339,70 @@ void DPFORAM::AppendCache(const uchar *v_new_13) {
 }
 
 void DPFORAM::Flush() {
-    uchar *tmp[2];
+    uchar *read_array_23_i[2];
     for (uint64_t i = 0; i < this->n_; i++) {
         for (uint j = 0; j < 2; j++) {
-            tmp[j] = this->read_array_23_[j][i];
+            read_array_23_i[j] = this->read_array_23_[j][i];
         }
-        this->ShareTwoThird(this->write_array_13_[i], this->data_size_, tmp);
-        memset(this->write_array_13_[i], 0, this->data_size_);
+        this->ShareTwoThird(this->write_array_13_[i], this->data_size_, read_array_23_i);
+    }
+    this->cache_ctr_ = 0;
+    for (uint i = 0; i < 2; i++) {
+        for (uint64_t j = 0; j < this->n_; j++) {
+            memset(this->cache_23_[i][j], 0, this->data_size_);
+        }
     }
 }
 
 void DPFORAM::PrintMetadata() {
-    std::cout << "===================" << std::endl;
-    std::cout << "party_: " << this->party_ << std::endl;
-    std::cout << "tau_: " << this->tau_ << std::endl;
-    std::cout << "n_: " << this->n_ << std::endl;
-    std::cout << "data_size_: " << this->data_size_ << std::endl;
-    std::cout << "cache_ctr_: " << this->cache_ctr_ << std::endl;
-    std::cout << "read_array_23_: " << (this->read_array_23_ != NULL) << std::endl;
-    std::cout << "write_array_: " << (this->write_array_13_ != NULL) << std::endl;
-    std::cout << "cache_23_: " << (this->cache_23_ != NULL) << std::endl;
-    std::cout << "position_map_: " << (this->position_map_ != NULL) << std::endl;
-    std::cout << "===================\n"
-              << std::endl;
+    fprintf(stderr, "===================\n");
+    fprintf(stderr, "party_: %u\n", this->party_);
+    fprintf(stderr, "tau_: %u\n", this->tau_);
+    fprintf(stderr, "n_: %" PRIu64 "\n", this->n_);
+    fprintf(stderr, "data_size_: %u\n", this->data_size_);
+    fprintf(stderr, "cache_ctr_: %" PRIu64 "\n", this->cache_ctr_);
+    fprintf(stderr, "read_array_23_: %d\n", (this->read_array_23_ != NULL));
+    fprintf(stderr, "write_array_13_: %d\n", (this->write_array_13_ != NULL));
+    fprintf(stderr, "cache_23_: %d\n", (this->cache_23_ != NULL));
+    fprintf(stderr, "position_map_: %d\n", (this->position_map_ != NULL));
+    fprintf(stderr, "===================\n");
 }
 
 void DPFORAM::Test(uint iter) {
-    uint64_t party_wc = 0;
-    uint64_t wc;
+    uint64_t party_time = 0;
+    uint64_t time;
 
     PrintMetadata();
 
     uint64_t range = 1ULL << (this->log_block_ct_ + this->tau_);
-    uint64_t addr_23[2] = {10, 10};
+    uint64_t index_23[2] = {10, 10};
     uchar *rec_23[2];
     uchar *new_rec_23[2];
     for (uint i = 0; i < 2; i++) {
-        rec_23[i] = new uchar[this->data_size_];
-        new_rec_23[i] = new uchar[this->data_size_];
-        memset(rec_23[i], 0, this->data_size_);
-        memset(new_rec_23[i], 0, this->data_size_);
+        rec_23[i] = new uchar[this->data_size_]();
+        new_rec_23[i] = new uchar[this->data_size_]();
     }
     uchar rec_exp[this->data_size_];
     memset(rec_exp, 0, this->data_size_ * sizeof(uchar));
     if (this->party_ == 1) {
-        addr_23[0] = rand_uint64(range);
-        this->conn_[0]->WriteLong(addr_23[0], false);
+        // conn 0:P2, 1:P0
+        index_23[0] = rand_uint64(range);
+        this->conn_[0]->WriteLong(index_23[0], false);
     } else if (this->party_ == 2) {
-        addr_23[1] = this->conn_[1]->ReadLong();
+        // conn 0:P0, 1:P1
+        index_23[1] = this->conn_[1]->ReadLong();
     }
 
     for (uint t = 0; t < iter; t++) {
         if (this->party_ == 1) {
+            // conn 0:P2, 1:P0
             this->rnd_->GenerateBlock(new_rec_23[0], this->data_size_);
             this->conn_[0]->Write(new_rec_23[0], this->data_size_, false);
 
             this->Sync();
-            wc = current_timestamp();
-            this->Access(addr_23, new_rec_23, rec_23);
-            party_wc += current_timestamp() - wc;
+            time = timestamp();
+            this->Access(index_23, new_rec_23, rec_23);
+            party_time += timestamp() - time;
 
             uchar rec_out[this->data_size_];
             conn_[0]->Read(rec_out, this->data_size_);
@@ -406,30 +410,30 @@ void DPFORAM::Test(uint iter) {
             xor_bytes(rec_out, rec_23[1], this->data_size_, rec_out);
 
             if (memcmp(rec_exp, rec_out, this->data_size_) == 0) {
-                std::cout << "addr=" << addr_23[0] << ", t=" << t << ": Pass"
-                          << std::endl;
+                fprintf(stderr, "addr=%" PRIu64 ", t=%u: Pass\n", index_23[0], t);
             } else {
-                std::cerr << "addr=" << addr_23[0] << ", t=" << t
-                          << ": Fail !!!" << std::endl;
+                fprintf(stderr, "addr=%" PRIu64 ", t=%u: Fail !!!\n", index_23[0], t);
             }
 
             memcpy(rec_exp, new_rec_23[0], this->data_size_);
         } else if (this->party_ == 2) {
+            // conn 0:P0, 1:P1
             conn_[1]->Read(new_rec_23[1], this->data_size_);
 
             this->Sync();
-            wc = current_timestamp();
-            this->Access(addr_23, new_rec_23, rec_23);
-            party_wc += current_timestamp() - wc;
+            time = timestamp();
+            this->Access(index_23, new_rec_23, rec_23);
+            party_time += timestamp() - time;
 
             conn_[1]->Write(rec_23[0], this->next_log_n_size_, false);
         } else if (this->party_ == 0) {
+            // conn 0:P1, 1:P2
             this->Sync();
-            wc = current_timestamp();
-            this->Access(addr_23, new_rec_23, rec_23);
-            party_wc += current_timestamp() - wc;
+            time = timestamp();
+            this->Access(index_23, new_rec_23, rec_23);
+            party_time += timestamp() - time;
         } else {
-            std::cout << "Incorrect party: " << party_ << std::endl;
+            fprintf(stderr, "Incorrect party: %d\n", this->party_);
         }
     }
 
@@ -445,17 +449,16 @@ void DPFORAM::Test(uint iter) {
     total_band += (uint64_t)this->conn_[0]->ReadLong();
     total_band += (uint64_t)this->conn_[1]->ReadLong();
 
-    conn_[0]->WriteLong(party_wc, false);
-    conn_[1]->WriteLong(party_wc, false);
-    uint64_t max_wc = party_wc;
+    conn_[0]->WriteLong(party_time, false);
+    conn_[1]->WriteLong(party_time, false);
+    uint64_t max_wc = party_time;
     max_wc = std::max(max_wc, (uint64_t)conn_[0]->ReadLong());
     max_wc = std::max(max_wc, (uint64_t)conn_[1]->ReadLong());
 
-    std::cout << std::endl;
-    std::cout << "Party Bandwidth(byte): " << (party_band / iter) << std::endl;
-    std::cout << "Party Wallclock(microsec): " << (party_wc / iter)
-              << std::endl;
-    std::cout << "Total Bandwidth(byte): " << (total_band / iter) << std::endl;
-    std::cout << "Max Wallclock(microsec): " << (max_wc / iter) << std::endl;
-    std::cout << std::endl;
+    fprintf(stderr, "\n");
+    fprintf(stderr, "Party Bandwidth(byte): %f\n", party_band / iter);
+    fprintf(stderr, "Party Wallclock(microsec): %f\n", party_time / iter);
+    fprintf(stderr, "Total Bandwidth(byte): %f\n", total_band / iter);
+    fprintf(stderr, "Max Wallclock(microsec): %f\n", max_wc / iter);
+    fprintf(stderr, "\n");
 }

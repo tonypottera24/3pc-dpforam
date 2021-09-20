@@ -19,31 +19,31 @@ int main(int argc, char *argv[]) {
     options.positional_help("[optional args]").show_positional_help();
     options.add_options()(
         "party", "Party:[0|1|2]", cxxopts::value<string>())(
-        "eip", "Eddie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))(
-        "dip", "Debbie's ip", cxxopts::value<string>()->default_value("127.0.0.1"))(
-        "tau", "Tau", cxxopts::value<uint>()->default_value("3"))(
-        "logn", "LogN", cxxopts::value<uint>()->default_value("12"))(
+        "next_party_ip", "next party's ip", cxxopts::value<string>()->default_value("127.0.0.1"))(
+        "tau", "tau", cxxopts::value<uint>()->default_value("3"))(
+        "n", "number of data", cxxopts::value<uint>()->default_value("12"))(
         "data_size", "data_size", cxxopts::value<uint>()->default_value("4"))(
         "thr", "Threads", cxxopts::value<uint>()->default_value("1"))(
         "iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
 
     auto result = options.parse(argc, argv);
     if (result.count("party") == 0) {
-        cout << "No party specified" << endl;
-        cout << options.help({"", "Group"}) << endl;
+        fprintf(stderr, "No party specified\n");
+        fprintf(stderr, "%s\n", options.help({"", "Group"}).c_str());
         return 0;
     }
     uint party = result["party"].as<uint>();
-    string eddie_ip = result["eip"].as<string>();
-    string debbie_ip = result["dip"].as<string>();
+    string next_party_ip = result["next_party_ip"].as<string>();
+
     uint tau = result["tau"].as<uint>();
-    uint log_n = result["logn"].as<uint>();
+    uint n = result["n"].as<uint>();
     uint data_size = result["data_size"].as<uint>();
+
     uint threads = result["thr"].as<uint>();
     uint iters = result["iter"].as<uint>();
 
     omp_set_num_threads(threads);
-    int port = 8000;
+    const uint port = 8000;
 
     Connection *cons[2] = {new SimpleSocket(), new SimpleSocket()};
     AutoSeededRandomPool rnd;
@@ -52,71 +52,51 @@ int main(int argc, char *argv[]) {
     for (uint i = 0; i < 96; i++) {
         bytes[i] = i;
     }
-    uint offset_DE = 0;
-    uint offset_CE = 32;
-    uint offset_CD = 64;
+    uint offset_P2_P1 = 0;
+    uint offset_P0_P1 = 32;
+    uint offset_P0_P2 = 64;
 
-    if (party == 2) {
-        cout << "Establishing connection with debbie... " << flush;
-        cons[0]->InitServer(port);
-        cout << "done" << endl;
+    fprintf(stderr, "Initilize server on port %u P2...\n", port);
+    cons[0]->InitServer(port);
+    fprintf(stderr, "Initilize server on port %u P2 done.\n", port);
+    fprintf(stderr, "Connecting to %s on port %u...\n", next_party_ip.c_str(), port);
+    cons[1]->InitClient(next_party_ip.c_str(), port);
+    fprintf(stderr, "Connecting to %s on port %u done.\n", next_party_ip.c_str(), port);
 
-        cout << "Establishing connection with charlie... " << flush;
-        cons[1]->InitServer(port + 1);
-        cout << "done" << endl;
-
-        prgs[0].SetKeyWithIV(bytes + offset_DE, 16, bytes + offset_DE + 16);
-        prgs[1].SetKeyWithIV(bytes + offset_CE, 16, bytes + offset_CE + 16);
-    } else if (party == 3) {
-        cout << "Connecting with eddie... " << flush;
-        cons[1]->InitClient(eddie_ip.c_str(), port);
-        cout << "done" << endl;
-
-        cout << "Establishing connection with charlie... " << flush;
-        cons[0]->InitServer(port + 2);
-        cout << "done" << endl;
-
-        prgs[0].SetKeyWithIV(bytes + offset_CD, 16, bytes + offset_CD + 16);
-        prgs[1].SetKeyWithIV(bytes + offset_DE, 16, bytes + offset_DE + 16);
-    } else if (party == 1) {
-        cout << "Connecting with eddie... " << flush;
-        cons[0]->InitClient(eddie_ip.c_str(), port + 1);
-        cout << "done" << endl;
-
-        cout << "Connecting with debbie... " << flush;
-        cons[1]->InitClient(debbie_ip.c_str(), port + 2);
-        cout << "done" << endl;
-
-        prgs[0].SetKeyWithIV(bytes + offset_CE, 16, bytes + offset_CE + 16);
-        prgs[1].SetKeyWithIV(bytes + offset_CD, 16, bytes + offset_CD + 16);
+    if (party == 1) {
+        // conn 0:P2, 1:P0
+        prgs[0].SetKeyWithIV(bytes + offset_P2_P1, 16, bytes + offset_P2_P1 + 16);
+        prgs[1].SetKeyWithIV(bytes + offset_P0_P1, 16, bytes + offset_P0_P1 + 16);
+    } else if (party == 2) {
+        // conn 0:P0, 1:P1
+        prgs[0].SetKeyWithIV(bytes + offset_P0_P2, 16, bytes + offset_P0_P2 + 16);
+        prgs[1].SetKeyWithIV(bytes + offset_P2_P1, 16, bytes + offset_P2_P1 + 16);
+    } else if (party == 0) {
+        // conn 0:P1, 1:P2
+        prgs[0].SetKeyWithIV(bytes + offset_P0_P1, 16, bytes + offset_P0_P1 + 16);
+        prgs[1].SetKeyWithIV(bytes + offset_P0_P2, 16, bytes + offset_P0_P2 + 16);
     } else {
-        cout << "Incorrect party: " << party << endl;
-        delete cons[0];
-        delete cons[1];
-        return 0;
+        fprintf(stderr, "Incorrect party: %u\n", party);
+        exit(1);
     }
 
-    Protocol *test_proto = NULL;
-    unsigned long init_wc = current_timestamp();
-    test_proto = new DPFORAM(party, cons, &rnd, prgs, tau, log_n,
-                             data_size, true);
-    init_wc = current_timestamp() - init_wc;
-    std::cout << "Init Wallclock(microsec): " << init_wc << std::endl;
+    Protocol *dpf_oram = NULL;
+    uint64_t start_time = timestamp();
+    dpf_oram = new DPFORAM(party, cons, &rnd, prgs, n, data_size, tau);
+    uint64_t end_time = timestamp();
+    fprintf(stderr, "Time to initilize DPF ORAM: %" PRIu64 "\n", end_time - start_time);
 
-    if (test_proto != NULL) {
-        test_proto->Sync();
-        test_proto->Test(iters);
-        test_proto->Sync();
-        delete test_proto;
+    if (dpf_oram != NULL) {
+        dpf_oram->Sync();
+        dpf_oram->Test(iters);
+        dpf_oram->Sync();
+        delete dpf_oram;
     }
 
-    cout << "Closing connections... " << flush;
-    sleep(1);
+    fprintf(stderr, "Closing connections... ");
     cons[0]->Close();
     cons[1]->Close();
-    delete cons[0];
-    delete cons[1];
-    cout << "done" << endl;
+    fprintf(stderr, "Closing connections done.");
 
     return 0;
 }

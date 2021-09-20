@@ -58,19 +58,19 @@ uint128 *dpf_allocate_blocks(size_t nblocks) {
 void _output_bit_to_bit(uint64_t input) {
     for (int i = 0; i < 64; i++) {
         if ((1ll << i) & input)
-            printf("1");
+            fprintf(stderr, "1");
         else
-            printf("0");
+            fprintf(stderr, "0");
     }
 }
 
 void dpf_cb(uint128 input) {
     uint64_t *val = (uint64_t *)&input;
 
-    //printf("%016lx%016lx\n", val[0], val[1]);
+    //fprintf(stderr,"%016lx%016lx\n", val[0], val[1]);
     _output_bit_to_bit(val[0]);
     _output_bit_to_bit(val[1]);
-    printf("\n");
+    fprintf(stderr, "\n");
 }
 
 // void dpf_cbnotnewline(block input)

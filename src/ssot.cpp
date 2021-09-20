@@ -135,12 +135,12 @@ void SSOT::Test(uint iter) {
             xor_bytes(u01[b], v01[b], data_size, expected);
             xor_bytes(p0, p1, data_size, output);
             if (memcmp(output, expected, data_size) == 0) {
-                std::cout << "SSOT passed: " << test << std::endl;
+                fprintf(stderr, "SSOT passed: %u\n", test);
             } else {
-                std::cerr << "!!!!! SSOT failed: " << test << std::endl;
+                fprintf(stderr, "SSOT failed: %u\n", test);
             }
         } else {
-            std::cout << "Incorrect party: " << this->party_ << std::endl;
+            fprintf(stderr, "Incorrect party: %d\n", this->party_);
         }
 
         for (uint i = 0; i < 2; i++) {

@@ -24,7 +24,7 @@ void SimpleSocket::SetStream() {
     setvbuf(stream_, buffer_, _IOFBF, BUFF_BYTES);
 }
 
-void SimpleSocket::InitServer(int port) {
+void SimpleSocket::InitServer(uint port) {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
         error("InitServer: socket failed");
@@ -54,7 +54,7 @@ void SimpleSocket::InitServer(int port) {
     SetNoDelay();
 }
 
-void SimpleSocket::InitClient(const char *ip, int port) {
+void SimpleSocket::InitClient(const char *ip, uint port) {
     socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_fd_ < 0) {
         error("InitClient: socket failed");
@@ -91,7 +91,7 @@ void SimpleSocket::Write(const uchar *data, uint64_t data_size, bool count_band)
         offset += write_size;
     }
     if (count_band) {
-        bandwidth_ += data_size;
+        this->bandwidth_ += data_size;
     }
 }
 

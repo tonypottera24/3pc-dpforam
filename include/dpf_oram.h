@@ -2,6 +2,7 @@
 #define DPF_ORAM_H_
 
 #include <assert.h>
+#include <inttypes.h>
 #include <omp.h>
 
 #include <iostream>
