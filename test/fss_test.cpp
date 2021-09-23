@@ -16,7 +16,7 @@ int main() {
 
         for (uint i = 0; i < 100; i++) {
             bool pass = true;
-            uint64_t alpha = rand_uint64(range);
+            uint64_t alpha = rand_uint64() % range;
             uchar *keys[2];
             generator.Gen(alpha, m, keys);
             uchar *share0 = new uchar[range];
@@ -28,12 +28,12 @@ int main() {
                 uchar output = share0[x] ^ share1[x];
                 if (x == alpha) {
                     if (output == 0) {
-                        fprintf(stderr, "Failed: alpha = %" PRIu64 ", x = %" PRIu64 ", outValue = %c\n", alpha, x, output);
+                        fprintf(stderr, "Failed: alpha = %llu, x = %llu, outValue = %c\n", alpha, x, output);
                         pass = false;
                     }
                 } else {
                     if (output != 0) {
-                        fprintf(stderr, "Failed: alpha = %" PRIu64 ", x = %" PRIu64 ", outValue = %c\n", alpha, x, output);
+                        fprintf(stderr, "Failed: alpha = %llu, x = %llu, outValue = %c\n", alpha, x, output);
                         pass = false;
                     }
                 }

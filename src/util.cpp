@@ -14,20 +14,10 @@ void xor_bytes(const uchar *input_a, const uchar *input_b, uint len, uchar *outp
     }
 }
 
-void uint_to_bytes(uint value, uchar *bytes) {
-    bytes[0] = (value >> 24) & 0xFF;
-    bytes[1] = (value >> 16) & 0xFF;
-    bytes[2] = (value >> 8) & 0xFF;
-    bytes[3] = value & 0xFF;
-}
-
-uint bytes_to_uint(const uchar *bytes) {
-    uint value = 0;
-    for (uint i = 0; i < 4; i++) {
-        value <<= 8;
-        value |= bytes[i];
+void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint len, uchar *output) {
+    for (uint i = 0; i < len; i++) {
+        output[i] = input_a[i] ^ input_b[i] ^ input_c[i];
     }
-    return value;
 }
 
 void uint64_to_bytes(uint64_t value, uchar *bytes) {
@@ -60,7 +50,7 @@ uint64_t bytes_to_uint64(const uchar *bytes) {
     return value;
 }
 
-uint64_t bytes_to_uint64(const uchar *bytes, uint len) {
+uint64_t bytes_to_uint64(const uchar *bytes, const uint len) {
     uint64_t value = 0;
     uint min = std::min(len, 8u);
     for (uint i = 0; i < min; i++) {
@@ -70,12 +60,15 @@ uint64_t bytes_to_uint64(const uchar *bytes, uint len) {
     return value;
 }
 
-uint64_t rand_uint64(int64_t range) {
-    assert(range > 0);
+void rand_bytes(uchar *bytes, const uint len) {
+    RAND_bytes(bytes, len);
+}
+
+uint64_t rand_uint64() {
     uchar bytes[8];
-    RAND_bytes(bytes, 8);
+    rand_bytes(bytes, 8);
     uint64_t value = bytes_to_uint64(bytes);
-    return value % range;
+    return value;
 }
 
 uint64_t timestamp() {
@@ -95,4 +88,12 @@ void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes
     for (uint i = 0; i < input_size; i++) {
         memcpy(&output[i * bytes_per_block], input[i], bytes_per_block);
     }
+}
+
+void print_bytes(uchar *bytes, uint len, char *description) {
+    printf("%s: 0x", description);
+    for (uint i = 0; i < len; i++) {
+        printf("%02X", bytes[i]);
+    }
+    printf("\n");
 }

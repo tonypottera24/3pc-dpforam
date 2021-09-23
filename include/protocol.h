@@ -20,7 +20,7 @@ public:
              CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs);
     virtual ~Protocol();
     uint64_t Bandwidth();
-    virtual void Test(uint iter) = 0;
+    virtual void Test(uint iterations) = 0;
 };
 
 #endif /* PROTOCOL_H_ */

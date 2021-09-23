@@ -1,6 +1,8 @@
 #ifndef CONNECTION_H_
 #define CONNECTION_H_
 
+#include <cstdint>
+
 #include "typedef.h"
 
 class Connection {
@@ -8,7 +10,7 @@ public:
     uint64_t bandwidth_ = 0;
 
     virtual ~Connection();
-    virtual void InitServer(uint port) = 0;
+    virtual void InitServer(const char *ip, const uint port) = 0;
     virtual void InitClient(const char *ip, uint port) = 0;
     virtual void SetNoDelay() = 0;
     virtual void Write(const uchar *data, uint64_t bytes,

@@ -356,7 +356,7 @@ void test_libdpf() {
 
     uint64_t j;
     for (j = 0; j < 1; j++) {
-        fprintf(stderr, "Group %ld\n", j);
+        fprintf(stderr, "Group %llu\n", j);
 
         dpf_cb(resf0[j]);
         dpf_cb(resf1[j]);

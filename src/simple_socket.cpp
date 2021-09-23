@@ -24,8 +24,8 @@ void SimpleSocket::SetStream() {
     setvbuf(stream_, buffer_, _IOFBF, BUFF_BYTES);
 }
 
-void SimpleSocket::InitServer(uint port) {
-    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+void SimpleSocket::InitServer(const char *ip, const uint port) {
+    int server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server_fd < 0) {
         error("InitServer: socket failed");
     }
@@ -35,7 +35,7 @@ void SimpleSocket::InitServer(uint port) {
     }
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr(ip);
     address.sin_port = htons(port);
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
         error("InitServer: bind failed");
@@ -55,19 +55,24 @@ void SimpleSocket::InitServer(uint port) {
 }
 
 void SimpleSocket::InitClient(const char *ip, uint port) {
-    socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd_ < 0) {
-        error("InitClient: socket failed");
-    }
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-    if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
-        error("InitClient: inet_pton failed");
-    }
-    if (connect(socket_fd_, (struct sockaddr *)&server_addr,
-                sizeof(server_addr)) < 0) {
-        error("InitClient: connect failed");
+    int connect_status = -1;
+    while (connect_status < 0) {
+        socket_fd_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (socket_fd_ < 0) {
+            error("InitClient: socket failed");
+        }
+        struct sockaddr_in server_addr;
+        server_addr.sin_family = AF_INET;
+        server_addr.sin_port = htons(port);
+        if (inet_pton(AF_INET, ip, &server_addr.sin_addr) <= 0) {
+            error("InitClient: inet_pton failed");
+        }
+        connect_status = connect(socket_fd_, (struct sockaddr *)&server_addr, sizeof(server_addr));
+        if (connect_status < 0) {
+            close(socket_fd_);
+            fprintf(stderr, "InitClient: connect failed, wait for 3 sec...\n");
+            sleep(3);
+        }
     }
     SetStream();
     SetNoDelay();
@@ -81,10 +86,9 @@ void SimpleSocket::SetNoDelay() {
 }
 
 void SimpleSocket::Write(const uchar *data, uint64_t data_size, bool count_band) {
-    uint64_t write_size;
-    uint64_t offset = 0ULL;
+    uint64_t offset = 0;
     while (offset < data_size) {
-        write_size = ::write(socket_fd_, data + offset, data_size - offset);
+        uint64_t write_size = ::write(socket_fd_, data + offset, data_size - offset);
         if (write_size < 0) {
             error("write failed");
         }
@@ -93,17 +97,17 @@ void SimpleSocket::Write(const uchar *data, uint64_t data_size, bool count_band)
     if (count_band) {
         this->bandwidth_ += data_size;
     }
+    fflush(stream_);
 }
 
 void SimpleSocket::Read(uchar *data, uint64_t data_size) {
-    uint64_t read_bytes;
-    uint64_t offset = 0ULL;
+    uint64_t offset = 0;
     while (offset < data_size) {
-        read_bytes = ::read(socket_fd_, data + offset, data_size - offset);
-        if (read_bytes < 0) {
+        uint64_t read_size = ::read(socket_fd_, data + offset, data_size - offset);
+        if (read_size < 0) {
             error("read failed");
         }
-        offset += read_bytes;
+        offset += read_size;
     }
 }
 

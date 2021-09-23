@@ -25,7 +25,7 @@ CC = clang++
 CFLAGS = -Wall -g
 CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -maes -msse2 -fopenmp
 LDFLAGS = -L/opt/local/lib -Llib
-LDLIBS = -lcryptopp -lcrypto -fopenmp
+LDLIBS = -lcryptopp -lcrypto -fopenmp -lboost_program_options-mt
 # -mmacosx-version-min=11.2
 
 .PHONY: all clean

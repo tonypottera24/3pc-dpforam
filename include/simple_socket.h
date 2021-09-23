@@ -14,7 +14,7 @@ private:
     void SetStream();
 
 public:
-    void InitServer(uint port);
+    void InitServer(const char *server_ip, const uint port);
     void InitClient(const char *ip, uint port);
     void SetNoDelay();
     void Write(const uchar *data, uint64_t bytes, bool count_band = true);

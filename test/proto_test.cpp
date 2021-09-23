@@ -1,99 +1,124 @@
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
 #include <omp.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <iostream>
+#include <boost/program_options.hpp>
+#include <thread>
 
-#include "cxxopts.hpp"
 #include "dpf_oram.h"
 #include "simple_socket.h"
 #include "util.h"
 
 using namespace CryptoPP;
-using namespace std;
+namespace po = boost::program_options;
+
+void start_server(Connection *conn, const char *ip, const uint port) {
+    conn->InitServer(ip, port);
+}
 
 int main(int argc, char *argv[]) {
-    cxxopts::Options options(argv[0], "3PC DPF-ORAM");
-    options.positional_help("[optional args]").show_positional_help();
-    options.add_options()(
-        "party", "Party:[0|1|2]", cxxopts::value<string>())(
-        "next_party_ip", "next party's ip", cxxopts::value<string>()->default_value("127.0.0.1"))(
-        "tau", "tau", cxxopts::value<uint>()->default_value("3"))(
-        "n", "number of data", cxxopts::value<uint>()->default_value("12"))(
-        "data_size", "data_size", cxxopts::value<uint>()->default_value("4"))(
-        "thr", "Threads", cxxopts::value<uint>()->default_value("1"))(
-        "iter", "Iterations", cxxopts::value<uint>()->default_value("100"));
+    po::options_description desc("Allowed options");
+    desc.add_options()(
+        "help", "3PC DPF-ORAM")(
+        "party", po::value<uint>(), "party id, 0 | 1 | 2")(
+        "ip", po::value<std::string>()->default_value("127.0.0.1"), "server ip")(
+        "port", po::value<uint>()->default_value(8080), "server port")(
+        "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
+        "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
+        "m", po::value<uint64_t>()->default_value(3), "number of data (n = 2^m)")(
+        "data_size", po::value<uint>()->default_value(4), "data size (bytes)")(
+        "tau", po::value<uint>()->default_value(3), "tau, each block include 2^tau data")(
+        "threads", po::value<uint>()->default_value(1), "number of threads")(
+        "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
-    auto result = options.parse(argc, argv);
-    if (result.count("party") == 0) {
-        fprintf(stderr, "No party specified\n");
-        fprintf(stderr, "%s\n", options.help({"", "Group"}).c_str());
-        return 0;
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+    } catch (po::unknown_option const &error) {
+        std::cerr << "Invalid option: " << error.get_option_name() << "\n";
+        std::cerr << desc << "\n";
+        exit(1);
     }
-    uint party = result["party"].as<uint>();
-    string next_party_ip = result["next_party_ip"].as<string>();
 
-    uint tau = result["tau"].as<uint>();
-    uint n = result["n"].as<uint>();
-    uint data_size = result["data_size"].as<uint>();
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
+        exit(1);
+    }
 
-    uint threads = result["thr"].as<uint>();
-    uint iters = result["iter"].as<uint>();
+    uint party;
+    if (vm.count("party")) {
+        party = vm["party"].as<uint>();
+        assert(0 <= party && party < 3);
+    } else {
+        printf("Error: party was not set.\n\n");
+        std::cout << desc << std::endl;
+        exit(1);
+    }
+
+    std::string ip = vm["ip"].as<std::string>();
+    uint port = vm["port"].as<uint>();
+
+    std::string next_party_ip = vm["next_party_ip"].as<std::string>();
+    uint next_party_port = vm["next_party_port"].as<uint>();
+
+    uint64_t m = vm["m"].as<uint64_t>();
+    uint64_t n = std::pow(2, m);
+
+    uint data_size = vm["data_size"].as<uint>();
+    uint tau = vm["tau"].as<uint>();
+
+    uint threads = vm["threads"].as<uint>();
+    uint iterations = vm["iterations"].as<uint>();
 
     omp_set_num_threads(threads);
-    const uint port = 8000;
 
-    Connection *cons[2] = {new SimpleSocket(), new SimpleSocket()};
+    Connection *conn[2] = {new SimpleSocket(), new SimpleSocket()};
+
+    fprintf(stderr, "Initilizing server %s:%u...\n", ip.c_str(), port);
+    std::thread start_server_thread(start_server, conn[0], ip.c_str(), port);
+
+    fprintf(stderr, "Connecting to %s:%u...\n", next_party_ip.c_str(), next_party_port);
+    conn[1]->InitClient(next_party_ip.c_str(), next_party_port);
+    fprintf(stderr, "Connecting to %s:%u done.\n", next_party_ip.c_str(), port);
+
+    start_server_thread.join();
+    fprintf(stderr, "Initilizing server %s:%u done.\n", ip.c_str(), port);
+
+    fprintf(stderr, "Initilizing PRG...\n");
     AutoSeededRandomPool rnd;
     CTR_Mode<AES>::Encryption prgs[2];
     uchar bytes[96];
     for (uint i = 0; i < 96; i++) {
         bytes[i] = i;
     }
-    uint offset_P2_P1 = 0;
-    uint offset_P0_P1 = 32;
-    uint offset_P0_P2 = 64;
+    uint offset[3] = {0, 32, 64};
+    // P0 [0:P2]=0 [1:P1]=2
+    // P1 [0:P0]=1 [1:P2]=0
+    // P2 [0:P1]=2 [1:P0]=1
+    prgs[0].SetKeyWithIV(bytes + offset[(party + 2) % 3], 16, bytes + offset[(party + 2) % 3] + 16);
+    prgs[1].SetKeyWithIV(bytes + offset[party], 16, bytes + offset[party] + 16);
+    fprintf(stderr, "Initilizing PRG done.\n");
 
-    fprintf(stderr, "Initilize server on port %u P2...\n", port);
-    cons[0]->InitServer(port);
-    fprintf(stderr, "Initilize server on port %u P2 done.\n", port);
-    fprintf(stderr, "Connecting to %s on port %u...\n", next_party_ip.c_str(), port);
-    cons[1]->InitClient(next_party_ip.c_str(), port);
-    fprintf(stderr, "Connecting to %s on port %u done.\n", next_party_ip.c_str(), port);
-
-    if (party == 1) {
-        // conn 0:P2, 1:P0
-        prgs[0].SetKeyWithIV(bytes + offset_P2_P1, 16, bytes + offset_P2_P1 + 16);
-        prgs[1].SetKeyWithIV(bytes + offset_P0_P1, 16, bytes + offset_P0_P1 + 16);
-    } else if (party == 2) {
-        // conn 0:P0, 1:P1
-        prgs[0].SetKeyWithIV(bytes + offset_P0_P2, 16, bytes + offset_P0_P2 + 16);
-        prgs[1].SetKeyWithIV(bytes + offset_P2_P1, 16, bytes + offset_P2_P1 + 16);
-    } else if (party == 0) {
-        // conn 0:P1, 1:P2
-        prgs[0].SetKeyWithIV(bytes + offset_P0_P1, 16, bytes + offset_P0_P1 + 16);
-        prgs[1].SetKeyWithIV(bytes + offset_P0_P2, 16, bytes + offset_P0_P2 + 16);
-    } else {
-        fprintf(stderr, "Incorrect party: %u\n", party);
-        exit(1);
-    }
-
+    fprintf(stderr, "Initilizing DPFORAM...\n");
     Protocol *dpf_oram = NULL;
     uint64_t start_time = timestamp();
-    dpf_oram = new DPFORAM(party, cons, &rnd, prgs, n, data_size, tau);
+    dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau);
     uint64_t end_time = timestamp();
-    fprintf(stderr, "Time to initilize DPF ORAM: %" PRIu64 "\n", end_time - start_time);
+    fprintf(stderr, "Initilizing DPFORAM done.\n");
+    fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
     if (dpf_oram != NULL) {
-        dpf_oram->Test(iters);
+        dpf_oram->Test(iterations);
         delete dpf_oram;
     }
 
     fprintf(stderr, "Closing connections... ");
-    cons[0]->Close();
-    cons[1]->Close();
+    conn[0]->Close();
+    conn[1]->Close();
     fprintf(stderr, "Closing connections done.");
 
     return 0;
