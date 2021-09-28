@@ -32,14 +32,14 @@ private:
     void InitPositionMap();
     void InitArray(uchar **&array);
     void DeleteArray(uchar **array);
-    void GetLatestData(const uchar *v_read_13,
-                       const uchar *v_cache_13, const uchar *v_meta_13,
+    void GetLatestData(uchar *v_read_13,
+                       uchar *v_cache_13, const bool is_cached_23[2],
                        uchar *v_out_23[2], bool count_band = true);
     void ShareTwoThird(const uchar *v_in, const uint64_t n, uchar *v_old[2], bool count_band = true);
     void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band = true);
-    void PIR(uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *output, bool count_band = true);
+    void PIR(uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *v_out_13, bool count_band = true);
     void PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
-    void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], uchar v_meta[1], bool read_only = false);
+    void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached[2], bool read_only = false);
     void AppendCache(uchar *v_new_23[2], bool count_band = true);
     void Flush(bool count_band = true);
     void Reset();
