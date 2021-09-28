@@ -7,7 +7,7 @@ SSOT::SSOT(const uint party, Connection *cons[2],
 
 void SSOT::P2(const uint data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
-    fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
+    // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
     uchar x01[2][data_size];
     this->prgs_[P0].GenerateBlock(x01[0], data_size);
     this->prgs_[P0].GenerateBlock(x01[1], data_size);
@@ -35,9 +35,9 @@ void SSOT::P2(const uint data_size, bool count_band) {
 
 void SSOT::P0(const uint b0, const uchar *u01[2], const uint data_size, uchar *p0, bool count_band) {
     const uint P2 = 0, P1 = 1;
-    fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
-    print_bytes(u01[0], data_size, "u01", 0);
-    print_bytes(u01[1], data_size, "u01", 1);
+    // fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
+    // print_bytes(u01[0], data_size, "u01", 0);
+    // print_bytes(u01[1], data_size, "u01", 1);
     // Receive x0, x1, y, alpha from P2
     uchar x01[2][data_size];
     this->prgs_[P2].GenerateBlock(x01[0], data_size);
@@ -73,9 +73,9 @@ void SSOT::P0(const uint b0, const uchar *u01[2], const uint data_size, uchar *p
 
 void SSOT::P1(const uint b1, const uchar *v01[2], const uint data_size, uchar *p1, bool count_band) {
     const uint P0 = 0, P2 = 1;
-    fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
-    print_bytes(v01[0], data_size, "v01", 0);
-    print_bytes(v01[1], data_size, "v01", 1);
+    // fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
+    // print_bytes(v01[0], data_size, "v01", 0);
+    // print_bytes(v01[1], data_size, "v01", 1);
     // Receive y0, y1, x, beta from P2
     uchar y01[2][data_size];
     this->prgs_[P2].GenerateBlock(y01[0], data_size);
