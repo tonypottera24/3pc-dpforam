@@ -32,15 +32,16 @@ private:
     void InitPositionMap();
     void InitArray(uchar **&array);
     void DeleteArray(uchar **array);
-    void GetLatestData(const uchar *v_read,
-                       const uchar *v_cache, const uchar *v_meta,
-                       uchar *v_out);
+    void GetLatestData(const uchar *v_read_13,
+                       const uchar *v_cache_13, const uchar *v_meta_13,
+                       uchar *v_out_13, bool count_band = true);
     void ShareTwoThird(const uchar *v_in, const uint n, uchar *v_old[2], bool count_band = true);
-    void PIR(uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *output);
-    void PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], const uchar *v_delta);
-    void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], uchar v_meta[1]);
-    void AppendCache(const uchar *v_new);
-    void Flush();
+    void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band = true);
+    void PIR(uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *output, bool count_band = true);
+    void PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], const uchar *v_delta_13, bool count_band = true);
+    void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], uchar v_meta[1], bool read_only = false);
+    void AppendCache(const uchar *v_new, bool count_band = true);
+    void Flush(bool count_band = true);
     void Reset();
 
 public:
@@ -49,8 +50,8 @@ public:
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
             uint64_t n, uint data_size, uint tau);
     ~DPFORAM();
-    void Read(const uint64_t index[2], uchar *v_old[2]);
-    void Write(const uint64_t index_23[2], const uchar *old_data_13, const uchar *new_data_13);
+    void Read(const uint64_t index[2], uchar *v_old[2], bool read_only = false);
+    void Write(const uint64_t index_23[2], const uchar *old_data_13, const uchar *new_data_13, bool count_band = true);
     void PrintMetadata();
     void Test(uint iterations);
 };

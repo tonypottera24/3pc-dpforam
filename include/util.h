@@ -1,12 +1,10 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <cmath>
+
 #include "libdpf/block.h"
 #include "typedef.h"
-
-const __m128i masks_128[2] = {_mm_set_epi32(0, 0, 0, 0), _mm_set_epi32(
-                                                             0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)};
-const uchar masks_8[2] = {0x00, 0xFF};
 
 void xor_bytes(const uchar *a, const uchar *b, uint length, uchar *out);
 void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint len, uchar *output);
@@ -20,6 +18,12 @@ void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes
 void rand_bytes(uchar *bytes, const uint len);
 uint64_t rand_uint64();
 uint64_t timestamp();
-void print_bytes(uchar *bytes, uint len, char *description);
+
+uint64_t bit_length(const uint64_t n);
+uint64_t byte_length(const uint64_t n);
+uint64_t uint64_log2(const uint64_t n);
+uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q);
+
+void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
 #endif /* UTIL_H_ */

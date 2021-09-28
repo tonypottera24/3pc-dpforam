@@ -90,8 +90,35 @@ void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes
     }
 }
 
-void print_bytes(uchar *bytes, uint len, char *description) {
-    printf("%s: 0x", description);
+uint64_t bit_length(const uint64_t n) {
+    uint64_t bit_length = 0, tmp = n;
+    while (tmp != 0) {
+        tmp >>= 1;
+        bit_length++;
+    }
+    return bit_length;
+}
+
+uint64_t byte_length(const uint64_t n) {
+    uint64_t byte_length = (bit_length(n) + 7ULL) / 8ULL;
+    return byte_length == 0 ? 1 : byte_length;
+}
+
+uint64_t uint64_log2(const uint64_t n) {
+    assert((n > 0) && "uint64_log2 n <= 0");
+    return bit_length(n) - 1;
+}
+
+uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q) {
+    return (n + q - 1ULL) / q;
+}
+
+void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {
+    if (array_index == -1) {
+        printf("%s: 0x", array_name);
+    } else {
+        printf("%s[%llu]: 0x", array_name, array_index);
+    }
     for (uint i = 0; i < len; i++) {
         printf("%02X", bytes[i]);
     }
