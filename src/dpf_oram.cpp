@@ -41,14 +41,15 @@ DPFORAM::~DPFORAM() {
 
 void DPFORAM::Reset() {
     for (uint i = 0; i < 2; i++) {
-        this->DeleteArray(this->read_array_23_[i]);
-        this->InitArray(this->read_array_23_[i]);
-        this->DeleteArray(this->cache_23_[i]);
-        this->InitArray(this->cache_23_[i]);
+        for (uint64_t j = 0; j < this->n_; j++) {
+            memset(this->read_array_23_[i][j], 0, this->data_size_);
+            memset(this->cache_23_[i][j], 0, this->data_size_);
+        }
     }
     this->cache_ctr_ = 0;
-    this->DeleteArray(this->write_array_13_);
-    this->InitArray(this->write_array_13_);
+    for (uint64_t i = 0; i < this->n_; i++) {
+        memset(this->write_array_13_[i], 0, this->data_size_);
+    }
     if (this->position_map_ != NULL) {
         this->position_map_->Reset();
     }
@@ -78,7 +79,6 @@ void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint data_size, c
     }
 
     uint64_t log_n = uint64_log2(n);
-    // fprintf(stderr, "[%llu]PIR, log_n = %llu\n", this->n_, log_n);
 
     uchar *query_23[2];
     uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
@@ -222,8 +222,8 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
     uint64_t data_index_23[2];
     uchar *old_block_23[2];
     for (uint i = 0; i < 2; i++) {
-        block_index_23[i] = index_23[i] / data_per_block;
-        data_index_23[i] = index_23[i] % data_per_block;
+        block_index_23[i] = index_23[i] >> this->tau_;
+        data_index_23[i] = index_23[i] & (data_per_block - 1);
         old_block_23[i] = new uchar[this->position_map_->data_size_];
     }
     // fprintf(stderr, "[%llu]ReadPositionMap, block_index_23 = (%llu, %llu), data_index_23 = (%llu, %llu)\n", this->n_, block_index_23[0], block_index_23[1], data_index_23[0], data_index_23[1]);
@@ -308,27 +308,21 @@ void DPFORAM::Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_onl
         return;
     }
 
-    // read v_r from the read array.
     uchar v_read_13[this->data_size_];
     PIR(this->read_array_23_, this->n_, this->data_size_, index_23, v_read_13, !read_only);
     // print_bytes(v_read_13, this->data_size_, "Read: v_read_13");
 
-    // read the position map.
-    // if there's no position map, n == 1, the cache will always be empty
-    // since the cache will be flushed immediately after write operation.
-    uint64_t cache_index_23[2] = {};
-    uchar v_meta_13[1] = {};
+    uint64_t cache_index_23[2];
+    uchar v_meta_13[1];
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, v_meta_13, read_only);
     }
     // fprintf(stderr, "[%llu]Read cache_index_23 = (%llu, %llu), v_meta_13 = %d\n", this->n_, cache_index_23[0], cache_index_23[1], v_meta_13[0]);
 
-    // read the cache.
     uchar v_cache_13[this->data_size_];
     PIR(this->cache_23_, this->n_, this->data_size_, cache_index_23, v_cache_13, !read_only);
     // print_bytes(v_cache_13, this->data_size_, "Read: v_cache_13");
 
-    // Use SSOT to select v_r and v_cache by is_used
     GetLatestData(v_read_13, v_cache_13, v_meta_13, v_out_23, !read_only);
     // print_bytes(v_out_23, this->data_size_, "Read: v_out_23");
 }
@@ -337,9 +331,7 @@ void DPFORAM::Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *ne
     // fprintf(stderr, "[%llu]Write, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
 
     if (this->n_ == 1) {
-        for (uint i = 0; i < 2; i++) {
-            memcpy(this->write_array_13_[0], new_data_23[0], this->data_size_);
-        }
+        memcpy(this->write_array_13_[0], new_data_23[0], this->data_size_);
         return;
     }
 
@@ -365,14 +357,8 @@ void DPFORAM::AppendCache(uchar *v_new_23[2], bool count_band) {
     for (uint i = 0; i < 2; i++) {
         memcpy(this->cache_23_[i][this->cache_ctr_], v_new_23[i], this->data_size_);
     }
-    // print_bytes(v_new_23[0], this->data_size_, "v_new_23", 0);
-    // print_bytes(v_new_23[1], this->data_size_, "v_new_23", 1);
-    // print_bytes(this->cache_23_[0][this->cache_ctr_], this->data_size_, "AppendCache: cache_23_", 0);
-    // print_bytes(this->cache_23_[1][this->cache_ctr_], this->data_size_, "AppendCache: cache_23_", 1);
     this->cache_ctr_++;
-
     if (this->cache_ctr_ == this->n_) {
-        // this->PrintMetadata();
         this->Flush();
         if (this->position_map_ != NULL) {
             this->position_map_->Reset();
@@ -388,19 +374,7 @@ void DPFORAM::Flush(bool count_band) {
         for (uint i = 0; i < 2; i++) {
             array_23[i] = this->read_array_23_[i][j];
         }
-        // fprintf(stderr, "\nFlush, j = %llu\n", j);
-        // print_bytes(this->write_array_13_[j], this->data_size_, "write_array_13_", j);
-        // print_bytes(array_23[0], this->data_size_, "array_23", 0);
-        // print_bytes(array_23[1], this->data_size_, "array_23", 1);
         this->ShareTwoThird(this->write_array_13_[j], this->data_size_, array_23, count_band);
-        // print_bytes(this->write_array_13_[j], this->data_size_, "write_array_13_", j);
-        // print_bytes(array_23[0], this->data_size_, "array_23", 0);
-        // print_bytes(array_23[1], this->data_size_, "array_23", 1);
-    }
-    for (uint i = 0; i < 2; i++) {
-        for (uint64_t j = 0; j < this->n_; j++) {
-            memset(this->cache_23_[i][j], 0, this->data_size_);
-        }
     }
     this->cache_ctr_ = 0;
 }

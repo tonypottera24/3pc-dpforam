@@ -1,6 +1,13 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <assert.h>
+#include <emmintrin.h>
+#include <openssl/rand.h>
+#include <string.h>
+#include <sys/time.h>
+
+#include <algorithm>
 #include <cmath>
 
 #include "libdpf/block.h"
@@ -13,8 +20,6 @@ void uint64_to_bytes(uint64_t value, uchar *bytes);
 void uint64_to_bytes(uint64_t value, uchar *bytes, uint len);
 uint64_t bytes_to_uint64(const uchar *b);
 uint64_t bytes_to_uint64(const uchar *b, uint len);
-void bytes_to_bytes_array(uchar *input, const uint input_size, const uint output_size, uchar **output);
-void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes_per_block, uchar *output);
 void rand_bytes(uchar *bytes, const uint len);
 uint64_t rand_uint64();
 uint64_t timestamp();

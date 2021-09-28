@@ -1,22 +1,14 @@
 #include "util.h"
 
-#include <assert.h>
-#include <emmintrin.h>
-#include <openssl/rand.h>
-#include <string.h>
-#include <sys/time.h>
-
-#include <algorithm>
-
-void xor_bytes(const uchar *input_a, const uchar *input_b, uint len, uchar *output) {
+void xor_bytes(const uchar *a, const uchar *b, uint len, uchar *output) {
     for (uint i = 0; i < len; i++) {
-        output[i] = input_a[i] ^ input_b[i];
+        output[i] = a[i] ^ b[i];
     }
 }
 
-void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint len, uchar *output) {
+void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint len, uchar *output) {
     for (uint i = 0; i < len; i++) {
-        output[i] = input_a[i] ^ input_b[i] ^ input_c[i];
+        output[i] = a[i] ^ b[i] ^ c[i];
     }
 }
 
@@ -75,19 +67,6 @@ uint64_t timestamp() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
-}
-
-void bytes_to_bytes_array(uchar *input, const uint input_size, const uint output_size, uchar **output) {
-    uint bytes_per_block = (input_size + output_size - 1) / output_size;
-    for (uint i = 0; i < output_size; i++) {
-        memcpy(output[i], &input[i * bytes_per_block], bytes_per_block);
-    }
-}
-
-void bytes_array_to_bytes(uchar **input, const uint input_size, const uint bytes_per_block, uchar *output) {
-    for (uint i = 0; i < input_size; i++) {
-        memcpy(&output[i * bytes_per_block], input[i], bytes_per_block);
-    }
 }
 
 uint64_t bit_length(const uint64_t n) {

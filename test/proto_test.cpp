@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         delete dpf_oram;
     }
 
-    fprintf(stderr, "Closing connections... ");
+    fprintf(stderr, "Closing connections... \n");
     conn[0]->Close();
     conn[1]->Close();
     fprintf(stderr, "Closing connections done.");
