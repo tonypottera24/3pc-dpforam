@@ -106,22 +106,17 @@ void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint data_size, c
     }
 }
 
-void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], const uchar *v_delta_13, bool count_band) {
+void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band) {
     // fprintf(stderr, "[%llu]PIW, index_23 = (%llu, %llu), n = %llu\n", this->n_, index_23[0], index_23[1], n);
     // print_bytes(v_delta_13, data_size, "v_delta_13");
     assert((n > 0) && "PIW n == 0");
     if (n == 1) {
-        memcpy(array[0], v_delta_13, data_size);
+        memcpy(array[0], v_delta_23[0], data_size);
         return;
     }
 
     uint64_t log_n = uint64_log2(n);
     // fprintf(stderr, "[%llu]PIW, log_n = %llu\n", this->n_, log_n);
-    uchar *v_delta_23[2];
-    for (uint i = 0; i < 2; i++) {
-        v_delta_23[i] = new uchar[data_size];
-    }
-    this->ShareTwoThird(v_delta_13, data_size, v_delta_23, count_band);
 
     uchar *query_23[2];
     uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
@@ -144,7 +139,6 @@ void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const u
     }
 
     for (uint i = 0; i < 2; i++) {
-        delete[] v_delta_23[i];
         delete[] query_23[i];
     }
 }
@@ -276,9 +270,24 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         uchar delta_data_13[data_size];
         xor_bytes(old_data_13, new_data_13, data_size, delta_data_13);
         // print_bytes(delta_data_13, data_size, "delta_data_13");
-        PIW(data_array_13, data_per_block, data_size, data_index_23, delta_data_13, !read_only);
+        uchar *delta_data_23[2];
+        for (uint i = 0; i < 2; i++) {
+            delta_data_23[i] = new uchar[data_size];
+        }
+        this->ShareTwoThird(delta_data_13, data_size, delta_data_23, !read_only);
+        PIW(data_array_13, data_per_block, data_size, data_index_23, delta_data_23, !read_only);
 
-        this->position_map_->Write(block_index_23, old_block_23[0], new_block_13, !read_only);
+        uchar *new_block_23[2];
+        for (uint i = 0; i < 2; i++) {
+            new_block_23[i] = new uchar[this->position_map_->data_size_];
+        }
+        this->ShareTwoThird(new_block_13, this->position_map_->data_size_, new_block_23, !read_only);
+        this->position_map_->Write(block_index_23, old_block_23, new_block_23, !read_only);
+
+        for (uint i = 0; i < 2; i++) {
+            delete[] delta_data_23[i];
+            delete[] new_block_23[i];
+        }
     }
     // this->position_map_->PrintMetadata();
 
@@ -324,33 +333,38 @@ void DPFORAM::Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_onl
     // print_bytes(v_out_23, this->data_size_, "Read: v_out_23");
 }
 
-void DPFORAM::Write(const uint64_t index_23[2], const uchar *old_data_13, const uchar *new_data_13, bool count_band) {
+void DPFORAM::Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *new_data_23[2], bool count_band) {
     // fprintf(stderr, "[%llu]Write, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
 
     if (this->n_ == 1) {
         for (uint i = 0; i < 2; i++) {
-            memcpy(this->write_array_13_[0], new_data_13, this->data_size_);
+            memcpy(this->write_array_13_[0], new_data_23[0], this->data_size_);
         }
         return;
     }
 
-    uchar delta_data_13[this->data_size_];
-    xor_bytes(old_data_13, new_data_13, this->data_size_, delta_data_13);
+    uchar *delta_data_23[2];
+    for (uint i = 0; i < 2; i++) {
+        delta_data_23[i] = new uchar[this->data_size_];
+        xor_bytes(old_data_23[i], new_data_23[i], this->data_size_, delta_data_23[i]);
+    }
     // print_bytes(old_data_13, this->data_size_, "old_data_13");
     // print_bytes(new_data_13, this->data_size_, "new_data_13");
     // print_bytes(delta_data_13, this->data_size_, "delta_data_13");
 
-    PIW(this->write_array_13_, this->n_, this->data_size_, index_23, delta_data_13, count_band);
-    this->AppendCache(new_data_13, count_band);
+    PIW(this->write_array_13_, this->n_, this->data_size_, index_23, delta_data_23, count_band);
+    this->AppendCache(new_data_23, count_band);
+
+    for (uint i = 0; i < 2; i++) {
+        delete[] delta_data_23[i];
+    }
 }
 
-void DPFORAM::AppendCache(const uchar *v_new_13, bool count_band) {
+void DPFORAM::AppendCache(uchar *v_new_23[2], bool count_band) {
     // fprintf(stderr, "[%llu]AppendCache, this->cache_ctr_ = %llu\n", this->n_, this->cache_ctr_);
-    uchar *v_new_23[2];
     for (uint i = 0; i < 2; i++) {
-        v_new_23[i] = this->cache_23_[i][this->cache_ctr_];
+        memcpy(this->cache_23_[i][this->cache_ctr_], v_new_23[i], this->data_size_);
     }
-    this->ShareTwoThird(v_new_13, this->data_size_, v_new_23, count_band);
     // print_bytes(v_new_23[0], this->data_size_, "v_new_23", 0);
     // print_bytes(v_new_23[1], this->data_size_, "v_new_23", 1);
     // print_bytes(this->cache_23_[0][this->cache_ctr_], this->data_size_, "AppendCache: cache_23_", 0);
@@ -450,15 +464,15 @@ void DPFORAM::Test(uint iterations) {
 
         // write randomly generated data
         // fprintf(stderr, "\nTest, ============ Write random data\n");
-        uchar old_data_13[this->data_size_];
-        memcpy(old_data_13, old_data_23[0], this->data_size_);
-
-        uchar new_data_13[this->data_size_];
-        this->rnd_->GenerateBlock(new_data_13, this->data_size_);
+        uchar *new_data_23[2];
+        for (uint i = 0; i < 2; i++) {
+            new_data_23[i] = new uchar[this->data_size_];
+            this->prgs_[i].GenerateBlock(new_data_23[i], this->data_size_);
+        }
 
         // print_bytes(new_data_13, this->data_size_, "new_data_13");
         time = timestamp();
-        this->Write(index_23, old_data_13, new_data_13);
+        this->Write(index_23, old_data_23, new_data_23);
         party_time += timestamp() - time;
 
         // this->PrintMetadata();
@@ -481,14 +495,9 @@ void DPFORAM::Test(uint iterations) {
         // print_bytes(verify_data, this->data_size_, "verify_data");
 
         uchar new_data[this->data_size_];
-        memcpy(new_data, new_data_13, this->data_size_);
-        this->conn_[0]->Write(new_data_13, this->data_size_, false);
-        this->conn_[1]->Write(new_data_13, this->data_size_, false);
-        uchar tmp[this->data_size_];
-        this->conn_[0]->Read(tmp, this->data_size_);
-        xor_bytes(tmp, new_data, this->data_size_, new_data);
-        this->conn_[1]->Read(tmp, this->data_size_);
-        xor_bytes(tmp, new_data, this->data_size_, new_data);
+        this->conn_[1]->Write(new_data_23[0], this->data_size_, false);
+        this->conn_[0]->Read(new_data, this->data_size_);
+        xor_bytes(new_data, new_data_23[0], new_data_23[1], this->data_size_, new_data);
         // print_bytes(new_data, this->data_size_, "new_data");
 
         if (memcmp(verify_data, new_data, this->data_size_) == 0) {
