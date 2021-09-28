@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint64_t>()->default_value(9), "number of data (n = 2^log_n)")(
-        "data_size", po::value<uint>()->default_value(4), "data size (bytes)")(
-        "tau", po::value<uint>()->default_value(3), "tau, each block include 2^tau data")(
+        "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (n = 2^log_n)")(
+        "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
+        "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
     uint64_t log_n = vm["log_n"].as<uint64_t>();
     uint64_t n = 1ULL << log_n;
 
-    uint data_size = vm["data_size"].as<uint>();
-    uint tau = vm["tau"].as<uint>();
+    uint64_t data_size = vm["data_size"].as<uint64_t>();
+    uint64_t tau = vm["tau"].as<uint64_t>();
 
     uint threads = vm["threads"].as<uint>();
     uint iterations = vm["iterations"].as<uint>();

@@ -23,8 +23,8 @@ private:
     uint64_t cache_ctr_;
 
 public:
-    uint tau_;
-    uint data_size_;
+    uint64_t tau_;
+    uint64_t data_size_;
     uint64_t n_;
 
 private:
@@ -34,8 +34,8 @@ private:
     void DeleteArray(uchar **array);
     void GetLatestData(const uchar *v_read_13,
                        const uchar *v_cache_13, const uchar *v_meta_13,
-                       uchar *v_out_13, bool count_band = true);
-    void ShareTwoThird(const uchar *v_in, const uint n, uchar *v_old[2], bool count_band = true);
+                       uchar *v_out_23[2], bool count_band = true);
+    void ShareTwoThird(const uchar *v_in, const uint64_t n, uchar *v_old[2], bool count_band = true);
     void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band = true);
     void PIR(uchar **array[2], const uint64_t n, const uint data_size, const uint64_t index[2], uchar *output, bool count_band = true);
     void PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], const uchar *v_delta_13, bool count_band = true);
@@ -48,7 +48,7 @@ public:
     DPFORAM(const uint party, Connection *connections[2],
             CryptoPP::AutoSeededRandomPool *rnd,
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
-            uint64_t n, uint data_size, uint tau);
+            uint64_t n, uint64_t data_size, uint64_t tau);
     ~DPFORAM();
     void Read(const uint64_t index[2], uchar *v_old[2], bool read_only = false);
     void Write(const uint64_t index_23[2], const uchar *old_data_13, const uchar *new_data_13, bool count_band = true);
