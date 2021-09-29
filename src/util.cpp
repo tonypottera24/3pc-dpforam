@@ -79,8 +79,12 @@ uint64_t bit_length(const uint64_t n) {
 }
 
 uint64_t byte_length(const uint64_t n) {
-    uint64_t byte_length = (bit_length(n) + 7ULL) / 8ULL;
-    return byte_length == 0 ? 1 : byte_length;
+    uint64_t byte_length = 0, tmp = n;
+    while (tmp != 0) {
+        tmp >>= 8;
+        byte_length++;
+    }
+    return byte_length;
 }
 
 uint64_t uint64_log2(const uint64_t n) {

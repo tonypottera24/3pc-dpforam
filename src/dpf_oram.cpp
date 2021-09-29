@@ -22,7 +22,7 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
 
     uint64_t pos_data_per_block = 1 << this->tau_;
     uint64_t pos_n = uint64_ceil_divide(this->n_, pos_data_per_block);
-    uint64_t pos_data_size = (byte_length(this->n_) + 1) * pos_data_per_block;
+    uint64_t pos_data_size = (byte_length(this->n_ << 1)) * pos_data_per_block;
     if (this->n_ > 1ULL) {
         this->position_map_ = new DPFORAM(party, connections, rnd, prgs, pos_n, pos_data_size, tau);
     }
@@ -254,18 +254,14 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         for (uint i = 0; i < data_per_block; i++) {
             data_array_13[i] = &new_block_13[i * bytes_per_block];
         }
-        uchar delta_data_13[data_size];
+        uchar new_data_13[data_size];
         uint64_t new_cache_index = (this->cache_ctr_ << 1) + 1ULL;
-        uint64_to_bytes(new_cache_index, delta_data_13, data_size);
-        xor_bytes(old_data_13, delta_data_13, data_size, delta_data_13);
+        uint64_to_bytes(new_cache_index, new_data_13, data_size);
 
-        uchar *delta_data_23[2];
         for (uint i = 0; i < 2; i++) {
-            delta_data_23[i] = new uchar[data_size];
+            xor_bytes(old_data_23[i], new_data_13, data_size, old_data_23[i]);
         }
-        this->ShareTwoThird(delta_data_13, data_size, delta_data_23, !read_only);
-
-        PIW(data_array_13, data_per_block, data_size, data_index_23, delta_data_23, !read_only);
+        PIW(data_array_13, data_per_block, data_size, data_index_23, old_data_23, !read_only);
 
         uchar *new_block_23[2];
         for (uint i = 0; i < 2; i++) {
@@ -275,12 +271,12 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         this->position_map_->Write(block_index_23, old_block_23, new_block_23, !read_only);
 
         for (uint i = 0; i < 2; i++) {
-            delete[] delta_data_23[i];
             delete[] new_block_23[i];
         }
     }
 
     for (uint i = 0; i < 2; i++) {
+        delete[] old_data_23[i];
         delete[] old_block_23[i];
         delete[] old_data_array_23[i];
     }
@@ -398,7 +394,6 @@ void DPFORAM::Test(uint iterations) {
         // fprintf(stderr, "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
 
         // fprintf(stderr, "\nTest, ========== Read old data ==========\n");
-        // this->PrintMetadata();
 
         uchar *old_data_23[2];
         for (uint i = 0; i < 2; i++) {
@@ -408,9 +403,6 @@ void DPFORAM::Test(uint iterations) {
         this->Read(index_23, old_data_23);
         party_time += timestamp() - time;
 
-        // this->PrintMetadata();
-
-        // write randomly generated data
         // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         uchar *new_data_23[2];
         for (uint i = 0; i < 2; i++) {
@@ -421,8 +413,6 @@ void DPFORAM::Test(uint iterations) {
         time = timestamp();
         this->Write(index_23, old_data_23, new_data_23);
         party_time += timestamp() - time;
-
-        // this->PrintMetadata();
 
         // fprintf(stderr, "\nTest, ========== Read validation data ==========\n");
         uchar *verify_data_23[2];
@@ -459,20 +449,20 @@ void DPFORAM::Test(uint iterations) {
     this->conn_[0]->WriteLong(party_bandwidth, false);
     this->conn_[1]->WriteLong(party_bandwidth, false);
     uint64_t total_bandwidth = party_bandwidth;
-    total_bandwidth += (uint64_t)this->conn_[0]->ReadLong();
-    total_bandwidth += (uint64_t)this->conn_[1]->ReadLong();
+    total_bandwidth += this->conn_[0]->ReadLong();
+    total_bandwidth += this->conn_[1]->ReadLong();
 
     conn_[0]->WriteLong(party_time, false);
     conn_[1]->WriteLong(party_time, false);
     uint64_t max_time = party_time;
-    max_time = std::max(max_time, (uint64_t)conn_[0]->ReadLong());
-    max_time = std::max(max_time, (uint64_t)conn_[1]->ReadLong());
+    max_time = std::max(max_time, conn_[0]->ReadLong());
+    max_time = std::max(max_time, conn_[1]->ReadLong());
 
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %llu\n", this->n_);
-    fprintf(stderr, "Party Bandwidth(byte): %f\n", (double)party_bandwidth / iterations);
-    fprintf(stderr, "Party execution time(microsec): %f\n", (double)party_time / iterations);
-    fprintf(stderr, "Total Bandwidth(byte): %f\n", (double)total_bandwidth / iterations);
-    fprintf(stderr, "Max Execution time(microsec): %f\n", (double)max_time / iterations);
+    fprintf(stderr, "Party Bandwidth(byte): %llu\n", party_bandwidth / iterations);
+    fprintf(stderr, "Party execution time(microsec): %llu\n", party_time / iterations);
+    fprintf(stderr, "Total Bandwidth(byte): %llu\n", total_bandwidth / iterations);
+    fprintf(stderr, "Max Execution time(microsec): %llu\n", max_time / iterations);
     fprintf(stderr, "\n");
 }
