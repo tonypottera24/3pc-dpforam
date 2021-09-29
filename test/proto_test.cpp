@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Closing connections... \n");
     conn[0]->Close();
     conn[1]->Close();
-    fprintf(stderr, "Closing connections done.");
+    fprintf(stderr, "Closing connections done.\n");
 
     return 0;
 }

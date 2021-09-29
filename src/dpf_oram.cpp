@@ -165,11 +165,10 @@ void DPFORAM::GetLatestData(uchar *v_read_13,
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
         uchar v_read_12[this->data_size_];
-        this->conn_[P2]->Read(v_read_12, this->data_size_);
-        xor_bytes(v_read_12, v_read_13, this->data_size_, v_read_12);
-
         uchar v_cache_12[this->data_size_];
+        this->conn_[P2]->Read(v_read_12, this->data_size_);
         this->conn_[P2]->Read(v_cache_12, this->data_size_);
+        xor_bytes(v_read_12, v_read_13, this->data_size_, v_read_12);
         xor_bytes(v_cache_12, v_cache_13, this->data_size_, v_cache_12);
 
         const uchar *u01[2] = {v_read_12, v_cache_12};
@@ -201,16 +200,13 @@ void DPFORAM::ShareTwoThird(const uchar *v_in_13, const uint64_t data_size, ucha
 void DPFORAM::ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band) {
     // fprintf(stderr, "ShareIndexTwoThird, index_13 = %llu, ", index_13);
     uint64_t rand_range = n;
-    this->conn_[1]->WriteLong(index_13 % rand_range, count_band);
+    this->conn_[1]->WriteLong(index_13, count_band);
     index_23[0] = this->conn_[0]->ReadLong() % rand_range;
     index_23[1] = index_13 % rand_range;
-    // fprintf(stderr, "ShareIndexTwoThird, index_13 = %llu, index_23 = (%llu, %llu)\n", index_13, index_23[0], index_23[1]);
 }
 
 void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached_23[2], bool read_only) {
     // fprintf(stderr, "[%llu]ReadPositionMap, index_23 = (%llu, %llu), read_only = %d\n", this->n_, index_23[0], index_23[1], read_only);
-
-    // this->position_map_->PrintMetadata();
 
     uint64_t data_size = byte_length(this->n_ << 1);
     uint64_t data_per_block = 1ULL << this->tau_;
@@ -224,12 +220,9 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         data_index_23[i] = index_23[i] & (data_per_block - 1);
         old_block_23[i] = new uchar[this->position_map_->data_size_];
     }
-    // fprintf(stderr, "[%llu]ReadPositionMap, block_index_23 = (%llu, %llu), data_index_23 = (%llu, %llu)\n", this->n_, block_index_23[0], block_index_23[1], data_index_23[0], data_index_23[1]);
 
     // read block from array
     this->position_map_->Read(block_index_23, old_block_23, read_only);
-    // print_bytes(old_block_23[0], this->position_map_->data_size_, "ReadPositionMap old_block_23", 0);
-    // print_bytes(old_block_23[1], this->position_map_->data_size_, "ReadPositionMap old_block_23", 1);
 
     // read data from block
     uchar **old_data_array_23[2];
@@ -242,8 +235,6 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
     }
     uchar old_data_13[data_size];
     PIR(old_data_array_23, data_per_block, data_size, data_index_23, old_data_13, !read_only);
-    // print_bytes(old_data_13, data_size, "ReadPositionMap old_data_13");
-
     uchar *old_data_23[2];
     for (uint i = 0; i < 2; i++) {
         old_data_23[i] = new uchar[data_size];
@@ -254,10 +245,8 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         is_cached_23[i] = cache_index_23[i] & 1;
         cache_index_23[i] = (cache_index_23[i] >> 1) % this->n_;
     }
-    // fprintf(stderr, "cache_index_13 = %llu, cache_index_23 = (%llu, %llu)\n", cache_index_13, cache_index_23[0], cache_index_23[1]);
 
     if (read_only == false) {
-        // write data to block
         uchar new_block_13[this->position_map_->data_size_];
         memcpy(new_block_13, old_block_23[0], this->position_map_->data_size_);
 
@@ -265,20 +254,17 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         for (uint i = 0; i < data_per_block; i++) {
             data_array_13[i] = &new_block_13[i * bytes_per_block];
         }
-        uchar new_data_13[data_size];
-        uint64_t new_cache_index = (this->cache_ctr_ << 1) + 1ULL;
-        // fprintf(stderr, "cache_ctr_ = %llu, data_size = %llu\n", this->cache_ctr_, data_size);
-        uint64_to_bytes(new_cache_index, new_data_13, data_size);
-        // print_bytes(new_data_13, data_size, "new_data_13");
-
         uchar delta_data_13[data_size];
-        xor_bytes(old_data_13, new_data_13, data_size, delta_data_13);
-        // print_bytes(delta_data_13, data_size, "delta_data_13");
+        uint64_t new_cache_index = (this->cache_ctr_ << 1) + 1ULL;
+        uint64_to_bytes(new_cache_index, delta_data_13, data_size);
+        xor_bytes(old_data_13, delta_data_13, data_size, delta_data_13);
+
         uchar *delta_data_23[2];
         for (uint i = 0; i < 2; i++) {
             delta_data_23[i] = new uchar[data_size];
         }
         this->ShareTwoThird(delta_data_13, data_size, delta_data_23, !read_only);
+
         PIW(data_array_13, data_per_block, data_size, data_index_23, delta_data_23, !read_only);
 
         uchar *new_block_23[2];
@@ -293,9 +279,7 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
             delete[] new_block_23[i];
         }
     }
-    // this->position_map_->PrintMetadata();
 
-    // cleanup
     for (uint i = 0; i < 2; i++) {
         delete[] old_block_23[i];
         delete[] old_data_array_23[i];
@@ -314,21 +298,16 @@ void DPFORAM::Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_onl
 
     uchar v_read_13[this->data_size_];
     PIR(this->read_array_23_, this->n_, this->data_size_, index_23, v_read_13, !read_only);
-    // print_bytes(v_read_13, this->data_size_, "Read: v_read_13");
 
     uint64_t cache_index_23[2];
     bool is_cached_23[2];
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
     }
-    // fprintf(stderr, "[%llu]Read cache_index_23 = (%llu, %llu), v_meta_13 = %d\n", this->n_, cache_index_23[0], cache_index_23[1], v_meta_13[0]);
 
     uchar v_cache_13[this->data_size_];
     PIR(this->cache_23_, this->n_, this->data_size_, cache_index_23, v_cache_13, !read_only);
-    // print_bytes(v_cache_13, this->data_size_, "Read: v_cache_13");
-
     GetLatestData(v_read_13, v_cache_13, is_cached_23, v_out_23, !read_only);
-    // print_bytes(v_out_23, this->data_size_, "Read: v_out_23");
 }
 
 void DPFORAM::Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *new_data_23[2], bool count_band) {
@@ -344,9 +323,6 @@ void DPFORAM::Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *ne
         delta_data_23[i] = new uchar[this->data_size_];
         xor_bytes(old_data_23[i], new_data_23[i], this->data_size_, delta_data_23[i]);
     }
-    // print_bytes(old_data_13, this->data_size_, "old_data_13");
-    // print_bytes(new_data_13, this->data_size_, "new_data_13");
-    // print_bytes(delta_data_13, this->data_size_, "delta_data_13");
 
     PIW(this->write_array_13_, this->n_, this->data_size_, index_23, delta_data_23, count_band);
     this->AppendCache(new_data_23, count_band);
@@ -373,7 +349,6 @@ void DPFORAM::AppendCache(uchar *v_new_23[2], bool count_band) {
 void DPFORAM::Flush(bool count_band) {
     // fprintf(stderr, "[%llu]Flush\n", this->n_);
     uchar *array_23[2];
-
     for (uint64_t j = 0; j < this->n_; j++) {
         for (uint i = 0; i < 2; i++) {
             array_23[i] = this->read_array_23_[i][j];
@@ -384,7 +359,7 @@ void DPFORAM::Flush(bool count_band) {
 }
 
 void DPFORAM::PrintMetadata() {
-    fprintf(stderr, "===================\n");
+    fprintf(stderr, "========== PrintMetadata ==========\n");
     fprintf(stderr, "party_: %u\n", this->party_);
     fprintf(stderr, "tau_: %llu\n", this->tau_);
     fprintf(stderr, "n_: %llu\n", this->n_);
@@ -406,7 +381,7 @@ void DPFORAM::PrintMetadata() {
     for (uint i = 0; i < this->n_; i++) {
         print_bytes(this->cache_23_[1][i], this->data_size_, "this->cache_23_[1]", i);
     }
-    fprintf(stderr, "===================\n");
+    fprintf(stderr, "========== PrintMetadata ==========\n");
 }
 
 void DPFORAM::Test(uint iterations) {
@@ -416,16 +391,13 @@ void DPFORAM::Test(uint iterations) {
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
         // fprintf(stderr, "Test, iteration = %u\n", iteration);
-        // this->PrintMetadata();
-        // randomly pick a index
         uint64_t rand_range = this->n_ - 1;
         uint64_t index_13 = rand_uint64() % rand_range;
         uint64_t index_23[2];
         this->ShareIndexTwoThird(index_13, this->n_, index_23, false);
         // fprintf(stderr, "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
 
-        // read old data for write
-        // fprintf(stderr, "\nTest, ============ Read old data\n");
+        // fprintf(stderr, "\nTest, ========== Read old data ==========\n");
         // this->PrintMetadata();
 
         uchar *old_data_23[2];
@@ -435,48 +407,40 @@ void DPFORAM::Test(uint iterations) {
         time = timestamp();
         this->Read(index_23, old_data_23);
         party_time += timestamp() - time;
-        // print_bytes(old_data_23[0], this->data_size_, "old_data_23", 0);
-        // print_bytes(old_data_23[1], this->data_size_, "old_data_23", 1);
 
         // this->PrintMetadata();
 
         // write randomly generated data
-        // fprintf(stderr, "\nTest, ============ Write random data\n");
+        // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         uchar *new_data_23[2];
         for (uint i = 0; i < 2; i++) {
             new_data_23[i] = new uchar[this->data_size_];
             this->prgs_[i].GenerateBlock(new_data_23[i], this->data_size_);
         }
 
-        // print_bytes(new_data_13, this->data_size_, "new_data_13");
         time = timestamp();
         this->Write(index_23, old_data_23, new_data_23);
         party_time += timestamp() - time;
 
         // this->PrintMetadata();
 
-        // read data for validation.
-        // fprintf(stderr, "\nTest, ============ Read validation data\n");
+        // fprintf(stderr, "\nTest, ========== Read validation data ==========\n");
         uchar *verify_data_23[2];
         for (uint i = 0; i < 2; i++) {
             verify_data_23[i] = new uchar[this->data_size_];
         }
 
         this->Read(index_23, verify_data_23, true);
-        // print_bytes(verify_data_23[0], this->data_size_, "verify_data_23", 0);
-        // print_bytes(verify_data_23[1], this->data_size_, "verify_data_23", 1);
 
         this->conn_[1]->Write(verify_data_23[0], this->data_size_, false);
         uchar verify_data[this->data_size_];
         this->conn_[0]->Read(verify_data, this->data_size_);
         xor_bytes(verify_data_23[0], verify_data_23[1], verify_data, this->data_size_, verify_data);
-        // print_bytes(verify_data, this->data_size_, "verify_data");
 
         uchar new_data[this->data_size_];
         this->conn_[1]->Write(new_data_23[0], this->data_size_, false);
         this->conn_[0]->Read(new_data, this->data_size_);
         xor_bytes(new_data, new_data_23[0], new_data_23[1], this->data_size_, new_data);
-        // print_bytes(new_data, this->data_size_, "new_data");
 
         if (memcmp(verify_data, new_data, this->data_size_) == 0) {
             fprintf(stderr, "%u, Pass\n", iteration);
@@ -507,8 +471,8 @@ void DPFORAM::Test(uint iterations) {
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %llu\n", this->n_);
     fprintf(stderr, "Party Bandwidth(byte): %f\n", (double)party_bandwidth / iterations);
-    fprintf(stderr, "Party Wallclock(microsec): %f\n", (double)party_time / iterations);
+    fprintf(stderr, "Party execution time(microsec): %f\n", (double)party_time / iterations);
     fprintf(stderr, "Total Bandwidth(byte): %f\n", (double)total_bandwidth / iterations);
-    fprintf(stderr, "Max Wallclock(microsec): %f\n", (double)max_time / iterations);
+    fprintf(stderr, "Max Execution time(microsec): %f\n", (double)max_time / iterations);
     fprintf(stderr, "\n");
 }
