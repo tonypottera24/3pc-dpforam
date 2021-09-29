@@ -11,19 +11,18 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
     this->data_size_ = data_size;
     this->tau_ = tau;
 
-    // first level position map, can be contained by two blocks.
+    this->InitArray(this->write_array_13_, true);
 
-    for (uint i = 0; i < 2; i++) {
-        this->InitArray(this->read_array_23_[i]);
-        this->InitArray(this->cache_23_[i]);
-    }
-    this->InitArray(this->write_array_13_);
-    this->cache_ctr_ = 0;
-
-    uint64_t pos_data_per_block = 1 << this->tau_;
-    uint64_t pos_n = uint64_ceil_divide(this->n_, pos_data_per_block);
-    uint64_t pos_data_size = (byte_length(this->n_ << 1)) * pos_data_per_block;
     if (this->n_ > 1ULL) {
+        for (uint i = 0; i < 2; i++) {
+            this->InitArray(this->read_array_23_[i]);
+            this->InitArray(this->cache_23_[i]);
+        }
+        this->cache_ctr_ = 0;
+
+        uint64_t pos_data_per_block = 1 << this->tau_;
+        uint64_t pos_n = uint64_ceil_divide(this->n_, pos_data_per_block);
+        uint64_t pos_data_size = byte_length(this->n_ << 1) * pos_data_per_block;
         this->position_map_ = new DPFORAM(party, connections, rnd, prgs, pos_n, pos_data_size, tau);
     }
 }
@@ -41,30 +40,42 @@ DPFORAM::~DPFORAM() {
 
 void DPFORAM::Reset() {
     for (uint i = 0; i < 2; i++) {
-        for (uint64_t j = 0; j < this->n_; j++) {
-            memset(this->read_array_23_[i][j], 0, this->data_size_);
-            memset(this->cache_23_[i][j], 0, this->data_size_);
+        if (this->read_array_23_[i] != NULL) {
+            this->ResetArray(this->read_array_23_[i]);
+        }
+        if (this->cache_23_[i] != NULL) {
+            this->ResetArray(this->cache_23_[i]);
         }
     }
     this->cache_ctr_ = 0;
-    for (uint64_t i = 0; i < this->n_; i++) {
-        memset(this->write_array_13_[i], 0, this->data_size_);
+    if (this->write_array_13_ != NULL) {
+        this->ResetArray(this->write_array_13_);
     }
     if (this->position_map_ != NULL) {
         this->position_map_->Reset();
     }
 }
 
-void DPFORAM::InitArray(uchar **&array) {
+void DPFORAM::InitArray(uchar **&array, bool set_zero) {
     array = new uchar *[this->n_];
-    for (uint i = 0; i < this->n_; i++) {
-        array[i] = new uchar[this->data_size_]();  // init to zero
+    for (uint64_t i = 0; i < this->n_; i++) {
+        array[i] = new uchar[this->data_size_];
+        if (set_zero) {
+            memset(array[i], 0, this->data_size_);
+        }
+    }
+}
+
+void DPFORAM::ResetArray(uchar **array) {
+    if (array == NULL) return;
+    for (uint64_t i = 0; i < this->n_; i++) {
+        memset(array[i], 0, this->data_size_);
     }
 }
 
 void DPFORAM::DeleteArray(uchar **array) {
     if (array == NULL) return;
-    for (uint i = 0; i < this->n_; i++) {
+    for (uint64_t i = 0; i < this->n_; i++) {
         delete[] array[i];
     }
     delete[] array;

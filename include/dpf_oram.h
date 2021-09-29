@@ -30,7 +30,8 @@ public:
 private:
     void Init();
     void InitPositionMap();
-    void InitArray(uchar **&array);
+    void InitArray(uchar **&array, bool set_zero = false);
+    void ResetArray(uchar **array);
     void DeleteArray(uchar **array);
     void GetLatestData(uchar *v_read_13,
                        uchar *v_cache_13, const bool is_cached_23[2],
