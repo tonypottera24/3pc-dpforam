@@ -1,54 +1,31 @@
 #include "util.h"
 
-void xor_bytes(const uchar *a, const uchar *b, uint len, uchar *output) {
-    for (uint i = 0; i < len; i++) {
-        output[i] = a[i] ^ b[i];
+void xor_bytes(const uchar *a, const uchar *b, uint64_t len, uchar *out) {
+    for (uint64_t i = 0; i < len; i++) {
+        out[i] = a[i] ^ b[i];
     }
+    // for (uint64_t i = 0; i < len; i += 8) {
+    //     uint64_t size = std::min(len - i, 8ULL);
+    //     uint64_t *aa = (uint64_t *)&a[i];
+    //     uint64_t *bb = (uint64_t *)&b[i];
+    //     uint64_t o = (*aa) ^ (*bb);
+    //     memcpy(&out[i], &o, size);
+    // }
 }
 
-void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint len, uchar *output) {
-    for (uint i = 0; i < len; i++) {
+void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint64_t len, uchar *output) {
+    for (uint64_t i = 0; i < len; i++) {
         output[i] = a[i] ^ b[i] ^ c[i];
     }
 }
 
-void uint64_to_bytes(uint64_t value, uchar *bytes) {
-    bytes[0] = (value >> 56) & 0xFF;
-    bytes[1] = (value >> 48) & 0xFF;
-    bytes[2] = (value >> 40) & 0xFF;
-    bytes[3] = (value >> 32) & 0xFF;
-    bytes[4] = (value >> 24) & 0xFF;
-    bytes[5] = (value >> 16) & 0xFF;
-    bytes[6] = (value >> 8) & 0xFF;
-    bytes[7] = value & 0xFF;
-}
-
 void uint64_to_bytes(uint64_t value, uchar *bytes, uint len) {
-    for (uint i = 0; i < std::min(len, 8u); i++) {
-        bytes[len - 1 - i] = value & 0xFF;
-        value >>= 8;
-    }
-    if (len > 8) {
-        memset(bytes, 0, len - 8);
-    }
-}
-
-uint64_t bytes_to_uint64(const uchar *bytes) {
-    uint64_t value = 0;
-    for (uint i = 0; i < 8; i++) {
-        value <<= 8;
-        value |= bytes[i];
-    }
-    return value;
+    memcpy(bytes, &value, len);
 }
 
 uint64_t bytes_to_uint64(const uchar *bytes, const uint len) {
-    uint64_t value = 0;
-    uint min = std::min(len, 8u);
-    for (uint i = 0; i < min; i++) {
-        value <<= 8;
-        value |= bytes[len - min + i];
-    }
+    uint64_t value;
+    memcpy(&value, bytes, len);
     return value;
 }
 
@@ -59,8 +36,13 @@ void rand_bytes(uchar *bytes, const uint len) {
 uint64_t rand_uint64() {
     uchar bytes[8];
     rand_bytes(bytes, 8);
-    uint64_t value = bytes_to_uint64(bytes);
-    return value;
+    return bytes_to_uint64(bytes);
+}
+
+uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg) {
+    uchar bytes[8];
+    prg.GenerateBlock(bytes, 8);
+    return bytes_to_uint64(bytes);
 }
 
 uint64_t timestamp() {

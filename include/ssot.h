@@ -11,9 +11,9 @@ public:
     SSOT(const uint party, Connection* cons[2],
          CryptoPP::AutoSeededRandomPool* rnd,
          CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption* prgs);
-    void P1(const uint b1, const uchar* v01[2], const uint data_size, uchar* p1, bool count_band = true);
-    void P2(const uint data_size, bool count_band = true);
-    void P0(const uint b0, const uchar* u01[2], const uint data_size, uchar* p0, bool count_band = true);
+    void P2(const uint64_t n, const uint64_t data_size, bool count_band = true);
+    void P0(const uint64_t b0, uchar** u, const uint64_t n, const uint64_t data_size, uchar* p0, bool count_band = true);
+    void P1(const uint64_t b1, uchar** v, const uint64_t n, const uint64_t data_size, uchar* p1, bool count_band = true);
     void Test(uint iter);
 };
 

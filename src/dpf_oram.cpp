@@ -39,17 +39,19 @@ DPFORAM::~DPFORAM() {
 }
 
 void DPFORAM::Reset() {
-    for (uint i = 0; i < 2; i++) {
-        if (this->read_array_23_[i] != NULL) {
-            this->ResetArray(this->read_array_23_[i]);
-        }
-        if (this->cache_23_[i] != NULL) {
-            this->ResetArray(this->cache_23_[i]);
+    if (this->n_ > 1) {
+        for (uint i = 0; i < 2; i++) {
+            for (uint64_t j = 0; j < this->n_; j++) {
+                memset(read_array_23_[i][j], 0, this->data_size_);
+                memset(cache_23_[i][j], 0, this->data_size_);
+            }
         }
     }
     this->cache_ctr_ = 0;
     if (this->write_array_13_ != NULL) {
-        this->ResetArray(this->write_array_13_);
+        for (uint64_t i = 0; i < this->n_; i++) {
+            memset(write_array_13_[i], 0, this->data_size_);
+        }
     }
     if (this->position_map_ != NULL) {
         this->position_map_->Reset();
@@ -81,16 +83,51 @@ void DPFORAM::DeleteArray(uchar **array) {
     delete[] array;
 }
 
-void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
-    // fprintf(stderr, "[%llu]PIR, n = %llu\n", this->n_, n);
-    assert((n > 0ULL) && "PIR n == 0");
-    if (n == 1ULL) {
-        for (uint i = 0; i < 2; i++) {
-            xor_bytes(array_23[0][0], array_23[1][0], data_size, v_out_13);
-        }
-        return;
+void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
+    assert((n > 0) && "PIR n == 0");
+    if (n == 1) {
+        xor_bytes(array_23[0][0], array_23[1][0], data_size, v_out_13);
+    } else if (n <= 32) {
+        SSOT_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
+    } else {
+        DPF_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
     }
+}
 
+void DPFORAM::SSOT_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
+    // fprintf(stderr, "[%llu]SSOT_PIR, v_meta_13 = %d\n", this->n_, v_meta_13[0]);
+
+    SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
+    if (this->party_ == 2) {
+        const uint P1 = 0, P0 = 1;
+
+        ssot->P2(n, data_size, count_band);
+
+        this->prgs_[P0].GenerateBlock(v_out_13, data_size);
+    } else if (this->party_ == 0) {
+        const uint P2 = 0, P1 = 1;
+
+        const uint64_t b0 = index_23[P1] ^ index_23[P2];
+        uchar *u[n];
+        for (uint64_t i = 0; i < n; i++) {
+            u[i] = new uchar[data_size];
+            xor_bytes(array_23[0][i], array_23[1][i], data_size, u[i]);
+        }
+        ssot->P0(b0, u, n, data_size, v_out_13, count_band);
+
+        uchar tmp[data_size];
+        this->prgs_[P2].GenerateBlock(tmp, data_size);
+        xor_bytes(tmp, v_out_13, data_size, v_out_13);
+    } else if (this->party_ == 1) {
+        const uint P0 = 0, P2 = 1;
+        const uint64_t b1 = index_23[P2];
+        ssot->P1(b1, array_23[P2], n, data_size, v_out_13, count_band);
+    }
+    delete ssot;
+}
+
+void DPFORAM::DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
+    // fprintf(stderr, "[%llu]PIR, n = %llu\n", this->n_, n);
     uint64_t log_n = uint64_log2(n);
 
     uchar *query_23[2];
@@ -119,7 +156,7 @@ void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint data_size, c
     }
 }
 
-void DPFORAM::PIW(uchar **array, const uint64_t n, const uint data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band) {
+void DPFORAM::PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band) {
     // fprintf(stderr, "[%llu]PIW, index_23 = (%llu, %llu), n = %llu\n", this->n_, index_23[0], index_23[1], n);
     // print_bytes(v_delta_13, data_size, "v_delta_13");
     assert((n > 0) && "PIW n == 0");
@@ -169,7 +206,7 @@ void DPFORAM::GetLatestData(uchar *v_read_13,
         this->conn_[P0]->Write(v_read_13, this->data_size_, count_band);
         this->conn_[P0]->Write(v_cache_13, this->data_size_, count_band);
 
-        ssot->P2(this->data_size_, count_band);
+        ssot->P2(2, this->data_size_, count_band);
 
         this->conn_[P0]->Read(v_out_23[P0], this->data_size_);
         this->conn_[P1]->Read(v_out_23[P1], this->data_size_);
@@ -182,18 +219,18 @@ void DPFORAM::GetLatestData(uchar *v_read_13,
         xor_bytes(v_read_12, v_read_13, this->data_size_, v_read_12);
         xor_bytes(v_cache_12, v_cache_13, this->data_size_, v_cache_12);
 
-        const uchar *u01[2] = {v_read_12, v_cache_12};
-        const uint b0 = is_cached_23[P1] ^ is_cached_23[P2];
-        ssot->P0(b0, u01, this->data_size_, v_out_23[P2], count_band);
+        uchar *u[2] = {v_read_12, v_cache_12};
+        const uint64_t b0 = is_cached_23[P1] ^ is_cached_23[P2];
+        ssot->P0(b0, u, 2, this->data_size_, v_out_23[P2], count_band);
 
         this->prgs_[P1].GenerateBlock(v_out_23[P1], this->data_size_);
         xor_bytes(v_out_23[P2], v_out_23[P1], this->data_size_, v_out_23[P2]);
         this->conn_[P2]->Write(v_out_23[P2], this->data_size_, count_band);
     } else if (this->party_ == 1) {
         const uint P0 = 0, P2 = 1;
-        const uchar *v01[2] = {v_read_13, v_cache_13};
-        const uint b1 = is_cached_23[P2];
-        ssot->P1(b1, v01, this->data_size_, v_out_23[P2], count_band);
+        uchar *v[2] = {v_read_13, v_cache_13};
+        const uint64_t b1 = is_cached_23[P2];
+        ssot->P1(b1, v, 2, this->data_size_, v_out_23[P2], count_band);
 
         this->prgs_[P0].GenerateBlock(v_out_23[P0], this->data_size_);
         this->conn_[P2]->Write(v_out_23[P2], this->data_size_, count_band);

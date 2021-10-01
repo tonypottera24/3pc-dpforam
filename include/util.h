@@ -2,6 +2,8 @@
 #define UTIL_H_
 
 #include <assert.h>
+#include <cryptopp/modes.h>
+#include <cryptopp/osrng.h>
 #include <emmintrin.h>
 #include <openssl/rand.h>
 #include <string.h>
@@ -13,15 +15,14 @@
 #include "libdpf/block.h"
 #include "typedef.h"
 
-void xor_bytes(const uchar *a, const uchar *b, uint length, uchar *out);
-void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint len, uchar *output);
+void xor_bytes(const uchar *a, const uchar *b, uint64_t length, uchar *out);
+void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint64_t len, uchar *output);
 
-void uint64_to_bytes(uint64_t value, uchar *bytes);
-void uint64_to_bytes(uint64_t value, uchar *bytes, uint len);
-uint64_t bytes_to_uint64(const uchar *b);
-uint64_t bytes_to_uint64(const uchar *b, uint len);
+void uint64_to_bytes(uint64_t value, uchar *bytes, uint len = 8);
+uint64_t bytes_to_uint64(const uchar *b, uint len = 8);
 void rand_bytes(uchar *bytes, const uint len);
 uint64_t rand_uint64();
+uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg);
 uint64_t timestamp();
 
 uint64_t bit_length(const uint64_t n);

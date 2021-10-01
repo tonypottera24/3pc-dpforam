@@ -5,108 +5,104 @@ SSOT::SSOT(const uint party, Connection *cons[2],
            CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) : Protocol(party, cons, rnd, prgs) {
 }
 
-void SSOT::P2(const uint data_size, bool count_band) {
+void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
     // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
-    uchar x01[2][data_size];
-    this->prgs_[P0].GenerateBlock(x01[0], data_size);
-    this->prgs_[P0].GenerateBlock(x01[1], data_size);
-
-    uchar y01[2][data_size];
-    this->prgs_[P1].GenerateBlock(y01[0], data_size);
-    this->prgs_[P1].GenerateBlock(y01[1], data_size);
+    uchar *x[n], *y[n];
+    for (uint64_t i = 0; i < n; i++) {
+        x[i] = new uchar[data_size];
+        y[i] = new uchar[data_size];
+        this->prgs_[P0].GenerateBlock(x[i], data_size);
+        this->prgs_[P1].GenerateBlock(y[i], data_size);
+    }
 
     uchar delta[data_size];
     this->rnd_->GenerateBlock(delta, data_size);
 
-    uint alpha = this->prgs_[P0].GenerateBit();
-    uint beta = this->prgs_[P1].GenerateBit();
+    uint64_t alpha = rand_uint64(this->prgs_[P0]) % n;
+    uint64_t beta = rand_uint64(this->prgs_[P1]) % n;
 
-    uchar x[data_size];
-    xor_bytes(x01[beta], delta, data_size, x);
-    uchar y[data_size];
-    xor_bytes(y01[alpha], delta, data_size, y);
+    uchar xx[data_size];
+    xor_bytes(x[beta], delta, data_size, xx);
+    uchar yy[data_size];
+    xor_bytes(y[alpha], delta, data_size, yy);
 
     // Send x0, x1, y, alpha to P0
-    this->conn_[P0]->Write(y, data_size, count_band);
+    this->conn_[P0]->Write(yy, data_size, count_band);
     // Send y0, y1, x, beta to P1
-    this->conn_[P1]->Write(x, data_size, count_band);
+    this->conn_[P1]->Write(xx, data_size, count_band);
 }
 
-void SSOT::P0(const uint b0, const uchar *u01[2], const uint data_size, uchar *p0, bool count_band) {
+void SSOT::P0(const uint64_t b0, uchar **u, const uint64_t n, const uint64_t data_size, uchar *p0, bool count_band) {
     const uint P2 = 0, P1 = 1;
     // fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
-    // print_bytes(u01[0], data_size, "u01", 0);
-    // print_bytes(u01[1], data_size, "u01", 1);
     // Receive x0, x1, y, alpha from P2
-    uchar x01[2][data_size];
-    this->prgs_[P2].GenerateBlock(x01[0], data_size);
-    this->prgs_[P2].GenerateBlock(x01[1], data_size);
+    uchar *x[n];
+    for (uint64_t i = 0; i < n; i++) {
+        x[i] = new uchar[data_size];
+        this->prgs_[P2].GenerateBlock(x[i], data_size);
+    }
 
     uchar y[data_size];
     this->conn_[P2]->Read(y, data_size);
 
-    uint alpha = this->prgs_[P2].GenerateBit();
+    uint64_t alpha = rand_uint64(this->prgs_[P2]) % n;
 
     // Send s to P1
-    uint s = b0 ^ alpha;
-    this->conn_[P1]->WriteInt(s, count_band);
+    uint64_t s = b0 ^ alpha;
+    this->conn_[P1]->WriteLong(s, count_band);
 
     // Receive t from P1
-    uint t = this->conn_[P1]->ReadInt();
+    uint64_t t = this->conn_[P1]->ReadLong();
 
     // Send u0' and u1' to P1
-    uchar u01_p[2][data_size];
-    xor_bytes(u01[b0], x01[t], data_size, u01_p[0]);
-    xor_bytes(u01[1 - b0], x01[1 - t], data_size, u01_p[1]);
-    this->conn_[P1]->Write(u01_p[0], data_size, count_band);
-    this->conn_[P1]->Write(u01_p[1], data_size, count_band);
+    uchar uu[data_size * n];
+    for (uint64_t i = 0; i < n; i++) {
+        xor_bytes(u[b0 ^ i], x[t ^ i], data_size, &uu[i * data_size]);
+    }
+    this->conn_[P1]->Write(uu, data_size * n, count_band);
 
     // Receive v0' and v1' from P1
-    uchar v01_p[2][data_size];
-    this->conn_[P1]->Read(v01_p[0], data_size);
-    this->conn_[P1]->Read(v01_p[1], data_size);
-
-    // Compute p_0
-    xor_bytes(v01_p[b0], y, data_size, p0);
+    uchar vv[data_size * n];
+    this->conn_[P1]->Read(vv, data_size * n);
+    xor_bytes(&vv[b0 * data_size], y, data_size, p0);
 }
 
-void SSOT::P1(const uint b1, const uchar *v01[2], const uint data_size, uchar *p1, bool count_band) {
+void SSOT::P1(const uint64_t b1, uchar **v, const uint64_t n, const uint64_t data_size, uchar *p1, bool count_band) {
     const uint P0 = 0, P2 = 1;
     // fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
     // print_bytes(v01[0], data_size, "v01", 0);
     // print_bytes(v01[1], data_size, "v01", 1);
     // Receive y0, y1, x, beta from P2
-    uchar y01[2][data_size];
-    this->prgs_[P2].GenerateBlock(y01[0], data_size);
-    this->prgs_[P2].GenerateBlock(y01[1], data_size);
+    uchar *y[n];
+    for (uint64_t i = 0; i < n; i++) {
+        y[i] = new uchar[data_size];
+        this->prgs_[P2].GenerateBlock(y[i], data_size);
+    }
 
     uchar x[data_size];
     this->conn_[P2]->Read(x, data_size);
 
-    uint beta = this->prgs_[P2].GenerateBit();
+    uint64_t beta = rand_uint64(this->prgs_[P2]) % n;
 
     // Send t to P0
-    uint t = b1 ^ beta;
-    this->conn_[P0]->WriteInt(t, count_band);
+    uint64_t t = b1 ^ beta;
+    this->conn_[P0]->WriteLong(t, count_band);
 
     // Receive s from P0
-    uint s = this->conn_[P0]->ReadInt();
+    uint64_t s = this->conn_[P0]->ReadLong();
 
     // Send v0' and v1' to P0
-    uchar v01_p[2][data_size];
-    xor_bytes(v01[b1], y01[s], data_size, v01_p[0]);
-    xor_bytes(v01[1 - b1], y01[1 - s], data_size, v01_p[1]);
-    this->conn_[P0]->Write(v01_p[0], data_size, count_band);
-    this->conn_[P0]->Write(v01_p[1], data_size, count_band);
+    uchar vv[data_size * n];
+    for (uint64_t i = 0; i < n; i++) {
+        xor_bytes(v[b1 ^ i], y[s ^ i], data_size, &vv[i * data_size]);
+    }
+    this->conn_[P0]->Write(vv, data_size * n, count_band);
 
     // Receive u0' and u1' from P0
-    uchar u01_p[2][data_size];
-    this->conn_[P0]->Read(u01_p[0], data_size);
-    this->conn_[P0]->Read(u01_p[1], data_size);
-
-    // Compute p_1
-    xor_bytes(u01_p[b1], x, data_size, p1);
+    uchar uu[data_size * n];
+    this->conn_[P0]->Read(uu, data_size * n);
+    xor_bytes(&uu[b1 * data_size], x, data_size, p1);
 }
 
 void SSOT::Test(uint iterations) {
