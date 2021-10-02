@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
         "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (n = 2^log_n)")(
         "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
+        "ssot_threshold", po::value<uint64_t>()->default_value(8ULL), "ssot threshold")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -70,6 +71,7 @@ int main(int argc, char *argv[]) {
 
     uint64_t data_size = vm["data_size"].as<uint64_t>();
     uint64_t tau = vm["tau"].as<uint64_t>();
+    uint64_t ssot_threshold = vm["ssot_threshold"].as<uint64_t>();
 
     uint threads = vm["threads"].as<uint>();
     uint iterations = vm["iterations"].as<uint>();
@@ -106,7 +108,7 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Initilizing DPFORAM...\n");
     Protocol *dpf_oram = NULL;
     uint64_t start_time = timestamp();
-    dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau);
+    dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau, ssot_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Initilizing DPFORAM done.\n");
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);

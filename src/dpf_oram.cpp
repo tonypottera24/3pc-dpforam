@@ -5,11 +5,12 @@ FSS1Bit DPFORAM::fss_;
 DPFORAM::DPFORAM(const uint party, Connection *connections[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
-                 uint64_t n, uint64_t data_size, uint64_t tau) : Protocol(party, connections, rnd, prgs) {
+                 uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold) : Protocol(party, connections, rnd, prgs) {
     // fprintf(stderr, "DPFORAM n = %llu, data_size = %u, tau = %u\n", n, data_size, tau);
     this->n_ = n;
     this->data_size_ = data_size;
     this->tau_ = tau;
+    this->ssot_threshold_ = ssot_threshold;
 
     this->InitArray(this->write_array_13_, true);
 
@@ -23,7 +24,7 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
         uint64_t pos_data_per_block = 1 << this->tau_;
         uint64_t pos_n = uint64_ceil_divide(this->n_, pos_data_per_block);
         uint64_t pos_data_size = byte_length(this->n_ << 1) * pos_data_per_block;
-        this->position_map_ = new DPFORAM(party, connections, rnd, prgs, pos_n, pos_data_size, tau);
+        this->position_map_ = new DPFORAM(party, connections, rnd, prgs, pos_n, pos_data_size, tau, ssot_threshold);
     }
 }
 
@@ -87,19 +88,27 @@ void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_siz
     assert((n > 0) && "PIR n == 0");
     if (n == 1) {
         xor_bytes(array_23[0][0], array_23[1][0], data_size, v_out_13);
-    } else if (n <= 32) {
-        SSOT_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
+    } else if (n <= this->ssot_threshold_) {
+        SSOT_PIR(NULL, array_23, n, data_size, index_23, v_out_13, count_band);
     } else {
         DPF_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
     }
 }
 
-void DPFORAM::SSOT_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
+void DPFORAM::SSOT_PIR(uchar **array_13, uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
     // fprintf(stderr, "[%llu]SSOT_PIR, v_meta_13 = %d\n", this->n_, v_meta_13[0]);
 
     SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
+
+        if (array_13 != NULL) {
+            uchar array[n * data_size];
+            for (uint64_t i = 0; i < n; i++) {
+                memcpy(&array[i * data_size], array_13[i], data_size);
+            }
+            this->conn_[P0]->Write(array, n * data_size);
+        }
 
         ssot->P2(n, data_size, count_band);
 
@@ -108,10 +117,20 @@ void DPFORAM::SSOT_PIR(uchar **array_23[2], const uint64_t n, const uint64_t dat
         const uint P2 = 0, P1 = 1;
 
         const uint64_t b0 = index_23[P1] ^ index_23[P2];
+
         uchar *u[n];
-        for (uint64_t i = 0; i < n; i++) {
-            u[i] = new uchar[data_size];
-            xor_bytes(array_23[0][i], array_23[1][i], data_size, u[i]);
+        if (array_13 != NULL) {
+            uchar array[n * data_size];
+            this->conn_[P2]->Read(array, n * data_size);
+            for (uint64_t i = 0; i < n; i++) {
+                u[i] = new uchar[data_size];
+                xor_bytes(&array[i * data_size], array_13[i], data_size, u[i]);
+            }
+        } else {
+            for (uint64_t i = 0; i < n; i++) {
+                u[i] = new uchar[data_size];
+                xor_bytes(array_23[0][i], array_23[1][i], data_size, u[i]);
+            }
         }
         ssot->P0(b0, u, n, data_size, v_out_13, count_band);
 
@@ -121,7 +140,13 @@ void DPFORAM::SSOT_PIR(uchar **array_23[2], const uint64_t n, const uint64_t dat
     } else if (this->party_ == 1) {
         const uint P0 = 0, P2 = 1;
         const uint64_t b1 = index_23[P2];
-        ssot->P1(b1, array_23[P2], n, data_size, v_out_13, count_band);
+        uchar **u;
+        if (array_13 != NULL) {
+            u = array_13;
+        } else {
+            u = array_23[P2];
+        }
+        ssot->P1(b1, u, n, data_size, v_out_13, count_band);
     }
     delete ssot;
 }
@@ -337,8 +362,29 @@ void DPFORAM::Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_onl
         for (uint i = 0; i < 2; i++) {
             this->ShareTwoThird(this->write_array_13_[0], this->data_size_, v_out_23, !read_only);
         }
-        return;
+    } else if (this->n_ <= this->ssot_threshold_) {
+        SSOT_Read(index_23, v_out_23, read_only);
+    } else {
+        DPF_Read(index_23, v_out_23, read_only);
     }
+}
+
+void DPFORAM::SSOT_Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_only) {
+    // fprintf(stderr, "[%llu]Read, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
+
+    uchar v_read_13[this->data_size_];
+    SSOT_PIR(this->write_array_13_, NULL, this->n_, this->data_size_, index_23, v_read_13, !read_only);
+    this->ShareTwoThird(v_read_13, this->data_size_, v_out_23, !read_only);
+
+    uint64_t cache_index_23[2];
+    bool is_cached_23[2];
+    if (this->position_map_ != NULL) {
+        ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
+    }
+}
+
+void DPFORAM::DPF_Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_only) {
+    // fprintf(stderr, "[%llu]Read, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
 
     uchar v_read_13[this->data_size_];
     PIR(this->read_array_23_, this->n_, this->data_size_, index_23, v_read_13, !read_only);
