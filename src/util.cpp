@@ -1,21 +1,39 @@
 #include "util.h"
 
 void xor_bytes(const uchar *a, const uchar *b, uint64_t len, uchar *out) {
-    for (uint64_t i = 0; i < len; i++) {
-        out[i] = a[i] ^ b[i];
-    }
-    // for (uint64_t i = 0; i < len; i += 8) {
-    //     uint64_t size = std::min(len - i, 8ULL);
-    //     uint64_t *aa = (uint64_t *)&a[i];
-    //     uint64_t *bb = (uint64_t *)&b[i];
-    //     uint64_t o = (*aa) ^ (*bb);
-    //     memcpy(&out[i], &o, size);
+    // for (uint64_t i = 0; i < len; i++) {
+    //     out[i] = a[i] ^ b[i];
     // }
+    for (uint64_t offset = 0; offset < len; offset += sizeof(uint64_t)) {
+        if (len - offset > sizeof(uint64_t)) {
+            uint64_t *aa = (uint64_t *)&a[offset];
+            uint64_t *bb = (uint64_t *)&b[offset];
+            uint64_t o = (*aa) ^ (*bb);
+            memcpy(&out[offset], &o, sizeof(uint64_t));
+        } else {
+            for (uint64_t i = offset; i < len; i++) {
+                out[i] = a[i] ^ b[i];
+            }
+        }
+    }
 }
 
-void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint64_t len, uchar *output) {
-    for (uint64_t i = 0; i < len; i++) {
-        output[i] = a[i] ^ b[i] ^ c[i];
+void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint64_t len, uchar *out) {
+    // for (uint64_t i = 0; i < len; i++) {
+    //     output[i] = a[i] ^ b[i] ^ c[i];
+    // }
+    for (uint64_t offset = 0; offset < len; offset += sizeof(uint64_t)) {
+        if (len - offset > sizeof(uint64_t)) {
+            uint64_t *aa = (uint64_t *)&a[offset];
+            uint64_t *bb = (uint64_t *)&b[offset];
+            uint64_t *cc = (uint64_t *)&c[offset];
+            uint64_t o = (*aa) ^ (*bb) ^ (*cc);
+            memcpy(&out[offset], &o, sizeof(uint64_t));
+        } else {
+            for (uint64_t i = offset; i < len; i++) {
+                out[i] = a[i] ^ b[i] ^ c[i];
+            }
+        }
     }
 }
 
@@ -34,14 +52,14 @@ void rand_bytes(uchar *bytes, const uint len) {
 }
 
 uint64_t rand_uint64() {
-    uchar bytes[8];
-    rand_bytes(bytes, 8);
+    uchar bytes[sizeof(uint64_t)];
+    rand_bytes(bytes, sizeof(uint64_t));
     return bytes_to_uint64(bytes);
 }
 
 uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg) {
-    uchar bytes[8];
-    prg.GenerateBlock(bytes, 8);
+    uchar bytes[sizeof(uint64_t)];
+    prg.GenerateBlock(bytes, sizeof(uint64_t));
     return bytes_to_uint64(bytes);
 }
 
