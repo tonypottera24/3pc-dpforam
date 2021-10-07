@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
         "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (n = 2^log_n)")(
         "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
-        "ssot_threshold", po::value<uint64_t>()->default_value(8ULL), "ssot threshold")(
+        "ssot_threshold", po::value<uint64_t>()->default_value(1000ULL), "ssot threshold")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
-        "iterations", po::value<uint>()->default_value(1000), "number of iterations");
+        "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
     po::variables_map vm;
     try {

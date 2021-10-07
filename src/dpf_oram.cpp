@@ -89,7 +89,8 @@ void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_siz
     if (n == 1) {
         xor_bytes(array_23[0][0], array_23[1][0], data_size, v_out_13);
     } else if (n <= this->ssot_threshold_) {
-        SSOT_PIR(NULL, array_23, n, data_size, index_23, v_out_13, count_band);
+        // SSOT_PIR(NULL, array_23, n, data_size, index_23, v_out_13, count_band);
+        PSEUDO_DPF_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
     } else {
         DPF_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
     }
@@ -178,6 +179,47 @@ void DPFORAM::DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data
 
     for (uint i = 0; i < 2; i++) {
         delete[] query_23[i];
+    }
+}
+
+void DPFORAM::PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
+    // fprintf(stderr, "[%llu]PIR, n = %llu\n", this->n_, n);
+
+    uint64_t byte_length = uint64_ceil_divide(n, 8ULL);
+    uchar *dpf_out[2];
+    for (uint i = 0; i < 2; i++) {
+        dpf_out[i] = new uchar[byte_length];
+    }
+    this->rnd_->GenerateBlock(dpf_out[0], byte_length);
+    memcpy(dpf_out[1], dpf_out[0], byte_length);
+    uint64_t index_13 = index_23[0] ^ index_23[1];
+    uint64_t index_13_byte = index_13 / 8ULL;
+    uint64_t index_13_bit = index_13 % 8ULL;
+    dpf_out[1][index_13_byte] = dpf_out[1][index_13_byte] ^ (1 << index_13_bit);
+    // print_bytes(dpf_out[0], byte_length, "dpf_out", 0);
+    // print_bytes(dpf_out[1], byte_length, "dpf_out", 1);
+
+    this->conn_[0]->Write(dpf_out[0], byte_length, count_band);
+    this->conn_[1]->Write(dpf_out[1], byte_length, count_band);
+
+    this->conn_[0]->Read(dpf_out[1], byte_length);
+    this->conn_[1]->Read(dpf_out[0], byte_length);
+
+    memset(v_out_13, 0, data_size);
+    for (uint i = 0; i < 2; i++) {
+        for (uint64_t j = 0; j < n; j++) {
+            uint64_t jj = j ^ index_23[i];
+            uint64_t jj_byte = jj / 8ULL;
+            uint64_t jj_bit = jj % 8ULL;
+            // fprintf(stderr, "PIR i = %u, j = %llu, jj = %llu, jj_byte = %llu, jj_bit = %llu, dpf = %u\n", i, j, jj, jj_byte, jj_bit, dpf_out[i][jj_byte] ^ (1 << jj_bit));
+            if ((dpf_out[i][jj_byte] >> jj_bit) & 1) {
+                xor_bytes(v_out_13, array_23[i][j], data_size, v_out_13);
+            }
+        }
+    }
+
+    for (uint i = 0; i < 2; i++) {
+        delete[] dpf_out[i];
     }
 }
 
@@ -362,26 +404,26 @@ void DPFORAM::Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_onl
         for (uint i = 0; i < 2; i++) {
             this->ShareTwoThird(this->write_array_13_[0], this->data_size_, v_out_23, !read_only);
         }
-    } else if (this->n_ <= this->ssot_threshold_) {
-        SSOT_Read(index_23, v_out_23, read_only);
+        // } else if (this->n_ <= this->ssot_threshold_) {
+        //     SSOT_Read(index_23, v_out_23, read_only);
     } else {
         DPF_Read(index_23, v_out_23, read_only);
     }
 }
 
-void DPFORAM::SSOT_Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_only) {
-    // fprintf(stderr, "[%llu]Read, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
+// void DPFORAM::SSOT_Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_only) {
+//     // fprintf(stderr, "[%llu]Read, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
 
-    uchar v_read_13[this->data_size_];
-    SSOT_PIR(this->write_array_13_, NULL, this->n_, this->data_size_, index_23, v_read_13, !read_only);
-    this->ShareTwoThird(v_read_13, this->data_size_, v_out_23, !read_only);
+//     uchar v_read_13[this->data_size_];
+//     SSOT_PIR(this->write_array_13_, NULL, this->n_, this->data_size_, index_23, v_read_13, !read_only);
+//     this->ShareTwoThird(v_read_13, this->data_size_, v_out_23, !read_only);
 
-    uint64_t cache_index_23[2];
-    bool is_cached_23[2];
-    if (this->position_map_ != NULL) {
-        ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
-    }
-}
+//     uint64_t cache_index_23[2];
+//     bool is_cached_23[2];
+//     if (this->position_map_ != NULL) {
+//         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
+//     }
+// }
 
 void DPFORAM::DPF_Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_only) {
     // fprintf(stderr, "[%llu]Read, index_23 = (%llu, %llu)\n", this->n_, index_23[0], index_23[1]);
@@ -527,7 +569,7 @@ void DPFORAM::Test(uint iterations) {
         xor_bytes(new_data, new_data_23[0], new_data_23[1], this->data_size_, new_data);
 
         if (memcmp(verify_data, new_data, this->data_size_) == 0) {
-            fprintf(stderr, "%u, Pass\n", iteration);
+            // fprintf(stderr, "%u, Pass\n", iteration);
         } else {
             fprintf(stderr, "%u, Fail !!!\n", iteration);
             exit(1);

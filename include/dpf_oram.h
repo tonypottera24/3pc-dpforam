@@ -41,6 +41,7 @@ private:
     void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band = true);
     void PIR(uchar **array[2], const uint64_t n, const uint64_t data_size, const uint64_t index[2], uchar *v_out_13, bool count_band = true);
     void DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
+    void PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
     void SSOT_PIR(uchar **array_13, uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
     void PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
     void SSOT_Read(const uint64_t index_23[2], uchar *v_old_23[2], bool read_only = false);
