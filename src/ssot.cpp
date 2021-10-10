@@ -19,8 +19,8 @@ void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     uchar delta[data_size];
     this->rnd_->GenerateBlock(delta, data_size);
 
-    uint64_t alpha = rand_uint64(this->prgs_[P0]) % n;
-    uint64_t beta = rand_uint64(this->prgs_[P1]) % n;
+    uint64_t alpha = rand_uint64(&this->prgs_[P0]) % n;
+    uint64_t beta = rand_uint64(&this->prgs_[P1]) % n;
 
     uchar xx[data_size];
     xor_bytes(x[beta], delta, data_size, xx);
@@ -46,7 +46,7 @@ void SSOT::P0(const uint64_t b0, uchar **u, const uint64_t n, const uint64_t dat
     uchar y[data_size];
     this->conn_[P2]->Read(y, data_size);
 
-    uint64_t alpha = rand_uint64(this->prgs_[P2]) % n;
+    uint64_t alpha = rand_uint64(&this->prgs_[P2]) % n;
 
     // Send s to P1
     uint64_t s = b0 ^ alpha;
@@ -83,7 +83,7 @@ void SSOT::P1(const uint64_t b1, uchar **v, const uint64_t n, const uint64_t dat
     uchar x[data_size];
     this->conn_[P2]->Read(x, data_size);
 
-    uint64_t beta = rand_uint64(this->prgs_[P2]) % n;
+    uint64_t beta = rand_uint64(&this->prgs_[P2]) % n;
 
     // Send t to P0
     uint64_t t = b1 ^ beta;

@@ -89,67 +89,10 @@ void DPFORAM::PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_siz
     if (n == 1) {
         xor_bytes(array_23[0][0], array_23[1][0], data_size, v_out_13);
     } else if (n <= this->ssot_threshold_) {
-        // SSOT_PIR(NULL, array_23, n, data_size, index_23, v_out_13, count_band);
         PSEUDO_DPF_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
     } else {
         DPF_PIR(array_23, n, data_size, index_23, v_out_13, count_band);
     }
-}
-
-void DPFORAM::SSOT_PIR(uchar **array_13, uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
-    // fprintf(stderr, "[%llu]SSOT_PIR, v_meta_13 = %d\n", this->n_, v_meta_13[0]);
-
-    SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
-    if (this->party_ == 2) {
-        const uint P1 = 0, P0 = 1;
-
-        if (array_13 != NULL) {
-            uchar array[n * data_size];
-            for (uint64_t i = 0; i < n; i++) {
-                memcpy(&array[i * data_size], array_13[i], data_size);
-            }
-            this->conn_[P0]->Write(array, n * data_size);
-        }
-
-        ssot->P2(n, data_size, count_band);
-
-        this->prgs_[P0].GenerateBlock(v_out_13, data_size);
-    } else if (this->party_ == 0) {
-        const uint P2 = 0, P1 = 1;
-
-        const uint64_t b0 = index_23[P1] ^ index_23[P2];
-
-        uchar *u[n];
-        if (array_13 != NULL) {
-            uchar array[n * data_size];
-            this->conn_[P2]->Read(array, n * data_size);
-            for (uint64_t i = 0; i < n; i++) {
-                u[i] = new uchar[data_size];
-                xor_bytes(&array[i * data_size], array_13[i], data_size, u[i]);
-            }
-        } else {
-            for (uint64_t i = 0; i < n; i++) {
-                u[i] = new uchar[data_size];
-                xor_bytes(array_23[0][i], array_23[1][i], data_size, u[i]);
-            }
-        }
-        ssot->P0(b0, u, n, data_size, v_out_13, count_band);
-
-        uchar tmp[data_size];
-        this->prgs_[P2].GenerateBlock(tmp, data_size);
-        xor_bytes(tmp, v_out_13, data_size, v_out_13);
-    } else if (this->party_ == 1) {
-        const uint P0 = 0, P2 = 1;
-        const uint64_t b1 = index_23[P2];
-        uchar **u;
-        if (array_13 != NULL) {
-            u = array_13;
-        } else {
-            u = array_23[P2];
-        }
-        ssot->P1(b1, u, n, data_size, v_out_13, count_band);
-    }
-    delete ssot;
 }
 
 void DPFORAM::DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
@@ -183,36 +126,23 @@ void DPFORAM::DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data
 }
 
 void DPFORAM::PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
-    // fprintf(stderr, "[%llu]PIR, n = %llu\n", this->n_, n);
+    fprintf(stderr, "[%llu]PIR, n = %llu, index_23 = (%llu, %llu)\n", this->n_, n, index_23[0], index_23[1]);
 
     uint64_t byte_length = uint64_ceil_divide(n, 8ULL);
     uchar *dpf_out[2];
     for (uint i = 0; i < 2; i++) {
         dpf_out[i] = new uchar[byte_length];
     }
-    this->rnd_->GenerateBlock(dpf_out[0], byte_length);
-    memcpy(dpf_out[1], dpf_out[0], byte_length);
-    uint64_t index_13 = index_23[0] ^ index_23[1];
-    uint64_t index_13_byte = index_13 / 8ULL;
-    uint64_t index_13_bit = index_13 % 8ULL;
-    dpf_out[1][index_13_byte] = dpf_out[1][index_13_byte] ^ (1 << index_13_bit);
-    // print_bytes(dpf_out[0], byte_length, "dpf_out", 0);
-    // print_bytes(dpf_out[1], byte_length, "dpf_out", 1);
-
-    this->conn_[0]->Write(dpf_out[0], byte_length, count_band);
+    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], byte_length, dpf_out[1]);
     this->conn_[1]->Write(dpf_out[1], byte_length, count_band);
-
     this->conn_[0]->Read(dpf_out[1], byte_length);
-    this->conn_[1]->Read(dpf_out[0], byte_length);
+    this->prgs_[1].GenerateBlock(dpf_out[0], byte_length);
 
     memset(v_out_13, 0, data_size);
     for (uint i = 0; i < 2; i++) {
         for (uint64_t j = 0; j < n; j++) {
-            uint64_t jj = j ^ index_23[i];
-            uint64_t jj_byte = jj / 8ULL;
-            uint64_t jj_bit = jj % 8ULL;
-            // fprintf(stderr, "PIR i = %u, j = %llu, jj = %llu, jj_byte = %llu, jj_bit = %llu, dpf = %u\n", i, j, jj, jj_byte, jj_bit, dpf_out[i][jj_byte] ^ (1 << jj_bit));
-            if ((dpf_out[i][jj_byte] >> jj_bit) & 1) {
+            // fprintf(stderr, "PIR i = %u, j = %llu, jj = %llu, jj_byte = %llu, jj_bit = %llu, dpf = %u\n", i, j, j ^ index_23[i], jj_byte, jj_bit, dpf_out[i][jj_byte] ^ (1 << jj_bit));
+            if (this->fss_.PseudoEval(j ^ index_23[i], dpf_out[i])) {
                 xor_bytes(v_out_13, array_23[i][j], data_size, v_out_13);
             }
         }
@@ -229,8 +159,16 @@ void DPFORAM::PIW(uchar **array, const uint64_t n, const uint64_t data_size, con
     assert((n > 0) && "PIW n == 0");
     if (n == 1) {
         memcpy(array[0], v_delta_23[0], data_size);
-        return;
+    } else if (n <= this->ssot_threshold_) {
+        PSEUDO_DPF_PIW(array, n, data_size, index_23, v_delta_23, count_band);
+    } else {
+        DPF_PIW(array, n, data_size, index_23, v_delta_23, count_band);
     }
+}
+
+void DPFORAM::DPF_PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band) {
+    // fprintf(stderr, "[%llu]PIW, index_23 = (%llu, %llu), n = %llu\n", this->n_, index_23[0], index_23[1], n);
+    // print_bytes(v_delta_13, data_size, "v_delta_13");
 
     uint64_t log_n = uint64_log2(n);
     // fprintf(stderr, "[%llu]PIW, log_n = %llu\n", this->n_, log_n);
@@ -258,6 +196,35 @@ void DPFORAM::PIW(uchar **array, const uint64_t n, const uint64_t data_size, con
 
     for (uint i = 0; i < 2; i++) {
         delete[] query_23[i];
+    }
+}
+
+void DPFORAM::PSEUDO_DPF_PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band) {
+    // fprintf(stderr, "[%llu]PIW, index_23 = (%llu, %llu), n = %llu\n", this->n_, index_23[0], index_23[1], n);
+    // print_bytes(v_delta_13, data_size, "v_delta_13");
+
+    uint64_t byte_length = uint64_ceil_divide(n, 8ULL);
+    uchar *dpf_out[2];
+    for (uint i = 0; i < 2; i++) {
+        dpf_out[i] = new uchar[byte_length];
+    }
+
+    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], byte_length, dpf_out[1]);
+    this->conn_[1]->Write(dpf_out[1], byte_length, count_band);
+    this->conn_[0]->Read(dpf_out[1], byte_length);
+    this->prgs_[1].GenerateBlock(dpf_out[0], byte_length);
+
+    for (uint i = 0; i < 2; i++) {
+        for (uint64_t j = 0; j < n; j++) {
+            // fprintf(stderr, "PIW i = %u, j = %llu, jj = %llu, dpf = %u\n", i, j, j ^ index_23[i], dpf_out[j ^ index_23[i]]);
+            if (this->fss_.PseudoEval(j ^ index_23[i], dpf_out[i])) {
+                xor_bytes(array[j], v_delta_23[i], data_size, array[j]);
+            }
+        }
+    }
+
+    for (uint i = 0; i < 2; i++) {
+        delete[] dpf_out[i];
     }
 }
 

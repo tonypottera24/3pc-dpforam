@@ -57,10 +57,10 @@ uint64_t rand_uint64() {
     return bytes_to_uint64(bytes);
 }
 
-uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg) {
-    uchar bytes[sizeof(uint64_t)];
-    prg.GenerateBlock(bytes, sizeof(uint64_t));
-    return bytes_to_uint64(bytes);
+uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg) {
+    uint64_t value;
+    prg->GenerateBlock((uchar *)&value, sizeof(uint64_t));
+    return value;
 }
 
 uint64_t timestamp() {

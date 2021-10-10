@@ -42,9 +42,9 @@ private:
     void PIR(uchar **array[2], const uint64_t n, const uint64_t data_size, const uint64_t index[2], uchar *v_out_13, bool count_band = true);
     void DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
     void PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
-    void SSOT_PIR(uchar **array_13, uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
     void PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
-    void SSOT_Read(const uint64_t index_23[2], uchar *v_old_23[2], bool read_only = false);
+    void DPF_PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
+    void PSEUDO_DPF_PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
     void DPF_Read(const uint64_t index_23[2], uchar *v_old_23[2], bool read_only = false);
     void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached[2], bool read_only = false);
     void AppendCache(uchar *v_new_23[2], bool count_band = true);

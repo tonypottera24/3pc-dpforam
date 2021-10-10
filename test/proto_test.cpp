@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (n = 2^log_n)")(
+        "log_n", po::value<uint64_t>()->default_value(2ULL), "number of data (n = 2^log_n)")(
         "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
         "ssot_threshold", po::value<uint64_t>()->default_value(1000ULL), "ssot threshold")(
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     // P2 [0:P1]=2 [1:P0]=1
     prgs[0].SetKeyWithIV(bytes + offset[(party + 2) % 3], 16, bytes + offset[(party + 2) % 3] + 16);
     prgs[1].SetKeyWithIV(bytes + offset[party], 16, bytes + offset[party] + 16);
-    fprintf(stderr, "Initilizing PRG done.\n");
+    fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     fprintf(stderr, "Initilizing DPFORAM...\n");
     Protocol *dpf_oram = NULL;

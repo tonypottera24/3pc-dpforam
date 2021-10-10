@@ -52,11 +52,11 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-uint FSS1Bit::Gen(uint64_t index, uint log_n, uchar *keys[2]) {
+uint FSS1Bit::Gen(uint64_t index, uint64_t log_n, uchar *keys[2]) {
     return GEN(&aes_key_, index, log_n, keys, keys + 1);
 }
 
-void FSS1Bit::EvalAll(const uchar *key, uint log_n, uchar *out) {
+void FSS1Bit::EvalAll(const uchar *key, uint64_t log_n, uchar *out) {
     uint128 *res = EVALFULL(&aes_key_, key);
     if (log_n <= 6) {
         to_byte_vector(((uint64_t *)res)[0], out, (1 << log_n));
@@ -68,4 +68,19 @@ void FSS1Bit::EvalAll(const uchar *key, uint log_n, uchar *out) {
         }
     }
     free(res);
+}
+
+void FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg, uint64_t index, uint64_t byte_length, uchar *dpf_out) {
+    prg->GenerateBlock(dpf_out, byte_length);
+    print_bytes(dpf_out, byte_length, "dpf_out_before", 0);
+    uint64_t index_byte = index / 8ULL;
+    uint64_t index_bit = index % 8ULL;
+    dpf_out[index_byte] ^= 1 << index_bit;
+}
+
+bool FSS1Bit::PseudoEval(uint64_t index, uchar *dpf_out) {
+    uint64_t index_byte = index / 8ULL;
+    uint64_t index_bit = index % 8ULL;
+    // fprintf(stderr, "PIR i = %u, j = %llu, jj = %llu, jj_byte = %llu, jj_bit = %llu, dpf = %u\n", i, j, jj, jj_byte, jj_bit, dpf_out[i][jj_byte] ^ (1 << jj_bit));
+    return (dpf_out[index_byte] >> index_bit) & 1;
 }
