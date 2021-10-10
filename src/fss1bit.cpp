@@ -72,7 +72,6 @@ void FSS1Bit::EvalAll(const uchar *key, uint64_t log_n, uchar *out) {
 
 void FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg, uint64_t index, uint64_t byte_length, uchar *dpf_out) {
     prg->GenerateBlock(dpf_out, byte_length);
-    print_bytes(dpf_out, byte_length, "dpf_out_before", 0);
     uint64_t index_byte = index / 8ULL;
     uint64_t index_bit = index % 8ULL;
     dpf_out[index_byte] ^= 1 << index_bit;

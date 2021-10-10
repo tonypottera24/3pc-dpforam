@@ -126,7 +126,7 @@ void DPFORAM::DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data
 }
 
 void DPFORAM::PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band) {
-    fprintf(stderr, "[%llu]PIR, n = %llu, index_23 = (%llu, %llu)\n", this->n_, n, index_23[0], index_23[1]);
+    // fprintf(stderr, "[%llu]PIR, n = %llu, index_23 = (%llu, %llu)\n", this->n_, n, index_23[0], index_23[1]);
 
     uint64_t byte_length = uint64_ceil_divide(n, 8ULL);
     uchar *dpf_out[2];
