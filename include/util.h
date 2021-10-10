@@ -25,8 +25,8 @@ uint64_t rand_uint64();
 uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg);
 uint64_t timestamp();
 
-uint64_t bit_length(const uint64_t n);
-uint64_t byte_length(const uint64_t n);
+uint64_t bit_length(uint64_t n);
+uint64_t byte_length(uint64_t n);
 uint64_t uint64_log2(const uint64_t n);
 uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q);
 

@@ -28,10 +28,11 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (n = 2^log_n)")(
+        "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (log)")(
         "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
-        "ssot_threshold", po::value<uint64_t>()->default_value(1000ULL), "ssot threshold")(
+        "log_ssot_threshold", po::value<uint64_t>()->default_value(10ULL), "ssot threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(10ULL), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -71,7 +72,13 @@ int main(int argc, char *argv[]) {
 
     uint64_t data_size = vm["data_size"].as<uint64_t>();
     uint64_t tau = vm["tau"].as<uint64_t>();
-    uint64_t ssot_threshold = vm["ssot_threshold"].as<uint64_t>();
+    uint64_t log_ssot_threshold = vm["log_ssot_threshold"].as<uint64_t>();
+    uint64_t ssot_threshold = 1ULL << log_ssot_threshold;
+    fprintf(stderr, "SSOT threshold %llu\n", ssot_threshold);
+
+    uint64_t log_pseudo_dpf_threshold = vm["log_pseudo_dpf_threshold"].as<uint64_t>();
+    uint64_t pseudo_dpf_threshold = 1ULL << log_pseudo_dpf_threshold;
+    fprintf(stderr, "Pseudo DPF threshold %llu\n", pseudo_dpf_threshold);
 
     uint threads = vm["threads"].as<uint>();
     uint iterations = vm["iterations"].as<uint>();
@@ -80,7 +87,7 @@ int main(int argc, char *argv[]) {
 
     Connection *conn[2] = {new SimpleSocket(), new SimpleSocket()};
 
-    fprintf(stderr, "Initilizing server %s:%u...\n", ip.c_str(), port);
+    // fprintf(stderr, "Initilizing server %s:%u...\n", ip.c_str(), port);
     std::thread start_server_thread(start_server, conn[0], ip.c_str(), port);
 
     fprintf(stderr, "Connecting to %s:%u...\n", next_party_ip.c_str(), next_party_port);
@@ -88,9 +95,9 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Connecting to %s:%u done.\n", next_party_ip.c_str(), port);
 
     start_server_thread.join();
-    fprintf(stderr, "Initilizing server %s:%u done.\n", ip.c_str(), port);
+    // fprintf(stderr, "Initilizing server %s:%u done.\n", ip.c_str(), port);
 
-    fprintf(stderr, "Initilizing PRG...\n");
+    // fprintf(stderr, "Initilizing PRG...\n");
     AutoSeededRandomPool rnd;
     CTR_Mode<AES>::Encryption prgs[2];
     uchar bytes[96];
@@ -103,14 +110,14 @@ int main(int argc, char *argv[]) {
     // P2 [0:P1]=2 [1:P0]=1
     prgs[0].SetKeyWithIV(bytes + offset[(party + 2) % 3], 16, bytes + offset[(party + 2) % 3] + 16);
     prgs[1].SetKeyWithIV(bytes + offset[party], 16, bytes + offset[party] + 16);
-    fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
+    // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
-    fprintf(stderr, "Initilizing DPFORAM...\n");
+    // fprintf(stderr, "Initilizing DPFORAM...\n");
     Protocol *dpf_oram = NULL;
     uint64_t start_time = timestamp();
-    dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau, ssot_threshold);
+    dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
-    fprintf(stderr, "Initilizing DPFORAM done.\n");
+    // fprintf(stderr, "Initilizing DPFORAM done.\n");
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
     if (dpf_oram != NULL) {

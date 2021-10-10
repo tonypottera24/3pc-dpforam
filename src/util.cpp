@@ -69,19 +69,19 @@ uint64_t timestamp() {
     return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
 }
 
-uint64_t bit_length(const uint64_t n) {
-    uint64_t bit_length = 0, tmp = n;
-    while (tmp != 0) {
-        tmp >>= 1;
+uint64_t bit_length(uint64_t n) {
+    uint64_t bit_length = 0;
+    while (n != 0) {
+        n >>= 1;
         bit_length++;
     }
     return bit_length;
 }
 
-uint64_t byte_length(const uint64_t n) {
-    uint64_t byte_length = 0, tmp = n;
-    while (tmp != 0) {
-        tmp >>= 8;
+uint64_t byte_length(uint64_t n) {
+    uint64_t byte_length = 0;
+    while (n != 0) {
+        n >>= 8;
         byte_length++;
     }
     return byte_length;

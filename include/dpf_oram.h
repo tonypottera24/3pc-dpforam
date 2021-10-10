@@ -23,6 +23,7 @@ private:
     uint64_t cache_ctr_;
     uint64_t tau_;
     uint64_t ssot_threshold_;
+    uint64_t pseudo_dpf_threshold_;
 
 public:
     uint64_t data_size_;
@@ -39,13 +40,22 @@ private:
                        uchar *v_out_23[2], bool count_band = true);
     void ShareTwoThird(const uchar *v_in, const uint64_t n, uchar *v_old[2], bool count_band = true);
     void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band = true);
+
     void PIR(uchar **array[2], const uint64_t n, const uint64_t data_size, const uint64_t index[2], uchar *v_out_13, bool count_band = true);
-    void DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
-    void PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band);
+    void DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band = true);
+    void PSEUDO_DPF_PIR(uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band = true);
+    void SSOT_PIR(uchar **array_13, uchar **array_23[2], const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_out_13, bool count_band = true);
+
     void PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
     void DPF_PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
     void PSEUDO_DPF_PIW(uchar **array, const uint64_t n, const uint64_t data_size, const uint64_t index_23[2], uchar *v_delta_23[2], bool count_band = true);
+
     void DPF_Read(const uint64_t index_23[2], uchar *v_old_23[2], bool read_only = false);
+    void SSOT_Read(const uint64_t index_23[2], uchar *v_out_23[2], bool read_only = false);
+
+    void DPF_Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *new_data_23[2], bool count_band = true);
+    void SSOT_Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *new_data_23[2], bool count_band = true);
+
     void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached[2], bool read_only = false);
     void AppendCache(uchar *v_new_23[2], bool count_band = true);
     void Flush(bool count_band = true);
@@ -55,7 +65,7 @@ public:
     DPFORAM(const uint party, Connection *connections[2],
             CryptoPP::AutoSeededRandomPool *rnd,
             CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
-            uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold);
+            uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold);
     ~DPFORAM();
     void Read(const uint64_t index_23[2], uchar *v_old_23[2], bool read_only = false);
     void Write(const uint64_t index_23[2], uchar *old_data_23[2], uchar *new_data_23[2], bool count_band = true);
