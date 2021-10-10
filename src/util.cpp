@@ -52,9 +52,9 @@ void rand_bytes(uchar *bytes, const uint len) {
 }
 
 uint64_t rand_uint64() {
-    uchar bytes[sizeof(uint64_t)];
-    rand_bytes(bytes, sizeof(uint64_t));
-    return bytes_to_uint64(bytes);
+    uint64_t value;
+    rand_bytes((uchar *)&value, sizeof(uint64_t));
+    return value;
 }
 
 uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg) {

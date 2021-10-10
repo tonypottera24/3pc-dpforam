@@ -158,7 +158,7 @@ void DPFORAM::PIW(uchar **array, const uint64_t n, const uint64_t data_size, con
     // print_bytes(v_delta_13, data_size, "v_delta_13");
     assert((n > 0) && "PIW n == 0");
     if (n == 1) {
-        memcpy(array[0], v_delta_23[0], data_size);
+        xor_bytes(array[0], v_delta_23[0], data_size, array[0]);
     } else if (n <= this->ssot_threshold_) {
         PSEUDO_DPF_PIW(array, n, data_size, index_23, v_delta_23, count_band);
     } else {
