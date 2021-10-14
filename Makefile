@@ -5,6 +5,9 @@ BIN_DIR = bin
 LIBDPF_SRC_DIR = $(SRC_DIR)/libdpf
 LIBDPF_OBJ_DIR = $(OBJ_DIR)/libdpf
 
+DATA_SRC_DIR = $(SRC_DIR)/data
+DATA_OBJ_DIR = $(OBJ_DIR)/data
+
 TEST_SRC_DIR = test
 TEST_OBJ_DIR = $(OBJ_DIR)/test
 TEST_BIN_DIR = $(BIN_DIR)/test
@@ -16,6 +19,9 @@ OBJ := $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 LIBDPF_SRC := $(wildcard $(LIBDPF_SRC_DIR)/*.cpp)
 LIBDPF_OBJ := $(LIBDPF_SRC:$(LIBDPF_SRC_DIR)/%.cpp=$(LIBDPF_OBJ_DIR)/%.o)
 
+DATA_SRC := $(wildcard $(DATA_SRC_DIR)/*.cpp)
+DATA_OBJ := $(DATA_SRC:$(DATA_SRC_DIR)/%.cpp=$(DATA_OBJ_DIR)/%.o)
+
 TEST_SRC := $(wildcard $(TEST_SRC_DIR)/*.cpp)
 TEST_OBJ := $(TEST_SRC:$(TEST_SRC_DIR)/%.cpp=$(TEST_OBJ_DIR)/%.o)
 TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
@@ -23,7 +29,7 @@ TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
 
 CC = clang++
 CFLAGS = -Wall -g -O2
-CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -maes -msse2 -fopenmp
+CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -maes -msse2 -fopenmp
 LDFLAGS = -L/opt/local/lib -Llib
 LDLIBS = -lcryptopp -lcrypto -fopenmp -lboost_program_options-mt
 # -mmacosx-version-min=11.2
@@ -39,11 +45,15 @@ LDLIBS = -lcryptopp -lcrypto -fopenmp -lboost_program_options-mt
 all: $(TEST_BIN)
 
 # link test
-$(TEST_BIN): $(LIBDPF_OBJ) $(OBJ) $(TEST_OBJ) | $(TEST_BIN_DIR)
-	$(CC) $(LDFLAGS) $(LIBDPF_OBJ) $(OBJ) $(TEST_OBJ_DIR)/$(notdir $@).o $(LDLIBS) -o $@
+$(TEST_BIN): $(LIBDPF_OBJ) $(DATA_OBJ) $(OBJ) $(TEST_OBJ) | $(TEST_BIN_DIR)
+	$(CC) $(LDFLAGS) $(LIBDPF_OBJ) $(DATA_OBJ) $(OBJ) $(TEST_OBJ_DIR)/$(notdir $@).o $(LDLIBS) -o $@
 
 # compile src/libdpf
 $(LIBDPF_OBJ_DIR)/%.o: $(LIBDPF_SRC_DIR)/%.cpp | $(LIBDPF_OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+# compile src/data
+$(DATA_OBJ_DIR)/%.o: $(DATA_SRC_DIR)/%.cpp | $(DATA_OBJ_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 # compile src
@@ -60,8 +70,8 @@ $(TEST_OBJ_DIR)/%.o: $(TEST_SRC_DIR)/%.cpp | $(TEST_OBJ_DIR)
 # dpf: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
 # 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -c $< -o $@ libdpf.o
 
-$(BIN_DIR) $(LIBDPF_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR):
+$(BIN_DIR) $(LIBDPF_OBJ_DIR) $(DATA_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR):
 	mkdir -p $@
 
 clean:
-	@$(RM) -rv $(BIN_DIR) $(LIBDPF_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR) # The @ disables the echoing of the command
+	@$(RM) -rv $(BIN_DIR) $(LIBDPF_OBJ_DIR) $(DATA_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR) # The @ disables the echoing of the command
