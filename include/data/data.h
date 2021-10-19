@@ -8,8 +8,11 @@ public:
     uint64_t size_;
 
 public:
-    Data Add(Data a, Data b);
-    Data Minus(Data a, Data b);
+    virtual Data &operator=(const Data &other) = 0;
+    virtual Data &operator+=(const Data &rhs) = 0;
+    virtual Data &operator-=(const Data &rhs) = 0;
+    // friend Data operator+(Data lhs, const Data &rhs);
+    // friend Data operator-(Data lhs, const Data &rhs);
 };
 
 #endif /* DATA_H_ */

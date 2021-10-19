@@ -5,8 +5,6 @@
 
 #include <algorithm>
 
-#include "bit_perm.h"
-
 const uint64_t masks[64] = {0x0000000000000001ULL, 0x0000000000000002ULL,
                             0x0000000000000004ULL, 0x0000000000000008ULL, 0x0000000000000010ULL,
                             0x0000000000000020ULL, 0x0000000000000040ULL, 0x0000000000000080ULL,

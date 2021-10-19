@@ -8,45 +8,50 @@ SSOT::SSOT(const uint party, Connection *cons[2],
 void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
     // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
-    uchar *x[n], *y[n];
-    for (uint64_t i = 0; i < n; i++) {
-        x[i] = new uchar[data_size];
-        y[i] = new uchar[data_size];
-        this->prgs_[P0].GenerateBlock(x[i], data_size);
-        this->prgs_[P1].GenerateBlock(y[i], data_size);
-    }
 
-    uchar delta[data_size];
-    this->rnd_->GenerateBlock(delta, data_size);
+    BinaryData delta = BinaryData(data_size);
+    delta.Random(*this->rnd_);
 
     uint64_t alpha = rand_uint64(&this->prgs_[P0]) % n;
     uint64_t beta = rand_uint64(&this->prgs_[P1]) % n;
 
-    uchar xx[data_size];
-    xor_bytes(x[beta], delta, data_size, xx);
-    uchar yy[data_size];
-    xor_bytes(y[alpha], delta, data_size, yy);
+    BinaryData x = BinaryData(data_size);
+    BinaryData y = BinaryData(data_size);
+    BinaryData xx = BinaryData(data_size);
+    BinaryData yy = BinaryData(data_size);
+    for (uint64_t i = 0; i < n; i++) {
+        x.Random(this->prgs_[P0]);
+        y.Random(this->prgs_[P1]);
+        if (i == beta) {
+            xx = x + delta;
+        }
+        if (i == alpha) {
+            yy = y + delta;
+        }
+    }
 
     // Send x0, x1, y, alpha to P0
-    this->conn_[P0]->Write(yy, data_size, count_band);
+    this->conn_[P0]->WriteData(yy, count_band);
     // Send y0, y1, x, beta to P1
-    this->conn_[P1]->Write(xx, data_size, count_band);
+    this->conn_[P1]->WriteData(xx, count_band);
 }
 
-void SSOT::P0(const uint64_t b0, uchar **u, const uint64_t n, const uint64_t data_size, uchar *p0, bool count_band) {
+BinaryData *SSOT::P0(const uint64_t b0, std::vector<BinaryData> &u, bool count_band) {
     const uint P2 = 0, P1 = 1;
     // fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
     // Receive x0, x1, y, alpha from P2
-    uchar *x[n];
-    for (uint64_t i = 0; i < n; i++) {
-        x[i] = new uchar[data_size];
-        this->prgs_[P2].GenerateBlock(x[i], data_size);
-    }
 
-    uchar y[data_size];
-    this->conn_[P2]->Read(y, data_size);
+    uint64_t n = u.size();
+    uint data_size = u[0].Size();
+    BinaryData y = this->conn_[P2]->ReadData(data_size);
 
     uint64_t alpha = rand_uint64(&this->prgs_[P2]) % n;
+
+    BinaryData *x = new BinaryData[n];
+    for (uint64_t i = 0; i < n; i++) {
+        x[i] = BinaryData(data_size);
+        x[i].Random(this->prgs_[P2]);
+    }
 
     // Send s to P1
     uint64_t s = b0 ^ alpha;
@@ -56,34 +61,35 @@ void SSOT::P0(const uint64_t b0, uchar **u, const uint64_t n, const uint64_t dat
     uint64_t t = this->conn_[P1]->ReadLong();
 
     // Send u0' and u1' to P1
-    uchar uu[data_size * n];
+    std::vector<BinaryData> uu;
     for (uint64_t i = 0; i < n; i++) {
-        xor_bytes(u[b0 ^ i], x[t ^ i], data_size, &uu[i * data_size]);
+        uu.emplace_back(u[b0 ^ i] + x[t ^ i]);
     }
-    this->conn_[P1]->Write(uu, data_size * n, count_band);
+    this->conn_[P1]->WriteData(uu, count_band);
 
     // Receive v0' and v1' from P1
-    uchar vv[data_size * n];
-    this->conn_[P1]->Read(vv, data_size * n);
-    xor_bytes(&vv[b0 * data_size], y, data_size, p0);
+    std::vector<BinaryData> vv = this->conn_[P1]->ReadData(n, data_size);
+    return new BinaryData(vv[b0] + y);
 }
 
-void SSOT::P1(const uint64_t b1, uchar **v, const uint64_t n, const uint64_t data_size, uchar *p1, bool count_band) {
+BinaryData *SSOT::P1(const uint64_t b1, std::vector<BinaryData> &v, bool count_band) {
     const uint P0 = 0, P2 = 1;
     // fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
     // print_bytes(v01[0], data_size, "v01", 0);
     // print_bytes(v01[1], data_size, "v01", 1);
     // Receive y0, y1, x, beta from P2
-    uchar *y[n];
-    for (uint64_t i = 0; i < n; i++) {
-        y[i] = new uchar[data_size];
-        this->prgs_[P2].GenerateBlock(y[i], data_size);
-    }
 
-    uchar x[data_size];
-    this->conn_[P2]->Read(x, data_size);
+    uint64_t n = v.size();
+    uint data_size = v[0].Size();
+    BinaryData x = this->conn_[P2]->ReadData(data_size);
 
     uint64_t beta = rand_uint64(&this->prgs_[P2]) % n;
+
+    BinaryData *y = new BinaryData[n];
+    for (uint64_t i = 0; i < n; i++) {
+        y[i] = BinaryData(data_size);
+        y[i].Random(this->prgs_[P2]);
+    }
 
     // Send t to P0
     uint64_t t = b1 ^ beta;
@@ -93,16 +99,15 @@ void SSOT::P1(const uint64_t b1, uchar **v, const uint64_t n, const uint64_t dat
     uint64_t s = this->conn_[P0]->ReadLong();
 
     // Send v0' and v1' to P0
-    uchar vv[data_size * n];
+    std::vector<BinaryData> vv;
     for (uint64_t i = 0; i < n; i++) {
-        xor_bytes(v[b1 ^ i], y[s ^ i], data_size, &vv[i * data_size]);
+        vv.emplace_back(v[b1 ^ i] + y[s ^ i]);
     }
-    this->conn_[P0]->Write(vv, data_size * n, count_band);
+    this->conn_[P0]->WriteData(vv, count_band);
 
     // Receive u0' and u1' from P0
-    uchar uu[data_size * n];
-    this->conn_[P0]->Read(uu, data_size * n);
-    xor_bytes(&uu[b1 * data_size], x, data_size, p1);
+    std::vector<BinaryData> uu = this->conn_[P0]->ReadData(n, data_size);
+    return new BinaryData(uu[b1] + x);
 }
 
 void SSOT::Test(uint iterations) {
@@ -112,9 +117,9 @@ void SSOT::Test(uint iterations) {
     //     uint b1 = this->rnd_->GenerateBit();
     //     uchar *u01[2] = {new uchar[data_size], new uchar[data_size]};
     //     uchar *v01[2] = {new uchar[data_size], new uchar[data_size]};
-    //     for (uint i = 0; i < 2; i++) {
-    //         this->rnd_->GenerateBlock(u01[i], data_size);
-    //         this->rnd_->GenerateBlock(v01[i], data_size);
+    //     for (uint b = 0; b < 2; b++) {
+    //         this->rnd_->GenerateBlock(u01[b], data_size);
+    //         this->rnd_->GenerateBlock(v01[b], data_size);
     //     }
     //     uchar p0[data_size];
     //     uchar p1[data_size];
@@ -146,9 +151,9 @@ void SSOT::Test(uint iterations) {
     //         fprintf(stderr, "Incorrect party: %d\n", this->party_);
     //     }
 
-    //     for (uint i = 0; i < 2; i++) {
-    //         delete[] u01[i];
-    //         delete[] v01[i];
+    //     for (uint b = 0; b < 2; b++) {
+    //         delete[] u01[b];
+    //         delete[] v01[b];
     //     }
     // }
 }

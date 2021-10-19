@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "binary_data.h"
 #include "typedef.h"
 
 class Connection {
@@ -21,10 +22,12 @@ public:
     // virtual void fread(uchar *data, uint64_t bytes) = 0;
     virtual void Flush() = 0;
     virtual void Close() = 0;
-    void WriteInt(int n, bool count_band = true);
-    int ReadInt();
     void WriteLong(uint64_t n, bool count_band = true);
     uint64_t ReadLong();
+    void WriteData(BinaryData &data, bool count_band = true);
+    BinaryData &ReadData(const uint size);
+    void WriteData(std::vector<BinaryData> &data, bool count_band = true);
+    std::vector<BinaryData> &ReadData(const uint size, const uint data_size);
 };
 
 #endif /* CONNECTION_H_ */
