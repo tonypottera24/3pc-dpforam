@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
 
     Protocol *dpf_oram = NULL;
     uint64_t start_time = timestamp();
-    dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    dpf_oram = new DPFORAM(party, DataType::BINARY, conn, &rnd, prgs, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 

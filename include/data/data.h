@@ -1,37 +1,55 @@
 #ifndef DATA_H_
 #define DATA_H_
 
+#include <cryptopp/modes.h>
+#include <cryptopp/osrng.h>
 #include <inttypes.h>
 
+#include "binary_data.h"
 #include "typedef.h"
 
+enum class DataType {
+    BINARY,
+    GROUP
+};
+
 class Data {
-public:
-    uint64_t size_;
+protected:
+    BinaryData binary_data_;
 
 public:
-    Data();
+    DataType data_type_;
+
+public:
+    Data() {}
     Data(const Data &other);
-    Data(uchar *data, const uint size);
-    Data(const uint size, const bool set_zero = false);
+    Data(const DataType data_type);
+    Data(const DataType data_type, uchar *data, const uint size);
+    Data(const DataType data_type, const uint size, const bool set_zero = false);
     ~Data();
 
-    virtual Data &operator=(const Data &other) = 0;
+    Data &operator=(const Data &other);
     // Data &operator=(Data &&other) noexcept;
-    virtual Data &operator+=(const Data &rhs) = 0;
-    virtual Data &operator-=(const Data &rhs) = 0;
-    // friend Data operator+(Data lhs, const Data &rhs);
-    // friend Data operator-(Data lhs, const Data &rhs);
-    virtual bool operator==(const Data &rhs) = 0;
+    Data &operator+=(const Data &rhs);
+    Data &operator-=(const Data &rhs);
+    friend Data operator+(Data lhs, const Data &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend Data operator-(Data lhs, const Data &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
+    bool operator==(const Data &rhs);
     bool operator!=(const Data &rhs) { return !(*this == rhs); }
 
-    virtual uint Size() = 0;
-    virtual uchar *Dump() = 0;
-    virtual void Load(uchar *data) = 0;
-    virtual void Reset() = 0;
-    // virtual void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg) = 0;
-    // virtual void Random(CryptoPP::AutoSeededRandomPool *prg) = 0;
-    virtual void Print(const char *title = "") = 0;
+    uint Size();
+    uchar *Dump();
+    void Load(uchar *data);
+    void Reset();
+    void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg);
+    void Random(CryptoPP::AutoSeededRandomPool *prg);
+    void Print(const char *title = "");
 };
 
 #endif /* DATA_H_ */

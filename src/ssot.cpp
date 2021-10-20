@@ -1,24 +1,24 @@
 #include "ssot.h"
 
-SSOT::SSOT(const uint party, Connection *cons[2],
+SSOT::SSOT(const uint party, const DataType data_type, Connection *cons[2],
            CryptoPP::AutoSeededRandomPool *rnd,
-           CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) : Protocol(party, cons, rnd, prgs) {
+           CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs) : Protocol(party, cons, rnd, prgs), data_type_(data_type) {
 }
 
 void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
     // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
 
-    BinaryData delta = BinaryData(data_size);
+    Data delta = Data(this->data_type_, data_size);
     delta.Random(this->rnd_);
 
     uint64_t alpha = rand_uint64(&this->prgs_[P0]) % n;
     uint64_t beta = rand_uint64(&this->prgs_[P1]) % n;
 
-    BinaryData x = BinaryData(data_size);
-    BinaryData y = BinaryData(data_size);
-    BinaryData xx = BinaryData(data_size);
-    BinaryData yy = BinaryData(data_size);
+    Data x = Data(this->data_type_, data_size);
+    Data y = Data(this->data_type_, data_size);
+    Data xx = Data(this->data_type_, data_size);
+    Data yy = Data(this->data_type_, data_size);
     for (uint64_t i = 0; i < n; i++) {
         x.Random(&this->prgs_[P0]);
         y.Random(&this->prgs_[P1]);
@@ -36,20 +36,20 @@ void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     this->conn_[P1]->WriteData(xx, count_band);
 }
 
-BinaryData *SSOT::P0(const uint64_t b0, std::vector<BinaryData> &u, bool count_band) {
+Data *SSOT::P0(const uint64_t b0, std::vector<Data> &u, bool count_band) {
     const uint P2 = 0, P1 = 1;
     // fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
     // Receive x0, x1, y, alpha from P2
 
     uint64_t n = u.size();
     uint data_size = u[0].Size();
-    BinaryData y = this->conn_[P2]->ReadData(data_size);
+    Data y = this->conn_[P2]->ReadData(this->data_type_, data_size);
 
     uint64_t alpha = rand_uint64(&this->prgs_[P2]) % n;
 
-    BinaryData *x = new BinaryData[n];
+    Data *x = new Data[n];
     for (uint64_t i = 0; i < n; i++) {
-        x[i] = BinaryData(data_size);
+        x[i] = Data(this->data_type_, data_size);
         x[i].Random(&this->prgs_[P2]);
     }
 
@@ -61,18 +61,18 @@ BinaryData *SSOT::P0(const uint64_t b0, std::vector<BinaryData> &u, bool count_b
     uint64_t t = this->conn_[P1]->ReadLong();
 
     // Send u0' and u1' to P1
-    std::vector<BinaryData> uu;
+    std::vector<Data> uu;
     for (uint64_t i = 0; i < n; i++) {
         uu.emplace_back(u[b0 ^ i] + x[t ^ i]);
     }
     this->conn_[P1]->WriteData(uu, count_band);
 
     // Receive v0' and v1' from P1
-    std::vector<BinaryData> vv = this->conn_[P1]->ReadData(n, data_size);
-    return new BinaryData(vv[b0] + y);
+    std::vector<Data> vv = this->conn_[P1]->ReadData(this->data_type_, n, data_size);
+    return new Data(vv[b0] + y);
 }
 
-BinaryData *SSOT::P1(const uint64_t b1, std::vector<BinaryData> &v, bool count_band) {
+Data *SSOT::P1(const uint64_t b1, std::vector<Data> &v, bool count_band) {
     const uint P0 = 0, P2 = 1;
     // fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
     // print_bytes(v01[0], data_size, "v01", 0);
@@ -81,13 +81,13 @@ BinaryData *SSOT::P1(const uint64_t b1, std::vector<BinaryData> &v, bool count_b
 
     uint64_t n = v.size();
     uint data_size = v[0].Size();
-    BinaryData x = this->conn_[P2]->ReadData(data_size);
+    Data x = this->conn_[P2]->ReadData(this->data_type_, data_size);
 
     uint64_t beta = rand_uint64(&this->prgs_[P2]) % n;
 
-    BinaryData *y = new BinaryData[n];
+    Data *y = new Data[n];
     for (uint64_t i = 0; i < n; i++) {
-        y[i] = BinaryData(data_size);
+        y[i] = Data(this->data_type_, data_size);
         y[i].Random(&this->prgs_[P2]);
     }
 
@@ -99,15 +99,15 @@ BinaryData *SSOT::P1(const uint64_t b1, std::vector<BinaryData> &v, bool count_b
     uint64_t s = this->conn_[P0]->ReadLong();
 
     // Send v0' and v1' to P0
-    std::vector<BinaryData> vv;
+    std::vector<Data> vv;
     for (uint64_t i = 0; i < n; i++) {
         vv.emplace_back(v[b1 ^ i] + y[s ^ i]);
     }
     this->conn_[P0]->WriteData(vv, count_band);
 
     // Receive u0' and u1' from P0
-    std::vector<BinaryData> uu = this->conn_[P0]->ReadData(n, data_size);
-    return new BinaryData(uu[b1] + x);
+    std::vector<Data> uu = this->conn_[P0]->ReadData(this->data_type_, n, data_size);
+    return new Data(uu[b1] + x);
 }
 
 void SSOT::Test(uint iterations) {

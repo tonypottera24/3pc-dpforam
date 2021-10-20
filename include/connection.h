@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "binary_data.h"
+#include "data.h"
 #include "typedef.h"
 
 class Connection {
@@ -24,10 +24,10 @@ public:
     virtual void Close() = 0;
     void WriteLong(uint64_t n, bool count_band = true);
     uint64_t ReadLong();
-    void WriteData(BinaryData &data, bool count_band = true);
-    BinaryData &ReadData(const uint size);
-    void WriteData(std::vector<BinaryData> &data, bool count_band = true);
-    std::vector<BinaryData> &ReadData(const uint size, const uint data_size);
+    void WriteData(Data &data, bool count_band = true);
+    Data &ReadData(const DataType data_type, const uint size);
+    void WriteData(std::vector<Data> &data, bool count_band = true);
+    std::vector<Data> &ReadData(const DataType data_type, const uint size, const uint data_size);
 };
 
 #endif /* CONNECTION_H_ */
