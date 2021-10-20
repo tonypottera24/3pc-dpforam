@@ -29,6 +29,7 @@ uint64_t bit_length(uint64_t n);
 uint64_t byte_length(uint64_t n);
 uint64_t uint64_log2(const uint64_t n);
 uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q);
+uint64_t uint64_pow2_ceil(const uint64_t n);
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 

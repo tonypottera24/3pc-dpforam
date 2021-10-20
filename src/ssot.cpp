@@ -10,7 +10,7 @@ void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
 
     BinaryData delta = BinaryData(data_size);
-    delta.Random(*this->rnd_);
+    delta.Random(this->rnd_);
 
     uint64_t alpha = rand_uint64(&this->prgs_[P0]) % n;
     uint64_t beta = rand_uint64(&this->prgs_[P1]) % n;
@@ -20,8 +20,8 @@ void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
     BinaryData xx = BinaryData(data_size);
     BinaryData yy = BinaryData(data_size);
     for (uint64_t i = 0; i < n; i++) {
-        x.Random(this->prgs_[P0]);
-        y.Random(this->prgs_[P1]);
+        x.Random(&this->prgs_[P0]);
+        y.Random(&this->prgs_[P1]);
         if (i == beta) {
             xx = x + delta;
         }
@@ -50,7 +50,7 @@ BinaryData *SSOT::P0(const uint64_t b0, std::vector<BinaryData> &u, bool count_b
     BinaryData *x = new BinaryData[n];
     for (uint64_t i = 0; i < n; i++) {
         x[i] = BinaryData(data_size);
-        x[i].Random(this->prgs_[P2]);
+        x[i].Random(&this->prgs_[P2]);
     }
 
     // Send s to P1
@@ -88,7 +88,7 @@ BinaryData *SSOT::P1(const uint64_t b1, std::vector<BinaryData> &v, bool count_b
     BinaryData *y = new BinaryData[n];
     for (uint64_t i = 0; i < n; i++) {
         y[i] = BinaryData(data_size);
-        y[i].Random(this->prgs_[P2]);
+        y[i].Random(&this->prgs_[P2]);
     }
 
     // Send t to P0

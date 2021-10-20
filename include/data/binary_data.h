@@ -1,6 +1,7 @@
 #ifndef BINARY_DATA_H_
 #define BINARY_DATA_H_
 
+#include "data.h"
 #include "typedef.h"
 #include "util.h"
 
@@ -17,7 +18,7 @@ public:
     ~BinaryData();
 
     BinaryData &operator=(const BinaryData &other);
-    BinaryData &operator=(BinaryData &&other) noexcept;
+    // BinaryData &operator=(BinaryData &&other) noexcept;
     BinaryData &operator+=(const BinaryData &rhs);
     BinaryData &operator-=(const BinaryData &rhs);
     friend BinaryData operator+(BinaryData lhs, const BinaryData &rhs) {
@@ -35,8 +36,8 @@ public:
     uchar *Dump();
     void Load(uchar *data);
     void Reset();
-    void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
-    void Random(CryptoPP::AutoSeededRandomPool &prg);
+    void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg);
+    void Random(CryptoPP::AutoSeededRandomPool *prg);
     void Print(const char *title = "");
 };
 

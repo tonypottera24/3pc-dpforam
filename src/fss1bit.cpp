@@ -75,9 +75,14 @@ void FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg, uint
     dpf_out[index_byte] ^= 1 << index_bit;
 }
 
-bool FSS1Bit::PseudoEval(uint64_t index, uchar *dpf_out) {
-    uint64_t index_byte = index / 8ULL;
-    uint64_t index_bit = index % 8ULL;
-    // fprintf(stderr, "PIR i = %u, j = %llu, jj = %llu, jj_byte = %llu, jj_bit = %llu, dpf = %u\n", i, j, jj, jj_byte, jj_bit, dpf_out[i][jj_byte] ^ (1 << jj_bit));
-    return (dpf_out[index_byte] >> index_bit) & 1;
+void FSS1Bit::PseudoEvalAll(uchar *dpf_out, const uint64_t n, bool *dpf_out_evaluated) {
+    uint64_t index_byte = 0, index_bit = 0;
+    for (uint64_t i = 0; i < n; i++) {
+        dpf_out_evaluated[i] = (dpf_out[index_byte] >> index_bit) & 1;
+        index_bit++;
+        if (index_bit == 8ULL) {
+            index_byte++;
+            index_bit = 0;
+        }
+    }
 }

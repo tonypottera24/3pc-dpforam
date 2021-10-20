@@ -45,17 +45,17 @@ BinaryData &BinaryData::operator=(const BinaryData &other) {
     return *this;
 }
 
-BinaryData &BinaryData::operator=(BinaryData &&other) noexcept {
-    // move operation
-    if (this == &other) {
-        return *this;
-    }
+// BinaryData &BinaryData::operator=(BinaryData &&other) noexcept {
+//     // move operation
+//     if (this == &other) {
+//         return *this;
+//     }
 
-    delete[] this->data_;
-    this->data_ = std::exchange(other.data_, nullptr);
-    this->size_ = std::exchange(other.size_, 0);
-    return *this;
-}
+//     delete[] this->data_;
+//     this->data_ = std::exchange(other.data_, nullptr);
+//     this->size_ = std::exchange(other.size_, 0);
+//     return *this;
+// }
 
 BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
     assert(this->size_ == rhs.size_);
@@ -89,20 +89,20 @@ void BinaryData::Reset() {
     memset(this->data_, 0, this->size_);
 }
 
-void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {
-    prg.GenerateBlock(this->data_, this->size_);
+void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg) {
+    prg->GenerateBlock(this->data_, this->size_);
 }
-void BinaryData::Random(CryptoPP::AutoSeededRandomPool &prg) {
-    prg.GenerateBlock(this->data_, this->size_);
+void BinaryData::Random(CryptoPP::AutoSeededRandomPool *prg) {
+    prg->GenerateBlock(this->data_, this->size_);
 }
 
 void BinaryData::Print(const char *title) {
     if (strlen(title) > 0) {
-        fprintf(stderr, "%s ", title);
+        debug_print("%s ", title);
     }
-    fprintf(stderr, "0x");
+    debug_print("0x");
     for (uint i = 0; i < this->size_; i++) {
-        fprintf(stderr, "%02X", this->data_[i]);
+        debug_print("%02X", this->data_[i]);
     }
-    fprintf(stderr, "\n");
+    debug_print("\n");
 }

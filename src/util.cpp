@@ -38,6 +38,7 @@ void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint64_t len, uch
 }
 
 void uint64_to_bytes(uint64_t value, uchar *bytes, uint len) {
+    // TODO check small endiens / large endiens... if small, some bytes may be truncated
     memcpy(bytes, &value, len);
 }
 
@@ -94,6 +95,15 @@ uint64_t uint64_log2(const uint64_t n) {
 
 uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q) {
     return (n + q - 1ULL) / q;
+}
+
+uint64_t uint64_pow2_ceil(const uint64_t n) {
+    uint64_t log_n = uint64_log2(n);
+    uint64_t clean_n = 1ULL << log_n;
+    if (clean_n < n) {
+        clean_n <<= 1ULL;
+    }
+    return clean_n;
 }
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {

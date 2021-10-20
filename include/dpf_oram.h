@@ -43,13 +43,13 @@ private:
     void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band = true);
 
     BinaryData &PIR(std::vector<BinaryData> array[2], const uint64_t index[2], bool count_band = true);
-    BinaryData &DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t index_23[2], bool count_band = true);
-    BinaryData &PSEUDO_DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t index_23[2], bool count_band = true);
+    BinaryData &DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], bool count_band = true);
+    BinaryData &PSEUDO_DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], bool count_band = true);
     BinaryData &SSOT_PIR(std::vector<BinaryData> &array_13, const uint64_t index_23[2], bool count_band = true);
 
     void PIW(std::vector<BinaryData> &array, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band = true);
-    void DPF_PIW(std::vector<BinaryData> &array, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band = true);
-    void PSEUDO_DPF_PIW(std::vector<BinaryData> &array, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band = true);
+    void DPF_PIW(std::vector<BinaryData> &array, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band = true);
+    void PSEUDO_DPF_PIW(std::vector<BinaryData> &array, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band = true);
 
     BinaryData *DPF_Read(const uint64_t index_23[2], bool read_only = false);
     BinaryData *SSOT_Read(const uint64_t index_23[2], bool read_only = false);

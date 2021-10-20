@@ -27,11 +27,11 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint64_t>()->default_value(2ULL), "number of data (log)")(
+        "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (log)")(
         "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
         "log_ssot_threshold", po::value<uint64_t>()->default_value(10ULL), "ssot threshold (log)")(
-        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(0ULL), "pseudo dpf threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(10ULL), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -96,7 +96,6 @@ int main(int argc, char *argv[]) {
     start_server_thread.join();
     // fprintf(stderr, "Initilizing server %s:%u done.\n", ip.c_str(), port);
 
-    // fprintf(stderr, "Initilizing PRG...\n");
     CryptoPP::AutoSeededRandomPool rnd;
     CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prgs[2];
     uchar bytes[96];
@@ -111,12 +110,10 @@ int main(int argc, char *argv[]) {
     prgs[1].SetKeyWithIV(bytes + offset[party], 16, bytes + offset[party] + 16);
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
-    // fprintf(stderr, "Initilizing DPFORAM...\n");
     Protocol *dpf_oram = NULL;
     uint64_t start_time = timestamp();
     dpf_oram = new DPFORAM(party, conn, &rnd, prgs, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
-    // fprintf(stderr, "Initilizing DPFORAM done.\n");
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
     if (dpf_oram != NULL) {
@@ -124,10 +121,8 @@ int main(int argc, char *argv[]) {
         delete dpf_oram;
     }
 
-    fprintf(stderr, "Closing connections... \n");
     conn[0]->Close();
     conn[1]->Close();
-    fprintf(stderr, "Closing connections done.\n");
 
     return 0;
 }

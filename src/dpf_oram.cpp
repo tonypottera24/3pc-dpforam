@@ -6,7 +6,9 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
                  CryptoPP::AutoSeededRandomPool *rnd,
                  CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
                  uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold) : Protocol(party, connections, rnd, prgs) {
-    // fprintf(stderr, "DPFORAM n = %llu, data_size = %u, tau = %u\n", n, data_size, tau);
+    // debug_print("DPFORAM n = %llu, data_size = %u, tau = %u\n", n, data_size, tau);
+    this->rnd_ = rnd;
+    this->prgs_ = prgs;
     this->tau_ = tau;
     this->ssot_threshold_ = ssot_threshold;
     this->pseudo_dpf_threshold_ = pseudo_dpf_threshold;
@@ -61,15 +63,15 @@ void DPFORAM::ResetArray(std::vector<BinaryData> &array) {
 
 void DPFORAM::PrintArray(std::vector<BinaryData> &array, const char *array_name, const int64_t array_index) {
     if (array_index == -1) {
-        fprintf(stderr, "%s:\n", array_name);
+        debug_print("%s:\n", array_name);
     } else {
-        fprintf(stderr, "%s[%llu]:\n", array_name, array_index);
+        debug_print("%s[%llu]:\n", array_name, array_index);
     }
     for (uint64_t i = 0; i < array.size(); i++) {
-        fprintf(stderr, "[%llu] ", i);
+        debug_print("[%llu] ", i);
         array[i].Print();
     }
-    fprintf(stderr, "\n");
+    debug_print("\n");
 }
 
 uint64_t DPFORAM::Size() {
@@ -81,26 +83,24 @@ uint DPFORAM::DataSize() {
 }
 
 BinaryData &DPFORAM::PIR(std::vector<BinaryData> array_23[2], const uint64_t index_23[2], bool count_band) {
-    uint64_t n = array_23[0].size();
-    fprintf(stderr, "[%llu]PIR, n = %llu\n", this->Size(), n);
+    uint64_t n = uint64_pow2_ceil(array_23[0].size());
+    uint64_t log_n = uint64_log2(n);
+    uint64_t clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
+    debug_print("[%llu]PIR, n = %llu\n", this->Size(), n);
     if (n == 1) {
         BinaryData *v_out_13 = new BinaryData();
-        *v_out_13 = array_23[0][0] - array_23[1][0];
+        *v_out_13 = array_23[0][0];
         return *v_out_13;
     } else if (n <= this->pseudo_dpf_threshold_) {
-        return PSEUDO_DPF_PIR(array_23, index_23, count_band);
+        return PSEUDO_DPF_PIR(array_23, n, log_n, clean_index_23, count_band);
     } else {
-        return DPF_PIR(array_23, index_23, count_band);
+        return DPF_PIR(array_23, n, log_n, clean_index_23, count_band);
     }
 }
 
-BinaryData &DPFORAM::DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t index_23[2], bool count_band) {
-    uint64_t log_n = uint64_log2(array_23[0].size());
-    uint64_t n = 1ULL << log_n;
-    if (n < array_23[0].size()) {
-        n <<= 1ULL;
-    }
-    fprintf(stderr, "[%llu]DPF_PIR, n = %lu, log_n = %llu, new n = %llu\n", this->Size(), array_23[0].size(), log_n, n);
+BinaryData &DPFORAM::DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], bool count_band) {
+    debug_print("[%llu]DPF_PIR, n = %llu, log_n = %llu\n", this->Size(), n, log_n);
+    // only accept power of 2 n
 
     uchar *query_23[2];
     uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
@@ -118,6 +118,7 @@ BinaryData &DPFORAM::DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t
         uchar dpf_out[n];
         this->fss_.EvalAll(query_23[b], log_n, dpf_out);
         for (uint64_t i = 0; i < array_23[b].size(); i++) {
+            debug_print("[%llu]DPF_PIR, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
                 *v_out_13 += array_23[b][i];
             }
@@ -130,24 +131,27 @@ BinaryData &DPFORAM::DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t
     return *v_out_13;
 }
 
-BinaryData &DPFORAM::PSEUDO_DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t index_23[2], bool count_band) {
-    uint64_t n = array_23[0].size();
-    fprintf(stderr, "[%llu]PSEUDO_DPF_PIR, n = %llu, index_23 = (%llu, %llu)\n", this->Size(), n, index_23[0], index_23[1]);
-    uint64_t byte_length = uint64_ceil_divide(n, 8ULL);
+BinaryData &DPFORAM::PSEUDO_DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], bool count_band) {
+    debug_print("[%llu]PSEUDO_DPF_PIR, n = %llu, index_23 = (%llu, %llu)\n", this->Size(), n, index_23[0], index_23[1]);
+    // only accept power of 2 n
+
+    uint64_t data_length = uint64_ceil_divide(n, 8ULL);
     uchar *dpf_out[2];
     for (uint b = 0; b < 2; b++) {
-        dpf_out[b] = new uchar[byte_length];
+        dpf_out[b] = new uchar[data_length];
     }
-    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], byte_length, dpf_out[1]);
-    this->conn_[1]->Write(dpf_out[1], byte_length, count_band);
-    this->conn_[0]->Read(dpf_out[1], byte_length);
-    this->prgs_[1].GenerateBlock(dpf_out[0], byte_length);
+    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], data_length, dpf_out[1]);
+    this->conn_[1]->Write(dpf_out[1], data_length, count_band);
+    this->conn_[0]->Read(dpf_out[1], data_length);
+    this->prgs_[1].GenerateBlock(dpf_out[0], data_length);
 
     uint data_size = array_23[0][0].Size();
     BinaryData *v_out_13 = new BinaryData(data_size, true);
     for (uint b = 0; b < 2; b++) {
+        bool dpf_out_evaluated[n];
+        this->fss_.PseudoEvalAll(dpf_out[b], n, dpf_out_evaluated);
         for (uint64_t i = 0; i < array_23[b].size(); i++) {
-            if (this->fss_.PseudoEval(i ^ index_23[b], dpf_out[b])) {
+            if (dpf_out_evaluated[i ^ index_23[b]]) {
                 *v_out_13 += array_23[b][i];
             }
         }
@@ -162,7 +166,7 @@ BinaryData &DPFORAM::PSEUDO_DPF_PIR(std::vector<BinaryData> array_23[2], const u
 BinaryData &DPFORAM::SSOT_PIR(std::vector<BinaryData> &array_13, const uint64_t index_23[2], bool count_band) {
     // TODO n may not be power of 2
     uint64_t n = array_13.size();
-    fprintf(stderr, "[%llu]SSOT_PIR, n = %llu, index_23 = (%llu, %llu)\n", this->Size(), n, index_23[0], index_23[1]);
+    debug_print("[%llu]SSOT_PIR, n = %llu, index_23 = (%llu, %llu)\n", this->Size(), n, index_23[0], index_23[1]);
     uint data_size = array_13[0].Size();
     BinaryData *v_out_13;
     SSOT *ssot = new SSOT(this->party_, this->conn_, this->rnd_, this->prgs_);
@@ -175,7 +179,7 @@ BinaryData &DPFORAM::SSOT_PIR(std::vector<BinaryData> &array_13, const uint64_t 
         ssot->P2(n, data_size, count_band);
 
         v_out_13 = new BinaryData(data_size, true);
-        v_out_13->Random(this->prgs_[P0]);
+        v_out_13->Random(&this->prgs_[P0]);
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
 
@@ -186,7 +190,7 @@ BinaryData &DPFORAM::SSOT_PIR(std::vector<BinaryData> &array_13, const uint64_t 
         v_out_13 = ssot->P0(index_23[P1] ^ index_23[P2], u, count_band);
 
         BinaryData tmp = BinaryData(data_size);
-        tmp.Random(this->prgs_[P2]);
+        tmp.Random(&this->prgs_[P2]);
         *v_out_13 += tmp;
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;
@@ -198,25 +202,21 @@ BinaryData &DPFORAM::SSOT_PIR(std::vector<BinaryData> &array_13, const uint64_t 
 }
 
 void DPFORAM::PIW(std::vector<BinaryData> &array_13, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band) {
-    uint64_t n = array_13.size();
-    fprintf(stderr, "[%llu]PIW, index_23 = (%llu, %llu), n = %llu\n", this->Size(), index_23[0], index_23[1], n);
+    uint64_t n = uint64_pow2_ceil(array_13.size());
+    uint64_t log_n = uint64_log2(n);
+    uint64_t clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
+    debug_print("[%llu]PIW, index_23 = (%llu, %llu), n = %llu\n", this->Size(), index_23[0], index_23[1], n);
     if (n == 1) {
         array_13[0] += v_delta_23[0];
     } else if (n <= this->pseudo_dpf_threshold_) {
-        PSEUDO_DPF_PIW(array_13, index_23, v_delta_23, count_band);
+        PSEUDO_DPF_PIW(array_13, n, log_n, clean_index_23, v_delta_23, count_band);
     } else {
-        DPF_PIW(array_13, index_23, v_delta_23, count_band);
+        DPF_PIW(array_13, n, log_n, clean_index_23, v_delta_23, count_band);
     }
 }
 
-void DPFORAM::DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band) {
-    uint64_t log_n = uint64_log2(array_13.size());
-    uint64_t n = 1ULL << log_n;
-    if (n < array_13.size()) {
-        n <<= 1ULL;
-    }
-    fprintf(stderr, "[%llu]DPF_PIW, index_23 = (%llu, %llu), n = %lu, log_n = %llu, new n = %llu\n", this->Size(), index_23[0], index_23[1], array_13.size(), log_n, n);
-    // fprintf(stderr, "[%llu]PIW, log_n = %llu\n", this->n_, log_n);
+void DPFORAM::DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band) {
+    debug_print("[%llu]DPF_PIW, index_23 = (%llu, %llu), n = %lu, log_n = %llu, new n = %llu\n", this->Size(), index_23[0], index_23[1], array_13.size(), log_n, n);
 
     uchar *query_23[2];
     uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
@@ -231,7 +231,6 @@ void DPFORAM::DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t index_23
         uchar dpf_out[n];
         this->fss_.EvalAll(query_23[b], log_n, dpf_out);
         for (uint64_t i = 0; i < array_13.size(); i++) {
-            // fprintf(stderr, "PIW i = %u, j = %llu, jj = %llu, dpf = %u\n", i, j, j ^ index_23[i], dpf_out[j ^ index_23[i]]);
             if (dpf_out[i ^ index_23[b]]) {
                 array_13[i] += v_delta_23[b];
             }
@@ -243,24 +242,24 @@ void DPFORAM::DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t index_23
     }
 }
 
-void DPFORAM::PSEUDO_DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band) {
-    uint64_t n = array_13.size();
-    fprintf(stderr, "[%llu]PSEUDO_DPF_PIW, index_23 = (%llu, %llu), n = %llu\n", this->Size(), index_23[0], index_23[1], n);
-    uint64_t byte_length = uint64_ceil_divide(n, 8ULL);
+void DPFORAM::PSEUDO_DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band) {
+    debug_print("[%llu]PSEUDO_DPF_PIW, index_23 = (%llu, %llu), n = %llu\n", this->Size(), index_23[0], index_23[1], n);
+    uint64_t data_length = uint64_ceil_divide(n, 8ULL);
     uchar *dpf_out[2];
     for (uint b = 0; b < 2; b++) {
-        dpf_out[b] = new uchar[byte_length];
+        dpf_out[b] = new uchar[data_length];
     }
 
-    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], byte_length, dpf_out[1]);
-    this->conn_[1]->Write(dpf_out[1], byte_length, count_band);
-    this->conn_[0]->Read(dpf_out[1], byte_length);
-    this->prgs_[1].GenerateBlock(dpf_out[0], byte_length);
+    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], data_length, dpf_out[1]);
+    this->conn_[1]->Write(dpf_out[1], data_length, count_band);
+    this->conn_[0]->Read(dpf_out[1], data_length);
+    this->prgs_[1].GenerateBlock(dpf_out[0], data_length);
 
     for (uint b = 0; b < 2; b++) {
+        bool dpf_out_evaluated[n];
+        this->fss_.PseudoEvalAll(dpf_out[b], n, dpf_out_evaluated);
         for (uint64_t i = 0; i < array_13.size(); i++) {
-            // fprintf(stderr, "PIW i = %u, j = %llu, jj = %llu, dpf = %u\n", i, j, j ^ index_23[i], dpf_out[j ^ index_23[i]]);
-            if (this->fss_.PseudoEval(i ^ index_23[b], dpf_out[b])) {
+            if (dpf_out_evaluated[i ^ index_23[b]]) {
                 array_13[i] += v_delta_23[b];
             }
         }
@@ -273,7 +272,7 @@ void DPFORAM::PSEUDO_DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t i
 
 BinaryData *DPFORAM::GetLatestData(BinaryData &v_read_13,
                                    BinaryData &v_cache_13, const bool is_cached_23[2], bool count_band) {
-    fprintf(stderr, "[%llu]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
+    debug_print("[%llu]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = v_read_13.Size();
     BinaryData *v_out_23 = new BinaryData[2]{BinaryData(data_size), BinaryData(data_size)};
@@ -297,7 +296,7 @@ BinaryData *DPFORAM::GetLatestData(BinaryData &v_read_13,
         const uint64_t b0 = is_cached_23[P1] ^ is_cached_23[P2];
         v_out_23[P2] = *ssot->P0(b0, u, count_band);
 
-        v_out_23[P1].Random(this->prgs_[P1]);
+        v_out_23[P1].Random(&this->prgs_[P1]);
 
         v_out_23[P2] += v_out_23[P1];
         this->conn_[P2]->WriteData(v_out_23[P2], count_band);
@@ -307,7 +306,7 @@ BinaryData *DPFORAM::GetLatestData(BinaryData &v_read_13,
         const uint64_t b1 = is_cached_23[P2];
         v_out_23[P2] = *ssot->P1(b1, v, count_band);
 
-        v_out_23[P0].Random(this->prgs_[P0]);
+        v_out_23[P0].Random(&this->prgs_[P0]);
         this->conn_[P2]->WriteData(v_out_23[P2], count_band);
     }
     delete ssot;
@@ -315,14 +314,14 @@ BinaryData *DPFORAM::GetLatestData(BinaryData &v_read_13,
 }
 
 BinaryData *DPFORAM::ShareTwoThird(BinaryData &v_in_13, bool count_band) {
-    fprintf(stderr, "[%llu]ShareTwoThird\n", this->Size());
+    debug_print("[%llu]ShareTwoThird\n", this->Size());
     this->conn_[1]->WriteData(v_in_13, count_band);
     BinaryData v_out = this->conn_[0]->ReadData(v_in_13.Size());
     return new BinaryData[2]{v_out, v_in_13};
 }
 
 void DPFORAM::ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band) {
-    fprintf(stderr, "[%llu]ShareIndexTwoThird, n = %llu, index_13 = %llu\n", this->Size(), n, index_13);
+    debug_print("[%llu]ShareIndexTwoThird, n = %llu, index_13 = %llu\n", this->Size(), n, index_13);
     uint64_t rand_range = n;
     this->conn_[1]->WriteLong(index_13, count_band);
     index_23[0] = this->conn_[0]->ReadLong() % rand_range;
@@ -330,12 +329,12 @@ void DPFORAM::ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint
 }
 
 void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached_23[2], bool read_only) {
-    fprintf(stderr, "[%llu]ReadPositionMap, index_23 = (%llu, %llu), read_only = %d\n", this->Size(), index_23[0], index_23[1], read_only);
-
     uint64_t n = this->Size();
-    uint64_t data_size = byte_length((n << 1ULL) + 1ULL);
+    uint64_t data_size = byte_length(n << 1ULL);
     uint64_t data_per_block = 1ULL << this->tau_;
-    // fprintf(stderr, "[%llu]ReadPositionMap, data_size = %llu, data_per_block = %llu\n", this->n_, data_size, data_per_block);
+    debug_print("[%llu]ReadPositionMap, n = %llu, index_23 = (%llu, %llu), data_size = %llu, data_per_block = %llu, read_only = %d\n", this->Size(), n, index_23[0], index_23[1], data_size, data_per_block, read_only);
+
+    // this->position_map_->PrintMetadata();
 
     uint64_t block_index_23[2];
     uint64_t data_index_23[2];
@@ -356,6 +355,7 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         }
     }
     BinaryData old_data_13 = PIR(old_data_array_23, data_index_23, !read_only);
+    old_data_13.Print("old_data_13");
     BinaryData *old_data_23 = this->ShareTwoThird(old_data_13, !read_only);
 
     for (uint b = 0; b < 2; b++) {
@@ -373,13 +373,21 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         for (uint i = 0; i < data_per_block; i++) {
             data_array_13.emplace_back(&new_block_data[i * data_size], data_size);
         }
+        uchar new_cache_index_bytes[data_size];
         uint64_t new_cache_index = (this->cache_array_23_[0].size() << 1) + 1ULL;
-        BinaryData new_data_13 = BinaryData((uchar *)&new_cache_index, data_size);
+        debug_print("new_cache_index = %llu\n", new_cache_index);
+        uint64_to_bytes(new_cache_index, new_cache_index_bytes, data_size);
+        BinaryData new_data_13 = BinaryData(new_cache_index_bytes, data_size);
+        new_data_13.Print("new_data_13");
 
         for (uint b = 0; b < 2; b++) {
             old_data_23[b] += new_data_13;
         }
         PIW(data_array_13, data_index_23, old_data_23, !read_only);
+        for (uint i = 0; i < data_per_block; i++) {
+            memcpy(&new_block_data[i * data_size], data_array_13[i].Dump(), data_size);
+        }
+        new_block_13.Load(new_block_data);
 
         BinaryData *new_block_23 = this->ShareTwoThird(new_block_13, !read_only);
         this->position_map_->Write(block_index_23, old_block_23, new_block_23, !read_only);
@@ -387,10 +395,11 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         delete[] new_block_23;
     }
     delete[] old_data_23;
+    // this->position_map_->PrintMetadata();
 }
 
 BinaryData *DPFORAM::Read(const uint64_t index_23[2], bool read_only) {
-    fprintf(stderr, "[%llu]Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%llu]Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
     uint64_t n = this->Size();
     if (n == 1) {
         return this->ShareTwoThird(this->write_array_13_[0], !read_only);
@@ -402,7 +411,7 @@ BinaryData *DPFORAM::Read(const uint64_t index_23[2], bool read_only) {
 }
 
 BinaryData *DPFORAM::DPF_Read(const uint64_t index_23[2], bool read_only) {
-    fprintf(stderr, "[%llu]DPF_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%llu]DPF_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
 
     BinaryData v_read_13 = PIR(this->read_array_23_, index_23, !read_only);
     v_read_13.Print("v_read_13");
@@ -412,7 +421,7 @@ BinaryData *DPFORAM::DPF_Read(const uint64_t index_23[2], bool read_only) {
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
     }
-    fprintf(stderr, "cache_index_23 = (%llu, %llu), is_cached_23 = (%u,%u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
+    debug_print("cache_index_23 = (%llu, %llu), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
         return this->ShareTwoThird(v_read_13, !read_only);
@@ -423,13 +432,13 @@ BinaryData *DPFORAM::DPF_Read(const uint64_t index_23[2], bool read_only) {
 }
 
 BinaryData *DPFORAM::SSOT_Read(const uint64_t index_23[2], bool read_only) {
-    fprintf(stderr, "[%llu]SSOT_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%llu]SSOT_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
     BinaryData v_read_13 = SSOT_PIR(this->write_array_13_, index_23, !read_only);
     return this->ShareTwoThird(v_read_13, !read_only);
 }
 
 void DPFORAM::Write(const uint64_t index_23[2], BinaryData old_data_23[2], BinaryData new_data_23[2], bool count_band) {
-    fprintf(stderr, "[%llu]Write, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%llu]Write, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
     uint64_t n = this->write_array_13_.size();
     if (n == 1) {
         this->write_array_13_[0] = new_data_23[0];
@@ -439,7 +448,7 @@ void DPFORAM::Write(const uint64_t index_23[2], BinaryData old_data_23[2], Binar
 }
 
 void DPFORAM::DPF_Write(const uint64_t index_23[2], BinaryData old_data_23[2], BinaryData new_data_23[2], bool count_band) {
-    fprintf(stderr, "[%llu]DPF_Write, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%llu]DPF_Write, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
 
     BinaryData delta_data_23[2];
     for (uint b = 0; b < 2; b++) {
@@ -451,12 +460,12 @@ void DPFORAM::DPF_Write(const uint64_t index_23[2], BinaryData old_data_23[2], B
 }
 
 void DPFORAM::AppendCache(BinaryData v_new_23[2], bool count_band) {
-    fprintf(stderr, "[%llu]AppendCache\n", this->Size());
+    debug_print("[%llu]AppendCache\n", this->Size());
     for (uint b = 0; b < 2; b++) {
         this->cache_array_23_[b].push_back(v_new_23[b]);
     }
     if (this->cache_array_23_[0].size() == this->read_array_23_[0].size()) {
-        this->Flush();
+        this->Flush(count_band);
         if (this->position_map_ != NULL) {
             this->position_map_->Reset();
         }
@@ -464,23 +473,26 @@ void DPFORAM::AppendCache(BinaryData v_new_23[2], bool count_band) {
 }
 
 void DPFORAM::Flush(bool count_band) {
-    fprintf(stderr, "[%llu]Flush\n", this->Size());
+    debug_print("[%llu]Flush\n", this->Size());
     for (uint64_t i = 0; i < this->write_array_13_.size(); i++) {
         BinaryData *array_23 = this->ShareTwoThird(this->write_array_13_[i], count_band);
         for (uint b = 0; b < 2; b++) {
             this->read_array_23_[b][i] = array_23[b];
         }
     }
+    for (uint b = 0; b < 2; b++) {
+        this->cache_array_23_[b].clear();
+    }
 }
 
 void DPFORAM::PrintMetadata() {
-    fprintf(stderr, "========== PrintMetadata ==========\n");
-    fprintf(stderr, "party_: %u\n", this->party_);
-    fprintf(stderr, "tau_: %llu\n", this->tau_);
-    fprintf(stderr, "n: %lu\n", this->write_array_13_.size());
-    fprintf(stderr, "data_size: %u\n", this->DataSize());
-    fprintf(stderr, "cache_size: %lu\n", this->cache_array_23_[0].size());
-    fprintf(stderr, "position_map_: %d\n", (this->position_map_ != NULL));
+    debug_print("========== PrintMetadata ==========\n");
+    debug_print("party_: %u\n", this->party_);
+    debug_print("tau_: %llu\n", this->tau_);
+    debug_print("n: %lu\n", this->write_array_13_.size());
+    debug_print("data_size: %u\n", this->DataSize());
+    debug_print("cache_size: %lu\n", this->cache_array_23_[0].size());
+    debug_print("position_map_: %d\n", (this->position_map_ != NULL));
 
     this->PrintArray(this->read_array_23_[0], "read_array_23", 0);
     this->PrintArray(this->read_array_23_[1], "read_array_23", 1);
@@ -488,7 +500,7 @@ void DPFORAM::PrintMetadata() {
     this->PrintArray(this->cache_array_23_[0], "cache_23", 0);
     this->PrintArray(this->cache_array_23_[1], "cache_23", 1);
 
-    fprintf(stderr, "========== PrintMetadata ==========\n");
+    debug_print("========== PrintMetadata ==========\n");
 }
 
 void DPFORAM::Test(uint iterations) {
@@ -498,29 +510,30 @@ void DPFORAM::Test(uint iterations) {
     uint64_t time;
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
-        fprintf(stderr, "Test, iteration = %u\n", iteration);
+        debug_print("Test, iteration = %u\n", iteration);
         uint64_t n = this->write_array_13_.size();
         uint64_t rand_range = n - 1;
         uint64_t index_13 = rand_uint64() % rand_range;
         uint64_t index_23[2];
         this->ShareIndexTwoThird(index_13, n, index_23, false);
-        // fprintf(stderr, "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
+        // debug_print( "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
 
-        this->PrintMetadata();
+        // this->PrintMetadata();
 
-        fprintf(stderr, "\nTest, ========== Read old data ==========\n");
+        debug_print("\nTest, ========== Read old data ==========\n");
         time = timestamp();
         BinaryData *old_data_23 = this->Read(index_23);
         party_time += timestamp() - time;
 
         old_data_23[0].Print("old_data_23[0]");
         old_data_23[1].Print("old_data_23[1]");
+
         this->PrintMetadata();
 
-        fprintf(stderr, "\nTest, ========== Write random data ==========\n");
+        debug_print("\nTest, ========== Write random data ==========\n");
         BinaryData new_data_23[2] = {BinaryData(this->DataSize()), BinaryData(this->DataSize())};
         for (uint b = 0; b < 2; b++) {
-            new_data_23[b].Random(this->prgs_[b]);
+            new_data_23[b].Random(&this->prgs_[b]);
         }
         new_data_23[0].Print("new_data_23[0]");
         new_data_23[1].Print("new_data_23[1]");
@@ -531,7 +544,7 @@ void DPFORAM::Test(uint iterations) {
 
         this->PrintMetadata();
 
-        fprintf(stderr, "\nTest, ========== Read validation data ==========\n");
+        debug_print("\nTest, ========== Read validation data ==========\n");
         BinaryData *verify_data_23 = this->Read(index_23, true);
 
         verify_data_23[0].Print("verify_data_23[0]");
@@ -550,7 +563,7 @@ void DPFORAM::Test(uint iterations) {
         new_data.Print("new_data");
 
         if (verify_data == new_data) {
-            // fprintf(stderr, "%u, Pass\n", iteration);
+            debug_print("%u, Pass\n", iteration);
         } else {
             fprintf(stderr, "%u, Fail !!!\n", iteration);
             exit(1);
