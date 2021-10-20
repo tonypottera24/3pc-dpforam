@@ -37,7 +37,7 @@ public:
     void Reset();
     void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
     void Random(CryptoPP::AutoSeededRandomPool &prg);
-    void Print();
+    void Print(const char *title = "");
 };
 
 #endif /* BINARY_DATA_H_ */

@@ -15,7 +15,7 @@ DPFORAM::DPFORAM(const uint party, Connection *connections[2],
 
     if (n > 1ULL) {
         for (uint b = 0; b < 2; b++) {
-            this->InitArray(this->read_array_23_[b], n, data_size);
+            this->InitArray(this->read_array_23_[b], n, data_size, true);
         }
 
         uint64_t pos_data_per_block = 1 << this->tau_;
@@ -61,13 +61,15 @@ void DPFORAM::ResetArray(std::vector<BinaryData> &array) {
 
 void DPFORAM::PrintArray(std::vector<BinaryData> &array, const char *array_name, const int64_t array_index) {
     if (array_index == -1) {
-        printf("%s: ", array_name);
+        fprintf(stderr, "%s:\n", array_name);
     } else {
-        printf("%s[%llu]: ", array_name, array_index);
+        fprintf(stderr, "%s[%llu]:\n", array_name, array_index);
     }
     for (uint64_t i = 0; i < array.size(); i++) {
+        fprintf(stderr, "[%llu] ", i);
         array[i].Print();
     }
+    fprintf(stderr, "\n");
 }
 
 uint64_t DPFORAM::Size() {
@@ -93,10 +95,12 @@ BinaryData &DPFORAM::PIR(std::vector<BinaryData> array_23[2], const uint64_t ind
 }
 
 BinaryData &DPFORAM::DPF_PIR(std::vector<BinaryData> array_23[2], const uint64_t index_23[2], bool count_band) {
-    uint64_t n = array_23[0].size();
-    fprintf(stderr, "[%llu]DPF_PIR, n = %llu\n", this->Size(), n);
-    uint64_t log_n = uint64_log2(n);
-    n = 1ULL << (log_n + 1ULL);
+    uint64_t log_n = uint64_log2(array_23[0].size());
+    uint64_t n = 1ULL << log_n;
+    if (n < array_23[0].size()) {
+        n <<= 1ULL;
+    }
+    fprintf(stderr, "[%llu]DPF_PIR, n = %lu, log_n = %llu, new n = %llu\n", this->Size(), array_23[0].size(), log_n, n);
 
     uchar *query_23[2];
     uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
@@ -206,10 +210,12 @@ void DPFORAM::PIW(std::vector<BinaryData> &array_13, const uint64_t index_23[2],
 }
 
 void DPFORAM::DPF_PIW(std::vector<BinaryData> &array_13, const uint64_t index_23[2], BinaryData v_delta_23[2], bool count_band) {
-    uint64_t n = array_13.size();
-    fprintf(stderr, "[%llu]DPF_PIW, index_23 = (%llu, %llu), n = %llu\n", this->Size(), index_23[0], index_23[1], n);
-    uint64_t log_n = uint64_log2(n);
-    n = 1ULL << (log_n + 1ULL);
+    uint64_t log_n = uint64_log2(array_13.size());
+    uint64_t n = 1ULL << log_n;
+    if (n < array_13.size()) {
+        n <<= 1ULL;
+    }
+    fprintf(stderr, "[%llu]DPF_PIW, index_23 = (%llu, %llu), n = %lu, log_n = %llu, new n = %llu\n", this->Size(), index_23[0], index_23[1], array_13.size(), log_n, n);
     // fprintf(stderr, "[%llu]PIW, log_n = %llu\n", this->n_, log_n);
 
     uchar *query_23[2];
@@ -399,17 +405,20 @@ BinaryData *DPFORAM::DPF_Read(const uint64_t index_23[2], bool read_only) {
     fprintf(stderr, "[%llu]DPF_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
 
     BinaryData v_read_13 = PIR(this->read_array_23_, index_23, !read_only);
+    v_read_13.Print("v_read_13");
 
     uint64_t cache_index_23[2];
     bool is_cached_23[2];
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
     }
+    fprintf(stderr, "cache_index_23 = (%llu, %llu), is_cached_23 = (%u,%u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
         return this->ShareTwoThird(v_read_13, !read_only);
     }
     BinaryData v_cache_13 = PIR(this->cache_array_23_, cache_index_23, !read_only);
+    v_cache_13.Print("v_cache_13");
     return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
 }
 
@@ -473,11 +482,11 @@ void DPFORAM::PrintMetadata() {
     fprintf(stderr, "cache_size: %lu\n", this->cache_array_23_[0].size());
     fprintf(stderr, "position_map_: %d\n", (this->position_map_ != NULL));
 
-    // this->PrintArray(this->read_array_23_[0], "read_array_23", 0);
-    // this->PrintArray(this->read_array_23_[1], "read_array_23", 1);
-    // this->PrintArray(this->cache_array_23_[0], "cache_23", 0);
-    // this->PrintArray(this->cache_array_23_[1], "cache_23", 1);
-    // this->PrintArray(this->write_array_13_, "write_array");
+    this->PrintArray(this->read_array_23_[0], "read_array_23", 0);
+    this->PrintArray(this->read_array_23_[1], "read_array_23", 1);
+    this->PrintArray(this->write_array_13_, "write_array");
+    this->PrintArray(this->cache_array_23_[0], "cache_23", 0);
+    this->PrintArray(this->cache_array_23_[1], "cache_23", 1);
 
     fprintf(stderr, "========== PrintMetadata ==========\n");
 }
@@ -497,30 +506,48 @@ void DPFORAM::Test(uint iterations) {
         this->ShareIndexTwoThird(index_13, n, index_23, false);
         // fprintf(stderr, "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
 
+        this->PrintMetadata();
+
         fprintf(stderr, "\nTest, ========== Read old data ==========\n");
         time = timestamp();
         BinaryData *old_data_23 = this->Read(index_23);
         party_time += timestamp() - time;
+
+        old_data_23[0].Print("old_data_23[0]");
+        old_data_23[1].Print("old_data_23[1]");
+        this->PrintMetadata();
 
         fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         BinaryData new_data_23[2] = {BinaryData(this->DataSize()), BinaryData(this->DataSize())};
         for (uint b = 0; b < 2; b++) {
             new_data_23[b].Random(this->prgs_[b]);
         }
+        new_data_23[0].Print("new_data_23[0]");
+        new_data_23[1].Print("new_data_23[1]");
+
         time = timestamp();
         this->Write(index_23, old_data_23, new_data_23);
         party_time += timestamp() - time;
 
+        this->PrintMetadata();
+
         fprintf(stderr, "\nTest, ========== Read validation data ==========\n");
         BinaryData *verify_data_23 = this->Read(index_23, true);
+
+        verify_data_23[0].Print("verify_data_23[0]");
+        verify_data_23[1].Print("verify_data_23[1]");
+
+        this->PrintMetadata();
 
         this->conn_[1]->WriteData(verify_data_23[0], false);
         BinaryData verify_data = this->conn_[0]->ReadData(this->DataSize());
         verify_data += verify_data_23[0] + verify_data_23[1];
+        verify_data.Print("verify_data");
 
         this->conn_[1]->WriteData(new_data_23[0], false);
         BinaryData new_data = this->conn_[0]->ReadData(this->DataSize());
         new_data += new_data_23[0] + new_data_23[1];
+        new_data.Print("new_data");
 
         if (verify_data == new_data) {
             // fprintf(stderr, "%u, Pass\n", iteration);

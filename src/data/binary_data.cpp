@@ -96,8 +96,13 @@ void BinaryData::Random(CryptoPP::AutoSeededRandomPool &prg) {
     prg.GenerateBlock(this->data_, this->size_);
 }
 
-void BinaryData::Print() {
-    for (uint i = 0; i < this->size_; i++) {
-        printf("%02X", this->data_[i]);
+void BinaryData::Print(const char *title) {
+    if (strlen(title) > 0) {
+        fprintf(stderr, "%s ", title);
     }
+    fprintf(stderr, "0x");
+    for (uint i = 0; i < this->size_; i++) {
+        fprintf(stderr, "%02X", this->data_[i]);
+    }
+    fprintf(stderr, "\n");
 }
