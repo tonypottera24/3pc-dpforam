@@ -18,7 +18,7 @@ int main() {
             bool pass = true;
             uint64_t alpha = rand_uint64() % range;
             uchar *keys[2];
-            generator.Gen(alpha, m, keys);
+            generator.Gen(alpha, m, true, keys);
             uchar *share0 = new uchar[range];
             uchar *share1 = new uchar[range];
             evaluators[0].EvalAll(keys[0], m, share0);

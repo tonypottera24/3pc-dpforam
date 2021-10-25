@@ -28,10 +28,10 @@ int main(int argc, char *argv[]) {
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
         "log_n", po::value<uint64_t>()->default_value(9ULL), "number of data (log)")(
-        "data_size", po::value<uint64_t>()->default_value(4ULL), "data size (bytes)")(
+        "data_size", po::value<uint64_t>()->default_value(8ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
         "log_ssot_threshold", po::value<uint64_t>()->default_value(10ULL), "ssot threshold (log)")(
-        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(10ULL), "pseudo dpf threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(0ULL), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 

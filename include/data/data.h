@@ -7,15 +7,17 @@
 
 #include "binary_data.h"
 #include "typedef.h"
+#include "zp_data.h"
 
 enum class DataType {
     BINARY,
-    GROUP
+    ZP,
 };
 
 class Data {
 protected:
     BinaryData binary_data_;
+    ZpData zp_data_;
 
 public:
     DataType data_type_;
@@ -44,6 +46,7 @@ public:
     bool operator!=(const Data &rhs) { return !(*this == rhs); }
 
     uint Size();
+    bool IsSymmetric();
     uchar *Dump();
     void Load(uchar *data);
     void Reset();

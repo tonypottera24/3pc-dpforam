@@ -8,6 +8,7 @@ class BinaryData {
 private:
     uint size_;
     uchar *data_;
+    const bool is_symmetric_ = true;
 
 public:
     BinaryData();
@@ -28,6 +29,7 @@ public:
     void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg);
     void Random(CryptoPP::AutoSeededRandomPool *prg);
     uint Size() { return this->size_; }
+    bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
 };
 

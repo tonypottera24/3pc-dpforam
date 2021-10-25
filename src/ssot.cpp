@@ -26,7 +26,7 @@ void SSOT::P2(const uint64_t n, const uint64_t data_size, bool count_band) {
             xx = x + delta;
         }
         if (i == alpha) {
-            yy = y + delta;
+            yy = y - delta;
         }
     }
 
@@ -69,7 +69,7 @@ Data *SSOT::P0(const uint64_t b0, std::vector<Data> &u, bool count_band) {
 
     // Receive v0' and v1' from P1
     std::vector<Data> vv = this->conn_[P1]->ReadData(this->data_type_, n, data_size);
-    return new Data(vv[b0] + y);
+    return new Data(vv[b0] - y);
 }
 
 Data *SSOT::P1(const uint64_t b1, std::vector<Data> &v, bool count_band) {
@@ -107,7 +107,7 @@ Data *SSOT::P1(const uint64_t b1, std::vector<Data> &v, bool count_band) {
 
     // Receive u0' and u1' from P0
     std::vector<Data> uu = this->conn_[P0]->ReadData(this->data_type_, n, data_size);
-    return new Data(uu[b1] + x);
+    return new Data(uu[b1] - x);
 }
 
 void SSOT::Test(uint iterations) {

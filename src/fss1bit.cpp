@@ -50,8 +50,24 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-uint FSS1Bit::Gen(uint64_t index, uint64_t log_n, uchar *keys[2]) {
-    return GEN(&aes_key_, index, log_n, keys, keys + 1);
+uint FSS1Bit::Gen(uint64_t index, uint64_t log_n, const bool is_symmetric, uchar *query_23[2]) {
+    uint query_size = GEN(&aes_key_, index, log_n, query_23, query_23 + 1);
+    if (!is_symmetric) {
+        uint64_t n = 1 << log_n;
+        uchar dpf_out_0[n], dpf_out_1[n];
+        this->EvalAll(query_23[0], log_n, dpf_out_0);
+        this->EvalAll(query_23[1], log_n, dpf_out_1);
+        bool need_swap = false;
+        for (uint64_t i = 0; i < n; i++) {
+            if (dpf_out_1[i] > dpf_out_0[i]) {
+                need_swap = true;
+            }
+        }
+        if (need_swap) {
+            std::swap(query_23[0], query_23[1]);
+        }
+    }
+    return query_size;
 }
 
 void FSS1Bit::EvalAll(const uchar *key, uint64_t log_n, uchar *out) {
@@ -68,11 +84,18 @@ void FSS1Bit::EvalAll(const uchar *key, uint64_t log_n, uchar *out) {
     free(res);
 }
 
-void FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg, uint64_t index, uint64_t byte_length, uchar *dpf_out) {
+bool FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg, uint64_t index, uint64_t byte_length, const bool is_symmetric, uchar *dpf_out) {
     prg->GenerateBlock(dpf_out, byte_length);
-    uint64_t index_byte = index / 8ULL;
-    uint64_t index_bit = index % 8ULL;
+    uint64_t index_byte = index / sizeof(uint64_t);
+    uint64_t index_bit = index % sizeof(uint64_t);
     dpf_out[index_byte] ^= 1 << index_bit;
+    if (!is_symmetric && (dpf_out[index_byte] & (1 << index_bit)) == 0) {
+        for (uint64_t i = 0; i < byte_length; i++) {
+            dpf_out[i] = ~dpf_out[i];
+        }
+        return true;
+    }
+    return false;
 }
 
 void FSS1Bit::PseudoEvalAll(uchar *dpf_out, const uint64_t n, bool *dpf_out_evaluated) {

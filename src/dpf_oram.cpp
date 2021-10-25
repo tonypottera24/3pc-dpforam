@@ -100,10 +100,10 @@ Data &DPFORAM::DPF_PIR(std::vector<Data> array_23[2], const uint64_t n, const ui
     debug_print("[%llu]DPF_PIR, n = %llu, log_n = %llu\n", this->Size(), n, log_n);
     // only accept power of 2 n
     const DataType data_type = array_23[0][0].data_type_;
+    const bool is_symmetric = array_23[0][0].IsSymmetric();
 
     uchar *query_23[2];
-    uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
-    // TODO check if 0 is always has more 1
+    uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23);
 
     this->conn_[0]->Write(query_23[0], query_size, count_band);
     this->conn_[1]->Write(query_23[1], query_size, count_band);
@@ -117,9 +117,13 @@ Data &DPFORAM::DPF_PIR(std::vector<Data> array_23[2], const uint64_t n, const ui
         uchar dpf_out[n];
         this->fss_.EvalAll(query_23[b], log_n, dpf_out);
         for (uint64_t i = 0; i < array_23[b].size(); i++) {
-            debug_print("[%llu]DPF_PIR, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
+            // debug_print("[%llu]DPF_PIR, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
-                *v_out_13 += array_23[b][i];
+                if (b == 0) {
+                    *v_out_13 += array_23[b][i];
+                } else {
+                    *v_out_13 -= array_23[b][i];
+                }
             }
         }
     }
@@ -134,30 +138,47 @@ Data &DPFORAM::PSEUDO_DPF_PIR(std::vector<Data> array_23[2], const uint64_t n, c
     debug_print("[%llu]PSEUDO_DPF_PIR, n = %llu, index_23 = (%llu, %llu)\n", this->Size(), n, index_23[0], index_23[1]);
     // only accept power of 2 n
     const DataType data_type = array_23[0][0].data_type_;
+    const bool is_symmetric = array_23[0][0].IsSymmetric();
 
     uint64_t data_length = uint64_ceil_divide(n, 8ULL);
-    uchar *dpf_out[2];
+    uchar *query[2];
     for (uint b = 0; b < 2; b++) {
-        dpf_out[b] = new uchar[data_length];
+        query[b] = new uchar[data_length];
     }
-    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], data_length, dpf_out[1]);
-    this->conn_[1]->Write(dpf_out[1], data_length, count_band);
-    this->conn_[0]->Read(dpf_out[1], data_length);
-    this->prgs_[1].GenerateBlock(dpf_out[0], data_length);
+    uchar flipped = this->fss_.PseudoGen(&this->prgs_[1], index_23[0] ^ index_23[1], data_length, is_symmetric, query[0]);
+    this->conn_[0]->Write(query[0], data_length, count_band);
+    this->conn_[1]->Read(query[0], data_length);
+    this->prgs_[0].GenerateBlock(query[1], data_length);
+
+    if (!is_symmetric) {
+        this->conn_[1]->Write(&flipped, 1, count_band);
+        this->conn_[0]->Read(&flipped, 1);
+        if (flipped) {
+            for (uint64_t i = 0; i < data_length; i++) {
+                query[1][i] = ~query[1][i];
+            }
+        }
+    }
+
     uint data_size = array_23[0][0].Size();
     Data *v_out_13 = new Data(data_type, data_size, true);
     for (uint b = 0; b < 2; b++) {
         bool dpf_out_evaluated[n];
-        this->fss_.PseudoEvalAll(dpf_out[b], n, dpf_out_evaluated);
+        this->fss_.PseudoEvalAll(query[b], n, dpf_out_evaluated);
         for (uint64_t i = 0; i < array_23[b].size(); i++) {
+            // debug_print("[%llu]PSEUDO_DPF_PIR, i = %llu, ii = %llu, dpf_out_evaluated = %u\n", this->Size(), i, i ^ index_23[b], dpf_out_evaluated[i ^ index_23[b]]);
             if (dpf_out_evaluated[i ^ index_23[b]]) {
-                *v_out_13 += array_23[b][i];
+                if (b == 0) {
+                    *v_out_13 += array_23[b][i];
+                } else {
+                    *v_out_13 -= array_23[b][i];
+                }
             }
         }
     }
 
     for (uint b = 0; b < 2; b++) {
-        delete[] dpf_out[b];
+        delete[] query[b];
     }
     return *v_out_13;
 }
@@ -191,7 +212,7 @@ Data &DPFORAM::SSOT_PIR(std::vector<Data> &array_13, const uint64_t index_23[2],
 
         Data tmp = Data(data_type, data_size);
         tmp.Random(&this->prgs_[P2]);
-        *v_out_13 += tmp;
+        *v_out_13 -= tmp;
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;
         const uint P2 = 1;
@@ -217,9 +238,12 @@ void DPFORAM::PIW(std::vector<Data> &array_13, const uint64_t index_23[2], Data 
 
 void DPFORAM::DPF_PIW(std::vector<Data> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], Data v_delta_23[2], bool count_band) {
     debug_print("[%llu]DPF_PIW, index_23 = (%llu, %llu), n = %lu, log_n = %llu, new n = %llu\n", this->Size(), index_23[0], index_23[1], array_13.size(), log_n, n);
+    v_delta_23[0].Print("v_delta_23[0]");
+    v_delta_23[1].Print("v_delta_23[1]");
+    const bool is_symmetric = array_13[0].IsSymmetric();
 
     uchar *query_23[2];
-    uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, query_23);
+    uint query_size = this->fss_.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23);
 
     this->conn_[0]->Write(query_23[0], query_size, count_band);
     this->conn_[1]->Write(query_23[1], query_size, count_band);
@@ -231,8 +255,13 @@ void DPFORAM::DPF_PIW(std::vector<Data> &array_13, const uint64_t n, const uint6
         uchar dpf_out[n];
         this->fss_.EvalAll(query_23[b], log_n, dpf_out);
         for (uint64_t i = 0; i < array_13.size(); i++) {
+            // debug_print("[%llu]DPF_PIW, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
-                array_13[i] += v_delta_23[b];
+                if (b == 0) {
+                    array_13[i] += v_delta_23[b];
+                } else {
+                    array_13[i] -= v_delta_23[b];
+                }
             }
         }
     }
@@ -245,28 +274,44 @@ void DPFORAM::DPF_PIW(std::vector<Data> &array_13, const uint64_t n, const uint6
 void DPFORAM::PSEUDO_DPF_PIW(std::vector<Data> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], Data v_delta_23[2], bool count_band) {
     debug_print("[%llu]PSEUDO_DPF_PIW, index_23 = (%llu, %llu), n = %llu\n", this->Size(), index_23[0], index_23[1], n);
     uint64_t data_length = uint64_ceil_divide(n, 8ULL);
-    uchar *dpf_out[2];
+    const bool is_symmetric = array_13[0].IsSymmetric();
+
+    uchar *query[2];
     for (uint b = 0; b < 2; b++) {
-        dpf_out[b] = new uchar[data_length];
+        query[b] = new uchar[data_length];
     }
 
-    this->fss_.PseudoGen(&this->prgs_[0], index_23[0] ^ index_23[1], data_length, dpf_out[1]);
-    this->conn_[1]->Write(dpf_out[1], data_length, count_band);
-    this->conn_[0]->Read(dpf_out[1], data_length);
-    this->prgs_[1].GenerateBlock(dpf_out[0], data_length);
+    uchar flipped = this->fss_.PseudoGen(&this->prgs_[1], index_23[0] ^ index_23[1], data_length, is_symmetric, query[0]);
+    this->conn_[0]->Write(query[0], data_length, count_band);
+    this->conn_[1]->Read(query[0], data_length);
+    this->prgs_[0].GenerateBlock(query[1], data_length);
 
-    for (uint b = 0; b < 2; b++) {
-        bool dpf_out_evaluated[n];
-        this->fss_.PseudoEvalAll(dpf_out[b], n, dpf_out_evaluated);
-        for (uint64_t i = 0; i < array_13.size(); i++) {
-            if (dpf_out_evaluated[i ^ index_23[b]]) {
-                array_13[i] += v_delta_23[b];
+    if (!is_symmetric) {
+        this->conn_[1]->Write(&flipped, 1, count_band);
+        this->conn_[0]->Read(&flipped, 1);
+        if (flipped) {
+            for (uint64_t i = 0; i < data_length; i++) {
+                query[1][i] = ~query[1][i];
             }
         }
     }
 
     for (uint b = 0; b < 2; b++) {
-        delete[] dpf_out[b];
+        bool dpf_out_evaluated[n];
+        this->fss_.PseudoEvalAll(query[b], n, dpf_out_evaluated);
+        for (uint64_t i = 0; i < array_13.size(); i++) {
+            if (dpf_out_evaluated[i ^ index_23[b]]) {
+                if (b == 0) {
+                    array_13[i] += v_delta_23[b];
+                } else {
+                    array_13[i] -= v_delta_23[b];
+                }
+            }
+        }
+    }
+
+    for (uint b = 0; b < 2; b++) {
+        delete[] query[b];
     }
 }
 
@@ -296,19 +341,17 @@ Data *DPFORAM::GetLatestData(Data &v_read_13,
         std::vector<Data> u = {v_read_12, v_cache_12};
         const uint64_t b0 = is_cached_23[P1] ^ is_cached_23[P2];
         v_out_23[P2] = *ssot->P0(b0, u, count_band);
-
         v_out_23[P1].Random(&this->prgs_[P1]);
 
-        v_out_23[P2] += v_out_23[P1];
+        v_out_23[P2] -= v_out_23[P1];
         this->conn_[P2]->WriteData(v_out_23[P2], count_band);
     } else if (this->party_ == 1) {
         const uint P0 = 0, P2 = 1;
         std::vector<Data> v = {v_read_13, v_cache_13};
         const uint64_t b1 = is_cached_23[P2];
         v_out_23[P2] = *ssot->P1(b1, v, count_band);
-
-        v_out_23[P0].Random(&this->prgs_[P0]);
         this->conn_[P2]->WriteData(v_out_23[P2], count_band);
+        v_out_23[P0].Random(&this->prgs_[P0]);
     }
     delete ssot;
     return v_out_23;
@@ -365,7 +408,7 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         cache_index_23[b] = (cache_index_23[b] >> 1) % n;
     }
 
-    if (read_only == false) {
+    if (!read_only) {
         // TODO only 1 party need to write
         Data new_block_13 = old_block_23[0];
 
@@ -382,7 +425,7 @@ void DPFORAM::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_2
         new_data_13.Print("new_data_13");
 
         for (uint b = 0; b < 2; b++) {
-            old_data_23[b] += new_data_13;
+            old_data_23[b] = new_data_13 - old_data_23[b];
         }
         PIW(data_array_13, data_index_23, old_data_23, !read_only);
         for (uint i = 0; i < data_per_block; i++) {
@@ -426,6 +469,7 @@ Data *DPFORAM::DPF_Read(const uint64_t index_23[2], bool read_only) {
 
     if (this->cache_array_23_->size() == 0) {
         return this->ShareTwoThird(v_read_13, !read_only);
+        debug_print("GG\n");
     }
     Data v_cache_13 = PIR(this->cache_array_23_, cache_index_23, !read_only);
     v_cache_13.Print("v_cache_13");
@@ -453,7 +497,7 @@ void DPFORAM::DPF_Write(const uint64_t index_23[2], Data old_data_23[2], Data ne
 
     Data delta_data_23[2];
     for (uint b = 0; b < 2; b++) {
-        delta_data_23[b] = old_data_23[b] + new_data_23[b];
+        delta_data_23[b] = new_data_23[b] - old_data_23[b];
     }
 
     PIW(this->write_array_13_, index_23, delta_data_23, count_band);
@@ -532,7 +576,7 @@ void DPFORAM::Test(uint iterations) {
         this->PrintMetadata();
 
         debug_print("\nTest, ========== Write random data ==========\n");
-        Data new_data_23[2] = {Data(DataType::BINARY, this->DataSize()), Data(DataType::BINARY, this->DataSize())};
+        Data new_data_23[2] = {Data(this->data_type_, this->DataSize()), Data(this->data_type_, this->DataSize())};
         for (uint b = 0; b < 2; b++) {
             new_data_23[b].Random(&this->prgs_[b]);
         }
@@ -554,12 +598,12 @@ void DPFORAM::Test(uint iterations) {
         this->PrintMetadata();
 
         this->conn_[1]->WriteData(verify_data_23[0], false);
-        Data verify_data = this->conn_[0]->ReadData(DataType::BINARY, this->DataSize());
+        Data verify_data = this->conn_[0]->ReadData(this->data_type_, this->DataSize());
         verify_data += verify_data_23[0] + verify_data_23[1];
         verify_data.Print("verify_data");
 
         this->conn_[1]->WriteData(new_data_23[0], false);
-        Data new_data = this->conn_[0]->ReadData(DataType::BINARY, this->DataSize());
+        Data new_data = this->conn_[0]->ReadData(this->data_type_, this->DataSize());
         new_data += new_data_23[0] + new_data_23[1];
         new_data.Print("new_data");
 
@@ -586,8 +630,8 @@ void DPFORAM::Test(uint iterations) {
 
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %lu\n", this->write_array_13_.size());
-    fprintf(stderr, "Party Bandwidth(byte): %llu\n", party_bandwidth / iterations);
-    fprintf(stderr, "Party execution time(microsec): %llu\n", party_time / iterations);
+    // fprintf(stderr, "Party Bandwidth(byte): %llu\n", party_bandwidth / iterations);
+    // fprintf(stderr, "Party execution time(microsec): %llu\n", party_time / iterations);
     fprintf(stderr, "Total Bandwidth(byte): %llu\n", total_bandwidth / iterations);
     fprintf(stderr, "Max Execution time(microsec): %llu\n", max_time / iterations);
     fprintf(stderr, "\n");

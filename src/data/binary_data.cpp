@@ -74,7 +74,9 @@ bool BinaryData::operator==(const BinaryData &rhs) {
 }
 
 uchar *BinaryData::Dump() {
-    return this->data_;
+    uchar *data_bytes = new uchar[this->size_];
+    memcpy(data_bytes, this->data_, this->size_);
+    return data_bytes;
 }
 
 void BinaryData::Load(uchar *data) {
