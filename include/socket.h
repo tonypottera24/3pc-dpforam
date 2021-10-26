@@ -1,5 +1,5 @@
-#ifndef SIMPLE_SOCKET_H_
-#define SIMPLE_SOCKET_H_
+#ifndef SOCKET_H_
+#define SOCKET_H_
 
 #include <stdio.h>
 
@@ -25,4 +25,4 @@ public:
     void Close();
 };
 
-#endif /* SIMPLE_SOCKET_H_ */
+#endif /* SOCKET_H_ */

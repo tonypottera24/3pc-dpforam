@@ -9,7 +9,6 @@
 class Connection {
 public:
     uint64_t bandwidth_ = 0;
-
     virtual ~Connection();
     virtual void InitServer(const char *ip, const uint port) = 0;
     virtual void InitClient(const char *ip, uint port) = 0;
