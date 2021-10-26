@@ -204,7 +204,7 @@ Data &DPFORAM::SSOT_PIR(std::vector<Data> &array_13, const uint64_t index_23[2],
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
 
-        std::vector<Data> u = this->conn_[P2]->ReadData(data_type, n, data_size);
+        std::vector<Data> u = this->conn_[P2]->ReadData<Data>(data_type, n, data_size);
         for (uint64_t i = 0; i < n; i++) {
             u[i] += array_13[i];
         }
@@ -331,12 +331,12 @@ Data *DPFORAM::GetLatestData(Data &v_read_13,
 
         ssot->P2(2, data_size, count_band);
 
-        v_out_23[P0] = this->conn_[P0]->ReadData(data_type, data_size);
-        v_out_23[P1] = this->conn_[P1]->ReadData(data_type, data_size);
+        v_out_23[P0] = this->conn_[P0]->ReadData<Data>(data_type, data_size);
+        v_out_23[P1] = this->conn_[P1]->ReadData<Data>(data_type, data_size);
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
-        Data v_read_12 = this->conn_[P2]->ReadData(data_type, data_size) + v_read_13;
-        Data v_cache_12 = this->conn_[P2]->ReadData(data_type, data_size) + v_cache_13;
+        Data v_read_12 = this->conn_[P2]->ReadData<Data>(data_type, data_size) + v_read_13;
+        Data v_cache_12 = this->conn_[P2]->ReadData<Data>(data_type, data_size) + v_cache_13;
 
         std::vector<Data> u = {v_read_12, v_cache_12};
         const uint64_t b0 = is_cached_23[P1] ^ is_cached_23[P2];
@@ -360,7 +360,7 @@ Data *DPFORAM::GetLatestData(Data &v_read_13,
 Data *DPFORAM::ShareTwoThird(Data &v_in_13, bool count_band) {
     debug_print("[%llu]ShareTwoThird\n", this->Size());
     this->conn_[1]->WriteData(v_in_13, count_band);
-    Data v_out = this->conn_[0]->ReadData(v_in_13.data_type_, v_in_13.Size());
+    Data v_out = this->conn_[0]->ReadData<Data>(v_in_13.data_type_, v_in_13.Size());
     return new Data[2]{v_out, v_in_13};
 }
 
@@ -598,12 +598,12 @@ void DPFORAM::Test(uint iterations) {
         this->PrintMetadata();
 
         this->conn_[1]->WriteData(verify_data_23[0], false);
-        Data verify_data = this->conn_[0]->ReadData(this->data_type_, this->DataSize());
+        Data verify_data = this->conn_[0]->ReadData<Data>(this->data_type_, this->DataSize());
         verify_data += verify_data_23[0] + verify_data_23[1];
         verify_data.Print("verify_data");
 
         this->conn_[1]->WriteData(new_data_23[0], false);
-        Data new_data = this->conn_[0]->ReadData(this->data_type_, this->DataSize());
+        Data new_data = this->conn_[0]->ReadData<Data>(this->data_type_, this->DataSize());
         new_data += new_data_23[0] + new_data_23[1];
         new_data.Print("new_data");
 
