@@ -190,7 +190,7 @@ Data &DPFORAM::SSOT_PIR(std::vector<Data> &array_13, const uint64_t index_23[2],
     DataType data_type = array_13[0].data_type_;
     uint data_size = array_13[0].Size();
     Data *v_out_13;
-    SSOT *ssot = new SSOT(this->party_, this->data_type_, this->conn_, this->rnd_, this->prgs_);
+    SSOT<Data> *ssot = new SSOT<Data>(this->party_, this->data_type_, this->conn_, this->rnd_, this->prgs_);
     if (this->party_ == 2) {
         // const uint P1 = 0, P0 = 1;
         const uint P0 = 1;
@@ -322,7 +322,7 @@ Data *DPFORAM::GetLatestData(Data &v_read_13,
     uint data_size = v_read_13.Size();
     DataType data_type = v_read_13.data_type_;
     Data *v_out_23 = new Data[2]{Data(data_type, data_size), Data(data_type, data_size)};
-    SSOT *ssot = new SSOT(this->party_, this->data_type_, this->conn_, this->rnd_, this->prgs_);
+    SSOT<Data> *ssot = new SSOT<Data>(this->party_, this->data_type_, this->conn_, this->rnd_, this->prgs_);
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
