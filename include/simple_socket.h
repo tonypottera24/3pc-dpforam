@@ -1,7 +1,15 @@
 #ifndef SIMPLE_SOCKET_H_
 #define SIMPLE_SOCKET_H_
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+#include <cstring>
 
 #include "connection.h"
 

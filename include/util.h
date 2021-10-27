@@ -22,7 +22,7 @@ void uint64_to_bytes(uint64_t value, uchar *bytes, uint len = 8);
 uint64_t bytes_to_uint64(const uchar *b, uint len = 8);
 void rand_bytes(uchar *bytes, const uint len);
 uint64_t rand_uint64();
-uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg);
+uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
 uint64_t timestamp();
 
 uint64_t bit_length(uint64_t n);

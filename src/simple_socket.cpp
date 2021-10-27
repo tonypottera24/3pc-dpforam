@@ -1,15 +1,5 @@
 #include "simple_socket.h"
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
-#include <cstring>
-
 #define BUFF_BYTES 1024 * 16
 
 void error(const char *msg) {
@@ -110,42 +100,6 @@ void SimpleSocket::Read(uchar *data, uint64_t data_size) {
         offset += read_size;
     }
 }
-
-// TODO: debug
-// void SimpleSocket::fwrite(const uchar *data, uint64_t bytes, bool count_band)
-// {
-//     long write_bytes;
-//     uint64_t offset = 0ULL;
-//     while (offset < bytes)
-//     {
-//         write_bytes = ::fwrite(data + offset, 1, bytes - offset, stream);
-//         if (write_bytes < 0)
-//         {
-//             error("write failed");
-//         }
-//         offset += write_bytes;
-//     }
-//     if (count_band)
-//     {
-//         bandwidth += bytes;
-//     }
-// }
-
-// TODO: debug
-// void SimpleSocket::fread(uchar *data, uint64_t bytes)
-// {
-//     long read_bytes;
-//     uint64_t offset = 0ULL;
-//     while (offset < bytes)
-//     {
-//         read_bytes = ::fread(data + offset, 1, bytes - offset, stream);
-//         if (read_bytes < 0)
-//         {
-//             error("read failed");
-//         }
-//         offset += read_bytes;
-//     }
-// }
 
 void SimpleSocket::Flush() {
     fflush(stream_);

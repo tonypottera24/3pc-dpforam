@@ -87,11 +87,8 @@ void BinaryData::Reset() {
     memset(this->data_, 0, this->size_);
 }
 
-void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg) {
-    prg->GenerateBlock(this->data_, this->size_);
-}
-void BinaryData::Random(CryptoPP::AutoSeededRandomPool *prg) {
-    prg->GenerateBlock(this->data_, this->size_);
+void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {
+    prg.GenerateBlock(this->data_, this->size_);
 }
 
 void BinaryData::Print(const char *title) {

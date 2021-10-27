@@ -84,8 +84,8 @@ void FSS1Bit::EvalAll(const uchar *key, uint64_t log_n, uchar *out) {
     free(res);
 }
 
-bool FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prg, uint64_t index, uint64_t byte_length, const bool is_symmetric, uchar *dpf_out) {
-    prg->GenerateBlock(dpf_out, byte_length);
+bool FSS1Bit::PseudoGen(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg, uint64_t index, uint64_t byte_length, const bool is_symmetric, uchar *dpf_out) {
+    prg.GenerateBlock(dpf_out, byte_length);
     uint64_t index_byte = index / sizeof(uint64_t);
     uint64_t index_bit = index % sizeof(uint64_t);
     dpf_out[index_byte] ^= 1 << index_bit;

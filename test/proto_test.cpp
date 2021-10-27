@@ -1,4 +1,5 @@
 #include <cryptopp/aes.h>
+#include <cryptopp/cpu.h>
 #include <cryptopp/modes.h>
 #include <omp.h>
 #include <stdlib.h>
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
         "data_size", po::value<uint64_t>()->default_value(8ULL), "data size (bytes)")(
         "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
         "log_ssot_threshold", po::value<uint64_t>()->default_value(10ULL), "ssot threshold (log)")(
-        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(0ULL), "pseudo dpf threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(10ULL), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -89,6 +90,8 @@ int main(int argc, char *argv[]) {
     // fprintf(stderr, "Initilizing server %s:%u...\n", ip.c_str(), port);
     std::thread start_server_thread(start_server, conn[0], ip.c_str(), port);
 
+    fprintf(stderr, "HasAESNI %u\n", CryptoPP::HasAESNI());
+
     fprintf(stderr, "Connecting to %s:%u...\n", next_party_ip.c_str(), next_party_port);
     conn[1]->InitClient(next_party_ip.c_str(), next_party_port);
     fprintf(stderr, "Connecting to %s:%u done.\n", next_party_ip.c_str(), port);
@@ -96,10 +99,9 @@ int main(int argc, char *argv[]) {
     start_server_thread.join();
     // fprintf(stderr, "Initilizing server %s:%u done.\n", ip.c_str(), port);
 
-    CryptoPP::AutoSeededRandomPool rnd;
-    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prgs[2];
-    uchar bytes[96];
-    for (uint i = 0; i < 96; i++) {
+    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prgs[3];
+    uchar bytes[96 + 96];
+    for (uint i = 0; i < 96 + 96; i++) {
         bytes[i] = i;
     }
     uint offset[3] = {0, 32, 64};
@@ -108,18 +110,15 @@ int main(int argc, char *argv[]) {
     // P2 [0:P1]=2 [1:P0]=1
     prgs[0].SetKeyWithIV(bytes + offset[(party + 2) % 3], 16, bytes + offset[(party + 2) % 3] + 16);
     prgs[1].SetKeyWithIV(bytes + offset[party], 16, bytes + offset[party] + 16);
+    prgs[2].SetKeyWithIV(bytes + offset[party] + 96, 16, bytes + offset[party] + 96 + 16);
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
-    Protocol *dpf_oram = NULL;
     uint64_t start_time = timestamp();
-    dpf_oram = new DPFORAM(party, DataType::BINARY, conn, &rnd, prgs, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    DPFORAM<ZpData> dpf_oram = DPFORAM<ZpData>(party, conn, prgs, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
-    if (dpf_oram != NULL) {
-        dpf_oram->Test(iterations);
-        delete dpf_oram;
-    }
+    dpf_oram.Test(iterations);
 
     conn[0]->Close();
     conn[1]->Close();
