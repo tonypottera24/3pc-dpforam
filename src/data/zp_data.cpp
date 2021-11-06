@@ -45,6 +45,12 @@ ZpData &ZpData::operator=(const ZpData &other) {
 //     return *this;
 // }
 
+ZpData ZpData::operator-() {
+    ZpData *z = new ZpData(this->size_);
+    z->data_ = (this->p_ - this->data_) % this->p_;
+    return *z;
+}
+
 ZpData &ZpData::operator+=(const ZpData &rhs) {
     this->data_ = (this->data_ + rhs.data_) % this->p_;
     return *this;
@@ -72,6 +78,12 @@ void ZpData::Load(uchar *data) {
 
 void ZpData::Reset() {
     this->data_ = 0;
+}
+
+void ZpData::Random() {
+    CryptoPP::AutoSeededRandomPool rnd;
+    rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
+    this->data_ %= this->p_;
 }
 
 void ZpData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {

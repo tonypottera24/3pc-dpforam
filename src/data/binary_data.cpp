@@ -57,6 +57,14 @@ BinaryData &BinaryData::operator=(const BinaryData &other) {
 //     return *this;
 // }
 
+BinaryData BinaryData::operator-() {
+    BinaryData b = *this;
+    for (uint i = 0; i < this->size_; i++) {
+        b.data_[i] = ~this->data_[i];
+    }
+    return b;
+}
+
 BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
     assert(this->size_ == rhs.size_);
     xor_bytes(this->data_, rhs.data_, rhs.size_, this->data_);
@@ -85,6 +93,11 @@ void BinaryData::Load(uchar *data) {
 
 void BinaryData::Reset() {
     memset(this->data_, 0, this->size_);
+}
+
+void BinaryData::Random() {
+    CryptoPP::AutoSeededRandomPool rnd;
+    rnd.GenerateBlock(this->data_, this->size_);
 }
 
 void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {

@@ -23,6 +23,7 @@ public:
 
     BinaryData &operator=(const BinaryData &other);
     // BinaryData &operator=(BinaryData &&other) noexcept;
+    BinaryData operator-();
     BinaryData &operator+=(const BinaryData &rhs);
     BinaryData &operator-=(const BinaryData &rhs);
     bool operator==(const BinaryData &rhs);
@@ -38,6 +39,7 @@ public:
     uchar *Dump();
     void Load(uchar *data);
     void Reset();
+    void Random();
     void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
     uint Size() { return this->size_; }
     bool IsSymmetric() { return this->is_symmetric_; }

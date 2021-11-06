@@ -9,18 +9,20 @@
 #include <iostream>
 
 #include "binary_data.h"
-#include "connection.h"
 #include "fss1bit.h"
+#include "inv_gadget.h"
+#include "peer.h"
+#include "pir.h"
+#include "piw.h"
+#include "ssot.h"
 #include "util.h"
 #include "zp_data.h"
-
 template <typename D>
 class DPFORAM {
 private:
     uint party_;
     FSS1Bit fss_;
-    Connection **conn_;
-    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs_;
+    Peer *peer_;
 
     std::vector<D> read_array_23_[2];
     std::vector<D> write_array_13_;
@@ -47,35 +49,8 @@ private:
     void AppendCache(D v_new_23[2], bool count_band);
     void Flush(bool count_band);
 
-    template <typename DD>
-    DD *ShareTwoThird(DD &v_in_13, bool count_band);
-    template <typename DD>
-    std::vector<DD> *ShareTwoThird(std::vector<DD> &v_in_13, bool count_band);
-    void ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band);
-
-    template <typename DD>
-    DD &PIR(std::vector<DD> array_23[2], const uint64_t index_23[2], bool count_band);
-    template <typename DD>
-    DD &DPF_PIR(std::vector<DD> array_23[2], const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], bool count_band);
-    template <typename DD>
-    DD &PSEUDO_DPF_PIR(std::vector<DD> array_23[2], const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], bool count_band);
-    template <typename DD>
-    DD &SSOT_PIR(std::vector<DD> &array_13, const uint64_t index_23[2], bool count_band);
-
-    template <typename DD>
-    void PIW(std::vector<DD> &array_13, const uint64_t index_23[2], DD v_delta_23[2], bool count_band);
-    template <typename DD>
-    void DPF_PIW(std::vector<DD> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], DD v_delta_23[2], bool count_band);
-    template <typename DD>
-    void PSEUDO_DPF_PIW(std::vector<DD> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], DD v_delta_23[2], bool count_band);
-
-    void SSOT_P2(const uint64_t n, const uint64_t data_size, bool count_band);
-    D *SSOT_P0(const uint64_t b0, std::vector<D> &u, bool count_band);
-    D *SSOT_P1(const uint64_t b1, std::vector<D> &v, bool count_band);
-
 public:
-    DPFORAM(const uint party, Connection *connections[2],
-            CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
+    DPFORAM(const uint party, Peer peer[2],
             uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold);
     ~DPFORAM();
 
@@ -88,9 +63,5 @@ public:
     void Reset();
     void Test(uint iterations);
 };
-
-#include "pir.h"
-#include "piw.h"
-#include "ssot.h"
 
 #endif /* DPF_ORAM_H_ */

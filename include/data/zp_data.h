@@ -24,6 +24,7 @@ public:
 
     ZpData &operator=(const ZpData &other);
     // ZpData &operator=(ZpData &&other) noexcept;
+    ZpData operator-();
     ZpData &operator+=(const ZpData &rhs);
     ZpData &operator-=(const ZpData &rhs);
     bool operator==(const ZpData &rhs);
@@ -40,6 +41,7 @@ public:
     void Load(uchar *data);
     void Reset();
     void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
+    void Random();
     uint Size() { return this->size_; }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");

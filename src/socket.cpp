@@ -1,4 +1,4 @@
-#include "simple_socket.h"
+#include "socket.h"
 
 #define BUFF_BYTES 1024 * 16
 
@@ -7,14 +7,14 @@ void error(const char *msg) {
     exit(EXIT_FAILURE);
 }
 
-void SimpleSocket::SetStream() {
+void Socket::SetStream() {
     stream_ = fdopen(socket_fd_, "wb+");
     buffer_ = new char[BUFF_BYTES];
     memset(buffer_, 0, BUFF_BYTES);
     setvbuf(stream_, buffer_, _IOFBF, BUFF_BYTES);
 }
 
-void SimpleSocket::InitServer(const char *ip, const uint port) {
+void Socket::InitServer(const char *ip, const uint port) {
     int server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server_fd < 0) {
         error("InitServer: socket failed");
@@ -44,7 +44,7 @@ void SimpleSocket::InitServer(const char *ip, const uint port) {
     SetNoDelay();
 }
 
-void SimpleSocket::InitClient(const char *ip, uint port) {
+void Socket::InitClient(const char *ip, uint port) {
     int connect_status = -1;
     while (connect_status < 0) {
         socket_fd_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -68,14 +68,14 @@ void SimpleSocket::InitClient(const char *ip, uint port) {
     SetNoDelay();
 }
 
-void SimpleSocket::SetNoDelay() {
+void Socket::SetNoDelay() {
     int opt = 1;
     if (setsockopt(socket_fd_, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)) < 0) {
         error("SetNoDelay: setsockopt failed");
     }
 }
 
-void SimpleSocket::Write(const uchar *data, uint64_t data_size, bool count_band) {
+void Socket::Write(const uchar *data, uint64_t data_size, bool count_band) {
     uint64_t offset = 0;
     while (offset < data_size) {
         uint64_t write_size = ::write(socket_fd_, data + offset, data_size - offset);
@@ -90,7 +90,7 @@ void SimpleSocket::Write(const uchar *data, uint64_t data_size, bool count_band)
     fflush(stream_);
 }
 
-void SimpleSocket::Read(uchar *data, uint64_t data_size) {
+void Socket::Read(uchar *data, uint64_t data_size) {
     uint64_t offset = 0;
     while (offset < data_size) {
         uint64_t read_size = ::read(socket_fd_, data + offset, data_size - offset);
@@ -101,11 +101,11 @@ void SimpleSocket::Read(uchar *data, uint64_t data_size) {
     }
 }
 
-void SimpleSocket::Flush() {
+void Socket::Flush() {
     fflush(stream_);
 }
 
-void SimpleSocket::Close() {
+void Socket::Close() {
     fclose(stream_);
     delete[] buffer_;
     ::close(socket_fd_);

@@ -1,9 +1,8 @@
 #include "dpf_oram.h"
 
 template <typename D>
-DPFORAM<D>::DPFORAM(const uint party, class Connection *connections[2],
-                    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption *prgs,
-                    uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold) : party_(party), conn_(connections), prgs_(prgs), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
+DPFORAM<D>::DPFORAM(const uint party, Peer peer[2],
+                    uint64_t n, uint64_t data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold) : party_(party), peer_(peer), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
     // debug_print("DPFORAM n = %llu, data_size = %u, tau = %u\n", n, data_size, tau);
     this->InitArray(this->write_array_13_, n, data_size, true);
 
@@ -15,7 +14,7 @@ DPFORAM<D>::DPFORAM(const uint party, class Connection *connections[2],
         uint64_t pos_data_per_block = 1 << this->tau_;
         uint64_t pos_n = uint64_ceil_divide(n, pos_data_per_block);
         uint64_t pos_data_size = byte_length(n << 1) * pos_data_per_block;
-        this->position_map_ = new DPFORAM<BinaryData>(party, connections, prgs, pos_n, pos_data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+        this->position_map_ = new DPFORAM<BinaryData>(party, peer, pos_n, pos_data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     }
 }
 
@@ -91,61 +90,34 @@ D *DPFORAM<D>::GetLatestData(D &v_read_13,
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
-        this->conn_[P0]->WriteData(v_read_13, count_band);
-        this->conn_[P0]->WriteData(v_cache_13, count_band);
+        this->peer_[P0].WriteData(v_read_13, count_band);
+        this->peer_[P0].WriteData(v_cache_13, count_band);
 
-        this->SSOT_P2(2, data_size, count_band);
+        SSOT::P2<D>(this->peer_, 2, data_size, count_band);
 
-        v_out_23[P0] = this->conn_[P0]->template ReadData<D>(data_size);
-        v_out_23[P1] = this->conn_[P1]->template ReadData<D>(data_size);
+        v_out_23[P0] = this->peer_[P0].template ReadData<D>(data_size);
+        v_out_23[P1] = this->peer_[P1].template ReadData<D>(data_size);
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
-        D v_read_12 = this->conn_[P2]->template ReadData<D>(data_size) + v_read_13;
-        D v_cache_12 = this->conn_[P2]->template ReadData<D>(data_size) + v_cache_13;
+        D v_read_12 = this->peer_[P2].template ReadData<D>(data_size) + v_read_13;
+        D v_cache_12 = this->peer_[P2].template ReadData<D>(data_size) + v_cache_13;
 
         std::vector<D> u = {v_read_12, v_cache_12};
         const uint64_t b0 = is_cached_23[P1] ^ is_cached_23[P2];
-        v_out_23[P2] = *this->SSOT_P0(b0, u, count_band);
-        v_out_23[P1].Random(this->prgs_[P1]);
+        v_out_23[P2] = *SSOT::P0(this->peer_, b0, u, count_band);
+        v_out_23[P1].Random(this->peer_[P1].PRG());
 
         v_out_23[P2] -= v_out_23[P1];
-        this->conn_[P2]->WriteData(v_out_23[P2], count_band);
+        this->peer_[P2].WriteData(v_out_23[P2], count_band);
     } else if (this->party_ == 1) {
         const uint P0 = 0, P2 = 1;
         std::vector<D> v = {v_read_13, v_cache_13};
         const uint64_t b1 = is_cached_23[P2];
-        v_out_23[P2] = *this->SSOT_P1(b1, v, count_band);
-        this->conn_[P2]->WriteData(v_out_23[P2], count_band);
-        v_out_23[P0].Random(this->prgs_[P0]);
+        v_out_23[P2] = *SSOT::P1(this->peer_, b1, v, count_band);
+        this->peer_[P2].WriteData(v_out_23[P2], count_band);
+        v_out_23[P0].Random(this->peer_[P0].PRG());
     }
     return v_out_23;
-}
-
-template <typename D>
-template <typename DD>
-DD *DPFORAM<D>::ShareTwoThird(DD &v_in_13, bool count_band) {
-    debug_print("[%llu]ShareTwoThird\n", this->Size());
-    this->conn_[1]->WriteData(v_in_13, count_band);
-    DD v_out = this->conn_[0]->template ReadData<DD>(v_in_13.Size());
-    return new DD[2]{v_out, v_in_13};
-}
-
-template <typename D>
-template <typename DD>
-std::vector<DD> *DPFORAM<D>::ShareTwoThird(std::vector<DD> &v_in_13, bool count_band) {
-    debug_print("[%llu]ShareTwoThird vector\n", this->Size());
-    this->conn_[1]->WriteData(v_in_13, count_band);
-    std::vector<DD> v_out = this->conn_[0]->template ReadData<DD>(v_in_13.size(), v_in_13[0].Size());
-    return new std::vector<DD>[2] { v_out, v_in_13 };
-}
-
-template <typename D>
-void DPFORAM<D>::ShareIndexTwoThird(const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band) {
-    debug_print("[%llu]ShareIndexTwoThird, n = %llu, index_13 = %llu\n", this->Size(), n, index_13);
-    uint64_t rand_range = n;
-    this->conn_[1]->WriteLong(index_13, count_band);
-    index_23[0] = this->conn_[0]->ReadLong() % rand_range;
-    index_23[1] = index_13 % rand_range;
 }
 
 template <typename D>
@@ -175,9 +147,9 @@ void DPFORAM<D>::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_inde
             old_data_array_23[b].emplace_back(&old_block_data[i * data_size], data_size);
         }
     }
-    BinaryData old_data_13 = this->PIR<BinaryData>(old_data_array_23, data_index_23, !read_only);
+    BinaryData old_data_13 = PIR::PIR<BinaryData>(this->peer_, this->fss_, old_data_array_23, data_index_23, this->pseudo_dpf_threshold_, !read_only);
     // old_data_13.Print("old_data_13");
-    BinaryData *old_data_23 = this->ShareTwoThird<BinaryData>(old_data_13, !read_only);
+    BinaryData *old_data_23 = ShareTwoThird<BinaryData>(this->peer_, old_data_13, !read_only);
     // old_data_23[0].Print("old_data_23[0]");
     // old_data_23[1].Print("old_data_23[1]");
 
@@ -208,13 +180,13 @@ void DPFORAM<D>::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_inde
         }
         // old_data_23[0].Print("delta_data_23[0]");
         // old_data_23[1].Print("delta_data_23[1]");
-        this->PIW(data_array_13, data_index_23, old_data_23, !read_only);
+        PIW::PIW(this->peer_, this->fss_, data_array_13, data_index_23, old_data_23, this->pseudo_dpf_threshold_, !read_only);
         for (uint i = 0; i < data_per_block; i++) {
             memcpy(&new_block_data[i * data_size], data_array_13[i].Dump(), data_size);
         }
         new_block_13.Load(new_block_data);
 
-        BinaryData *new_block_23 = this->ShareTwoThird(new_block_13, !read_only);
+        BinaryData *new_block_23 = ShareTwoThird(this->peer_, new_block_13, !read_only);
         this->position_map_->Write(block_index_23, old_block_23, new_block_23, !read_only);
 
         // this->position_map_->PrintMetadata();
@@ -230,7 +202,7 @@ D *DPFORAM<D>::Read(const uint64_t index_23[2], bool read_only) {
     debug_print("[%llu]Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
     uint64_t n = this->Size();
     if (n == 1) {
-        return this->ShareTwoThird(this->write_array_13_[0], !read_only);
+        return ShareTwoThird(this->peer_, this->write_array_13_[0], !read_only);
     } else if (n >= this->ssot_threshold_) {
         return SSOT_Read(index_23, read_only);
     } else {
@@ -242,7 +214,7 @@ template <typename D>
 D *DPFORAM<D>::DPF_Read(const uint64_t index_23[2], bool read_only) {
     debug_print("[%llu]DPF_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
 
-    D v_read_13 = this->PIR(this->read_array_23_, index_23, !read_only);
+    D v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, this->pseudo_dpf_threshold_, !read_only);
     v_read_13.Print("v_read_13");
 
     uint64_t cache_index_23[2];
@@ -253,9 +225,9 @@ D *DPFORAM<D>::DPF_Read(const uint64_t index_23[2], bool read_only) {
     debug_print("cache_index_23 = (%llu, %llu), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
-        return this->ShareTwoThird(v_read_13, !read_only);
+        return ShareTwoThird(this->peer_, v_read_13, !read_only);
     }
-    D v_cache_13 = this->PIR(this->cache_array_23_, cache_index_23, !read_only);
+    D v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, this->pseudo_dpf_threshold_, !read_only);
     v_cache_13.Print("v_cache_13");
     return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
 }
@@ -263,8 +235,8 @@ D *DPFORAM<D>::DPF_Read(const uint64_t index_23[2], bool read_only) {
 template <typename D>
 D *DPFORAM<D>::SSOT_Read(const uint64_t index_23[2], bool read_only) {
     debug_print("[%llu]SSOT_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
-    D v_read_13 = this->SSOT_PIR(this->write_array_13_, index_23, !read_only);
-    return this->ShareTwoThird(v_read_13, !read_only);
+    D v_read_13 = PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
+    return ShareTwoThird(this->peer_, v_read_13, !read_only);
 }
 
 template <typename D>
@@ -287,7 +259,7 @@ void DPFORAM<D>::DPF_Write(const uint64_t index_23[2], D old_data_23[2], D new_d
         delta_data_23[b] = new_data_23[b] - old_data_23[b];
     }
 
-    this->PIW(this->write_array_13_, index_23, delta_data_23, count_band);
+    PIW::PIW(this->peer_, this->fss_, this->write_array_13_, index_23, delta_data_23, this->pseudo_dpf_threshold_, count_band);
     this->AppendCache(new_data_23, count_band);
 }
 
@@ -308,7 +280,7 @@ void DPFORAM<D>::AppendCache(D v_new_23[2], bool count_band) {
 template <typename D>
 void DPFORAM<D>::Flush(bool count_band) {
     debug_print("[%llu]Flush\n", this->Size());
-    std::vector<D> *array_23 = this->ShareTwoThird(this->write_array_13_, count_band);
+    std::vector<D> *array_23 = ShareTwoThird(this->peer_, this->write_array_13_, count_band);
     for (uint b = 0; b < 2; b++) {
         this->read_array_23_[b] = array_23[b];
     }
@@ -349,7 +321,7 @@ void DPFORAM<D>::Test(uint iterations) {
         uint64_t rand_range = n - 1;
         uint64_t index_13 = rand_uint64() % rand_range;
         uint64_t index_23[2];
-        this->ShareIndexTwoThird(index_13, n, index_23, false);
+        ShareIndexTwoThird<D>(this->peer_, index_13, n, index_23, false);
         // debug_print( "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
 
         // this->PrintMetadata();
@@ -367,7 +339,7 @@ void DPFORAM<D>::Test(uint iterations) {
         debug_print("\nTest, ========== Write random data ==========\n");
         D new_data_23[2] = {D(this->DataSize()), D(this->DataSize())};
         for (uint b = 0; b < 2; b++) {
-            new_data_23[b].Random(this->prgs_[b]);
+            new_data_23[b].Random(this->peer_[b].PRG());
         }
         new_data_23[0].Print("new_data_23[0]");
         new_data_23[1].Print("new_data_23[1]");
@@ -386,13 +358,13 @@ void DPFORAM<D>::Test(uint iterations) {
 
         this->PrintMetadata();
 
-        this->conn_[1]->WriteData(verify_data_23[0], false);
-        D verify_data = this->conn_[0]->template ReadData<D>(this->DataSize());
+        this->peer_[1].WriteData(verify_data_23[0], false);
+        D verify_data = this->peer_[0].template ReadData<D>(this->DataSize());
         verify_data += verify_data_23[0] + verify_data_23[1];
         verify_data.Print("verify_data");
 
-        this->conn_[1]->WriteData(new_data_23[0], false);
-        D new_data = this->conn_[0]->template ReadData<D>(this->DataSize());
+        this->peer_[1].WriteData(new_data_23[0], false);
+        D new_data = this->peer_[0].template ReadData<D>(this->DataSize());
         new_data += new_data_23[0] + new_data_23[1];
         new_data.Print("new_data");
 
@@ -404,18 +376,18 @@ void DPFORAM<D>::Test(uint iterations) {
         }
     }
 
-    uint64_t party_bandwidth = this->conn_[0]->bandwidth_ + this->conn_[1]->bandwidth_;
-    this->conn_[0]->WriteLong(party_bandwidth, false);
-    this->conn_[1]->WriteLong(party_bandwidth, false);
+    uint64_t party_bandwidth = this->peer_[0].Bandwidth() + this->peer_[1].Bandwidth();
+    this->peer_[0].WriteLong(party_bandwidth, false);
+    this->peer_[1].WriteLong(party_bandwidth, false);
     uint64_t total_bandwidth = party_bandwidth;
-    total_bandwidth += this->conn_[0]->ReadLong();
-    total_bandwidth += this->conn_[1]->ReadLong();
+    total_bandwidth += this->peer_[0].ReadLong();
+    total_bandwidth += this->peer_[1].ReadLong();
 
-    conn_[0]->WriteLong(party_time, false);
-    conn_[1]->WriteLong(party_time, false);
+    this->peer_[0].WriteLong(party_time, false);
+    this->peer_[1].WriteLong(party_time, false);
     uint64_t max_time = party_time;
-    max_time = std::max(max_time, conn_[0]->ReadLong());
-    max_time = std::max(max_time, conn_[1]->ReadLong());
+    max_time = std::max(max_time, peer_[0].ReadLong());
+    max_time = std::max(max_time, peer_[1].ReadLong());
 
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %lu\n", this->write_array_13_.size());

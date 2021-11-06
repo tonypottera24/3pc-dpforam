@@ -10,14 +10,16 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <vector>
 
-#include "connection.h"
+#include "typedef.h"
 
-class SimpleSocket : public Connection {
+class Socket {
 private:
     int socket_fd_;
     FILE *stream_;
     char *buffer_;
+    uint64_t bandwidth_ = 0;
 
     void SetStream();
 
