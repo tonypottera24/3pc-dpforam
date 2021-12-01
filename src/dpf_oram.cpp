@@ -86,7 +86,7 @@ D *DPFORAM<D>::GetLatestData(D &v_read_13,
     debug_print("[%llu]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = v_read_13.Size();
-    D *v_out_23 = new D[2]{D(data_size), D(data_size)};
+    D *v_out_23;
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
@@ -105,7 +105,8 @@ D *DPFORAM<D>::GetLatestData(D &v_read_13,
         std::vector<D> u = {v_read_12, v_cache_12};
         const uint64_t b0 = is_cached_23[P1] ^ is_cached_23[P2];
         v_out_23[P2] = *SSOT::P0(this->peer_, b0, u, count_band);
-        v_out_23[P1].Random(this->peer_[P1].PRG());
+        v_out_23[P1] = new D();
+        v_out_23[P1].Random(this->peer_[P1].PRG(), data_size);
 
         v_out_23[P2] -= v_out_23[P1];
         this->peer_[P2].WriteData(v_out_23[P2], count_band);
@@ -115,7 +116,8 @@ D *DPFORAM<D>::GetLatestData(D &v_read_13,
         const uint64_t b1 = is_cached_23[P2];
         v_out_23[P2] = *SSOT::P1(this->peer_, b1, v, count_band);
         this->peer_[P2].WriteData(v_out_23[P2], count_band);
-        v_out_23[P0].Random(this->peer_[P0].PRG());
+        v_out_23[P0] = new D();
+        v_out_23[P0].Random(this->peer_[P0].PRG(), data_size);
     }
     return v_out_23;
 }
@@ -184,7 +186,7 @@ void DPFORAM<D>::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_inde
         for (uint i = 0; i < data_per_block; i++) {
             memcpy(&new_block_data[i * data_size], data_array_13[i].Dump(), data_size);
         }
-        new_block_13.Load(new_block_data);
+        new_block_13.Load(new_block_data, data_size);
 
         BinaryData *new_block_23 = ShareTwoThird(this->peer_, new_block_13, !read_only);
         this->position_map_->Write(block_index_23, old_block_23, new_block_23, !read_only);
@@ -337,9 +339,9 @@ void DPFORAM<D>::Test(uint iterations) {
         this->PrintMetadata();
 
         debug_print("\nTest, ========== Write random data ==========\n");
-        D new_data_23[2] = {D(this->DataSize()), D(this->DataSize())};
+        D new_data_23[2];
         for (uint b = 0; b < 2; b++) {
-            new_data_23[b].Random(this->peer_[b].PRG());
+            new_data_23[b].Random(this->peer_[b].PRG(), this->DataSize());
         }
         new_data_23[0].Print("new_data_23[0]");
         new_data_23[1].Print("new_data_23[1]");

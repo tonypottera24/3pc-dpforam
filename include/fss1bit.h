@@ -13,9 +13,9 @@ private:
 
 public:
     FSS1Bit();
-    std::pair<std::vector<BinaryData>, bool> Gen(uint64_t index, uint64_t log_n, const bool is_symmetric);
+    std::pair<BinaryData *, bool> Gen(uint64_t index, uint64_t log_n, const bool is_symmetric);
     uchar *EvalAll(BinaryData &query_23, uint64_t log_n);
-    std::pair<std::vector<BinaryData>, bool> PseudoGen(Peer peer[2], uint64_t index, uint64_t byte_length, const bool is_symmetric);
+    std::pair<BinaryData *, bool> PseudoGen(Peer peer[2], uint64_t index, uint64_t byte_length, const bool is_symmetric);
     bool *PseudoEvalAll(BinaryData &query, const uint64_t n);
 };
 

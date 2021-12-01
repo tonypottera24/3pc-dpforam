@@ -14,6 +14,8 @@ private:
     uchar *data_;
     const bool is_symmetric_ = true;
 
+    void Resize(uint size);
+
 public:
     BinaryData();
     BinaryData(const BinaryData &other);
@@ -37,10 +39,10 @@ public:
     }
 
     uchar *Dump();
-    void Load(uchar *data);
+    void Load(uchar *data, uint size);
     void Reset();
-    void Random();
-    void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
+    void Random(uint size);
+    void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg, uint size);
     uint Size() { return this->size_; }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");

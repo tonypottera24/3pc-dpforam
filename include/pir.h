@@ -85,8 +85,8 @@ D &SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint64_t i
 
         SSOT::P2<D>(peer, n, data_size, count_band);
 
-        v_out_13 = new D(data_size, true);
-        v_out_13->Random(peer[P0].PRG());
+        v_out_13 = new D();
+        v_out_13->Random(peer[P0].PRG(), data_size);
     } else if (party == 0) {
         const uint P2 = 0, P1 = 1;
 
@@ -96,8 +96,8 @@ D &SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint64_t i
         }
         v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, count_band);
 
-        D tmp = D(data_size);
-        tmp.Random(peer[P2].PRG());
+        D tmp;
+        tmp.Random(peer[P2].PRG(), data_size);
         *v_out_13 -= tmp;
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;

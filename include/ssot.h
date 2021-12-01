@@ -7,19 +7,16 @@ void P2(Peer peer[2], const uint64_t n, const uint data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
     // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
 
-    D delta = D(data_size);
-    delta.Random();
+    D delta;
+    delta.Random(data_size);
 
     uint64_t alpha = rand_uint64(peer[P0].PRG()) % n;
     uint64_t beta = rand_uint64(peer[P1].PRG()) % n;
 
-    D x = D(data_size);
-    D y = D(data_size);
-    D xx = D(data_size);
-    D yy = D(data_size);
+    D x, y, xx, yy;
     for (uint64_t i = 0; i < n; i++) {
-        x.Random(peer[P0].PRG());
-        y.Random(peer[P1].PRG());
+        x.Random(peer[P0].PRG(), data_size);
+        y.Random(peer[P1].PRG(), data_size);
         if (i == beta) {
             xx = x + delta;
         }
@@ -46,10 +43,9 @@ D* P0(Peer peer[2], const uint64_t b0, std::vector<D>& u, bool count_band) {
 
     uint64_t alpha = rand_uint64(peer[P2].PRG()) % n;
 
-    std::vector<D> x;
+    D[n] x;
     for (uint64_t i = 0; i < n; i++) {
-        x.emplace_back(data_size);
-        x[i].Random(peer[P2].PRG());
+        x[i].Random(peer[P2].PRG(), data_size);
     }
 
     // Send s to P1
@@ -85,10 +81,9 @@ D* P1(Peer peer[2], const uint64_t b1, std::vector<D>& v, bool count_band) {
 
     uint64_t beta = rand_uint64(peer[P2].PRG()) % n;
 
-    std::vector<D> y;
+    D[n] y;
     for (uint64_t i = 0; i < n; i++) {
-        y.emplace_back(data_size);
-        y[i].Random(peer[P2].PRG());
+        y[i].Random(peer[P2].PRG(), data_size);
     }
 
     // Send t to P0

@@ -24,12 +24,8 @@ ZpData::~ZpData() {
 
 ZpData &ZpData::operator=(const ZpData &other) {
     // copy operation
-    if (this == &other) {
-        return *this;
-    }
-
+    if (this == &other) return *this;
     this->data_ = other.data_;
-
     return *this;
 }
 
@@ -71,23 +67,33 @@ uchar *ZpData::Dump() {
     return data_bytes;
 }
 
-void ZpData::Load(uchar *data) {
-    memcpy((uchar *)&(this->data_), data, this->size_);
+void ZpData::Load(uchar *data, uint size) {
+    memcpy((uchar *)&(this->data_), data, size);
     this->data_ %= this->p_;
+}
+
+void ZpData::ConvertFromBytes(uchar *data, uint size) {
+    // memcpy((uchar *)&(this->data_), data, this->size_);
+    CryptoPP::AutoSeededRandomPool rnd;
+    if (this->q_) {
+        this->data_ %= this->p_;
+    } else {
+        rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
+    }
 }
 
 void ZpData::Reset() {
     this->data_ = 0;
 }
 
-void ZpData::Random() {
+void ZpData::Random(uint size) {
     CryptoPP::AutoSeededRandomPool rnd;
-    rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
+    rnd.GenerateBlock((uchar *)&(this->data_), size);
     this->data_ %= this->p_;
 }
 
-void ZpData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {
-    prg.GenerateBlock((uchar *)&(this->data_), this->size_);
+void ZpData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg, uint size) {
+    prg.GenerateBlock((uchar *)&(this->data_), size);
     this->data_ %= this->p_;
 }
 

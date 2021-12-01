@@ -14,10 +14,9 @@ void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool c
     const uint P2 = inv ? 1 : 0;
     debug_print("inv::P0 inv = %u\n", inv);
 
-    std::vector<D> p;
+    D p[2];
     for (uint b = 0; b < 2; b++) {
-        p.emplace_back(data_size);
-        p[b].Random();
+        p[b].Random(data_size);
     }
     uchar s = rand_uint64() & 1;
     uchar bb = b ^ s;
@@ -70,8 +69,8 @@ D& Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
     // debug_print("is_0 = %u\n", is_0);
 
     P0<D>(peer, is_0, data_size, false, count_band);
-    D r = D(data_size);
-    r.Random();
+    D r;
+    r.Random(data_size);
     D m[2] = {v[1] - r, -v[1] - r};
     P1<D>(peer, m, false, count_band);
     D mb = P2<D>(peer, data_size, false, count_band);
@@ -79,8 +78,7 @@ D& Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
 
     // inv
     P0<D>(peer, !is_0, data_size, true, count_band);
-    r = D(data_size);
-    r.Random();
+    r.Random(data_size);
     m[0] = v[0] - r;
     m[1] = -v[0] - r;
     P1(peer, m, true, count_band);

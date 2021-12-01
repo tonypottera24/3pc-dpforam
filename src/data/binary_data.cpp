@@ -6,14 +6,12 @@ BinaryData::BinaryData() {
 }
 
 BinaryData::BinaryData(uchar *data, const uint size) {
-    this->data_ = new uchar[size];
-    this->size_ = size;
+    this->Resize(size);
     memcpy(this->data_, data, this->size_);
 }
 
 BinaryData::BinaryData(const uint size, const bool set_zero) {
-    this->data_ = new uchar[size];
-    this->size_ = size;
+    this->Resize(size);
     if (set_zero) {
         this->Reset();
     }
@@ -23,9 +21,8 @@ BinaryData::BinaryData(const BinaryData &other) {
     // NOTE test this part
     // this->data_ = other.data_;
     // this->size_ = other.size_;
-    this->data_ = new uchar[other.size_];
+    this->Resize(other.size_);
     memcpy(this->data_, other.data_, other.size_);
-    this->size_ = other.size_;
 }
 
 BinaryData::~BinaryData() {
@@ -34,14 +31,9 @@ BinaryData::~BinaryData() {
 
 BinaryData &BinaryData::operator=(const BinaryData &other) {
     // copy operation
-    if (this == &other) {
-        return *this;
-    }
-
-    this->data_ = new uchar[other.size_];
+    if (this == &other) return *this;
+    this->Resize(other.size_);
     memcpy(this->data_, other.data_, other.size_);
-    this->size_ = other.size_;
-
     return *this;
 }
 
@@ -87,21 +79,24 @@ uchar *BinaryData::Dump() {
     return data_bytes;
 }
 
-void BinaryData::Load(uchar *data) {
-    memcpy(this->data_, data, this->size_);
+void BinaryData::Load(uchar *data, uint size) {
+    this->Resize(size);
+    memcpy(this->data_, data, size);
 }
 
 void BinaryData::Reset() {
     memset(this->data_, 0, this->size_);
 }
 
-void BinaryData::Random() {
+void BinaryData::Random(uint size) {
+    this->Resize(size);
     CryptoPP::AutoSeededRandomPool rnd;
-    rnd.GenerateBlock(this->data_, this->size_);
+    rnd.GenerateBlock(this->data_, size);
 }
 
-void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {
-    prg.GenerateBlock(this->data_, this->size_);
+void BinaryData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg, uint size) {
+    this->Resize(size);
+    prg.GenerateBlock(this->data_, size);
 }
 
 void BinaryData::Print(const char *title) {
@@ -113,4 +108,11 @@ void BinaryData::Print(const char *title) {
         debug_print("%02X", this->data_[i]);
     }
     debug_print("\n");
+}
+
+void BinaryData::Resize(uint size) {
+    if (this->size_ == size) return;
+    if (this->data_ != NULL) delete[] this->data_;
+    if (size > 0) this->data_ = new uchar[size];
+    this->size_ = size;
 }
