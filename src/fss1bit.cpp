@@ -50,20 +50,20 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-std::pair<BinaryData *, bool> FSS1Bit::Gen(uint64_t index, uint64_t log_n, const bool is_symmetric) {
+std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uint64_t index, uint64_t log_n, const bool is_symmetric) {
     uchar *query_23_bytes[2];
     uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
-    BinaryData *query_23 = new BinaryData[2];
+    std::vector<BinaryData> *query_23 = new std::vector<BinaryData>;
     for (uint b = 0; b < 2; b++) {
-        query_23[b] = BinaryData(query_23_bytes[b], query_size);
+        query_23->emplace_back(query_23_bytes[b], query_size);
     }
     bool is_0 = true;
     if (!is_symmetric) {
-        uchar *dpf_out_0 = this->EvalAll(query_23[0], log_n);
-        uchar *dpf_out_1 = this->EvalAll(query_23[1], log_n);
+        uchar *dpf_out_0 = this->EvalAll((*query_23)[0], log_n);
+        uchar *dpf_out_1 = this->EvalAll((*query_23)[1], log_n);
         is_0 = dpf_out_0[index] > dpf_out_1[index];
     }
-    return std::make_pair(query_23, is_0);
+    return std::make_pair(*query_23, is_0);
 }
 
 uchar *FSS1Bit::EvalAll(BinaryData &query, uint64_t log_n) {
@@ -82,20 +82,23 @@ uchar *FSS1Bit::EvalAll(BinaryData &query, uint64_t log_n) {
     return out;
 }
 
-std::pair<BinaryData *, bool> FSS1Bit::PseudoGen(Peer peer[2], uint64_t index, uint64_t byte_length, const bool is_symmetric) {
-    BinaryData *query_23 = new BinaryData[2];
-    query_23[0].Random(peer[1].PRG(), byte_length);
-    query_23[1].Random(peer[0].PRG(), byte_length);
-    uchar *dpf_out = query_23[0].Dump();
+std::pair<std::vector<BinaryData>, bool> FSS1Bit::PseudoGen(Peer peer[2], uint64_t index, uint64_t byte_length, const bool is_symmetric) {
+    std::vector<BinaryData> *query_23 = new std::vector<BinaryData>;
+    for (uint b = 0; b < 2; b++) {
+        query_23->emplace_back();
+    }
+    (*query_23)[0].Random(peer[1].PRG(), byte_length);
+    (*query_23)[1].Random(peer[0].PRG(), byte_length);
+    uchar *dpf_out = (*query_23)[0].Dump();
     uint64_t index_byte = index / sizeof(uint64_t);
     uint64_t index_bit = index % sizeof(uint64_t);
     dpf_out[index_byte] ^= 1 << index_bit;
-    query_23[0].Load(dpf_out, byte_length);
+    (*query_23)[0].Load(dpf_out, byte_length);
     bool is_0 = false;
     if (!is_symmetric) {
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
-    return std::make_pair(query_23, is_0);
+    return std::make_pair(*query_23, is_0);
 }
 
 bool *FSS1Bit::PseudoEvalAll(BinaryData &query, const uint64_t n) {

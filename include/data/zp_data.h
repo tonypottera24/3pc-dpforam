@@ -11,7 +11,7 @@
 class ZpData {
 private:
     const uint size_ = sizeof(uint64_t);
-    uint64_t data_;
+    uint64_t data_ = 0;
     const uint64_t p_ = 11;
     const uint64_t q_ = p_ - 1;
     const bool is_symmetric_ = false;

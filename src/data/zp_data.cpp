@@ -72,15 +72,15 @@ void ZpData::Load(uchar *data, uint size) {
     this->data_ %= this->p_;
 }
 
-void ZpData::ConvertFromBytes(uchar *data, uint size) {
-    // memcpy((uchar *)&(this->data_), data, this->size_);
-    CryptoPP::AutoSeededRandomPool rnd;
-    if (this->q_) {
-        this->data_ %= this->p_;
-    } else {
-        rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
-    }
-}
+// void ZpData::ConvertFromBytes(uchar *data, uint size) {
+//     // memcpy((uchar *)&(this->data_), data, this->size_);
+//     CryptoPP::AutoSeededRandomPool rnd;
+//     if (this->q_) {
+//         this->data_ %= this->p_;
+//     } else {
+//         rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
+//     }
+// }
 
 void ZpData::Reset() {
     this->data_ = 0;

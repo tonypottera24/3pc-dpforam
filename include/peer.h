@@ -11,7 +11,6 @@ class Peer {
 private:
     Socket socket_;
     CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg_;
-    uint64_t bandwidth_ = 0;
 
 public:
     Peer() {}
@@ -25,15 +24,15 @@ public:
     uint64_t ReadLong();
 
     template <typename D>
-    D &ReadData(const uint size) {
+    D ReadData(const uint size) {
         // fprintf(stderr, "ReadData, size = %u\n", size);
         uchar binary_data[size];
         this->socket_.Read(binary_data, size);
-        return *new D(binary_data, size);
+        return D(binary_data, size);
     }
 
     template <typename D>
-    void WriteData(D &data, bool count_band) {
+    void WriteData(D data, bool count_band) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
         this->socket_.Write(data.Dump(), data.Size(), count_band);
     }

@@ -14,8 +14,9 @@ void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool c
     const uint P2 = inv ? 1 : 0;
     debug_print("inv::P0 inv = %u\n", inv);
 
-    D p[2];
+    std::vector<D> p;
     for (uint b = 0; b < 2; b++) {
+        p.emplace_back();
         p[b].Random(data_size);
     }
     uchar s = rand_uint64() & 1;
@@ -49,7 +50,7 @@ void P1(Peer peer[2], D m[2], const bool inv, bool count_band) {
 }
 
 template <typename D>
-D& P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
+D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
     const uint P0 = inv ? 0 : 1;
     const uint P1 = inv ? 1 : 0;
     debug_print("inv::P2 inv = %u\n", inv);
@@ -59,11 +60,11 @@ D& P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
     D pb = peer[P0].template ReadData<D>(data_size);
     std::vector<D> mm = peer[P1].template ReadData<D>(2, data_size);
 
-    return *new D(mm[bb] - pb);
+    return mm[bb] - pb;
 }
 
 template <typename D>
-D& Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
+D Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
     uint data_size = v[0].Size();
 
     // debug_print("is_0 = %u\n", is_0);
@@ -84,7 +85,7 @@ D& Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
     P1(peer, m, true, count_band);
     mb = P2<D>(peer, data_size, true, count_band);
     v_inv += r + mb;
-    return *new D(v_inv);
+    return v_inv;
 }
 
 }  // namespace inv_gadget

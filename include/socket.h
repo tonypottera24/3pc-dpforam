@@ -33,6 +33,7 @@ public:
     // void fread(uchar *data, uint64_t bytes);
     void Flush();
     void Close();
+    uint64_t Bandwidth();
 };
 
 #endif /* SIMPLE_SOCKET_H_ */

@@ -14,7 +14,7 @@ CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &Peer::PRG() {
 }
 
 uint64_t Peer::Bandwidth() {
-    return this->bandwidth_;
+    return this->socket_.Bandwidth();
 }
 
 void Peer::WriteLong(uint64_t n, bool count_band) {

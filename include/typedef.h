@@ -5,7 +5,7 @@
 
 typedef unsigned char uchar;
 
-#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #define debug_print(...) fprintf(stderr, __VA_ARGS__)

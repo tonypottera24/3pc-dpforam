@@ -110,3 +110,7 @@ void Socket::Close() {
     delete[] buffer_;
     ::close(socket_fd_);
 }
+
+uint64_t Socket::Bandwidth() {
+    return this->bandwidth_;
+}

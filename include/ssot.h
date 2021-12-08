@@ -32,7 +32,7 @@ void P2(Peer peer[2], const uint64_t n, const uint data_size, bool count_band) {
 }
 
 template <typename D>
-D* P0(Peer peer[2], const uint64_t b0, std::vector<D>& u, bool count_band) {
+D P0(Peer peer[2], const uint64_t b0, std::vector<D>& u, bool count_band) {
     const uint P2 = 0, P1 = 1;
     // fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
     // Receive x0, x1, y, alpha from P2
@@ -43,7 +43,7 @@ D* P0(Peer peer[2], const uint64_t b0, std::vector<D>& u, bool count_band) {
 
     uint64_t alpha = rand_uint64(peer[P2].PRG()) % n;
 
-    D[n] x;
+    D x[n];
     for (uint64_t i = 0; i < n; i++) {
         x[i].Random(peer[P2].PRG(), data_size);
     }
@@ -64,11 +64,11 @@ D* P0(Peer peer[2], const uint64_t b0, std::vector<D>& u, bool count_band) {
 
     // Receive v0' and v1' from P1
     std::vector<D> vv = peer[P1].template ReadData<D>(n, data_size);
-    return new D(vv[b0] - y);
+    return vv[b0] - y;
 }
 
 template <typename D>
-D* P1(Peer peer[2], const uint64_t b1, std::vector<D>& v, bool count_band) {
+D P1(Peer peer[2], const uint64_t b1, std::vector<D>& v, bool count_band) {
     const uint P0 = 0, P2 = 1;
     // fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
     // print_bytes(v01[0], data_size, "v01", 0);
@@ -81,7 +81,7 @@ D* P1(Peer peer[2], const uint64_t b1, std::vector<D>& v, bool count_band) {
 
     uint64_t beta = rand_uint64(peer[P2].PRG()) % n;
 
-    D[n] y;
+    D y[n];
     for (uint64_t i = 0; i < n; i++) {
         y[i].Random(peer[P2].PRG(), data_size);
     }
@@ -102,7 +102,7 @@ D* P1(Peer peer[2], const uint64_t b1, std::vector<D>& v, bool count_band) {
 
     // Receive u0' and u1' from P0
     std::vector<D> uu = peer[P0].template ReadData<D>(n, data_size);
-    return new D(uu[b1] - x);
+    return uu[b1] - x;
 }
 
 };  // namespace SSOT
