@@ -17,18 +17,18 @@
 #include "ssot.h"
 #include "util.h"
 #include "zp_data.h"
-template <typename D>
+template <typename D, typename K>
 class DPFORAM {
 private:
     uint party_;
     FSS1Bit fss_;
     Peer *peer_;
 
-    std::vector<D> key_array_13_;
+    std::vector<K> key_array_13_;
     std::vector<D> read_array_23_[2];
     std::vector<D> write_array_13_;
     std::vector<D> cache_array_23_[2];
-    DPFORAM<BinaryData> *position_map_ = NULL;
+    DPFORAM<BinaryData, BinaryData> *position_map_ = NULL;
     uint64_t tau_;
     uint64_t ssot_threshold_;
     uint64_t pseudo_dpf_threshold_;
@@ -58,8 +58,12 @@ public:
     void Write(const uint64_t index_23[2], D old_data_13, D new_data_13, bool count_band);
 
     void PrintMetadata();
-    uint64_t Size();
-    uint DataSize();
+    inline uint64_t Size() {
+        return this->write_array_13_.size();
+    }
+    inline uint DataSize() {
+        return this->write_array_13_[0].Size();
+    }
     void Reset();
     void Test(uint iterations);
 };
