@@ -56,9 +56,9 @@ static int getbit(uint64_t x, int n, int b) {
     return (x >> (n - b)) & 1;
 }
 
-int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
-        unsigned char **k1) {
-    int maxlayer = max(n - 7, 0);
+int GEN(AES_KEY *key, uint64_t alpha, int log_n, uchar **k0,
+        uchar **k1) {
+    int maxlayer = max(log_n - 7, 0);
     //int maxlayer = n;
 
     uint128 s[maxlayer + 1][2];
@@ -83,7 +83,7 @@ int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
         PRG(key, s[i - 1][1], &s1[LEFT], &s1[RIGHT], &t1[LEFT], &t1[RIGHT]);
 
         int keep, lose;
-        int alphabit = getbit(alpha, n, i);
+        int alphabit = getbit(alpha, log_n, i);
         if (alphabit == 0) {
             keep = LEFT;
             lose = RIGHT;
@@ -146,20 +146,20 @@ int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
     finalblock = uint128_xor(finalblock, s[maxlayer][0]);
     finalblock = uint128_xor(finalblock, s[maxlayer][1]);
 
-    unsigned char *buff0;
-    unsigned char *buff1;
+    uchar *buff0;
+    uchar *buff1;
     int size = 1 + 16 + 1 + 18 * maxlayer + 16;
-    //	buff0 = (unsigned char*) malloc(size);
-    //	buff1 = (unsigned char*) malloc(size);
-    buff0 = new unsigned char[size];
-    buff1 = new unsigned char[size];
+    //	buff0 = (uchar*) malloc(size);
+    //	buff1 = (uchar*) malloc(size);
+    buff0 = new uchar[size];
+    buff1 = new uchar[size];
 
     if (buff0 == NULL || buff1 == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
 
-    buff0[0] = n;
+    buff0[0] = log_n;
     memcpy(&buff0[1], &s[0][0], 16);
     buff0[17] = t[0][0];
     for (i = 1; i <= maxlayer; i++) {
@@ -169,7 +169,7 @@ int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
     }
     memcpy(&buff0[18 * maxlayer + 18], &finalblock, 16);
 
-    buff1[0] = n;
+    buff1[0] = log_n;
     memcpy(&buff1[18], &buff0[18], 18 * (maxlayer));
     memcpy(&buff1[1], &s[0][1], 16);
     buff1[17] = t[0][1];
@@ -181,7 +181,7 @@ int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
     return size;
 }
 
-uint128 EVAL(AES_KEY *key, unsigned char *k, uint64_t x) {
+uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
     int n = k[0];
     int max_layer = max(n - 7, 0);
 
@@ -238,7 +238,7 @@ uint128 EVAL(AES_KEY *key, unsigned char *k, uint64_t x) {
     return res;
 }
 
-uint128 *EVALFULL(AES_KEY *key, const unsigned char *k) {
+uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     int n = k[0];
     int maxlayer = max(n - 7, 0);
     uint64_t maxlayeritem = 1 << maxlayer;
@@ -330,8 +330,8 @@ void test_libdpf() {
     AES_KEY key;
     AES_set_encrypt_key(userkey, &key);
 
-    unsigned char *k0;
-    unsigned char *k1;
+    uchar *k0;
+    uchar *k1;
 
     GEN(&key, 1, 1, &k0, &k1);
 

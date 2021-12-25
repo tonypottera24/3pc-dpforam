@@ -17,7 +17,7 @@ uint128 dpf_seed(uint128 *seed) {
     if (seed) {
         cur_seed = *seed;
     } else {
-        if (RAND_bytes((unsigned char *)&cur_seed, 16) == 0) {
+        if (RAND_bytes((uchar *)&cur_seed, 16) == 0) {
             fprintf(stderr, "** unable to seed securely\n");
             return dpf_zero_block();
         }

@@ -54,7 +54,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint64_t
 }
 
 // template <typename K>
-// uint64_t DPF_KEY_PIR(Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const uint64_t log_n, const K key_23[2], bool pseudo, bool count_band) {
+// uint64_t DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const uint64_t log_n, const K key_23[2], bool pseudo, bool count_band) {
 //     debug_print("[%lu]DPF_KEY_PIR, n = %llu, log_n = %llu\n", key_array_13.size(), n, log_n);
 //     // only accept power of 2 n
 //     const bool is_symmetric = key_array_13[0].IsSymmetric();
@@ -67,14 +67,17 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint64_t
 //         peer[0].WriteData(query_23[0], count_band);
 //         query_23[0] = peer[1].template ReadData<BinaryData>(query_23[0].Size());
 //     } else {
-//         K key = key_23[0] + key_23[1];
-//         std::tie(query_23, is_0) = fss.Gen(, log_n, is_symmetric);
+//         if (party == 2) {
+//             K key = key_23[0] + key_23[1];
+//             std::tie(query_23, is_0) = fss.Gen(, log_n, is_symmetric);
 
-//         peer[0].WriteData(query_23[0], count_band);
-//         peer[1].WriteData(query_23[1], count_band);
-
-//         query_23[1] = peer[0].template ReadData<BinaryData>(query_23[0].Size());
-//         query_23[0] = peer[1].template ReadData<BinaryData>(query_23[1].Size());
+//             peer[0].WriteData(query_23[0], count_band);
+//             peer[1].WriteData(query_23[1], count_band);
+//         } else if (party == 0) {
+//             query_23[1] = peer[0].template ReadData<BinaryData>(query_23[0].Size());
+//         } else {  // party == 1
+//             query_23[0] = peer[1].template ReadData<BinaryData>(query_23[1].Size());
+//         }
 //     }
 
 //     uint data_size = array_23[0][0].Size();

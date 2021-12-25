@@ -3,11 +3,11 @@
 
 #include "aes.h"
 #include "block.h"
+#include "typedef.h"
 
-int GEN(AES_KEY *key, uint64_t alpha, int n, unsigned char **k0,
-        unsigned char **k1);
-uint128 EVAL(AES_KEY *key, unsigned char *k, uint64_t x);
-uint128 *EVALFULL(AES_KEY *key, const unsigned char *k);
+int GEN(AES_KEY *key, uint64_t alpha, int n, uchar **k0, uchar **k1);
+uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x);
+uint128 *EVALFULL(AES_KEY *key, const uchar *k);
 
 void test_libdpf();
 
