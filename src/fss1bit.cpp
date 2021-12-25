@@ -66,6 +66,11 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uint64_t index, uint64_t l
     return std::make_pair(*query_23, is_0);
 }
 
+bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
+    uint128 out = EVAL(&aes_key_, query.Dump(), index);
+    return dpf_lsb(out);
+}
+
 uchar *FSS1Bit::EvalAll(BinaryData &query, uint64_t log_n) {
     uchar *out = new uchar[1 << log_n];
     uint128 *res = EVALFULL(&aes_key_, query.Dump());
@@ -99,6 +104,12 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::PseudoGen(Peer peer[2], uint64
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
     return std::make_pair(*query_23, is_0);
+}
+
+bool FSS1Bit::PseudoEval(BinaryData &query, const uint64_t index) {
+    uint64_t index_byte = index / 8, index_bit = index % 8;
+    uchar *dpf_out = query.Dump();
+    return (dpf_out[index_byte] >> index_bit) & 1;
 }
 
 bool *FSS1Bit::PseudoEvalAll(BinaryData &query, const uint64_t n) {
