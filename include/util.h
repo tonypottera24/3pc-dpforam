@@ -16,21 +16,23 @@
 #include "peer.h"
 #include "typedef.h"
 
-void xor_bytes(const uchar *a, const uchar *b, uint64_t length, uchar *out);
-void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint64_t len, uchar *output);
+void xor_bytes(const uchar *a, const uchar *b, uint len, uchar *out);
+void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint len, uchar *output);
 
-void uint64_to_bytes(uint64_t value, uchar *bytes, uint len = 8);
-uint64_t bytes_to_uint64(const uchar *b, uint len = 8);
+void uint_to_bytes(uint value, uchar *bytes, uint len);
+uint bytes_to_uint(const uchar *b, uint len);
 void rand_bytes(uchar *bytes, const uint len);
-uint64_t rand_uint64();
-uint64_t rand_uint64(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
+uint rand_uint();
+uint rand_uint(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
 uint64_t timestamp();
 
-uint64_t bit_length(uint64_t n);
-uint64_t byte_length(uint64_t n);
-uint uint64_log2(const uint64_t n);
-uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q);
-uint64_t uint64_pow2_ceil(const uint64_t n);
+uint bit_length(uint n);
+uint byte_length(uint n);
+uint log2(const uint n);
+inline uint divide_ceil(const uint n, const uint q) {
+    return (n + q - 1) / q;
+}
+uint pow2_ceil(const uint n);
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
@@ -49,10 +51,10 @@ std::vector<D> *ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, bool count_
 }
 
 template <typename D>
-void ShareIndexTwoThird(Peer peer[2], const uint64_t index_13, const uint64_t n, uint64_t index_23[2], bool count_band) {
-    uint64_t rand_range = n;
-    peer[1].WriteLong(index_13, count_band);
-    index_23[0] = peer[0].ReadLong() % rand_range;
+void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint index_23[2], bool count_band) {
+    uint rand_range = n;
+    peer[1].WriteUInt(index_13, count_band);
+    index_23[0] = peer[0].ReadUInt() % rand_range;
     index_23[1] = index_13 % rand_range;
 }
 

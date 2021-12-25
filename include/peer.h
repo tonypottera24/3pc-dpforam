@@ -18,7 +18,10 @@ public:
 
     CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &PRG();
     Socket &Socket();
-    uint64_t Bandwidth();
+    uint Bandwidth();
+
+    void WriteUInt(uint n, bool count_band);
+    uint ReadUInt();
 
     void WriteLong(uint64_t n, bool count_band);
     uint64_t ReadLong();

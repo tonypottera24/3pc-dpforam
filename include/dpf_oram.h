@@ -30,35 +30,35 @@ private:
     std::vector<D> cache_array_23_[2];
     DPFORAM<BinaryData, BinaryData> *position_map_ = NULL;
     uint tau_;
-    uint64_t ssot_threshold_;
-    uint64_t pseudo_dpf_threshold_;
+    uint ssot_threshold_;
+    uint pseudo_dpf_threshold_;
 
 private:
     void Init();
     void InitPositionMap();
-    void InitArray(std::vector<D> &array, const uint64_t n, const uint data_size, bool set_zero);
+    void InitArray(std::vector<D> &array, const uint n, const uint data_size, bool set_zero);
     void ResetArray(std::vector<D> &array);
     void PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index = -1);
 
-    uint64_t KeyToIndex(D key, bool count_band);
+    uint KeyToIndex(D key, bool count_band);
     D GetLatestData(D v_read_13,
                     D v_cache_13, const bool is_cached_23[2], bool count_band);
-    D DPF_Read(const uint64_t index_23[2], bool read_only);
-    void DPF_Write(const uint64_t index_23[2], D old_data_13, D new_data_13, bool count_band);
-    void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached[2], bool read_only);
+    D DPF_Read(const uint index_23[2], bool read_only);
+    void DPF_Write(const uint index_23[2], D old_data_13, D new_data_13, bool count_band);
+    void ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached[2], bool read_only);
     void AppendCache(D v_new_13, bool count_band);
     void Flush(bool count_band);
 
 public:
     DPFORAM(const uint party, Peer peer[2],
-            uint64_t n, uint data_size, uint tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold);
+            uint n, uint data_size, uint tau, uint ssot_threshold, uint pseudo_dpf_threshold);
     ~DPFORAM();
 
-    D Read(const uint64_t index_23[2], bool read_only);
-    void Write(const uint64_t index_23[2], D old_data_13, D new_data_13, bool count_band);
+    D Read(const uint index_23[2], bool read_only);
+    void Write(const uint index_23[2], D old_data_13, D new_data_13, bool count_band);
 
     void PrintMetadata();
-    inline uint64_t Size() {
+    inline uint Size() {
         return this->write_array_13_.size();
     }
     inline uint DataSize() {

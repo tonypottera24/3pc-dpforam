@@ -78,7 +78,7 @@ void Socket::SetNoDelay() {
 void Socket::Write(const uchar *data, uint data_size, bool count_band) {
     uint offset = 0;
     while (offset < data_size) {
-        uint write_size = ::write(socket_fd_, data + offset, data_size - offset);
+        int write_size = ::write(socket_fd_, data + offset, data_size - offset);
         if (write_size < 0) {
             error("write failed");
         }
@@ -93,7 +93,7 @@ void Socket::Write(const uchar *data, uint data_size, bool count_band) {
 void Socket::Read(uchar *data, uint data_size) {
     uint offset = 0;
     while (offset < data_size) {
-        uint64_t read_size = ::read(socket_fd_, data + offset, data_size - offset);
+        int read_size = ::read(socket_fd_, data + offset, data_size - offset);
         if (read_size < 0) {
             error("read failed");
         }
@@ -111,6 +111,6 @@ void Socket::Close() {
     ::close(socket_fd_);
 }
 
-uint64_t Socket::Bandwidth() {
+uint Socket::Bandwidth() {
     return this->bandwidth_;
 }

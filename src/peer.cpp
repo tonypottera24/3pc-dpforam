@@ -13,8 +13,18 @@ CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &Peer::PRG() {
     return this->prg_;
 }
 
-uint64_t Peer::Bandwidth() {
+uint Peer::Bandwidth() {
     return this->socket_.Bandwidth();
+}
+
+void Peer::WriteUInt(uint n, bool count_band) {
+    this->socket_.Write((uchar *)&n, 4, count_band);
+}
+
+uint Peer::ReadUInt() {
+    uint n;
+    this->socket_.Read((uchar *)&n, 4);
+    return n;
 }
 
 void Peer::WriteLong(uint64_t n, bool count_band) {

@@ -52,12 +52,11 @@ void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *b
     *output2 = dpf_set_lsb_zero(stash[1]);
 }
 
-int getbit(const uint64_t x, const uint n, const uint b) {
+int getbit(const uint x, const uint n, const uint b) {
     return (x >> (n - b)) & 1;
 }
 
-int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0,
-        uchar **k1) {
+int GEN(AES_KEY *key, uint alpha, const uint log_n, uchar **k0, uchar **k1) {
     uint maxlayer = max((int)log_n - 7, 0);
     //int maxlayer = n;
 
@@ -180,7 +179,7 @@ int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0,
     return size;
 }
 
-uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
+uint128 EVAL(AES_KEY *key, uchar *k, uint x) {
     int n = k[0];
     int max_layer = max(n - 7, 0);
 

@@ -19,7 +19,7 @@ private:
     int socket_fd_;
     FILE *stream_;
     char *buffer_;
-    uint64_t bandwidth_ = 0;
+    uint bandwidth_ = 0;
 
     void SetStream();
 
@@ -29,11 +29,9 @@ public:
     void SetNoDelay();
     void Write(const uchar *data, uint data_size, bool count_band = true);
     void Read(uchar *data, uint data_size);
-    // void fwrite(const uchar *data, uint64_t bytes, bool count_band = true);
-    // void fread(uchar *data, uint64_t bytes);
     void Flush();
     void Close();
-    uint64_t Bandwidth();
+    uint Bandwidth();
 };
 
 #endif /* SIMPLE_SOCKET_H_ */

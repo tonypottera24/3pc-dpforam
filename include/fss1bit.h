@@ -13,12 +13,12 @@ private:
 
 public:
     FSS1Bit();
-    std::pair<std::vector<BinaryData>, bool> Gen(const uint64_t index, const uint log_n, const bool is_symmetric);
-    bool Eval(BinaryData &query, const uint64_t index);
+    std::pair<std::vector<BinaryData>, bool> Gen(const uint index, const uint log_n, const bool is_symmetric);
+    bool Eval(BinaryData &query, const uint index);
     bool *EvalAll(BinaryData &query_23, const uint log_n);
-    std::pair<std::vector<BinaryData>, bool> PseudoGen(Peer peer[2], const uint64_t index, const uint64_t byte_length, const bool is_symmetric);
-    bool PseudoEval(BinaryData &query, const uint64_t index);
-    bool *PseudoEvalAll(BinaryData &query, const uint64_t n);
+    std::pair<std::vector<BinaryData>, bool> PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric);
+    bool PseudoEval(BinaryData &query, const uint index);
+    bool *PseudoEvalAll(BinaryData &query, const uint n);
 };
 
 #endif /* FSS_H_ */
