@@ -35,15 +35,12 @@ void DPFORAM<D>::Reset() {
     debug_print("[%llu]Reset\n", this->Size());
     for (uint b = 0; b < 2; b++) {
         ResetArray(read_array_23_[b]);
-        debug_print("[%llu]Reset GG1.5\n", this->Size());
         cache_array_23_[b].clear();
     }
-    debug_print("[%llu]Reset GG1\n", this->Size());
     ResetArray(write_array_13_);
     if (this->position_map_ != NULL) {
         this->position_map_->Reset();
     }
-    debug_print("[%llu]Reset GG2\n", this->Size());
 }
 
 template <typename D>
@@ -82,6 +79,10 @@ uint64_t DPFORAM<D>::Size() {
 template <typename D>
 uint DPFORAM<D>::DataSize() {
     return this->write_array_13_[0].Size();
+}
+
+template <typename D>
+uint64_t DPFORAM<D>::KeyToIndex(D key, bool count_band) {
 }
 
 template <typename D>
@@ -204,7 +205,7 @@ D DPFORAM<D>::Read(const uint64_t index_23[2], bool read_only) {
     if (n == 1) {
         return this->write_array_13_[0];
     } else if (n >= this->ssot_threshold_) {
-        return SSOT_Read(index_23, read_only);
+        return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
     } else {
         return DPF_Read(index_23, read_only);
     }
@@ -230,12 +231,6 @@ D DPFORAM<D>::DPF_Read(const uint64_t index_23[2], bool read_only) {
     D v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, this->pseudo_dpf_threshold_, !read_only);
     v_cache_13.Print("v_cache_13");
     return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
-}
-
-template <typename D>
-D DPFORAM<D>::SSOT_Read(const uint64_t index_23[2], bool read_only) {
-    debug_print("[%llu]SSOT_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
-    return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
 }
 
 template <typename D>

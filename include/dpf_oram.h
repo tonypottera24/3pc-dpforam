@@ -24,6 +24,7 @@ private:
     FSS1Bit fss_;
     Peer *peer_;
 
+    std::vector<D> key_array_13_;
     std::vector<D> read_array_23_[2];
     std::vector<D> write_array_13_;
     std::vector<D> cache_array_23_[2];
@@ -39,11 +40,10 @@ private:
     void ResetArray(std::vector<D> &array);
     void PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index = -1);
 
+    uint64_t KeyToIndex(D key, bool count_band);
     D GetLatestData(D v_read_13,
                     D v_cache_13, const bool is_cached_23[2], bool count_band);
-
     D DPF_Read(const uint64_t index_23[2], bool read_only);
-    D SSOT_Read(const uint64_t index_23[2], bool read_only);
     void DPF_Write(const uint64_t index_23[2], D old_data_13, D new_data_13, bool count_band);
     void ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached[2], bool read_only);
     void AppendCache(D v_new_13, bool count_band);

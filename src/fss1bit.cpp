@@ -28,17 +28,17 @@ const uint64_t masks[64] = {0x0000000000000001ULL, 0x0000000000000002ULL,
                             0x0800000000000000ULL, 0x1000000000000000ULL, 0x2000000000000000ULL,
                             0x4000000000000000ULL, 0x8000000000000000ULL};
 
-void to_byte_vector(uint64_t input, uchar *output, uint size) {
+void to_bit_vector(uint64_t input, bool *output, uint size) {
 #pragma omp simd aligned(output, masks : 16)
     for (uint i = 0; i < size; i++) {
         output[i] = (input & masks[i]) != 0ULL;
     }
 }
 
-void to_byte_vector(uint128 input, uchar *output) {
+void to_bit_vector(uint128 input, bool *output) {
     uint64_t *val = (uint64_t *)&input;
-    to_byte_vector(val[0], output, 64);
-    to_byte_vector(val[1], output + 64, 64);
+    to_bit_vector(val[0], output, 64);
+    to_bit_vector(val[1], output + 64, 64);
 }
 
 FSS1Bit::FSS1Bit() {
@@ -59,8 +59,8 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uint64_t index, uint64_t l
     }
     bool is_0 = true;
     if (!is_symmetric) {
-        uchar *dpf_out_0 = this->EvalAll((*query_23)[0], log_n);
-        uchar *dpf_out_1 = this->EvalAll((*query_23)[1], log_n);
+        bool *dpf_out_0 = this->EvalAll((*query_23)[0], log_n);
+        bool *dpf_out_1 = this->EvalAll((*query_23)[1], log_n);
         is_0 = dpf_out_0[index] > dpf_out_1[index];
     }
     return std::make_pair(*query_23, is_0);
@@ -71,16 +71,16 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
     return dpf_lsb(out);
 }
 
-uchar *FSS1Bit::EvalAll(BinaryData &query, uint64_t log_n) {
-    uchar *out = new uchar[1 << log_n];
+bool *FSS1Bit::EvalAll(BinaryData &query, uint64_t log_n) {
+    bool *out = new bool[1 << log_n];
     uint128 *res = EVALFULL(&aes_key_, query.Dump());
     if (log_n <= 6) {
-        to_byte_vector(((uint64_t *)res)[0], out, (1 << log_n));
+        to_bit_vector(((uint64_t *)res)[0], out, (1 << log_n));
     } else {
         uint max_layer = std::max((int)log_n - 7, 0);
         uint64_t groups = 1ULL << max_layer;
         for (uint64_t i = 0; i < groups; i++) {
-            to_byte_vector(res[i], out + (i << 7));
+            to_bit_vector(res[i], out + (i << 7));
         }
     }
     free(res);
