@@ -28,7 +28,7 @@ uint64_t timestamp();
 
 uint64_t bit_length(uint64_t n);
 uint64_t byte_length(uint64_t n);
-uint64_t uint64_log2(const uint64_t n);
+uint uint64_log2(const uint64_t n);
 uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q);
 uint64_t uint64_pow2_ceil(const uint64_t n);
 

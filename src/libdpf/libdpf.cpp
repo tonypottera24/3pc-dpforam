@@ -52,13 +52,13 @@ void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *b
     *output2 = dpf_set_lsb_zero(stash[1]);
 }
 
-static int getbit(uint64_t x, int n, int b) {
+int getbit(const uint64_t x, const uint n, const uint b) {
     return (x >> (n - b)) & 1;
 }
 
-int GEN(AES_KEY *key, uint64_t alpha, int log_n, uchar **k0,
+int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0,
         uchar **k1) {
-    int maxlayer = max(log_n - 7, 0);
+    uint maxlayer = max((int)log_n - 7, 0);
     //int maxlayer = n;
 
     uint128 s[maxlayer + 1][2];
@@ -73,12 +73,11 @@ int GEN(AES_KEY *key, uint64_t alpha, int log_n, uchar **k0,
     s[0][0] = dpf_set_lsb_zero(s[0][0]);
     s[0][1] = dpf_set_lsb_zero(s[0][1]);
 
-    int i;
     uint128 s0[2], s1[2];  // 0=L,1=R
 #define LEFT 0
 #define RIGHT 1
     int t0[2], t1[2];
-    for (i = 1; i <= maxlayer; i++) {
+    for (uint i = 1; i <= maxlayer; i++) {
         PRG(key, s[i - 1][0], &s0[LEFT], &s0[RIGHT], &t0[LEFT], &t0[RIGHT]);
         PRG(key, s[i - 1][1], &s1[LEFT], &s1[RIGHT], &t1[LEFT], &t1[RIGHT]);
 
@@ -162,7 +161,7 @@ int GEN(AES_KEY *key, uint64_t alpha, int log_n, uchar **k0,
     buff0[0] = log_n;
     memcpy(&buff0[1], &s[0][0], 16);
     buff0[17] = t[0][0];
-    for (i = 1; i <= maxlayer; i++) {
+    for (uint i = 1; i <= maxlayer; i++) {
         memcpy(&buff0[18 * i], &sCW[i - 1], 16);
         buff0[18 * i + 16] = tCW[i - 1][0];
         buff0[18 * i + 17] = tCW[i - 1][1];
@@ -194,8 +193,7 @@ uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
     memcpy(&s[0], &k[1], 16);
     t[0] = k[17];
 
-    int i;
-    for (i = 1; i <= max_layer; i++) {
+    for (uint i = 1; i <= max_layer; i++) {
         memcpy(&sCW[i - 1], &k[18 * i], 16);
         tCW[i - 1][0] = k[18 * i + 16];
         tCW[i - 1][1] = k[18 * i + 17];
@@ -205,7 +203,7 @@ uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
 
     uint128 sL, sR;
     int tL, tR;
-    for (i = 1; i <= max_layer; i++) {
+    for (uint i = 1; i <= max_layer; i++) {
         PRG(key, s[i - 1], &sL, &sR, &tL, &tR);
 
         if (t[i - 1] == 1) {
@@ -247,9 +245,9 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     //int t[2][maxlayeritem];
     uint128 *s[2];
     int *t[2];
-    for (int ii = 0; ii < 2; ii++) {
-        s[ii] = new uint128[maxlayeritem];
-        t[ii] = new int[maxlayeritem];
+    for (int b = 0; b < 2; b++) {
+        s[b] = new uint128[maxlayeritem];
+        t[b] = new int[maxlayeritem];
     }
 
     int curlayer = 1;
@@ -261,9 +259,7 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     memcpy(&s[0][0], &k[1], 16);
     t[0][0] = k[17];
 
-    int i;
-    uint64_t j;
-    for (i = 1; i <= maxlayer; i++) {
+    for (uint i = 1; i <= maxlayer; i++) {
         memcpy(&sCW[i - 1], &k[18 * i], 16);
         tCW[i - 1][0] = k[18 * i + 16];
         tCW[i - 1][1] = k[18 * i + 17];
@@ -273,10 +269,10 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
 
     //block sL, sR;
     //int tL, tR;
-    for (i = 1; i <= maxlayer; i++) {
+    for (uint i = 1; i <= maxlayer; i++) {
         uint64_t itemnumber = 1 << (i - 1);
         //#pragma omp parallel for
-        for (j = 0; j < itemnumber; j++) {
+        for (uint64_t j = 0; j < itemnumber; j++) {
             uint128 sL, sR;
             int tL, tR;
             PRG(key, s[1 - curlayer][j], &sL, &sR, &tL, &tR);
@@ -300,7 +296,7 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     uint128 *res = (uint128 *)malloc(sizeof(uint128) * itemnumber);
 
     //#pragma omp parallel for
-    for (j = 0; j < itemnumber; j++) {
+    for (uint64_t j = 0; j < itemnumber; j++) {
         res[j] = s[1 - curlayer][j];
 
         if (t[1 - curlayer][j] == 1) {
@@ -312,9 +308,9 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
         }
     }
 
-    for (int ii = 0; ii < 2; ii++) {
-        delete[] s[ii];
-        delete[] t[ii];
+    for (uint b = 0; b < 2; b++) {
+        delete[] s[b];
+        delete[] t[b];
     }
 
     return res;
@@ -354,8 +350,7 @@ void test_libdpf() {
     resf0 = EVALFULL(&key, k0);
     resf1 = EVALFULL(&key, k1);
 
-    uint64_t j;
-    for (j = 0; j < 1; j++) {
+    for (uint64_t j = 0; j < 1; j++) {
         fprintf(stderr, "Group %llu\n", j);
 
         dpf_cb(resf0[j]);

@@ -29,14 +29,14 @@ private:
     std::vector<D> write_array_13_;
     std::vector<D> cache_array_23_[2];
     DPFORAM<BinaryData, BinaryData> *position_map_ = NULL;
-    uint64_t tau_;
+    uint tau_;
     uint64_t ssot_threshold_;
     uint64_t pseudo_dpf_threshold_;
 
 private:
     void Init();
     void InitPositionMap();
-    void InitArray(std::vector<D> &array, const uint64_t n, const uint64_t data_size, bool set_zero);
+    void InitArray(std::vector<D> &array, const uint64_t n, const uint data_size, bool set_zero);
     void ResetArray(std::vector<D> &array);
     void PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index = -1);
 
@@ -51,7 +51,7 @@ private:
 
 public:
     DPFORAM(const uint party, Peer peer[2],
-            uint64_t n, uint data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold);
+            uint64_t n, uint data_size, uint tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold);
     ~DPFORAM();
 
     D Read(const uint64_t index_23[2], bool read_only);

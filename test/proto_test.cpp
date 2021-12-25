@@ -29,11 +29,11 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint64_t>()->default_value(15ULL), "number of data (log)")(
-        "data_size", po::value<uint64_t>()->default_value(8ULL), "data size (bytes)")(
-        "tau", po::value<uint64_t>()->default_value(3ULL), "tau, each block include 2^tau data")(
-        "log_ssot_threshold", po::value<uint64_t>()->default_value(20ULL), "ssot threshold (log)")(
-        "log_pseudo_dpf_threshold", po::value<uint64_t>()->default_value(0ULL), "pseudo dpf threshold (log)")(
+        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
+        "data_size", po::value<uint>()->default_value(8), "data size (bytes)")(
+        "tau", po::value<uint>()->default_value(3), "tau, number of data included in a block (log)")(
+        "log_ssot_threshold", po::value<uint>()->default_value(20), "ssot threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint>()->default_value(0), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -68,16 +68,16 @@ int main(int argc, char *argv[]) {
     std::string next_party_ip = vm["next_party_ip"].as<std::string>();
     uint next_party_port = vm["next_party_port"].as<uint>();
 
-    uint64_t log_n = vm["log_n"].as<uint64_t>();
+    uint log_n = vm["log_n"].as<uint>();
     uint64_t n = 1ULL << log_n;
 
-    uint64_t data_size = vm["data_size"].as<uint64_t>();
-    uint64_t tau = vm["tau"].as<uint64_t>();
-    uint64_t log_ssot_threshold = vm["log_ssot_threshold"].as<uint64_t>();
+    uint data_size = vm["data_size"].as<uint>();
+    uint tau = vm["tau"].as<uint>();
+    uint log_ssot_threshold = vm["log_ssot_threshold"].as<uint>();
     uint64_t ssot_threshold = 1ULL << log_ssot_threshold;
     fprintf(stderr, "SSOT threshold %llu\n", ssot_threshold);
 
-    uint64_t log_pseudo_dpf_threshold = vm["log_pseudo_dpf_threshold"].as<uint64_t>();
+    uint log_pseudo_dpf_threshold = vm["log_pseudo_dpf_threshold"].as<uint>();
     uint64_t pseudo_dpf_threshold = 1ULL << log_pseudo_dpf_threshold;
     fprintf(stderr, "Pseudo DPF threshold %llu\n", pseudo_dpf_threshold);
 

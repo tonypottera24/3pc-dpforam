@@ -2,8 +2,8 @@
 
 template <typename D, typename K>
 DPFORAM<D, K>::DPFORAM(const uint party, Peer peer[2],
-                       uint64_t n, uint data_size, uint64_t tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold) : party_(party), peer_(peer), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
-    debug_print("DPFORAM n = %llu, data_size = %u, tau = %llu\n", n, data_size, tau);
+                       uint64_t n, uint data_size, uint tau, uint64_t ssot_threshold, uint64_t pseudo_dpf_threshold) : party_(party), peer_(peer), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
+    debug_print("DPFORAM n = %llu, data_size = %u, tau = %u\n", n, data_size, tau);
     this->InitArray(this->write_array_13_, n, data_size, true);
 
     if (n > 1ULL) {
@@ -44,7 +44,7 @@ void DPFORAM<D, K>::Reset() {
 }
 
 template <typename D, typename K>
-void DPFORAM<D, K>::InitArray(std::vector<D> &array, const uint64_t n, const uint64_t data_size, bool set_zero) {
+void DPFORAM<D, K>::InitArray(std::vector<D> &array, const uint64_t n, const uint data_size, bool set_zero) {
     for (uint64_t i = 0; i < n; i++) {
         array.emplace_back(data_size, set_zero);
     }
@@ -116,9 +116,9 @@ D DPFORAM<D, K>::GetLatestData(D v_read_13,
 template <typename D, typename K>
 void DPFORAM<D, K>::ReadPositionMap(const uint64_t index_23[2], uint64_t cache_index_23[2], bool is_cached_23[2], bool read_only) {
     uint64_t n = this->Size();
-    uint64_t data_size = byte_length(n << 1ULL);
+    uint data_size = byte_length(n << 1ULL);
     uint64_t data_per_block = 1ULL << this->tau_;
-    debug_print("[%llu]ReadPositionMap, n = %llu, index_23 = (%llu, %llu), data_size = %llu, data_per_block = %llu, read_only = %d\n", this->Size(), n, index_23[0], index_23[1], data_size, data_per_block, read_only);
+    debug_print("[%llu]ReadPositionMap, n = %llu, index_23 = (%llu, %llu), data_size = %u, data_per_block = %llu, read_only = %d\n", this->Size(), n, index_23[0], index_23[1], data_size, data_per_block, read_only);
 
     this->position_map_->PrintMetadata();
 
@@ -278,7 +278,7 @@ template <typename D, typename K>
 void DPFORAM<D, K>::PrintMetadata() {
     debug_print("========== PrintMetadata ==========\n");
     debug_print("party_: %u\n", this->party_);
-    debug_print("tau_: %llu\n", this->tau_);
+    debug_print("tau_: %u\n", this->tau_);
     debug_print("n: %lu\n", this->write_array_13_.size());
     debug_print("data_size: %u\n", this->DataSize());
     debug_print("cache_size: %lu\n", this->cache_array_23_[0].size());

@@ -6,9 +6,9 @@
 namespace PIR {
 
 template <typename D>
-D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint64_t log_n, const uint64_t index_23[2], bool pseudo, bool count_band) {
+D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint log_n, const uint64_t index_23[2], bool pseudo, bool count_band) {
     uint64_t n = array_23[0].size();
-    debug_print("[%lu]DPF_PIR, n = %llu, log_n = %llu\n", n, n, log_n);
+    debug_print("[%lu]DPF_PIR, n = %llu, log_n = %u\n", n, n, log_n);
     // only accept power of 2 n
     const bool is_symmetric = array_23[0][0].IsSymmetric();
 
@@ -54,8 +54,8 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint64_t
 }
 
 // template <typename K>
-// uint64_t DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const uint64_t log_n, const K key_23[2], bool pseudo, bool count_band) {
-//     debug_print("[%lu]DPF_KEY_PIR, n = %llu, log_n = %llu\n", key_array_13.size(), n, log_n);
+// uint64_t DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const uint log_n, const K key_23[2], bool pseudo, bool count_band) {
+//     debug_print("[%lu]DPF_KEY_PIR, n = %llu, log_n = %u\n", key_array_13.size(), n, log_n);
 //     // only accept power of 2 n
 //     const bool is_symmetric = key_array_13[0].IsSymmetric();
 
@@ -140,7 +140,7 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint64_t in
 template <typename D>
 D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint64_t index_23[2], uint64_t pseudo_dpf_threshold, bool count_band) {
     uint64_t n = uint64_pow2_ceil(array_23[0].size());
-    uint64_t log_n = uint64_log2(n);
+    uint log_n = uint64_log2(n);
     uint64_t clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
     debug_print("[%lu]PIR, n = %llu\n", array_23[0].size(), n);
     if (n == 1) {

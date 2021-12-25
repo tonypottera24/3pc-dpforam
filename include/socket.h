@@ -27,8 +27,8 @@ public:
     void InitServer(const char *server_ip, const uint port);
     void InitClient(const char *ip, uint port);
     void SetNoDelay();
-    void Write(const uchar *data, uint64_t bytes, bool count_band = true);
-    void Read(uchar *data, uint64_t bytes);
+    void Write(const uchar *data, uint data_size, bool count_band = true);
+    void Read(uchar *data, uint data_size);
     // void fwrite(const uchar *data, uint64_t bytes, bool count_band = true);
     // void fread(uchar *data, uint64_t bytes);
     void Flush();

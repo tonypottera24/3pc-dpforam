@@ -88,7 +88,7 @@ uint64_t byte_length(uint64_t n) {
     return byte_length;
 }
 
-uint64_t uint64_log2(const uint64_t n) {
+uint uint64_log2(const uint64_t n) {
     assert((n > 0) && "uint64_log2 n <= 0");
     return bit_length(n) - 1;
 }
@@ -98,7 +98,7 @@ uint64_t uint64_ceil_divide(const uint64_t n, const uint64_t q) {
 }
 
 uint64_t uint64_pow2_ceil(const uint64_t n) {
-    uint64_t log_n = uint64_log2(n);
+    uint log_n = uint64_log2(n);
     uint64_t clean_n = 1ULL << log_n;
     if (clean_n < n) {
         clean_n <<= 1ULL;

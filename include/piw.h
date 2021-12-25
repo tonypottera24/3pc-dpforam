@@ -80,8 +80,8 @@ D *FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, bool count_b
 }
 
 template <typename D>
-void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint64_t n, const uint64_t log_n, const uint64_t index_23[2], D v_delta_13, bool pseudo, bool count_band) {
-    debug_print("[%lu]DPF_PIW, index_23 = (%llu, %llu), n = %lu, log_n = %llu, new n = %llu\n", array_13.size(), index_23[0], index_23[1], array_13.size(), log_n, n);
+void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint64_t n, const uint log_n, const uint64_t index_23[2], D v_delta_13, bool pseudo, bool count_band) {
+    debug_print("[%lu]DPF_PIW, index_23 = (%llu, %llu), n = %lu, log_n = %u, new n = %llu\n", array_13.size(), index_23[0], index_23[1], array_13.size(), log_n, n);
     v_delta_13.Print("v_delta_13");
     const bool is_symmetric = array_13[0].IsSymmetric();
 
@@ -122,7 +122,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 template <typename D>
 void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint64_t index_23[2], D v_delta_13, uint64_t pseudo_dpf_threshold, bool count_band) {
     uint64_t n = uint64_pow2_ceil(array_13.size());
-    uint64_t log_n = uint64_log2(n);
+    uint log_n = uint64_log2(n);
     uint64_t clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
     debug_print("[%lu]PIW, index_23 = (%llu, %llu), n = %llu\n", array_13.size(), index_23[0], index_23[1], n);
     if (n == 1) {

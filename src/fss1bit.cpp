@@ -50,7 +50,7 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(const uint64_t index, const uint64_t log_n, const bool is_symmetric) {
+std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(const uint64_t index, const uint log_n, const bool is_symmetric) {
     uchar *query_23_bytes[2];
     uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
     std::vector<BinaryData> *query_23 = new std::vector<BinaryData>;
@@ -71,7 +71,7 @@ bool FSS1Bit::Eval(BinaryData &query, const uint64_t index) {
     return (val[index_res / 64ULL] >> (index_res % 64ULL)) & 1ULL;
 }
 
-bool *FSS1Bit::EvalAll(BinaryData &query, const uint64_t log_n) {
+bool *FSS1Bit::EvalAll(BinaryData &query, const uint log_n) {
     bool *out = new bool[1 << log_n];
     uint128 *res = EVALFULL(&aes_key_, query.Dump());
     if (log_n <= 6) {
