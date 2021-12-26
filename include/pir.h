@@ -6,8 +6,7 @@
 namespace PIR {
 
 template <typename D>
-D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint log_n, const uint index_23[2], bool pseudo, bool count_band) {
-    uint n = array_23[0].size();
+D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, const uint log_n, const uint index_23[2], bool pseudo, bool count_band) {
     debug_print("[%u]DPF_PIR, n = %u, log_n = %u\n", n, n, log_n);
     // only accept power of 2 n
     const bool is_symmetric = array_23[0][0].IsSymmetric();
@@ -38,7 +37,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint log
         } else {
             dpf_out = fss.EvalAll(query_23[b], log_n);
         }
-        for (uint i = 0; i < n; i++) {
+        for (uint i = 0; i < array_23[0].size(); i++) {
             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
                 v_sum[b] += array_23[b][i];
@@ -147,7 +146,7 @@ D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_2
         return array_23[0][0];
     } else {
         bool pseudo = (n <= pseudo_dpf_threshold);
-        return DPF_PIR(peer, fss, array_23, log_n, clean_index_23, pseudo, count_band);
+        return DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, pseudo, count_band);
     }
 }
 
