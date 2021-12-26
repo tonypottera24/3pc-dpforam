@@ -52,11 +52,7 @@ void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *b
     *output2 = dpf_set_lsb_zero(stash[1]);
 }
 
-int getbit(const uint x, const uint n, const uint b) {
-    return (x >> (n - b)) & 1;
-}
-
-int GEN(AES_KEY *key, uint alpha, const uint log_n, uchar **k0, uchar **k1) {
+int GEN(AES_KEY *key, uchar *alpha, const uint log_n, uchar **k0, uchar **k1) {
     uint maxlayer = max((int)log_n - 7, 0);
     //int maxlayer = n;
 
@@ -81,7 +77,7 @@ int GEN(AES_KEY *key, uint alpha, const uint log_n, uchar **k0, uchar **k1) {
         PRG(key, s[i - 1][1], &s1[LEFT], &s1[RIGHT], &t1[LEFT], &t1[RIGHT]);
 
         int keep, lose;
-        int alphabit = getbit(alpha, log_n, i);
+        int alphabit = getbit(alpha, i);
         if (alphabit == 0) {
             keep = LEFT;
             lose = RIGHT;
@@ -116,7 +112,8 @@ int GEN(AES_KEY *key, uint alpha, const uint log_n, uchar **k0, uchar **k1) {
     finalblock = dpf_zero_block();
     finalblock = dpf_reverse_lsb(finalblock);
 
-    char shift = (alpha)&127;
+    // char shift = (alpha)&127;
+    char shift = alpha[0];
     if (shift & 64) {
         finalblock = dpf_left_shirt(finalblock, 64);
     }
@@ -179,9 +176,9 @@ int GEN(AES_KEY *key, uint alpha, const uint log_n, uchar **k0, uchar **k1) {
     return size;
 }
 
-uint128 EVAL(AES_KEY *key, uchar *k, uint x) {
-    int n = k[0];
-    int max_layer = max(n - 7, 0);
+uint128 EVAL(AES_KEY *key, uchar *k, uchar *x) {
+    int log_n = k[0];
+    int max_layer = max(log_n - 7, 0);
 
     uint128 s[max_layer + 1];
     int t[max_layer + 1];
@@ -212,7 +209,8 @@ uint128 EVAL(AES_KEY *key, uchar *k, uint x) {
             tR = tR ^ tCW[i - 1][1];
         }
 
-        int xbit = getbit(x, n, i);
+        int xbit = getbit(x, i);
+        // int xbit = x[i];
         if (xbit == 0) {
             s[i] = sL;
             t[i] = tL;
@@ -315,45 +313,45 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     return res;
 }
 
-void test_libdpf() {
-    uint64_t userkey1 = 597349;
-    uint64_t userkey2 = 121379;
-    uint128 userkey = dpf_make_block(userkey1, userkey2);
+// void test_libdpf() {
+//     uint64_t userkey1 = 597349;
+//     uint64_t userkey2 = 121379;
+//     uint128 userkey = dpf_make_block(userkey1, userkey2);
 
-    dpf_seed(NULL);
+//     dpf_seed(NULL);
 
-    AES_KEY key;
-    AES_set_encrypt_key(userkey, &key);
+//     AES_KEY key;
+//     AES_set_encrypt_key(userkey, &key);
 
-    uchar *k0;
-    uchar *k1;
+//     uchar *k0;
+//     uchar *k1;
 
-    GEN(&key, 1, 1, &k0, &k1);
+//     GEN(&key, 1, 1, &k0, &k1);
 
-    uint128 res1;
-    uint128 res2;
+//     uint128 res1;
+//     uint128 res2;
 
-    res1 = EVAL(&key, k0, 0);
-    res2 = EVAL(&key, k1, 0);
-    dpf_cb(res1);
-    dpf_cb(res2);
-    dpf_cb(uint128_xor(res1, res2));
+//     res1 = EVAL(&key, k0, 0);
+//     res2 = EVAL(&key, k1, 0);
+//     dpf_cb(res1);
+//     dpf_cb(res2);
+//     dpf_cb(uint128_xor(res1, res2));
 
-    res1 = EVAL(&key, k0, 128);
-    res2 = EVAL(&key, k1, 128);
-    dpf_cb(res1);
-    dpf_cb(res2);
-    dpf_cb(uint128_xor(res1, res2));
+//     res1 = EVAL(&key, k0, 128);
+//     res2 = EVAL(&key, k1, 128);
+//     dpf_cb(res1);
+//     dpf_cb(res2);
+//     dpf_cb(uint128_xor(res1, res2));
 
-    uint128 *resf0, *resf1;
-    resf0 = EVALFULL(&key, k0);
-    resf1 = EVALFULL(&key, k1);
+//     uint128 *resf0, *resf1;
+//     resf0 = EVALFULL(&key, k0);
+//     resf1 = EVALFULL(&key, k1);
 
-    for (uint64_t j = 0; j < 1; j++) {
-        fprintf(stderr, "Group %llu\n", j);
+//     for (uint64_t j = 0; j < 1; j++) {
+//         fprintf(stderr, "Group %llu\n", j);
 
-        dpf_cb(resf0[j]);
-        dpf_cb(resf1[j]);
-        dpf_cb(uint128_xor(resf0[j], resf1[j]));
-    }
-}
+//         dpf_cb(resf0[j]);
+//         dpf_cb(resf1[j]);
+//         dpf_cb(uint128_xor(resf0[j], resf1[j]));
+//     }
+// }

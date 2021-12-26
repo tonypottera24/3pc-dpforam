@@ -112,8 +112,8 @@ int main(int argc, char *argv[]) {
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     uint64_t start_time = timestamp();
-    // DPFORAM<BinaryData, BinaryData> dpf_oram = DPFORAM<BinaryData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
-    DPFORAM<ZpData, BinaryData> dpf_oram = DPFORAM<ZpData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    DPFORAM<BinaryData, BinaryData> dpf_oram = DPFORAM<BinaryData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    // DPFORAM<ZpData, BinaryData> dpf_oram = DPFORAM<ZpData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 

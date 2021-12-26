@@ -102,6 +102,12 @@ uint pow2_ceil(const uint n) {
     return clean_n;
 }
 
+bool getbit(uchar *a, const uint i) {
+    uint byte_index = i >> 8;
+    uint bit_index = i & 127;
+    return (a[byte_index] >> bit_index) & 1;
+}
+
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {
     if (array_index == -1) {
         printf("%s: 0x", array_name);

@@ -34,6 +34,8 @@ inline uint divide_ceil(const uint n, const uint q) {
 }
 uint pow2_ceil(const uint n);
 
+bool getbit(uchar *a, const uint i);
+
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
 template <typename D>
