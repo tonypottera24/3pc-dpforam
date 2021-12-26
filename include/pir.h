@@ -8,7 +8,7 @@ namespace PIR {
 template <typename D>
 D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint log_n, const uint index_23[2], bool pseudo, bool count_band) {
     uint n = array_23[0].size();
-    debug_print("[%lu]DPF_PIR, n = %u, log_n = %u\n", n, n, log_n);
+    debug_print("[%u]DPF_PIR, n = %u, log_n = %u\n", n, n, log_n);
     // only accept power of 2 n
     const bool is_symmetric = array_23[0][0].IsSymmetric();
 
@@ -55,7 +55,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint log
 
 // template <typename K>
 // uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const uint log_n, const K key_23[2], bool pseudo, bool count_band) {
-//     debug_print("[%lu]DPF_KEY_PIR, n = %llu, log_n = %u\n", key_array_13.size(), n, log_n);
+//     debug_print("[%u]DPF_KEY_PIR, n = %u, log_n = %u\n", key_array_13.size(), n, log_n);
 //     // only accept power of 2 n
 //     const bool is_symmetric = key_array_13[0].IsSymmetric();
 
@@ -90,7 +90,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint log
 //             dpf_out = fss.EvalAll(query_23[b], log_n);
 //         }
 //         for (uint i = 0; i < array_23[b].size(); i++) {
-//             // debug_print("[%llu]DPF_PIR, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
+//             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
 //             if (dpf_out[i ^ index_23[b]]) {
 //                 v_sum[b] += array_23[b][i];
 //             }
@@ -108,7 +108,7 @@ template <typename D>
 D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], bool count_band) {
     // TODO n may not be power of 2
     uint n = array_13.size();
-    debug_print("[%lu]SSOT_PIR, n = %llu, index_23 = (%llu, %llu)\n", array_13.size(), n, index_23[0], index_23[1]);
+    debug_print("[%lu]SSOT_PIR, n = %u, index_23 = (%u, %u)\n", array_13.size(), n, index_23[0], index_23[1]);
     uint data_size = array_13[0].Size();
     D v_out_13;
     if (party == 2) {
@@ -142,7 +142,7 @@ D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_2
     uint n = pow2_ceil(array_23[0].size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
-    debug_print("[%lu]PIR, n = %llu\n", array_23[0].size(), n);
+    debug_print("[%lu]PIR, n = %u\n", array_23[0].size(), n);
     if (n == 1) {
         return array_23[0][0];
     } else {

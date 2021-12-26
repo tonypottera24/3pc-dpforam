@@ -3,7 +3,7 @@
 template <typename D, typename K>
 DPFORAM<D, K>::DPFORAM(const uint party, Peer peer[2],
                        uint n, uint data_size, uint tau, uint ssot_threshold, uint pseudo_dpf_threshold) : party_(party), peer_(peer), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
-    debug_print("DPFORAM n = %llu, data_size = %u, tau = %u\n", n, data_size, tau);
+    debug_print("DPFORAM n = %u, data_size = %u, tau = %u\n", n, data_size, tau);
     this->InitArray(this->write_array_13_, n, data_size, true);
 
     if (n > 1) {
@@ -32,7 +32,7 @@ DPFORAM<D, K>::~DPFORAM() {
 
 template <typename D, typename K>
 void DPFORAM<D, K>::Reset() {
-    debug_print("[%llu]Reset\n", this->Size());
+    debug_print("[%u]Reset\n", this->Size());
     for (uint b = 0; b < 2; b++) {
         ResetArray(read_array_23_[b]);
         cache_array_23_[b].clear();
@@ -65,7 +65,7 @@ void DPFORAM<D, K>::PrintArray(std::vector<D> &array, const char *array_name, co
         debug_print("%s[%llu]:\n", array_name, array_index);
     }
     for (uint i = 0; i < array.size(); i++) {
-        debug_print("[%llu] ", i);
+        debug_print("[%u] ", i);
         array[i].Print();
     }
     debug_print("\n");
@@ -80,7 +80,7 @@ void DPFORAM<D, K>::PrintArray(std::vector<D> &array, const char *array_name, co
 template <typename D, typename K>
 D DPFORAM<D, K>::GetLatestData(D v_read_13,
                                D v_cache_13, const bool is_cached_23[2], bool count_band) {
-    debug_print("[%llu]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
+    debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = v_read_13.Size();
     D v_out_13;
@@ -118,7 +118,7 @@ void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     uint n = this->Size();
     uint data_size = byte_length(n << 1);
     uint data_per_block = 1 << this->tau_;
-    debug_print("[%llu]ReadPositionMap, n = %llu, index_23 = (%llu, %llu), data_size = %u, data_per_block = %llu, read_only = %d\n", this->Size(), n, index_23[0], index_23[1], data_size, data_per_block, read_only);
+    debug_print("[%u]ReadPositionMap, n = %u, index_23 = (%u, %u), data_size = %u, data_per_block = %u, read_only = %d\n", this->Size(), n, index_23[0], index_23[1], data_size, data_per_block, read_only);
 
     this->position_map_->PrintMetadata();
 
@@ -165,7 +165,7 @@ void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
             data_array_13.emplace_back(&new_block_data[i * data_size], data_size);
         }
         uint new_cache_index = (this->cache_array_23_[0].size() << 1) + 1;
-        debug_print("new_cache_index = %llu\n", new_cache_index);
+        debug_print("new_cache_index = %u\n", new_cache_index);
 
         uchar new_cache_index_bytes[data_size];
         uint_to_bytes(new_cache_index, new_cache_index_bytes, data_size);
@@ -192,7 +192,7 @@ void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 
 template <typename D, typename K>
 D DPFORAM<D, K>::Read(const uint index_23[2], bool read_only) {
-    debug_print("[%llu]Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
     uint n = this->Size();
     if (n == 1) {
         return this->write_array_13_[0];
@@ -205,7 +205,7 @@ D DPFORAM<D, K>::Read(const uint index_23[2], bool read_only) {
 
 template <typename D, typename K>
 D DPFORAM<D, K>::DPF_Read(const uint index_23[2], bool read_only) {
-    debug_print("[%llu]DPF_Read, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%u]DPF_Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     D v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, this->pseudo_dpf_threshold_, !read_only);
     v_read_13.Print("v_read_13");
@@ -215,7 +215,7 @@ D DPFORAM<D, K>::DPF_Read(const uint index_23[2], bool read_only) {
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
     }
-    debug_print("cache_index_23 = (%llu, %llu), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
+    debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
         return v_read_13;
@@ -227,7 +227,7 @@ D DPFORAM<D, K>::DPF_Read(const uint index_23[2], bool read_only) {
 
 template <typename D, typename K>
 void DPFORAM<D, K>::Write(const uint index_23[2], D v_old_13, D v_new_13, bool count_band) {
-    debug_print("[%llu]Write, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
     uint n = this->write_array_13_.size();
     if (n == 1) {
         this->write_array_13_[0] = v_new_13;
@@ -238,7 +238,7 @@ void DPFORAM<D, K>::Write(const uint index_23[2], D v_old_13, D v_new_13, bool c
 
 template <typename D, typename K>
 void DPFORAM<D, K>::DPF_Write(const uint index_23[2], D v_old_13, D v_new_13, bool count_band) {
-    debug_print("[%llu]DPF_Write, index_23 = (%llu, %llu)\n", this->Size(), index_23[0], index_23[1]);
+    debug_print("[%u]DPF_Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     D v_delta_13 = v_new_13 - v_old_13;
 
@@ -248,7 +248,7 @@ void DPFORAM<D, K>::DPF_Write(const uint index_23[2], D v_old_13, D v_new_13, bo
 
 template <typename D, typename K>
 void DPFORAM<D, K>::AppendCache(D v_new_13, bool count_band) {
-    debug_print("[%llu]AppendCache\n", this->Size());
+    debug_print("[%u]AppendCache\n", this->Size());
     D *v_new_23 = ShareTwoThird(this->peer_, v_new_13, count_band);
     for (uint b = 0; b < 2; b++) {
         this->cache_array_23_[b].push_back(v_new_23[b]);
@@ -259,12 +259,12 @@ void DPFORAM<D, K>::AppendCache(D v_new_13, bool count_band) {
             this->position_map_->Reset();
         }
     }
-    debug_print("[%llu]AppendCache GG\n", this->Size());
+    debug_print("[%u]AppendCache GG\n", this->Size());
 }
 
 template <typename D, typename K>
 void DPFORAM<D, K>::Flush(bool count_band) {
-    debug_print("[%llu]Flush\n", this->Size());
+    debug_print("[%u]Flush\n", this->Size());
     std::vector<D> *array_23 = ShareTwoThird(this->peer_, this->write_array_13_, count_band);
     for (uint b = 0; b < 2; b++) {
         this->read_array_23_[b] = array_23[b];

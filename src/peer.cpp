@@ -18,22 +18,22 @@ uint Peer::Bandwidth() {
 }
 
 void Peer::WriteUInt(uint n, bool count_band) {
-    this->socket_.Write((uchar *)&n, 4, count_band);
+    this->socket_.Write((uchar *)&n, sizeof(uint), count_band);
 }
 
 uint Peer::ReadUInt() {
     uint n;
-    this->socket_.Read((uchar *)&n, 4);
+    this->socket_.Read((uchar *)&n, sizeof(uint));
     return n;
 }
 
 void Peer::WriteLong(uint64_t n, bool count_band) {
-    this->socket_.Write((uchar *)&n, 8, count_band);
+    this->socket_.Write((uchar *)&n, sizeof(uint64_t), count_band);
 }
 
 uint64_t Peer::ReadLong() {
     uint64_t n;
-    this->socket_.Read((uchar *)&n, 8);
+    this->socket_.Read((uchar *)&n, sizeof(uint64_t));
     return n;
 }
 
