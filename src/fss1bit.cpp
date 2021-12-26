@@ -50,10 +50,10 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(const uint index, const uint log_n, const bool is_symmetric) {
+std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uchar *index, const uint log_n, const bool is_symmetric) {
     uchar *query_23_bytes[2];
 
-    uint query_size = GEN(&aes_key_, (uchar *)(&index), log_n, &query_23_bytes[0], &query_23_bytes[1]);
+    uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
     std::vector<BinaryData> *query_23 = new std::vector<BinaryData>;
     for (uint b = 0; b < 2; b++) {
         query_23->emplace_back(query_23_bytes[b], query_size);
@@ -65,9 +65,9 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(const uint index, const ui
     return std::make_pair(*query_23, is_0);
 }
 
-bool FSS1Bit::Eval(BinaryData &query, const uint index) {
-    uint128 out = EVAL(&aes_key_, query.Dump(), (uchar *)(&index));
-    uint index_res = index & 255;
+bool FSS1Bit::Eval(BinaryData &query, uchar *index) {
+    uint128 out = EVAL(&aes_key_, query.Dump(), index);
+    uint index_res = index[0] & 255;
     uint64_t *val = (uint64_t *)&out;
     return (val[index_res >> 6] >> (index_res & 127)) & 1ULL;
 }
@@ -96,8 +96,8 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::PseudoGen(Peer peer[2], const 
     (*query_23)[0].Random(peer[1].PRG(), byte_length);
     (*query_23)[1].Random(peer[0].PRG(), byte_length);
     uchar *dpf_out = (*query_23)[0].Dump();
-    uint index_byte = index / sizeof(uint);
-    uint index_bit = index % sizeof(uint);
+    uint index_byte = index >> 3;
+    uint index_bit = index & 7;
     dpf_out[index_byte] ^= 1 << index_bit;
     (*query_23)[0].Load(dpf_out, byte_length);
     bool is_0 = false;

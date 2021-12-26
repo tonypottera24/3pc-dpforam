@@ -19,7 +19,8 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
         peer[0].WriteData(query_23[0], count_band);
         query_23[0] = peer[1].template ReadData<BinaryData>(query_23[0].Size());
     } else {
-        std::tie(query_23, is_0) = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric);
+        uint index = index_23[0] ^ index_23[1];
+        std::tie(query_23, is_0) = fss.Gen((uchar *)&index, log_n, is_symmetric);
 
         peer[0].WriteData(query_23[0], count_band);
         peer[1].WriteData(query_23[1], count_band);
