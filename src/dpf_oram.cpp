@@ -71,11 +71,13 @@ void DPFORAM<D, K>::PrintArray(std::vector<D> &array, const char *array_name, co
     debug_print("\n");
 }
 
-// template <typename K>
-// uint DPFORAM<K>::KeyToIndex(K key, bool count_band) {
-//     uint index_13 = PIR::DPF_KEY_PIR<K>(this->peer_, this->fss_, this->key_array_13_, log_n, key, this->pseudo_dpf_threshold_, count_band);
-//     return index_13;
-// }
+template <typename D, typename K>
+void DPFORAM<D, K>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
+    debug_print("[%u]KeyToIndex\n", this->Size());
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->Size(), count_band);
+    ShareIndexTwoThird<K>(this->peer_, index_13, this->Size(), index_23, count_band);
+    debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
+}
 
 template <typename D, typename K>
 D DPFORAM<D, K>::GetLatestData(D v_read_13,
@@ -120,7 +122,7 @@ void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     uint data_per_block = 1 << this->tau_;
     debug_print("[%u]ReadPositionMap, n = %u, index_23 = (%u, %u), data_size = %u, data_per_block = %u, read_only = %d\n", this->Size(), n, index_23[0], index_23[1], data_size, data_per_block, read_only);
 
-    this->position_map_->PrintMetadata();
+    // this->position_map_->PrintMetadata();
 
     uint block_index_23[2];
     uint data_index_23[2];
@@ -187,7 +189,7 @@ void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
         // this->position_map_->PrintMetadata();
     }
     delete[] old_data_23;
-    this->position_map_->PrintMetadata();
+    // this->position_map_->PrintMetadata();
 }
 
 template <typename D, typename K>
@@ -294,31 +296,65 @@ void DPFORAM<D, K>::PrintMetadata() {
 }
 
 template <typename D, typename K>
-void DPFORAM<D, K>::Test(uint iterations) {
+void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
     // TODO remember to free memory
     fprintf(stderr, "Test, iterations = %u \n", iterations);
     uint64_t party_time = 0;
-    uint64_t time;
+    std::chrono::high_resolution_clock::time_point t1, t2;
+    uint n = this->Size();
+
+    if (key_value) {
+        uint key_size = K().Size();
+        std::vector<K> key_array_33[3];
+        for (uint i = 0; i < n; i++) {
+            key_array_33[2].emplace_back();
+            key_array_33[2][i].Random(key_size);
+        }
+        this->peer_[0].WriteData(key_array_33[2], false);
+        this->peer_[1].WriteData(key_array_33[2], false);
+        key_array_33[0] = this->peer_[0].template ReadData<K>(n, key_size);
+        key_array_33[1] = this->peer_[1].template ReadData<K>(n, key_size);
+        for (uint i = 0; i < n; i++) {
+            K k = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
+            this->key_array_13_.push_back(k);
+        }
+    }
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
         debug_print("Test, iteration = %u\n", iteration);
-        uint n = this->write_array_13_.size();
-        // uint data_size = this->write_array_13_[0].Size();
 
-        // this->InitArray(this->key_array_13_, n, data_size, false);
-
-        uint rand_range = n - 1;
-        uint index_13 = rand_uint() % rand_range;
         uint index_23[2];
-        ShareIndexTwoThird<D>(this->peer_, index_13, n, index_23, false);
-        // debug_print( "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
+        K *key_23;
+
+        if (key_value) {
+            key_23[0].Random(this->peer_[0].PRG(), key_23[0].Size());
+            key_23[1].Random(this->peer_[1].PRG(), key_23[1].Size());
+
+            t1 = std::chrono::high_resolution_clock::now();
+            KeyToIndex(key_23, index_23, true);
+            t2 = std::chrono::high_resolution_clock::now();
+            party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        } else {
+            uint rand_range = n - 1;
+
+            // index_23[0] = rand_uint(this->peer_[0].PRG()) % rand_range;
+            // index_23[1] = rand_uint(this->peer_[1].PRG()) % rand_range;
+
+            uint index_13 = rand_uint() % rand_range;
+            ShareIndexTwoThird<K>(this->peer_, index_13, n, index_23, false);
+
+            // debug_print( "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
+        }
 
         // this->PrintMetadata();
 
         debug_print("\nTest, ========== Read old data ==========\n");
-        time = timestamp();
+        t1 = std::chrono::high_resolution_clock::now();
         D old_data_13 = this->Read(index_23, false);
-        party_time += timestamp() - time;
+        t2 = std::chrono::high_resolution_clock::now();
+        uint64_t delta_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        party_time += delta_time;
+        // printf("Read old data party_time = %llu, delta_time = %llu\n", party_time, delta_time);
 
         old_data_13.Print("old_data_13");
 
@@ -329,13 +365,19 @@ void DPFORAM<D, K>::Test(uint iterations) {
         new_data_13[2].Random(this->DataSize());
         new_data_13[2].Print("new_data_13[2]");
 
-        time = timestamp();
+        t1 = std::chrono::high_resolution_clock::now();
         this->Write(index_23, old_data_13, new_data_13[2], true);
-        party_time += timestamp() - time;
+        t2 = std::chrono::high_resolution_clock::now();
+        party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // printf("Write random data party_time = %llu\n", party_time);
 
         this->PrintMetadata();
 
         debug_print("\nTest, ========== Read validation data ==========\n");
+        if (key_value) {
+            KeyToIndex(key_23, index_23, false);
+        }
+
         D verify_data_13[3];
         verify_data_13[2] = this->Read(index_23, true);
 

@@ -65,9 +65,11 @@ uint rand_uint(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {
 }
 
 uint64_t timestamp() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
+    // struct timeval tv;
+    // gettimeofday(&tv, NULL);
+    // return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
+    using namespace std::chrono;
+    return duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 }
 
 uint bit_length(uint n) {

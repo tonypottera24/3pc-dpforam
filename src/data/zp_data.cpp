@@ -88,7 +88,7 @@ void ZpData::Reset() {
 
 void ZpData::Random(uint size) {
     CryptoPP::AutoSeededRandomPool rnd;
-    rnd.GenerateBlock((uchar *)&(this->data_), size);
+    rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
     this->data_ %= this->p_;
 }
 

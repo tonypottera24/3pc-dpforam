@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <omp.h>
 
+#include <chrono>
 #include <cmath>
 #include <iostream>
 
@@ -40,7 +41,6 @@ private:
     void ResetArray(std::vector<D> &array);
     void PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index = -1);
 
-    uint KeyToIndex(D key, bool count_band);
     D GetLatestData(D v_read_13,
                     D v_cache_13, const bool is_cached_23[2], bool count_band);
     D DPF_Read(const uint index_23[2], bool read_only);
@@ -54,6 +54,8 @@ public:
             uint n, uint data_size, uint tau, uint ssot_threshold, uint pseudo_dpf_threshold);
     ~DPFORAM();
 
+    void KeyToIndex(K key_23[2], uint index_23[2], bool count_band);
+
     D Read(const uint index_23[2], bool read_only);
     void Write(const uint index_23[2], D old_data_13, D new_data_13, bool count_band);
 
@@ -65,7 +67,7 @@ public:
         return this->write_array_13_[0].Size();
     }
     void Reset();
-    void Test(uint iterations);
+    void Test(uint iterations, bool key_value);
 };
 
 #endif /* DPF_ORAM_H_ */
