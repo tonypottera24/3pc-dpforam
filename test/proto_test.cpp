@@ -29,11 +29,11 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint>()->default_value(9), "number of data (log)")(
+        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
         "data_size", po::value<uint>()->default_value(8), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(3), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(20), "ssot threshold (log)")(
-        "log_pseudo_dpf_threshold", po::value<uint>()->default_value(0), "pseudo dpf threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint>()->default_value(5), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
-    dpf_oram.Test(iterations, true);
+    dpf_oram.Test(iterations, false);
 
     for (uint b = 0; b < 2; b++) {
         peer[b].Close();

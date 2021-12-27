@@ -303,6 +303,12 @@ void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
     std::chrono::high_resolution_clock::time_point t1, t2;
     uint n = this->Size();
 
+    // socket seems need extra setup at first read/write
+    this->peer_[0].WriteUInt(0, false);
+    this->peer_[1].WriteUInt(0, false);
+    this->peer_[0].ReadUInt();
+    this->peer_[1].ReadUInt();
+
     if (key_value) {
         uint key_size = K().Size();
         std::vector<K> key_array_33[3];
@@ -324,7 +330,7 @@ void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
         debug_print("Test, iteration = %u\n", iteration);
 
         uint index_23[2];
-        K *key_23;
+        K key_23[2];
 
         if (key_value) {
             key_23[0].Random(this->peer_[0].PRG(), key_23[0].Size());
@@ -336,13 +342,8 @@ void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
             party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         } else {
             uint rand_range = n - 1;
-
-            // index_23[0] = rand_uint(this->peer_[0].PRG()) % rand_range;
-            // index_23[1] = rand_uint(this->peer_[1].PRG()) % rand_range;
-
-            uint index_13 = rand_uint() % rand_range;
-            ShareIndexTwoThird<K>(this->peer_, index_13, n, index_23, false);
-
+            index_23[0] = rand_uint(this->peer_[0].PRG()) % rand_range;
+            index_23[1] = rand_uint(this->peer_[1].PRG()) % rand_range;
             // debug_print( "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
         }
 
@@ -354,7 +355,6 @@ void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
         t2 = std::chrono::high_resolution_clock::now();
         uint64_t delta_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         party_time += delta_time;
-        // printf("Read old data party_time = %llu, delta_time = %llu\n", party_time, delta_time);
 
         old_data_13.Print("old_data_13");
 
