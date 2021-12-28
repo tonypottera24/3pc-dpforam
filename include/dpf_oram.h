@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "binary_data.h"
+#include "ec_data.h"
 #include "fss1bit.h"
 #include "inv_gadget.h"
 #include "peer.h"
@@ -18,7 +19,7 @@
 #include "ssot.h"
 #include "util.h"
 #include "zp_data.h"
-template <typename D, typename K>
+template <typename K, typename D>
 class DPFORAM {
 private:
     uint party_;

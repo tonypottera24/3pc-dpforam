@@ -5,7 +5,7 @@ ZpData::ZpData() {
 }
 
 ZpData::ZpData(uchar *data, const uint size) {
-    memcpy((uchar *)&(this->data_), data, this->size_);
+    memcpy((uchar *)&(this->data_), data, this->Size());
 }
 
 ZpData::ZpData(const uint size, const bool set_zero) {
@@ -42,9 +42,8 @@ ZpData &ZpData::operator=(const ZpData &other) {
 // }
 
 ZpData ZpData::operator-() {
-    ZpData *z = new ZpData(this->size_);
-    z->data_ = (this->p_ - this->data_) % this->p_;
-    return *z;
+    this->data_ = (this->p_ - this->data_) % this->p_;
+    return *this;
 }
 
 ZpData &ZpData::operator+=(const ZpData &rhs) {
@@ -62,8 +61,8 @@ bool ZpData::operator==(const ZpData &rhs) {
 }
 
 uchar *ZpData::Dump() {
-    uchar *data_bytes = new uchar[this->size_];
-    memcpy(data_bytes, (uchar *)&(this->data_), this->size_);
+    uchar *data_bytes = new uchar[this->Size()];
+    memcpy(data_bytes, (uchar *)&(this->data_), this->Size());
     return data_bytes;
 }
 
@@ -72,23 +71,13 @@ void ZpData::Load(uchar *data, uint size) {
     this->data_ %= this->p_;
 }
 
-// void ZpData::ConvertFromBytes(uchar *data, uint size) {
-//     // memcpy((uchar *)&(this->data_), data, this->size_);
-//     CryptoPP::AutoSeededRandomPool rnd;
-//     if (this->q_) {
-//         this->data_ %= this->p_;
-//     } else {
-//         rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
-//     }
-// }
-
 void ZpData::Reset() {
     this->data_ = 0;
 }
 
 void ZpData::Random(uint size) {
     CryptoPP::AutoSeededRandomPool rnd;
-    rnd.GenerateBlock((uchar *)&(this->data_), this->size_);
+    rnd.GenerateBlock((uchar *)&(this->data_), this->Size());
     this->data_ %= this->p_;
 }
 

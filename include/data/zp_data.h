@@ -10,7 +10,6 @@
 
 class ZpData {
 private:
-    const uint size_ = sizeof(uint64_t);
     uint64_t data_ = 0;
     const uint64_t p_ = 11;
     const bool is_symmetric_ = false;
@@ -43,7 +42,7 @@ public:
     void Reset();
     void Random(uint size);
     void Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg, uint size);
-    uint Size() { return this->size_; }
+    uint Size() { return sizeof(uint64_t); }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
 };

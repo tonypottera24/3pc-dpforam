@@ -1,7 +1,7 @@
 #include "dpf_oram.h"
 
-template <typename D, typename K>
-DPFORAM<D, K>::DPFORAM(const uint party, Peer peer[2],
+template <typename K, typename D>
+DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2],
                        uint n, uint data_size, uint tau, uint ssot_threshold, uint pseudo_dpf_threshold) : party_(party), peer_(peer), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
     debug_print("DPFORAM n = %u, data_size = %u, tau = %u\n", n, data_size, tau);
     this->InitArray(this->write_array_13_, n, data_size, true);
@@ -18,8 +18,8 @@ DPFORAM<D, K>::DPFORAM(const uint party, Peer peer[2],
     }
 }
 
-template <typename D, typename K>
-DPFORAM<D, K>::~DPFORAM() {
+template <typename K, typename D>
+DPFORAM<K, D>::~DPFORAM() {
     if (this->position_map_ != NULL) {
         delete this->position_map_;
     }
@@ -30,8 +30,8 @@ DPFORAM<D, K>::~DPFORAM() {
     this->write_array_13_.clear();
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::Reset() {
+template <typename K, typename D>
+void DPFORAM<K, D>::Reset() {
     debug_print("[%u]Reset\n", this->Size());
     for (uint b = 0; b < 2; b++) {
         ResetArray(read_array_23_[b]);
@@ -43,22 +43,22 @@ void DPFORAM<D, K>::Reset() {
     }
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::InitArray(std::vector<D> &array, const uint n, const uint data_size, bool set_zero) {
+template <typename K, typename D>
+void DPFORAM<K, D>::InitArray(std::vector<D> &array, const uint n, const uint data_size, bool set_zero) {
     for (uint i = 0; i < n; i++) {
         array.emplace_back(data_size, set_zero);
     }
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::ResetArray(std::vector<D> &array) {
+template <typename K, typename D>
+void DPFORAM<K, D>::ResetArray(std::vector<D> &array) {
     for (uint i = 0; i < array.size(); i++) {
         array[i].Reset();
     }
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index) {
+template <typename K, typename D>
+void DPFORAM<K, D>::PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index) {
     if (array_index == -1) {
         debug_print("%s:\n", array_name);
     } else {
@@ -71,16 +71,16 @@ void DPFORAM<D, K>::PrintArray(std::vector<D> &array, const char *array_name, co
     debug_print("\n");
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
+template <typename K, typename D>
+void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
     debug_print("[%u]KeyToIndex\n", this->Size());
     uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->Size(), count_band);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->Size(), index_23, count_band);
     debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 }
 
-template <typename D, typename K>
-D DPFORAM<D, K>::GetLatestData(D v_read_13,
+template <typename K, typename D>
+D DPFORAM<K, D>::GetLatestData(D v_read_13,
                                D v_cache_13, const bool is_cached_23[2], bool count_band) {
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
@@ -115,8 +115,8 @@ D DPFORAM<D, K>::GetLatestData(D v_read_13,
     return v_out_13;
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached_23[2], bool read_only) {
+template <typename K, typename D>
+void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached_23[2], bool read_only) {
     uint n = this->Size();
     uint data_size = byte_length(n << 1);
     uint data_per_block = 1 << this->tau_;
@@ -192,8 +192,8 @@ void DPFORAM<D, K>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     // this->position_map_->PrintMetadata();
 }
 
-template <typename D, typename K>
-D DPFORAM<D, K>::Read(const uint index_23[2], bool read_only) {
+template <typename K, typename D>
+D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
     uint n = this->Size();
     if (n == 1) {
@@ -205,8 +205,8 @@ D DPFORAM<D, K>::Read(const uint index_23[2], bool read_only) {
     }
 }
 
-template <typename D, typename K>
-D DPFORAM<D, K>::DPF_Read(const uint index_23[2], bool read_only) {
+template <typename K, typename D>
+D DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
     debug_print("[%u]DPF_Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     D v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, this->pseudo_dpf_threshold_, !read_only);
@@ -227,8 +227,8 @@ D DPFORAM<D, K>::DPF_Read(const uint index_23[2], bool read_only) {
     return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::Write(const uint index_23[2], D v_old_13, D v_new_13, bool count_band) {
+template <typename K, typename D>
+void DPFORAM<K, D>::Write(const uint index_23[2], D v_old_13, D v_new_13, bool count_band) {
     debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
     uint n = this->write_array_13_.size();
     if (n == 1) {
@@ -238,8 +238,8 @@ void DPFORAM<D, K>::Write(const uint index_23[2], D v_old_13, D v_new_13, bool c
     }
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::DPF_Write(const uint index_23[2], D v_old_13, D v_new_13, bool count_band) {
+template <typename K, typename D>
+void DPFORAM<K, D>::DPF_Write(const uint index_23[2], D v_old_13, D v_new_13, bool count_band) {
     debug_print("[%u]DPF_Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     D v_delta_13 = v_new_13 - v_old_13;
@@ -248,8 +248,8 @@ void DPFORAM<D, K>::DPF_Write(const uint index_23[2], D v_old_13, D v_new_13, bo
     this->AppendCache(v_new_13, count_band);
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::AppendCache(D v_new_13, bool count_band) {
+template <typename K, typename D>
+void DPFORAM<K, D>::AppendCache(D v_new_13, bool count_band) {
     debug_print("[%u]AppendCache\n", this->Size());
     D *v_new_23 = ShareTwoThird(this->peer_, v_new_13, count_band);
     for (uint b = 0; b < 2; b++) {
@@ -264,8 +264,8 @@ void DPFORAM<D, K>::AppendCache(D v_new_13, bool count_band) {
     debug_print("[%u]AppendCache GG\n", this->Size());
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::Flush(bool count_band) {
+template <typename K, typename D>
+void DPFORAM<K, D>::Flush(bool count_band) {
     debug_print("[%u]Flush\n", this->Size());
     std::vector<D> *array_23 = ShareTwoThird(this->peer_, this->write_array_13_, count_band);
     for (uint b = 0; b < 2; b++) {
@@ -276,8 +276,8 @@ void DPFORAM<D, K>::Flush(bool count_band) {
     }
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::PrintMetadata() {
+template <typename K, typename D>
+void DPFORAM<K, D>::PrintMetadata() {
     debug_print("========== PrintMetadata ==========\n");
     debug_print("party_: %u\n", this->party_);
     debug_print("tau_: %u\n", this->tau_);
@@ -295,8 +295,8 @@ void DPFORAM<D, K>::PrintMetadata() {
     debug_print("========== PrintMetadata ==========\n");
 }
 
-template <typename D, typename K>
-void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
+template <typename K, typename D>
+void DPFORAM<K, D>::Test(uint iterations, bool key_value) {
     // TODO remember to free memory
     fprintf(stderr, "Test, iterations = %u \n", iterations);
     uint64_t party_time = 0;
@@ -431,5 +431,12 @@ void DPFORAM<D, K>::Test(uint iterations, bool key_value) {
 
 template class DPFORAM<BinaryData, BinaryData>;
 template class DPFORAM<BinaryData, ZpData>;
+template class DPFORAM<BinaryData, ECData>;
+
 template class DPFORAM<ZpData, BinaryData>;
 template class DPFORAM<ZpData, ZpData>;
+template class DPFORAM<ZpData, ECData>;
+
+template class DPFORAM<ECData, BinaryData>;
+template class DPFORAM<ECData, ZpData>;
+template class DPFORAM<ECData, ECData>;
