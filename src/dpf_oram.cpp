@@ -134,7 +134,6 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     // read block from array
     BinaryData old_block_13 = this->position_map_->Read(block_index_23, read_only);
     BinaryData *old_block_23 = ShareTwoThird<BinaryData>(this->peer_, old_block_13, !read_only);
-    ;
     old_block_13.Print("old_block_13");
 
     // read data from block
@@ -296,9 +295,12 @@ void DPFORAM<K, D>::PrintMetadata() {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Test(uint iterations, bool key_value) {
+void DPFORAM<K, D>::Test(uint iterations) {
     // TODO remember to free memory
     fprintf(stderr, "Test, iterations = %u \n", iterations);
+
+    bool key_value = !std::is_same<K, BinaryData>::value;
+
     uint64_t party_time = 0;
     std::chrono::high_resolution_clock::time_point t1, t2;
     uint n = this->Size();

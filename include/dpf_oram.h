@@ -68,7 +68,7 @@ public:
         return this->write_array_13_[0].Size();
     }
     void Reset();
-    void Test(uint iterations, bool key_value);
+    void Test(uint iterations);
 };
 
 #endif /* DPF_ORAM_H_ */

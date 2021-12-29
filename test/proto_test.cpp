@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
+        "log_n", po::value<uint>()->default_value(9), "number of data (log)")(
         "data_size", po::value<uint>()->default_value(8), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(3), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(20), "ssot threshold (log)")(
@@ -112,13 +112,14 @@ int main(int argc, char *argv[]) {
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     uint64_t start_time = timestamp();
-    // DPFORAM<BinaryData, ZpData> dpf_oram = DPFORAM<BinaryData, ZpData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
-    // DPFORAM<ZpData, ZpData> dpf_oram = DPFORAM<ZpData, ZpData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
-    DPFORAM<ZpData, ECData> dpf_oram = DPFORAM<ZpData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    // DPFORAM<BinaryData, BinaryData> dpf_oram = DPFORAM<BinaryData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    // DPFORAM<BinaryData, ECData> dpf_oram = DPFORAM<BinaryData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    // DPFORAM<ECData, BinaryData> dpf_oram = DPFORAM<ECData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    DPFORAM<ECData, ECData> dpf_oram = DPFORAM<ECData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
-    dpf_oram.Test(iterations, false);
+    dpf_oram.Test(iterations);
 
     for (uint b = 0; b < 2; b++) {
         peer[b].Close();

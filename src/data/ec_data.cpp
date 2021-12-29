@@ -66,11 +66,13 @@ void ECData::Random(uint size) {
     AutoSeededRandomPool prng;
     Integer x(prng, Integer::One(), this->group_.GetMaxExponent());
     this->data_ = this->group_.ExponentiateBase(x);
+    // this->data_ = this->group_.GetCurve().Identity();
 }
 
 void ECData::Random(CTR_Mode<AES>::Encryption &prg, uint size) {
     Integer x(prg, Integer::One(), this->group_.GetMaxExponent());
     this->data_ = this->group_.ExponentiateBase(x);
+    // this->data_ = this->group_.GetCurve().Identity();
 }
 
 void ECData::Print(const char *title) {
