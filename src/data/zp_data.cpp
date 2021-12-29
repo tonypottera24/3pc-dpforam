@@ -29,18 +29,6 @@ ZpData &ZpData::operator=(const ZpData &other) {
     return *this;
 }
 
-// ZpData &ZpData::operator=(ZpData &&other) noexcept {
-//     // move operation
-//     if (this == &other) {
-//         return *this;
-//     }
-
-//     delete[] this->data_;
-//     this->data_ = std::exchange(other.data_, nullptr);
-//     this->size_ = std::exchange(other.size_, 0);
-//     return *this;
-// }
-
 ZpData ZpData::operator-() {
     this->data_ = (this->p_ - this->data_) % this->p_;
     return *this;
