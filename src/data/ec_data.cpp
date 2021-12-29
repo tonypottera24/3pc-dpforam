@@ -63,15 +63,47 @@ void ECData::Reset() {
 }
 
 void ECData::Random(uint size) {
-    AutoSeededRandomPool prng;
-    Integer x(prng, Integer::One(), this->group_.GetMaxExponent());
-    this->data_ = this->group_.ExponentiateBase(x);
+    Integer x(this->prg_, Integer::One(), this->q_);
+    // bool v = rand_uint() & 1;
+    bool v = true;
+    while (true) {
+        Integer r = (a_exp_b_mod_c(x, Integer("3"), this->p_) + (this->a_ * x) % this->p_ + this->b_) % this->p_;
+        Integer y = a_exp_b_mod_c(r, this->q_, this->p_);
+        if (a_exp_b_mod_c(y, Integer::Two(), this->p_) == r) {
+            if (v) {
+                this->data_ = ECP::Point(x, y);
+            } else {
+                this->data_ = ECP::Point(x, this->p_ - y);
+            }
+            break;
+        }
+        x += 1;
+    }
+
+    // this->data_ = this->group_.ExponentiateBase(x);
     // this->data_ = this->group_.GetCurve().Identity();
 }
 
 void ECData::Random(CTR_Mode<AES>::Encryption &prg, uint size) {
-    Integer x(prg, Integer::One(), this->group_.GetMaxExponent());
-    this->data_ = this->group_.ExponentiateBase(x);
+    Integer x(prg, Integer::One(), this->q_);
+    // bool v = rand_uint() & 1;
+    bool v = true;
+    while (true) {
+        Integer r = (a_exp_b_mod_c(x, Integer("3"), this->p_) + (this->a_ * x) % this->p_ + this->b_) % this->p_;
+        Integer y = a_exp_b_mod_c(r, this->q_, this->p_);
+        if (a_exp_b_mod_c(y, Integer::Two(), this->p_) == r) {
+            if (v) {
+                this->data_ = ECP::Point(x, y);
+            } else {
+                this->data_ = ECP::Point(x, this->p_ - y);
+            }
+            break;
+        }
+        x += 1;
+    }
+
+    // Integer x(prg, Integer::One(), this->group_.GetMaxExponent());
+    // this->data_ = this->group_.ExponentiateBase(x);
     // this->data_ = this->group_.GetCurve().Identity();
 }
 

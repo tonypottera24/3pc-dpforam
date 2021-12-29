@@ -13,7 +13,6 @@ private:
     uint size_ = 0;
     uchar *data_ = NULL;
     const bool is_symmetric_ = true;
-
     void Resize(uint size);
 
 public:
