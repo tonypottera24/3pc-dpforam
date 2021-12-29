@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         "data_size", po::value<uint>()->default_value(8), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(3), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(20), "ssot threshold (log)")(
-        "log_pseudo_dpf_threshold", po::value<uint>()->default_value(5), "pseudo dpf threshold (log)")(
+        "log_pseudo_dpf_threshold", po::value<uint>()->default_value(4), "pseudo dpf threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
 
@@ -113,9 +113,9 @@ int main(int argc, char *argv[]) {
 
     uint64_t start_time = timestamp();
     // DPFORAM<BinaryData, BinaryData> dpf_oram = DPFORAM<BinaryData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
-    // DPFORAM<BinaryData, ECData> dpf_oram = DPFORAM<BinaryData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    DPFORAM<BinaryData, ECData> dpf_oram = DPFORAM<BinaryData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     // DPFORAM<ECData, BinaryData> dpf_oram = DPFORAM<ECData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
-    DPFORAM<ECData, ECData> dpf_oram = DPFORAM<ECData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    // DPFORAM<ECData, ECData> dpf_oram = DPFORAM<ECData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 

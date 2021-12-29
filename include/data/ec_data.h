@@ -14,11 +14,11 @@ using namespace CryptoPP;
 
 class ECData {
 private:
-    // const uint size_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve().EncodedPointSize(false);
     ECP::Point data_;
-    const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
-    const bool is_symmetric_ = false;
     const bool compressed_ = false;
+    static inline const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
+    static inline const uint size_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve().EncodedPointSize(false);
+    const bool is_symmetric_ = false;
 
 public:
     ECData();
@@ -48,11 +48,7 @@ public:
     void Reset();
     void Random(uint size);
     void Random(CTR_Mode<AES>::Encryption &prg, uint size);
-    uint Size() {
-        // printf("size %u\n", this->group_.GetCurve().EncodedPointSize(this->compressed_));
-        // return this->group_.GetCurve().EncodedPointSize(this->compressed_);
-        return 65;
-    }
+    uint Size() { return this->size_; }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
 };
