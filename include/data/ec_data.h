@@ -19,7 +19,6 @@ private:
     static inline const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
     static inline const uint size_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve().EncodedPointSize(false);
     const bool is_symmetric_ = false;
-    static inline AutoSeededRandomPool prg_;
     static inline const Integer p_ = Integer("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
     static inline const Integer q_ = Integer("0x3fffffffc0000000400000000000000000000000400000000000000000000000");
     static inline const Integer a_ = Integer("0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc");
@@ -52,7 +51,7 @@ public:
     void ConvertFromBytes(uchar *data, uint size);
     void Reset();
     void Random(uint size);
-    void Random(CTR_Mode<AES>::Encryption &prg, uint size);
+    void Random(RandomNumberGenerator &prg, uint size);
     uint Size() { return this->size_; }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");

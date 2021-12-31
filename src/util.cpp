@@ -48,8 +48,15 @@ uint bytes_to_uint(const uchar *bytes, const uint len) {
     return value;
 }
 
-void rand_bytes(uchar *bytes, const uint len) {
-    RAND_bytes(bytes, len);
+void rand_bytes(uchar *bytes, const uint size) {
+    CryptoPP::AutoSeededRandomPool rnd;
+    rnd.GenerateBlock(bytes, size);
+}
+
+bool rand_bool() {
+    uchar value;
+    rand_bytes(&value, sizeof(uchar));
+    return value & 1;
 }
 
 uint rand_uint() {
@@ -58,7 +65,7 @@ uint rand_uint() {
     return value;
 }
 
-uint rand_uint(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg) {
+uint rand_uint(CryptoPP::RandomNumberGenerator &prg) {
     uint value;
     prg.GenerateBlock((uchar *)&value, sizeof(uint));
     return value;

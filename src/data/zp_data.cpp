@@ -64,13 +64,12 @@ void ZpData::Reset() {
 }
 
 void ZpData::Random(uint size) {
-    CryptoPP::AutoSeededRandomPool rnd;
-    rnd.GenerateBlock((uchar *)&(this->data_), this->Size());
-    this->data_ %= this->p_;
+    CryptoPP::AutoSeededRandomPool prg;
+    this->Random(prg, size);
 }
 
-void ZpData::Random(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg, uint size) {
-    prg.GenerateBlock((uchar *)&(this->data_), size);
+void ZpData::Random(CryptoPP::RandomNumberGenerator &prg, uint size) {
+    prg.GenerateBlock((uchar *)&(this->data_), this->Size());
     this->data_ %= this->p_;
 }
 

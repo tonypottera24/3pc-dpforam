@@ -5,7 +5,6 @@
 #include <cryptopp/modes.h>
 #include <cryptopp/osrng.h>
 #include <emmintrin.h>
-#include <openssl/rand.h>
 #include <string.h>
 #include <sys/time.h>
 
@@ -22,8 +21,9 @@ void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c,
 void uint_to_bytes(uint value, uchar *bytes, uint len);
 uint bytes_to_uint(const uchar *b, uint len);
 void rand_bytes(uchar *bytes, const uint len);
+bool rand_bool();
 uint rand_uint();
-uint rand_uint(CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &prg);
+uint rand_uint(CryptoPP::RandomNumberGenerator &prg);
 uint64_t timestamp();
 
 uint bit_length(uint n);

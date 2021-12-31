@@ -19,7 +19,7 @@ void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool c
         p.emplace_back();
         p[b].Random(data_size);
     }
-    uchar s = rand_uint() & 1;
+    uchar s = rand_bool();
     uchar bb = b ^ s;
 
     peer[P1].Socket().Write(&s, 1, count_band);
