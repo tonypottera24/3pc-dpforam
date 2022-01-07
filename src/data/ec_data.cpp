@@ -71,7 +71,7 @@ void ECData::Random(RandomNumberGenerator &prg, uint size) {
     Integer x(prg, Integer::One(), this->p_);
     bool v = x.GetBit(0);
     while (true) {
-        Integer r = (a_exp_b_mod_c(x, Integer("3"), this->p_) + (this->a_ * x) % this->p_ + this->b_) % this->p_;
+        Integer r = ((a_exp_b_mod_c(x, Integer("3"), this->p_) + (this->a_ * x) % this->p_) % this->p_ + this->b_) % this->p_;
         Integer y = a_exp_b_mod_c(r, this->q_, this->p_);
         if (a_exp_b_mod_c(y, Integer::Two(), this->p_) == r) {
             if (v) {
