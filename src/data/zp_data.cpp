@@ -1,11 +1,11 @@
 #include "zp_data.h"
 
 ZpData::ZpData() {
-    this->data_ = 0;
+    this->data_ = Integer::Zero();
 }
 
 ZpData::ZpData(uchar *data, const uint size) {
-    memcpy((uchar *)&(this->data_), data, this->Size());
+    this->data_.Decode(data, size);
 }
 
 ZpData::ZpData(const uint size, const bool set_zero) {
@@ -19,7 +19,6 @@ ZpData::ZpData(const ZpData &other) {
 }
 
 ZpData::~ZpData() {
-    this->data_ = 0;
 }
 
 ZpData &ZpData::operator=(const ZpData &other) {
@@ -50,27 +49,26 @@ bool ZpData::operator==(const ZpData &rhs) {
 
 uchar *ZpData::Dump() {
     uchar *data_bytes = new uchar[this->Size()];
-    memcpy(data_bytes, (uchar *)&(this->data_), this->Size());
+    this->data_.Encode(data_bytes, this->Size());
     return data_bytes;
 }
 
 void ZpData::Load(uchar *data, uint size) {
-    memcpy((uchar *)&(this->data_), data, size);
-    this->data_ %= this->p_;
+    this->data_.Decode(data, size);
 }
 
 void ZpData::Reset() {
-    this->data_ = 0;
+    this->data_ = Integer::Zero();
 }
 
 void ZpData::Random(uint size) {
-    CryptoPP::AutoSeededRandomPool prg;
+    AutoSeededRandomPool prg;
     this->Random(prg, size);
 }
 
-void ZpData::Random(CryptoPP::RandomNumberGenerator &prg, uint size) {
-    prg.GenerateBlock((uchar *)&(this->data_), this->Size());
-    this->data_ %= this->p_;
+void ZpData::Random(RandomNumberGenerator &prg, uint size) {
+    Integer x(prg, Integer::Zero(), this->p_ - Integer::One());
+    this->data_ = x;
 }
 
 void ZpData::Print(const char *title) {

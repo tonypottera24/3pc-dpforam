@@ -68,7 +68,7 @@ void ECData::Random(uint size) {
 }
 
 void ECData::Random(RandomNumberGenerator &prg, uint size) {
-    Integer x(prg, Integer::One(), this->p_);
+    Integer x(prg, Integer::One(), this->p_ - Integer::One());
     bool v = x.GetBit(0);
     while (true) {
         Integer r = ((a_exp_b_mod_c(x, Integer("3"), this->p_) + (this->a_ * x) % this->p_) % this->p_ + this->b_) % this->p_;
@@ -77,7 +77,7 @@ void ECData::Random(RandomNumberGenerator &prg, uint size) {
             if (v) {
                 this->data_ = ECP::Point(x, y);
             } else {
-                this->data_ = ECP::Point(x, this->p_ - y);
+                this->data_ = ECP::Point(x, (this->p_ - y) % this->p_);
             }
             break;
         }

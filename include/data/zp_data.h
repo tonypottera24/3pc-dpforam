@@ -8,10 +8,12 @@
 #include "typedef.h"
 #include "util.h"
 
+using namespace CryptoPP;
+
 class ZpData {
 private:
-    uint64_t data_ = 0;
-    const uint64_t p_ = 11;
+    Integer data_;
+    static const inline Integer p_ = Integer("11");
     const bool is_symmetric_ = false;
 
 public:
@@ -38,11 +40,10 @@ public:
 
     uchar *Dump();
     void Load(uchar *data, uint size);
-    void ConvertFromBytes(uchar *data, uint size);
     void Reset();
     void Random(uint size);
-    void Random(CryptoPP::RandomNumberGenerator &prg, uint size);
-    uint Size() { return sizeof(uint64_t); }
+    void Random(RandomNumberGenerator &prg, uint size);
+    uint Size() { return this->p_.MinEncodedSize(); }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
 };
