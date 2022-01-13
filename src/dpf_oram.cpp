@@ -318,10 +318,10 @@ void DPFORAM<K, D>::Test(uint iterations) {
             key_array_33[2].emplace_back();
             key_array_33[2][i].Random(key_size);
         }
-        this->peer_[0].WriteData(key_array_33[2], false);
-        this->peer_[1].WriteData(key_array_33[2], false);
-        key_array_33[0] = this->peer_[0].template ReadData<K>(n, key_size);
-        key_array_33[1] = this->peer_[1].template ReadData<K>(n, key_size);
+
+        key_array_33[0] = write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], n, key_size, false);
+        key_array_33[1] = write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], n, key_size, false);
+
         for (uint i = 0; i < n; i++) {
             K k = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
             this->key_array_13_.push_back(k);
@@ -329,7 +329,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
     }
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
-        debug_print("Test, iteration = %u\n", iteration);
+        fprintf(stderr, "Test, iteration = %u\n", iteration);
 
         uint index_23[2];
         K key_23[2];

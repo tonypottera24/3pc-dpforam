@@ -76,8 +76,10 @@ void Socket::SetNoDelay() {
 }
 
 void Socket::Write(const uchar *data, uint data_size, bool count_band) {
+    // fprintf(stderr, "Write, data_size = %u\n", data_size);
     uint offset = 0;
     while (offset < data_size) {
+        // fprintf(stderr, "Write, offset = %u\n", offset);
         int write_size = ::write(socket_fd_, data + offset, data_size - offset);
         if (write_size < 0) {
             error("write failed");
