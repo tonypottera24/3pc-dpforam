@@ -48,10 +48,8 @@ bool ECData::operator==(const ECData &rhs) {
     return this->data_ == rhs.data_;
 }
 
-uchar *ECData::Dump() {
-    uchar *data_bytes = new uchar[this->Size()];
-    this->group_.GetCurve().EncodePoint(data_bytes, this->data_, this->compressed_);
-    return data_bytes;
+void ECData::Dump(uchar *data) {
+    this->group_.GetCurve().EncodePoint(data, this->data_, this->compressed_);
 }
 
 void ECData::Load(uchar *data, uint size) {

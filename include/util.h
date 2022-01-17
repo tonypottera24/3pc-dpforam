@@ -42,18 +42,18 @@ inline bool getbit(uchar *a, const uint i) {
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
 template <typename D>
-D *ShareTwoThird(Peer peer[2], D &v_in_13, bool count_band) {
+std::vector<D> ShareTwoThird(Peer peer[2], D &v_in_13, bool count_band) {
     peer[1].WriteData(v_in_13, count_band);
     D v_out = peer[0].template ReadData<D>(v_in_13.Size());
-    return new D[2]{v_out, v_in_13};
+    return {v_out, v_in_13};
 }
 
 template <typename D>
-std::vector<D> *ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, bool count_band) {
+std::vector<std::vector<D>> ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, bool count_band) {
     // peer[1].WriteData(v_in_13, count_band);
     // std::vector<D> v_out = peer[0].template ReadData<D>(v_in_13.size(), v_in_13[0].Size());
     std::vector<D> v_out = write_read_data(peer[1], v_in_13, peer[0], v_in_13.size(), v_in_13[0].Size(), count_band);
-    return new std::vector<D>[2] { v_out, v_in_13 };
+    return {v_out, v_in_13};
 }
 
 template <typename D>
@@ -65,26 +65,21 @@ void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint in
 }
 
 template <typename D>
-std::vector<D> &write_read_data(Peer &write_peer, std::vector<D> &data, Peer &read_peer, const uint size, const uint data_size, bool count_band) {
-    std::vector<D> *new_data = new std::vector<D>;
+std::vector<D> write_read_data(Peer &write_peer, std::vector<D> &data, Peer &read_peer, const uint size, const uint data_size, bool count_band) {
+    std::vector<D> new_data;
     uint data_per_block = std::max(1024 / data_size, 1U);
     uint round = divide_ceil(size, data_per_block);
-    // fprintf(stderr, "size = %u, data_size = %u\n", size, data_size);
-    // fprintf(stderr, "data_per_block = %u, round = %u\n", data_per_block, round);
     for (uint r = 0; r < round; r++) {
         std::vector<D> tmp_write_data;
         uint start_index = data_per_block * r;
         uint end_index = std::min(data_per_block * (r + 1), size);
         tmp_write_data.insert(tmp_write_data.begin(), data.begin() + start_index, data.begin() + end_index);
-        // fprintf(stderr, "start_index = %u, end_index = %u\n", start_index, end_index);
         write_peer.WriteData(tmp_write_data, count_band);
-        // fprintf(stderr, "finish write\n");
 
-        std::vector<D> &tmp_read_data = read_peer.ReadData<D>(end_index - start_index, data_size);
-        new_data->insert(new_data->begin(), tmp_read_data.begin(), tmp_read_data.end());
-        // fprintf(stderr, "new_data length = %lu\n", new_data->size());
+        std::vector<D> tmp_read_data = read_peer.ReadData<D>(end_index - start_index, data_size);
+        new_data.insert(new_data.begin(), tmp_read_data.begin(), tmp_read_data.end());
     }
-    return *new_data;
+    return new_data;
 }
 
 #endif /* UTIL_H_ */

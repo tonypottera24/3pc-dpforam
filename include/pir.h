@@ -32,7 +32,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     uint data_size = array_23[0][0].Size();
     D v_sum[2] = {D(data_size, true), D(data_size, true)};
     for (uint b = 0; b < 2; b++) {
-        bool *dpf_out;
+        std::vector<bool> dpf_out;
         if (pseudo) {
             dpf_out = fss.PseudoEvalAll(query_23[b], n);
         } else {
@@ -65,7 +65,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
         std::vector<BinaryData> query_23;
         K key = key_23[0] + key_23[1];
         uint log_n = key.Size() * 8;
-        std::tie(query_23, is_0) = fss.Gen(key.Dump(), log_n, true);
+        uchar key_buffer[key.Size()];
+        key.Dump(key_buffer);
+        std::tie(query_23, is_0) = fss.Gen(key_buffer, log_n, true);
 
         peer[0].WriteUInt(query_23[0].Size(), count_band);
         peer[1].WriteUInt(query_23[1].Size(), count_band);
@@ -79,7 +81,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
         BinaryData query = peer[party].template ReadData<BinaryData>(query_size);
         for (uint i = 0; i < key_array_13.size(); i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            if (fss.Eval(query, key.Dump())) {
+            uchar key_buffer[key.Size()];
+            key.Dump(key_buffer);
+            if (fss.Eval(query, key_buffer)) {
                 v_sum ^= i;
             }
         }

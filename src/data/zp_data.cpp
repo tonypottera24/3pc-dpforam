@@ -47,10 +47,8 @@ bool ZpData::operator==(const ZpData &rhs) {
     return (this->data_ % this->p_) == (rhs.data_ % this->p_);
 }
 
-uchar *ZpData::Dump() {
-    uchar *data_bytes = new uchar[this->Size()];
-    this->data_.Encode(data_bytes, this->Size());
-    return data_bytes;
+void ZpData::Dump(uchar *data) {
+    this->data_.Encode(data, this->Size());
 }
 
 void ZpData::Load(uchar *data, uint size) {

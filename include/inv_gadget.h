@@ -14,9 +14,8 @@ void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool c
     const uint P2 = inv ? 1 : 0;
     debug_print("inv::P0 inv = %u\n", inv);
 
-    std::vector<D> p;
+    std::vector<D> p(2);
     for (uint b = 0; b < 2; b++) {
-        p.emplace_back();
         p[b].Random(data_size);
     }
     uchar s = rand_bool();

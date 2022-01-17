@@ -28,14 +28,14 @@ const uint64_t masks[64] = {0x0000000000000001ULL, 0x0000000000000002ULL,
                             0x0800000000000000ULL, 0x1000000000000000ULL, 0x2000000000000000ULL,
                             0x4000000000000000ULL, 0x8000000000000000ULL};
 
-void to_bit_vector(const uint64_t input, bool *output, uint size) {
-#pragma omp simd aligned(output, masks : 16)
+void to_bit_vector(const uint64_t input, std::vector<bool>::iterator output, uint size) {
+    // #pragma omp simd aligned(output, masks : 16)
     for (uint i = 0; i < size; i++) {
         output[i] = (input & masks[i]) != 0ULL;
     }
 }
 
-void to_bit_vector(uint128 input, bool *output) {
+void to_bit_vector(uint128 input, std::vector<bool>::iterator output) {
     uint64_t *val = (uint64_t *)&input;
     to_bit_vector(val[0], output, 64);
     to_bit_vector(val[1], output + 64, 64);
@@ -54,34 +54,40 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uchar *index, const uint l
     uchar *query_23_bytes[2];
 
     uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
-    std::vector<BinaryData> *query_23 = new std::vector<BinaryData>;
+    std::vector<BinaryData> query_23;
     for (uint b = 0; b < 2; b++) {
-        query_23->emplace_back(query_23_bytes[b], query_size);
+        query_23.emplace_back(query_23_bytes[b], query_size);
+        delete[] query_23_bytes[b];
     }
     bool is_0 = true;
     if (!is_symmetric) {
-        is_0 = this->Eval((*query_23)[0], index) > this->Eval((*query_23)[1], index);
+        is_0 = this->Eval(query_23[0], index) > this->Eval(query_23[1], index);
     }
-    return std::make_pair(*query_23, is_0);
+    return std::make_pair(query_23, is_0);
 }
 
 bool FSS1Bit::Eval(BinaryData &query, uchar *index) {
-    uint128 out = EVAL(&aes_key_, query.Dump(), index);
+    uchar query_bytes[query.Size()];
+    query.Dump(query_bytes);
+    uint128 out = EVAL(&aes_key_, query_bytes, index);
     uint index_res = index[0] & 255;
     uint64_t *val = (uint64_t *)&out;
     return (val[index_res >> 6] >> (index_res & 127)) & 1ULL;
 }
 
-bool *FSS1Bit::EvalAll(BinaryData &query, const uint log_n) {
-    bool *out = new bool[1 << log_n];
-    uint128 *res = EVALFULL(&aes_key_, query.Dump());
+std::vector<bool> FSS1Bit::EvalAll(BinaryData &query, const uint log_n) {
+    uint n = 1 << log_n;
+    std::vector<bool> out(n);
+    uchar query_bytes[query.Size()];
+    query.Dump(query_bytes);
+    uint128 *res = EVALFULL(&aes_key_, query_bytes);
     if (log_n <= 6) {
-        to_bit_vector(((uint64_t *)res)[0], out, (1 << log_n));
+        to_bit_vector(((uint64_t *)res)[0], out.begin(), n);
     } else {
         uint max_layer = std::max((int)log_n - 7, 0);
         uint64_t groups = 1ULL << max_layer;
         for (uint64_t i = 0; i < groups; i++) {
-            to_bit_vector(res[i], out + (i << 7));
+            to_bit_vector(res[i], out.begin() + (i << 7));
         }
     }
     free(res);
@@ -89,32 +95,33 @@ bool *FSS1Bit::EvalAll(BinaryData &query, const uint log_n) {
 }
 
 std::pair<std::vector<BinaryData>, bool> FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric) {
-    std::vector<BinaryData> *query_23 = new std::vector<BinaryData>;
-    for (uint b = 0; b < 2; b++) {
-        query_23->emplace_back();
-    }
-    (*query_23)[0].Random(peer[1].PRG(), byte_length);
-    (*query_23)[1].Random(peer[0].PRG(), byte_length);
-    uchar *dpf_out = (*query_23)[0].Dump();
+    std::vector<BinaryData> query_23(2);
+    query_23[0].Random(peer[1].PRG(), byte_length);
+    query_23[1].Random(peer[0].PRG(), byte_length);
+    uchar dpf_out[byte_length];
+    query_23[0].Dump(dpf_out);
     uint index_byte = index >> 3;
     uint index_bit = index & 7;
     dpf_out[index_byte] ^= 1 << index_bit;
-    (*query_23)[0].Load(dpf_out, byte_length);
+    query_23[0].Load(dpf_out, byte_length);
     bool is_0 = false;
     if (!is_symmetric) {
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
-    return std::make_pair(*query_23, is_0);
+    return std::make_pair(query_23, is_0);
 }
 
 bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
-    return getbit(query.Dump(), index);
+    uchar query_bytes[query.Size()];
+    query.Dump(query_bytes);
+    return getbit(query_bytes, index);
 }
 
-bool *FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n) {
+std::vector<bool> FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n) {
     uint index_byte = 0, index_bit = 0;
-    uchar *dpf_out = query.Dump();
-    bool *dpf_out_evaluated = new bool[n];
+    uchar dpf_out[query.Size()];
+    query.Dump(dpf_out);
+    std::vector<bool> dpf_out_evaluated(n);
     for (uint i = 0; i < n; i++) {
         dpf_out_evaluated[i] = (dpf_out[index_byte] >> index_bit) & 1;
         index_bit++;

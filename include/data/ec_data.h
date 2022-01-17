@@ -46,7 +46,7 @@ public:
         return lhs;
     }
 
-    uchar *Dump();
+    void Dump(uchar *data);
     void Load(uchar *data, uint size);
     void ConvertFromBytes(uchar *data, uint size);
     void Reset();

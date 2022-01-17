@@ -4,7 +4,7 @@
 namespace PIW {
 
 template <typename D>
-D *FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, bool count_band) {
+std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, bool count_band) {
     debug_print("FindDeltaData, is_0 = %u\n", is_0);
     const bool is_symmetric = v_delta_13.IsSymmetric();
     const uint data_size = v_delta_13.Size();
@@ -19,7 +19,7 @@ D *FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, bool count_b
         v_delta_33[0].Print("v_delta_33[0]");
         v_delta_33[1].Print("v_delta_33[1]");
 
-        D *v_out_33 = new D[2];
+        std::vector<D> v_out_33(2);
         for (uint d = 0; d < 2; d++) {
             for (uint offset = 0; offset < 3; offset++) {
                 uint party_index = (party + offset) % 3;
@@ -103,9 +103,9 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
         query_23[1] = peer[0].template ReadData<BinaryData>(query_23[0].Size());
         query_23[0] = peer[1].template ReadData<BinaryData>(query_23[1].Size());
     }
-    D *v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, count_band);
+    std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, count_band);
     for (uint b = 0; b < 2; b++) {
-        bool *dpf_out;
+        std::vector<bool> dpf_out;
         if (pseudo) {
             dpf_out = fss.PseudoEvalAll(query_23[b], n);
         } else {

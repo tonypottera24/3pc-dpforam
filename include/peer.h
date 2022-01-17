@@ -37,19 +37,21 @@ public:
     template <typename D>
     void WriteData(D data, bool count_band) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
-        this->socket_.Write(data.Dump(), data.Size(), count_band);
+        uchar buffer[data.Size()];
+        data.Dump(buffer);
+        this->socket_.Write(buffer, data.Size(), count_band);
     }
 
     template <typename D>
-    std::vector<D> &ReadData(const uint size, const uint data_size) {
+    std::vector<D> ReadData(const uint size, const uint data_size) {
         uint buffer_size = size * data_size;
         uchar buffer[buffer_size];
         this->socket_.Read(buffer, buffer_size);
-        std::vector<D> *data = new std::vector<D>;
+        std::vector<D> data;
         for (uint i = 0; i < size; i++) {
-            data->emplace_back(&buffer[i * data_size], data_size);
+            data.emplace_back(&buffer[i * data_size], data_size);
         }
-        return *data;
+        return data;
     }
 
     template <typename D>
@@ -58,7 +60,9 @@ public:
         uint buffer_size = data.size() * data_size;
         uchar buffer[buffer_size];
         for (uint i = 0; i < data.size(); i++) {
-            memcpy(&buffer[i * data_size], data[i].Dump(), data_size);
+            uchar data_buffer[data_size];
+            data[i].Dump(data_buffer);
+            memcpy(&buffer[i * data_size], data_buffer, data_size);
         }
         this->socket_.Write(buffer, buffer_size, count_band);
     }

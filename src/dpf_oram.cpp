@@ -133,25 +133,28 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 
     // read block from array
     BinaryData old_block_13 = this->position_map_->Read(block_index_23, read_only);
-    BinaryData *old_block_23 = ShareTwoThird<BinaryData>(this->peer_, old_block_13, !read_only);
+    std::vector<BinaryData> old_block_23 = ShareTwoThird<BinaryData>(this->peer_, old_block_13, !read_only);
     old_block_13.Print("old_block_13");
 
     // read data from block
     std::vector<BinaryData> old_data_array_23[2];
     for (uint b = 0; b < 2; b++) {
-        uchar *old_block_data = old_block_23[b].Dump();
+        uchar old_block_data[old_block_23[b].Size()];
+        old_block_23[b].Dump(old_block_data);
         for (uint i = 0; i < data_per_block; i++) {
             old_data_array_23[b].emplace_back(&old_block_data[i * data_size], data_size);
         }
     }
     BinaryData old_data_13 = PIR::PIR<BinaryData>(this->peer_, this->fss_, old_data_array_23, data_index_23, this->pseudo_dpf_threshold_, !read_only);
     old_data_13.Print("old_data_13");
-    BinaryData *old_data_23 = ShareTwoThird<BinaryData>(this->peer_, old_data_13, !read_only);
+    std::vector<BinaryData> old_data_23 = ShareTwoThird<BinaryData>(this->peer_, old_data_13, !read_only);
     old_data_23[0].Print("old_data_23[0]");
     old_data_23[1].Print("old_data_23[1]");
 
     for (uint b = 0; b < 2; b++) {
-        cache_index_23[b] = bytes_to_uint(old_data_23[b].Dump(), old_data_23[b].Size());
+        uchar old_data_23_bytes[data_size];
+        old_data_23[b].Dump(old_data_23_bytes);
+        cache_index_23[b] = bytes_to_uint(old_data_23_bytes, old_data_23[b].Size());
         is_cached_23[b] = cache_index_23[b] & 1;
         cache_index_23[b] = (cache_index_23[b] >> 1) % n;
     }
@@ -161,7 +164,9 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
         BinaryData new_block_13 = old_block_13;
 
         std::vector<BinaryData> data_array_13;
-        uchar *new_block_data = new_block_13.Dump();
+
+        uchar new_block_data[new_block_13.Size()];
+        new_block_13.Dump(new_block_data);
         for (uint i = 0; i < data_per_block; i++) {
             data_array_13.emplace_back(&new_block_data[i * data_size], data_size);
         }
@@ -177,8 +182,10 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
         delta_data_13.Print("delta_data_13");
 
         PIW::PIW(this->party_, this->peer_, this->fss_, data_array_13, data_index_23, delta_data_13, this->pseudo_dpf_threshold_, !read_only);
+        uchar data_array_13_bytes[data_size];
         for (uint i = 0; i < data_per_block; i++) {
-            memcpy(&new_block_data[i * data_size], data_array_13[i].Dump(), data_size);
+            data_array_13[i].Dump(data_array_13_bytes);
+            memcpy(&new_block_data[i * data_size], data_array_13_bytes, data_size);
         }
         new_block_13.Load(new_block_data, data_per_block * data_size);
         new_block_13.Print("new_block_13");
@@ -187,7 +194,6 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 
         // this->position_map_->PrintMetadata();
     }
-    delete[] old_data_23;
     // this->position_map_->PrintMetadata();
 }
 
@@ -250,7 +256,7 @@ void DPFORAM<K, D>::DPF_Write(const uint index_23[2], D v_old_13, D v_new_13, bo
 template <typename K, typename D>
 void DPFORAM<K, D>::AppendCache(D v_new_13, bool count_band) {
     debug_print("[%u]AppendCache\n", this->Size());
-    D *v_new_23 = ShareTwoThird(this->peer_, v_new_13, count_band);
+    std::vector<D> v_new_23 = ShareTwoThird(this->peer_, v_new_13, count_band);
     for (uint b = 0; b < 2; b++) {
         this->cache_array_23_[b].push_back(v_new_23[b]);
     }
@@ -266,7 +272,7 @@ void DPFORAM<K, D>::AppendCache(D v_new_13, bool count_band) {
 template <typename K, typename D>
 void DPFORAM<K, D>::Flush(bool count_band) {
     debug_print("[%u]Flush\n", this->Size());
-    std::vector<D> *array_23 = ShareTwoThird(this->peer_, this->write_array_13_, count_band);
+    std::vector<std::vector<D>> array_23 = ShareTwoThird(this->peer_, this->write_array_13_, count_band);
     for (uint b = 0; b < 2; b++) {
         this->read_array_23_[b] = array_23[b];
     }
@@ -329,7 +335,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
     }
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
-        fprintf(stderr, "Test, iteration = %u\n", iteration);
+        // fprintf(stderr, "Test, iteration = %u\n", iteration);
 
         uint index_23[2];
         K key_23[2];
