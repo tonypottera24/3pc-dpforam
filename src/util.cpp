@@ -43,7 +43,7 @@ void uint_to_bytes(uint value, uchar *bytes, uint len) {
 }
 
 uint bytes_to_uint(const uchar *bytes, const uint len) {
-    uint value;
+    uint value = 0;
     memcpy(&value, bytes, len);
     return value;
 }

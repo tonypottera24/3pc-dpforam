@@ -54,43 +54,116 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 }
 
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const K key_23[2], uint index_n, bool count_band) {
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const K key_23[2], uint index_n, bool pseudo, bool count_band) {
     debug_print("[%lu]DPF_KEY_PIR\n", key_array_13.size());
-    // do not accept pseudo mode
+
+    const uint digest_size = 3;
+    const uint digest_size_log = digest_size * 8;
+    const uint digest_size_n = 1 << digest_size_log;
+    uchar digest[digest_size];
+    uint key_size = key_array_13[0].Size();
+    uchar key_buffer[key_size];
+    debug_print("GG00, digest_size = %u, key_size = %u\n", digest_size, key_size);
+    SHA256 hash;
 
     uint v_sum = 0;
     if (party == 2) {
         const uint P0 = 1;
-        bool is_0 = false;
-        std::vector<BinaryData> query_23;
         K key = key_23[0] + key_23[1];
-        uint log_n = key.Size() * 8;
-        uchar key_buffer[key.Size()];
-        key.Dump(key_buffer);
-        std::tie(query_23, is_0) = fss.Gen(key_buffer, log_n, true);
 
-        peer[0].WriteUInt(query_23[0].Size(), count_band);
-        peer[1].WriteUInt(query_23[1].Size(), count_band);
+        for (uint b = 0; b < 2; b++) {
+            bool is_0 = false;
+            std::vector<BinaryData> query_23;
+            key.Dump(key_buffer);
+            if (b == 1) {
+                key_buffer[0] ^= 1;
+            }
+            hash.Update(key_buffer, key_size);
+            hash.TruncatedFinal(digest, digest_size);
 
-        peer[0].WriteData(query_23[0], count_band);
-        peer[1].WriteData(query_23[1], count_band);
+            // if (pseudo) {
+            //     uint data_length = divide_ceil(n, 8);
+            //     std::tie(query_23, is_0) = fss.PseudoGen(peer, digest, data_length, true);
+            //     peer[0].WriteData(query_23[0], count_band);
+            // } else {
+            std::tie(query_23, is_0) = fss.Gen(digest, digest_size_log, true);
+            // }
 
+            peer[0].WriteUInt(query_23[0].Size(), count_band);
+            peer[1].WriteUInt(query_23[1].Size(), count_band);
+
+            peer[0].WriteData(query_23[0], count_band);
+            peer[1].WriteData(query_23[1], count_band);
+        }
         v_sum = rand_uint(peer[P0].PRG());
     } else {  // party == 0 || party == 1
-        uint query_size = peer[party].ReadUInt();
-        BinaryData query = peer[party].template ReadData<BinaryData>(query_size);
+        std::vector<bool> dpf_out[2];
+        for (uint b = 0; b < 2; b++) {
+            // if (pseudo) {
+            // debug_print("GG011 pseudo b = %u\n", b);
+            // query_23[0] = peer[1].template ReadData<BinaryData>(query_23[0].Size());
+            // dpf_out[b] = fss.PseudoEvalAll(query, digest_size_n - 1);
+            // } else {
+            uint query_size = peer[party].ReadUInt();
+            BinaryData query = peer[party].template ReadData<BinaryData>(query_size);
+            dpf_out[b] = fss.EvalAll(query, digest_size_log);
+            // }
+        }
+        std::vector<uint> key_array_digest[2];
         for (uint i = 0; i < key_array_13.size(); i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            uchar key_buffer[key.Size()];
             key.Dump(key_buffer);
-            if (fss.Eval(query, key_buffer)) {
-                v_sum ^= i;
+            for (uint b = 0; b < 2; b++) {
+                if (b == 1) {
+                    key_buffer[0] ^= 1;
+                }
+                hash.Update(key_buffer, key_size);
+                hash.TruncatedFinal(digest, digest_size);
+                uint digest_uint = bytes_to_uint(digest, digest_size);
+                key_array_digest[b].push_back(digest_uint);
             }
         }
-
+        uint *exists[2];
+        for (uint b = 0; b < 2; b++) {
+            exists[b] = new uint[digest_size_n]();
+            for (uint i = 0; i < key_array_digest[b].size(); i++) {
+                if (key_array_digest[b][i] >= digest_size_n) {
+                    fprintf(stderr, "key_array_digest[b][i] %u >= digest_size_n %u\n", key_array_digest[b][i], digest_size_n);
+                    exit(1);
+                }
+                exists[b][key_array_digest[b][i]]++;
+            }
+        }
+        for (uint i = 0; i < key_array_digest[0].size(); i++) {
+            uint key_digest = key_array_digest[0][i];
+            if (exists[0][key_digest] == 1) {
+                if (dpf_out[0][key_digest]) {
+                    v_sum ^= i;
+                }
+            } else if (exists[0][key_digest] == 0) {
+                fprintf(stderr, "exists[0][key_digest] == 0\n");
+                exit(1);
+            } else {  // collision
+                key_digest = key_array_digest[1][i];
+                if (exists[1][key_digest] == 1) {
+                    if (dpf_out[1][key_digest]) {
+                        v_sum ^= i;
+                    }
+                } else if (exists[1][key_digest] == 0) {
+                    fprintf(stderr, "exists[1][key_digest] == 0\n");
+                    exit(1);
+                } else {
+                    fprintf(stderr, "collision on second level DPF\n");
+                    exit(1);
+                }
+            }
+        }
         if (party == 0) {
             const uint P2 = 0;
             v_sum ^= rand_uint(peer[P2].PRG());
+        }
+        for (uint b = 0; b < 2; b++) {
+            delete[] exists[b];
         }
     }
     return v_sum % index_n;

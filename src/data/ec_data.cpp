@@ -90,5 +90,5 @@ void ECData::Print(const char *title) {
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
-    debug_print("%llu\n", this->data_);
+    std::cout << this->data_.x << " " << this->data_.y << std::endl;
 }

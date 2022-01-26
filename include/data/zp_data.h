@@ -13,7 +13,7 @@ using namespace CryptoPP;
 class ZpData {
 private:
     Integer data_;
-    static const inline Integer p_ = Integer("11");
+    static const inline Integer p_ = Integer("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
     const bool is_symmetric_ = false;
 
 public:

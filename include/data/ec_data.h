@@ -7,6 +7,8 @@
 #include <cryptopp/osrng.h>
 #include <inttypes.h>
 
+#include <iostream>
+
 #include "typedef.h"
 #include "util.h"
 

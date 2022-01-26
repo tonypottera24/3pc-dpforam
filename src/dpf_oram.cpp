@@ -74,7 +74,9 @@ void DPFORAM<K, D>::PrintArray(std::vector<D> &array, const char *array_name, co
 template <typename K, typename D>
 void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
     debug_print("[%u]KeyToIndex\n", this->Size());
-    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->Size(), count_band);
+    // bool pseudo = (this->Size() <= (1 << this->pseudo_dpf_threshold_));
+    bool pseudo = false;
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->Size(), pseudo, count_band);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->Size(), index_23, count_band);
     debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 }
@@ -357,6 +359,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         // this->PrintMetadata();
 
+        // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
         t1 = std::chrono::high_resolution_clock::now();
         D old_data_13 = this->Read(index_23, false);
@@ -368,6 +371,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         this->PrintMetadata();
 
+        // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         debug_print("\nTest, ========== Write random data ==========\n");
         D new_data_13[3];
         new_data_13[2].Random(this->DataSize());
@@ -381,6 +385,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         this->PrintMetadata();
 
+        // fprintf(stderr, "\nTest, ========== Read validation data  ==========\n");
         debug_print("\nTest, ========== Read validation data ==========\n");
         if (key_value) {
             KeyToIndex(key_23, index_23, false);

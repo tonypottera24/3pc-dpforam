@@ -77,7 +77,7 @@ std::vector<D> write_read_data(Peer &write_peer, std::vector<D> &data, Peer &rea
         write_peer.WriteData(tmp_write_data, count_band);
 
         std::vector<D> tmp_read_data = read_peer.ReadData<D>(end_index - start_index, data_size);
-        new_data.insert(new_data.begin(), tmp_read_data.begin(), tmp_read_data.end());
+        new_data.insert(new_data.end(), tmp_read_data.begin(), tmp_read_data.end());
     }
     return new_data;
 }

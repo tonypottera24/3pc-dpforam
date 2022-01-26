@@ -73,5 +73,5 @@ void ZpData::Print(const char *title) {
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
-    debug_print("%llu\n", this->data_);
+    // debug_print("%llu\n", this->data_);
 }
