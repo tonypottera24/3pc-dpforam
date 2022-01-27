@@ -75,8 +75,7 @@ template <typename K, typename D>
 void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
     debug_print("[%u]KeyToIndex\n", this->Size());
     // bool pseudo = (this->Size() <= (1 << this->pseudo_dpf_threshold_));
-    bool pseudo = false;
-    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->Size(), pseudo, count_band);
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->Size(), count_band);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->Size(), index_23, count_band);
     debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 }
@@ -359,6 +358,11 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         // this->PrintMetadata();
 
+        this->peer_[0].WriteUInt(0, false);
+        this->peer_[1].WriteUInt(0, false);
+        this->peer_[0].ReadUInt();
+        this->peer_[1].ReadUInt();
+
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
         t1 = std::chrono::high_resolution_clock::now();
@@ -370,6 +374,11 @@ void DPFORAM<K, D>::Test(uint iterations) {
         old_data_13.Print("old_data_13");
 
         this->PrintMetadata();
+
+        this->peer_[0].WriteUInt(0, false);
+        this->peer_[1].WriteUInt(0, false);
+        this->peer_[0].ReadUInt();
+        this->peer_[1].ReadUInt();
 
         // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         debug_print("\nTest, ========== Write random data ==========\n");

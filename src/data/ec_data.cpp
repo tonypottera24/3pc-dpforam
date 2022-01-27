@@ -1,11 +1,11 @@
 #include "ec_data.h"
 
 ECData::ECData() {
-    this->data_ = this->group_.GetCurve().Identity();
+    this->data_ = this->curve_.Identity();
 }
 
 ECData::ECData(uchar *data, const uint size) {
-    this->group_.GetCurve().DecodePoint(this->data_, data, size);
+    this->curve_.DecodePoint(this->data_, data, size);
 }
 
 ECData::ECData(const uint size, const bool set_zero) {
@@ -30,17 +30,17 @@ ECData &ECData::operator=(const ECData &other) {
 }
 
 ECData ECData::operator-() {
-    this->data_ = this->group_.GetCurve().Inverse(this->data_);
+    this->data_ = this->curve_.Inverse(this->data_);
     return *this;
 }
 
 ECData &ECData::operator+=(const ECData &rhs) {
-    this->data_ = this->group_.GetCurve().Add(this->data_, rhs.data_);
+    this->data_ = this->curve_.Add(this->data_, rhs.data_);
     return *this;
 }
 
 ECData &ECData::operator-=(const ECData &rhs) {
-    this->data_ = this->group_.GetCurve().Subtract(this->data_, rhs.data_);
+    this->data_ = this->curve_.Subtract(this->data_, rhs.data_);
     return *this;
 }
 
@@ -49,15 +49,15 @@ bool ECData::operator==(const ECData &rhs) {
 }
 
 void ECData::Dump(uchar *data) {
-    this->group_.GetCurve().EncodePoint(data, this->data_, this->compressed_);
+    this->curve_.EncodePoint(data, this->data_, this->compressed_);
 }
 
 void ECData::Load(uchar *data, uint size) {
-    this->group_.GetCurve().DecodePoint(this->data_, data, size);
+    this->curve_.DecodePoint(this->data_, data, size);
 }
 
 void ECData::Reset() {
-    this->data_ = this->group_.GetCurve().Identity();
+    this->data_ = this->curve_.Identity();
 }
 
 void ECData::Random(uint size) {

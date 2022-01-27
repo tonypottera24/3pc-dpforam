@@ -18,7 +18,8 @@ class ECData {
 private:
     ECP::Point data_;
     const bool compressed_ = false;
-    static inline const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
+    // static inline const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
+    static inline const DL_GroupParameters_EC<ECP>::EllipticCurve curve_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve();
     static inline const uint size_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve().EncodedPointSize(false);
     const bool is_symmetric_ = false;
     static inline const Integer p_ = Integer("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
