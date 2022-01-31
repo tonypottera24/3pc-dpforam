@@ -59,7 +59,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 }
 
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const K key_23[2], uint index_n, bool count_band) {
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const K key_23[2], uint index_n, EVP_MD_CTX *md_ctx, uchar *sha256_digest, bool count_band) {
     debug_print("[%lu]DPF_KEY_PIR\n", key_array_13.size());
 
     // std::chrono::high_resolution_clock::time_point t1, t2;
@@ -72,9 +72,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
     uint key_size = key_array_13[0].Size();
     uchar key_buffer[key_size];
     debug_print("GG00, digest_size = %u, key_size = %u\n", digest_size, key_size);
-    // SHA256 hash;
-    uchar *sha256_digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()));
-    EVP_MD_CTX *md_ctx = EVP_MD_CTX_new();
 
     uint v_sum = 0;
     if (party == 2) {
@@ -118,22 +115,12 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
         std::unordered_map<std::string, uint> exists;
         for (uint i = 0; i < key_array_13.size(); i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            // t2 = std::chrono::high_resolution_clock::now();
-            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            // fprintf(stderr, "time1.1 i = %u, = %llu\n", i, time);
             key.Dump(key_buffer);
-            // t2 = std::chrono::high_resolution_clock::now();
-            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            // fprintf(stderr, "time1.3 i = %u, = %llu\n", i, time);
 
             EVP_DigestInit_ex(md_ctx, EVP_sha256(), NULL);
             EVP_DigestUpdate(md_ctx, key_buffer, key_size);
             uint sha256_digest_size;
             EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
-
-            // t2 = std::chrono::high_resolution_clock::now();
-            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            // fprintf(stderr, "time1.5 i = %u, = %llu\n", i, time);
 
             std::string digest_string((char *)sha256_digest, digest_size);
             key_array_digest.push_back(digest_string);
@@ -143,9 +130,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
             } else {
                 exists[digest_string]++;
             }
-            // t2 = std::chrono::high_resolution_clock::now();
-            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            // fprintf(stderr, "time1.7 i = %u, = %llu\n", i, time);
         }
         // t2 = std::chrono::high_resolution_clock::now();
         // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
@@ -187,10 +171,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
             v_sum ^= rand_uint(peer[P2].PRG());
         }
     }
-    debug_print("before free\n");
-    EVP_MD_CTX_free(md_ctx);
-    OPENSSL_free(sha256_digest);
-    debug_print("after free\n");
     return v_sum % index_n;
 }
 

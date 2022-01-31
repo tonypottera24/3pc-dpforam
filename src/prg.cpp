@@ -1,15 +1,13 @@
 #include "prg.h"
 
 PRG::PRG() {
-    this->md_ctx_ = EVP_MD_CTX_new();
-    this->bn_ctx_ = BN_CTX_new();
     this->seed_ = (unsigned char *)OPENSSL_malloc(this->seed_size);
     RAND_bytes(this->seed_, this->seed_size);
 }
 
 PRG::~PRG() {
-    EVP_MD_CTX_free(this->md_ctx_);
-    BN_CTX_free(this->bn_ctx_);
+    // EVP_MD_CTX_free(this->md_ctx_);
+    // BN_CTX_free(this->bn_ctx_);
     free(this->seed_);
 }
 

@@ -12,8 +12,8 @@
 class PRG {
 private:
     uchar *seed_;
-    EVP_MD_CTX *md_ctx_;
-    BN_CTX *bn_ctx_;
+    static inline EVP_MD_CTX *md_ctx_ = EVP_MD_CTX_new();
+    static inline BN_CTX *bn_ctx_ = BN_CTX_new();
 
 public:
     const static inline EVP_MD *hash = EVP_sha256();

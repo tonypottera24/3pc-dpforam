@@ -35,6 +35,9 @@ private:
     uint ssot_threshold_;
     uint pseudo_dpf_threshold_;
 
+    EVP_MD_CTX *md_ctx_ = EVP_MD_CTX_new();
+    uchar *sha256_digest_ = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()));
+
 private:
     void Init();
     void InitPositionMap();

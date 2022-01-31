@@ -1,8 +1,9 @@
 #include "ec_data.h"
 
 ECData::ECData() {
-    this->data_ = EC_POINT_new(this->curve_);
-    EC_POINT_copy(this->data_, this->g_);
+    // this->data_ = EC_POINT_new(this->curve_);
+    // EC_POINT_copy(this->data_, this->g_);
+    this->data_ = EC_POINT_dup(this->g_, this->curve_);
 }
 
 ECData::ECData(uchar *data, const uint size) {
@@ -11,20 +12,19 @@ ECData::ECData(uchar *data, const uint size) {
 }
 
 ECData::ECData(const uint size, const bool set_zero) {
-    this->data_ = EC_POINT_new(this->curve_);
-    EC_POINT_copy(this->data_, this->g_);
-    if (set_zero) {
-        this->Reset();
-    }
+    // this->data_ = EC_POINT_new(this->curve_);
+    // EC_POINT_copy(this->data_, this->g_);
+    this->data_ = EC_POINT_dup(this->g_, this->curve_);
 }
 
 ECData::ECData(const ECData &other) {
-    this->data_ = EC_POINT_new(this->curve_);
-    EC_POINT_copy(this->data_, other.data_);
+    // this->data_ = EC_POINT_new(this->curve_);
+    // EC_POINT_copy(this->data_, other.data_);
+    this->data_ = EC_POINT_dup(other.data_, this->curve_);
 }
 
 ECData::~ECData() {
-    BN_CTX_free(bn_ctx_);
+    // BN_CTX_free(bn_ctx_);
     EC_POINT_free(this->data_);
 }
 
@@ -76,12 +76,14 @@ void ECData::Random(uint size) {
 
 void ECData::Random(PRG &prg, uint size) {
     debug_print("ECData::Random start\n");
-    BIGNUM *x = BN_new();
-    BIGNUM *q = BN_new();
+    BN_CTX_start(this->bn_ctx_);
+    BIGNUM *x = BN_CTX_get(this->bn_ctx_);
+    BIGNUM *q = BN_CTX_get(this->bn_ctx_);
     EC_GROUP_get_order(this->curve_, q, this->bn_ctx_);
     prg.RandBn(x, q);
     EC_POINT_copy(this->data_, this->g_);
     EC_POINT_mul(this->curve_, this->data_, x, NULL, NULL, this->bn_ctx_);
+    BN_CTX_end(this->bn_ctx_);
     debug_print("ECData::Random end\n");
     // bool v = x.GetBit(0);
     // while (true) {

@@ -13,11 +13,10 @@
 class ECData {
 private:
     EC_POINT *data_;
-    const bool compressed_ = false;
     const static inline EC_GROUP *curve_ = EC_GROUP_new_by_curve_name(NID_secp256k1);
     const static inline EC_POINT *g_ = EC_GROUP_get0_generator(EC_GROUP_new_by_curve_name(NID_secp256k1));
     const static inline uint size_ = EC_POINT_point2oct(EC_GROUP_new_by_curve_name(NID_secp256k1), EC_POINT_new(EC_GROUP_new_by_curve_name(NID_secp256k1)), POINT_CONVERSION_COMPRESSED, NULL, 0, NULL);
-    BN_CTX *bn_ctx_ = BN_CTX_new();
+    static inline BN_CTX *bn_ctx_ = BN_CTX_new();
     const bool is_symmetric_ = false;
 
 public:
