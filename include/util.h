@@ -2,8 +2,6 @@
 #define UTIL_H_
 
 #include <assert.h>
-#include <cryptopp/modes.h>
-#include <cryptopp/osrng.h>
 #include <emmintrin.h>
 #include <string.h>
 #include <sys/time.h>
@@ -24,7 +22,7 @@ uint bytes_to_uint(const uchar *b, uint len);
 void rand_bytes(uchar *bytes, const uint len);
 bool rand_bool();
 uint rand_uint();
-uint rand_uint(CryptoPP::RandomNumberGenerator &prg);
+uint rand_uint(PRG &prg);
 uint64_t timestamp();
 
 uint bit_length(uint n);

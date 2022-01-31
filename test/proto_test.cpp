@@ -99,16 +99,14 @@ int main(int argc, char *argv[]) {
 
     // fprintf(stderr, "HasAESNI %u\n", CryptoPP::HasAESNI());
 
-    uchar bytes[96];
-    for (uint i = 0; i < 96; i++) {
-        bytes[i] = i;
-    }
-    uint offset[3] = {0, 32, 64};
-    // P0 [0:P2]=0 [1:P1]=2
-    // P1 [0:P0]=1 [1:P2]=0
-    // P2 [0:P1]=2 [1:P0]=1
-    peer[0].PRG().SetKeyWithIV(bytes + offset[(party + 2) % 3], 16, bytes + offset[(party + 2) % 3] + 16);
-    peer[1].PRG().SetKeyWithIV(bytes + offset[party], 16, bytes + offset[party] + 16);
+    uint seed_size = EVP_MD_size(EVP_sha256());
+    uchar seed[seed_size];
+    RAND_bytes(seed, seed_size);
+    peer[1].PRG().SetSeed(seed);
+    peer[1].Socket().Write(seed, seed_size, false);
+    peer[0].Socket().Read(seed, seed_size);
+    peer[0].PRG().SetSeed(seed);
+
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     uint64_t start_time = timestamp();

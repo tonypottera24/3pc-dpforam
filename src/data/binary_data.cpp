@@ -91,14 +91,14 @@ void BinaryData::Reset() {
 }
 
 void BinaryData::Random(uint size) {
-    CryptoPP::AutoSeededRandomPool prg;
+    PRG prg;
     this->Random(prg, size);
 }
 
-void BinaryData::Random(CryptoPP::RandomNumberGenerator &prg, uint size) {
+void BinaryData::Random(PRG &prg, uint size) {
     this->Resize(size);
     if (size > 0) {
-        prg.GenerateBlock(this->data_, size);
+        prg.RandBytes(this->data_, size);
     }
 }
 

@@ -1,22 +1,19 @@
 #ifndef PEER_H_
 #define PEER_H_
 
-#include <cryptopp/modes.h>
-#include <cryptopp/osrng.h>
-
+#include "prg.h"
 #include "socket.h"
 #include "typedef.h"
 
 class Peer {
 private:
     Socket socket_;
-    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg_;
+    PRG prg_;
 
 public:
     Peer() {}
-    Peer(Socket socket, CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg);
 
-    CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &PRG();
+    PRG &PRG();
     Socket &Socket();
     uint Bandwidth();
 

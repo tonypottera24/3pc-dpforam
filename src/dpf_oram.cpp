@@ -452,13 +452,13 @@ void DPFORAM<K, D>::Test(uint iterations) {
 }
 
 template class DPFORAM<BinaryData, BinaryData>;
-template class DPFORAM<BinaryData, ZpData>;
+// template class DPFORAM<BinaryData, ZpData>;
 template class DPFORAM<BinaryData, ECData>;
 
-template class DPFORAM<ZpData, BinaryData>;
-template class DPFORAM<ZpData, ZpData>;
-template class DPFORAM<ZpData, ECData>;
+// template class DPFORAM<ZpData, BinaryData>;
+// template class DPFORAM<ZpData, ZpData>;
+// template class DPFORAM<ZpData, ECData>;
 
 template class DPFORAM<ECData, BinaryData>;
-template class DPFORAM<ECData, ZpData>;
+// template class DPFORAM<ECData, ZpData>;
 template class DPFORAM<ECData, ECData>;

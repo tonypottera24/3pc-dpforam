@@ -1,10 +1,9 @@
 #ifndef BINARY_DATA_H_
 #define BINARY_DATA_H_
 
-#include <cryptopp/modes.h>
-#include <cryptopp/osrng.h>
 #include <inttypes.h>
 
+#include "prg.h"
 #include "typedef.h"
 #include "util.h"
 
@@ -41,7 +40,7 @@ public:
     void Load(uchar *data, uint size);
     void Reset();
     void Random(uint size);
-    void Random(CryptoPP::RandomNumberGenerator &prg, uint size);
+    void Random(PRG &prg, uint size);
     uint Size() { return this->size_; }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");

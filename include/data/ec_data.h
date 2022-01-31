@@ -1,31 +1,24 @@
 #ifndef EC_DATA_H_
 #define EC_DATA_H_
 
-#include <cryptopp/eccrypto.h>
-#include <cryptopp/modes.h>
-#include <cryptopp/oids.h>
-#include <cryptopp/osrng.h>
 #include <inttypes.h>
+#include <openssl/ec.h>
+#include <openssl/obj_mac.h>
 
 #include <iostream>
 
 #include "typedef.h"
 #include "util.h"
 
-using namespace CryptoPP;
-
 class ECData {
 private:
-    ECP::Point data_;
+    EC_POINT *data_;
     const bool compressed_ = false;
     // static inline const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
-    static inline const DL_GroupParameters_EC<ECP>::EllipticCurve curve_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve();
-    static inline const uint size_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1()).GetCurve().EncodedPointSize(false);
+    static inline const EC_GROUP *curve_ = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    BN_CTX *bn_ctx_ = BN_CTX_new();
+    // static inline const uint size_ = 8;
     const bool is_symmetric_ = false;
-    static inline const Integer p_ = Integer("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
-    static inline const Integer q_ = Integer("0x3fffffffc0000000400000000000000000000000400000000000000000000000");
-    static inline const Integer a_ = Integer("0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc");
-    static inline const Integer b_ = Integer("0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b");
 
 public:
     ECData();
@@ -54,8 +47,11 @@ public:
     void ConvertFromBytes(uchar *data, uint size);
     void Reset();
     void Random(uint size);
-    void Random(RandomNumberGenerator &prg, uint size);
-    uint Size() { return this->size_; }
+    void Random(PRG &prg, uint size);
+    uint Size() {
+        return EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_COMPRESSED, NULL, 0, this->bn_ctx_);
+        // return this->size_;
+    }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
 };

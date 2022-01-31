@@ -1,15 +1,11 @@
 
 #include "peer.h"
 
-Peer::Peer(class Socket socket, CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption prg) : socket_(socket), prg_(prg) {
-    // fprintf(stderr, "Initilizing server %s:%u...\n", ip.c_str(), port);
-}
-
 Socket &Peer::Socket() {
     return this->socket_;
 }
 
-CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption &Peer::PRG() {
+PRG &Peer::PRG() {
     return this->prg_;
 }
 

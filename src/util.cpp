@@ -49,8 +49,7 @@ uint bytes_to_uint(const uchar *bytes, const uint len) {
 }
 
 void rand_bytes(uchar *bytes, const uint size) {
-    CryptoPP::AutoSeededRandomPool rnd;
-    rnd.GenerateBlock(bytes, size);
+    RAND_bytes(bytes, size);
 }
 
 bool rand_bool() {
@@ -65,9 +64,9 @@ uint rand_uint() {
     return value;
 }
 
-uint rand_uint(CryptoPP::RandomNumberGenerator &prg) {
+uint rand_uint(PRG &prg) {
     uint value;
-    prg.GenerateBlock((uchar *)&value, sizeof(uint));
+    prg.RandBytes((uchar *)&value, sizeof(uint));
     return value;
 }
 
