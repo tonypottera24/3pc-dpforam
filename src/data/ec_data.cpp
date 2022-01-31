@@ -2,8 +2,7 @@
 
 ECData::ECData() {
     this->data_ = EC_POINT_new(this->curve_);
-    const EC_POINT *g = EC_GROUP_get0_generator(this->curve_);
-    EC_POINT_copy(this->data_, g);
+    EC_POINT_copy(this->data_, this->g_);
 }
 
 ECData::ECData(uchar *data, const uint size) {
@@ -13,8 +12,7 @@ ECData::ECData(uchar *data, const uint size) {
 
 ECData::ECData(const uint size, const bool set_zero) {
     this->data_ = EC_POINT_new(this->curve_);
-    const EC_POINT *g = EC_GROUP_get0_generator(this->curve_);
-    EC_POINT_copy(this->data_, g);
+    EC_POINT_copy(this->data_, this->g_);
     if (set_zero) {
         this->Reset();
     }
@@ -82,8 +80,7 @@ void ECData::Random(PRG &prg, uint size) {
     BIGNUM *q = BN_new();
     EC_GROUP_get_order(this->curve_, q, this->bn_ctx_);
     prg.RandBn(x, q);
-    const EC_POINT *g = EC_GROUP_get0_generator(this->curve_);
-    EC_POINT_copy(this->data_, g);
+    EC_POINT_copy(this->data_, this->g_);
     EC_POINT_mul(this->curve_, this->data_, x, NULL, NULL, this->bn_ctx_);
     debug_print("ECData::Random end\n");
     // bool v = x.GetBit(0);

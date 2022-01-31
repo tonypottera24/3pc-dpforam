@@ -88,8 +88,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
             if (b == 1) {
                 key_buffer[0] ^= 1;
             }
-            // hash.Update(key_buffer, key_size);
-            // hash.TruncatedFinal(digest, digest_size);
             EVP_DigestInit_ex(md_ctx, EVP_sha256(), NULL);
             EVP_DigestUpdate(md_ctx, key_buffer, key_size);
             uint sha256_digest_size;

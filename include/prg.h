@@ -12,9 +12,12 @@
 class PRG {
 private:
     uchar *seed_;
-    const uint seed_size_ = EVP_MD_size(EVP_sha256());
     EVP_MD_CTX *md_ctx_;
     BN_CTX *bn_ctx_;
+
+public:
+    const static inline EVP_MD *hash = EVP_sha256();
+    const static inline uint seed_size = EVP_MD_size(EVP_sha256());
 
 public:
     PRG();

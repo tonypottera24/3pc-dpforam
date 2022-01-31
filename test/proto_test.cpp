@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
         "log_n", po::value<uint>()->default_value(10), "number of data (log)")(
-        "data_size", po::value<uint>()->default_value(8), "data size (bytes)")(
+        "data_size", po::value<uint>()->default_value(4), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(3), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(20), "ssot threshold (log)")(
         "log_pseudo_dpf_threshold", po::value<uint>()->default_value(0), "pseudo dpf threshold (log)")(
@@ -99,12 +99,11 @@ int main(int argc, char *argv[]) {
 
     // fprintf(stderr, "HasAESNI %u\n", CryptoPP::HasAESNI());
 
-    uint seed_size = EVP_MD_size(EVP_sha256());
-    uchar seed[seed_size];
-    RAND_bytes(seed, seed_size);
+    uchar seed[PRG::seed_size];
+    RAND_bytes(seed, PRG::seed_size);
     peer[1].PRG().SetSeed(seed);
-    peer[1].Socket().Write(seed, seed_size, false);
-    peer[0].Socket().Read(seed, seed_size);
+    peer[1].Socket().Write(seed, PRG::seed_size, false);
+    peer[0].Socket().Read(seed, PRG::seed_size);
     peer[0].PRG().SetSeed(seed);
 
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);

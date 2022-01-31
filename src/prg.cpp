@@ -3,8 +3,8 @@
 PRG::PRG() {
     this->md_ctx_ = EVP_MD_CTX_new();
     this->bn_ctx_ = BN_CTX_new();
-    this->seed_ = (unsigned char *)OPENSSL_malloc(this->seed_size_);
-    RAND_bytes(this->seed_, this->seed_size_);
+    this->seed_ = (unsigned char *)OPENSSL_malloc(this->seed_size);
+    RAND_bytes(this->seed_, this->seed_size);
 }
 
 PRG::~PRG() {
@@ -14,14 +14,14 @@ PRG::~PRG() {
 }
 
 void PRG::SetSeed(uchar *seed) {
-    memcpy(this->seed_, seed, this->seed_size_);
+    memcpy(this->seed_, seed, this->seed_size);
 }
 
 void PRG::RandBytes(uchar *data, uint size) {
     uint offset = 0;
     while (offset < size) {
-        EVP_DigestInit_ex(this->md_ctx_, EVP_sha256(), NULL);
-        EVP_DigestUpdate(this->md_ctx_, this->seed_, seed_size_);
+        EVP_DigestInit_ex(this->md_ctx_, this->hash, NULL);
+        EVP_DigestUpdate(this->md_ctx_, this->seed_, seed_size);
         uint digest_size;
         EVP_DigestFinal_ex(this->md_ctx_, this->seed_, &digest_size);
         if (offset + digest_size > size) {

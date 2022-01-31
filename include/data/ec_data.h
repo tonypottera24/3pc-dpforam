@@ -14,10 +14,10 @@ class ECData {
 private:
     EC_POINT *data_;
     const bool compressed_ = false;
-    // static inline const DL_GroupParameters_EC<ECP> group_ = DL_GroupParameters_EC<ECP>(ASN1::secp256r1());
-    static inline const EC_GROUP *curve_ = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    const static inline EC_GROUP *curve_ = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    const static inline EC_POINT *g_ = EC_GROUP_get0_generator(EC_GROUP_new_by_curve_name(NID_secp256k1));
+    const static inline uint size_ = EC_POINT_point2oct(EC_GROUP_new_by_curve_name(NID_secp256k1), EC_POINT_new(EC_GROUP_new_by_curve_name(NID_secp256k1)), POINT_CONVERSION_COMPRESSED, NULL, 0, NULL);
     BN_CTX *bn_ctx_ = BN_CTX_new();
-    // static inline const uint size_ = 8;
     const bool is_symmetric_ = false;
 
 public:
@@ -49,8 +49,7 @@ public:
     void Random(uint size);
     void Random(PRG &prg, uint size);
     uint Size() {
-        return EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_COMPRESSED, NULL, 0, this->bn_ctx_);
-        // return this->size_;
+        return this->size_;
     }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
