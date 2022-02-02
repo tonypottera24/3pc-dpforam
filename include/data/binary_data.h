@@ -16,7 +16,6 @@ private:
 public:
     BinaryData();
     BinaryData(const BinaryData &other);
-    // BinaryData(uchar *data, const uint size);
     BinaryData(const uint size);
     ~BinaryData();
 

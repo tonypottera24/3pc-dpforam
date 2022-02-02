@@ -2,20 +2,15 @@
 
 ECData::ECData() {
     this->data_ = EC_POINT_new(this->curve_);
-    EC_POINT_set_to_infinity(this->curve_, this->data_);
+    this->Reset();
     // this->data_ = EC_POINT_dup(this->g_, this->curve_);
     // EC_POINT_invert(this->curve_, this->data_, this->bn_ctx_);
     // EC_POINT_add(this->curve_, this->data_, this->data_, this->g_, this->bn_ctx_);
 }
 
-// ECData::ECData(uchar *data, const uint size) {
-//     this->data_ = EC_POINT_new(this->curve_);
-//     EC_POINT_oct2point(this->curve_, this->data_, data, size, this->bn_ctx_);
-// }
-
 ECData::ECData(const uint size) {
     this->data_ = EC_POINT_new(this->curve_);
-    EC_POINT_set_to_infinity(this->curve_, this->data_);
+    this->Reset();
     // this->data_ = EC_POINT_dup(this->g_, this->curve_);
     // EC_POINT_invert(this->curve_, this->data_, this->bn_ctx_);
     // EC_POINT_add(this->curve_, this->data_, this->data_, this->g_, this->bn_ctx_);

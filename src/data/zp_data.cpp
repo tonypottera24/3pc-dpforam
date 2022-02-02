@@ -2,16 +2,12 @@
 
 ZpData::ZpData() {
     this->data_ = BN_new();
-    BN_zero_ex(this->data_);
+    this->Reset();
 }
-
-// ZpData::ZpData(uchar *data, const uint size) {
-//     this->data_ = BN_bin2bn(data, this->Size(), NULL);
-// }
 
 ZpData::ZpData(const uint size) {
     this->data_ = BN_new();
-    BN_zero_ex(this->data_);
+    this->Reset();
 }
 
 ZpData::ZpData(const ZpData &other) {

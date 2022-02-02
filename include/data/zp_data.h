@@ -18,7 +18,6 @@ private:
 public:
     ZpData();
     ZpData(const ZpData &other);
-    // ZpData(uchar *data, const uint size);
     ZpData(const uint size);
     ~ZpData();
 

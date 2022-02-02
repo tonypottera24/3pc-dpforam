@@ -23,12 +23,10 @@ private:
 public:
     ECData();
     ECData(const ECData &other);
-    // ECData(uchar *data, const uint size);
     ECData(const uint size);
     ~ECData();
 
     ECData &operator=(const ECData &other);
-    // ECData &operator=(ECData &&other) noexcept;
     ECData operator-();
     ECData &operator+=(const ECData &rhs);
     ECData &operator-=(const ECData &rhs);

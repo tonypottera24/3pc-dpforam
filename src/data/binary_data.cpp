@@ -3,14 +3,8 @@
 BinaryData::BinaryData() {
 }
 
-// BinaryData::BinaryData(uchar *data, const uint size) {
-//     if (size == 0) return;
-//     this->data_.resize(size);
-//     memcpy(this->data_.data(), data, size);
-// }
-
 BinaryData::BinaryData(const uint size) {
-    this->data_.resize(size);
+    this->Resize(size);
     this->Reset();
 }
 
