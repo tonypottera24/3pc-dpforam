@@ -18,12 +18,13 @@ private:
     const static inline uint size_ = 33;
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
     const bool is_symmetric_ = false;
+    static inline PRG *prg_ = new PRG();
 
 public:
     ECData();
     ECData(const ECData &other);
-    ECData(uchar *data, const uint size);
-    ECData(const uint size, const bool set_zero = false);
+    // ECData(uchar *data, const uint size);
+    ECData(const uint size);
     ~ECData();
 
     ECData &operator=(const ECData &other);
@@ -41,12 +42,11 @@ public:
         return lhs;
     }
 
-    void Dump(uchar *data);
-    void Load(uchar *data, uint size);
-    void ConvertFromBytes(uchar *data, uint size);
+    std::vector<uchar> Dump();
+    void Load(std::vector<uchar> data);
     void Reset();
-    void Random(uint size);
-    void Random(PRG &prg, uint size);
+    void Resize(const uint size);
+    void Random(PRG *prg = NULL);
     uint Size() {
         // uint size = EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_COMPRESSED, NULL, 0, this->bn_ctx_);
         // fprintf(stderr, "size = %u\n", size);

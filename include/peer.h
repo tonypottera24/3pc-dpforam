@@ -13,7 +13,7 @@ private:
 public:
     Peer() {}
 
-    PRG &PRG();
+    PRG *PRG();
     Socket &Socket();
     uint Bandwidth();
 
@@ -26,17 +26,18 @@ public:
     template <typename D>
     D ReadData(const uint size) {
         // fprintf(stderr, "ReadData, size = %u\n", size);
-        uchar binary_data[size];
-        this->socket_.Read(binary_data, size);
-        return D(binary_data, size);
+        std::vector<uchar> buffer(size);
+        this->socket_.Read(buffer.data(), size);
+        D data;
+        data.Load(buffer);
+        return data;
     }
 
     template <typename D>
     void WriteData(D data, bool count_band) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
-        uchar buffer[data.Size()];
-        data.Dump(buffer);
-        this->socket_.Write(buffer, data.Size(), count_band);
+        std::vector<uchar> dump = data.Dump();
+        this->socket_.Write(dump.data(), dump.size(), count_band);
     }
 
     template <typename D>
@@ -44,24 +45,22 @@ public:
         uint buffer_size = size * data_size;
         uchar buffer[buffer_size];
         this->socket_.Read(buffer, buffer_size);
-        std::vector<D> data;
+        std::vector<D> data(size);
         for (uint i = 0; i < size; i++) {
-            data.emplace_back(&buffer[i * data_size], data_size);
+            std::vector<uchar> buf(buffer + data_size * i, buffer + data_size * (i + 1));
+            data[i].Load(buf);
         }
         return data;
     }
 
     template <typename D>
     void WriteData(std::vector<D> &data, bool count_band) {
-        uint data_size = data[0].Size();
-        uint buffer_size = data.size() * data_size;
-        uchar buffer[buffer_size];
+        std::vector<uchar> buffer;
         for (uint i = 0; i < data.size(); i++) {
-            uchar data_buffer[data_size];
-            data[i].Dump(data_buffer);
-            memcpy(&buffer[i * data_size], data_buffer, data_size);
+            std::vector<uchar> dump = data[i].Dump();
+            buffer.insert(buffer.end(), dump.begin(), dump.end());
         }
-        this->socket_.Write(buffer, buffer_size, count_band);
+        this->socket_.Write(buffer.data(), buffer.size(), count_band);
     }
 
     void Close();

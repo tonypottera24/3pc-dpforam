@@ -24,7 +24,7 @@ public:
     ~PRG();
     void SetSeed(uchar *seed);
     void RandBytes(uchar *data, uint size);
-    void RandBn(BIGNUM *bn, BIGNUM *p);
+    void RandBn(BIGNUM *bn, const BIGNUM *p);
 };
 
 #endif /* PRG_H_ */

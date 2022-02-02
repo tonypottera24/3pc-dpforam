@@ -1,6 +1,6 @@
 #include "util.h"
 
-void xor_bytes(const uchar *a, const uchar *b, uint len, uchar *out) {
+void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uint len) {
     // for (uint64_t i = 0; i < len; i++) {
     //     out[i] = a[i] ^ b[i];
     // }
@@ -9,16 +9,16 @@ void xor_bytes(const uchar *a, const uchar *b, uint len, uchar *out) {
             uint64_t *aa = (uint64_t *)&a[offset];
             uint64_t *bb = (uint64_t *)&b[offset];
             uint64_t o = (*aa) ^ (*bb);
-            memcpy(&out[offset], &o, sizeof(uint64_t));
+            memcpy(&r[offset], &o, sizeof(uint64_t));
         } else {
             for (uint i = offset; i < len; i++) {
-                out[i] = a[i] ^ b[i];
+                r[i] = a[i] ^ b[i];
             }
         }
     }
 }
 
-void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint len, uchar *out) {
+void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uchar *c, const uint len) {
     // for (uint64_t i = 0; i < len; i++) {
     //     output[i] = a[i] ^ b[i] ^ c[i];
     // }
@@ -28,10 +28,10 @@ void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uint len, uchar *
             uint64_t *bb = (uint64_t *)&b[offset];
             uint64_t *cc = (uint64_t *)&c[offset];
             uint64_t o = (*aa) ^ (*bb) ^ (*cc);
-            memcpy(&out[offset], &o, sizeof(uint64_t));
+            memcpy(&r[offset], &o, sizeof(uint64_t));
         } else {
             for (uint i = offset; i < len; i++) {
-                out[i] = a[i] ^ b[i] ^ c[i];
+                r[i] = a[i] ^ b[i] ^ c[i];
             }
         }
     }
@@ -58,15 +58,13 @@ bool rand_bool() {
     return value & 1;
 }
 
-uint rand_uint() {
+uint rand_uint(PRG *prg) {
     uint value;
-    rand_bytes((uchar *)&value, sizeof(uint));
-    return value;
-}
-
-uint rand_uint(PRG &prg) {
-    uint value;
-    prg.RandBytes((uchar *)&value, sizeof(uint));
+    if (prg == NULL) {
+        rand_bytes((uchar *)&value, sizeof(uint));
+    } else {
+        prg->RandBytes((uchar *)&value, sizeof(uint));
+    }
     return value;
 }
 

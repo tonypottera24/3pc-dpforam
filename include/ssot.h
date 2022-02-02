@@ -7,16 +7,16 @@ void P2(Peer peer[2], const uint n, const uint data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
     // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
 
-    D delta;
-    delta.Random(data_size);
+    D delta(data_size);
+    delta.Random();
 
     uint alpha = rand_uint(peer[P0].PRG()) % n;
     uint beta = rand_uint(peer[P1].PRG()) % n;
 
-    D x, y, xx, yy;
+    D x(data_size), y(data_size), xx(data_size), yy(data_size);
     for (uint i = 0; i < n; i++) {
-        x.Random(peer[P0].PRG(), data_size);
-        y.Random(peer[P1].PRG(), data_size);
+        x.Random(peer[P0].PRG());
+        y.Random(peer[P1].PRG());
         if (i == beta) {
             xx = x + delta;
         }
@@ -45,7 +45,8 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
 
     D x[n];
     for (uint i = 0; i < n; i++) {
-        x[i].Random(peer[P2].PRG(), data_size);
+        x[i].Resize(data_size);
+        x[i].Random(peer[P2].PRG());
     }
 
     // Send s to P1
@@ -56,9 +57,9 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
     uint t = peer[P1].ReadUInt();
 
     // Send u0' and u1' to P1
-    std::vector<D> uu;
+    std::vector<D> uu(n);
     for (uint i = 0; i < n; i++) {
-        uu.emplace_back(u[b0 ^ i] + x[t ^ i]);
+        uu[i] = u[b0 ^ i] + x[t ^ i];
     }
     // peer[P1].WriteData(uu, count_band);
 
@@ -85,7 +86,8 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
 
     D y[n];
     for (uint i = 0; i < n; i++) {
-        y[i].Random(peer[P2].PRG(), data_size);
+        y[i].Resize(data_size);
+        y[i].Random(peer[P2].PRG());
     }
 
     // Send t to P0
@@ -96,9 +98,9 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
     uint s = peer[P0].ReadUInt();
 
     // Send v0' and v1' to P0
-    std::vector<D> vv;
+    std::vector<D> vv(n);
     for (uint i = 0; i < n; i++) {
-        vv.emplace_back(v[b1 ^ i] + y[s ^ i]);
+        vv[i] = v[b1 ^ i] + y[s ^ i];
     }
     // peer[P0].WriteData(vv, count_band);
 

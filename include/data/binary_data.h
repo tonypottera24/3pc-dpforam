@@ -9,16 +9,15 @@
 
 class BinaryData {
 private:
-    uint size_ = 0;
-    uchar *data_ = NULL;
+    std::vector<uchar> data_;
     const bool is_symmetric_ = true;
-    void Resize(uint size);
+    static inline PRG *prg_ = new PRG();
 
 public:
     BinaryData();
     BinaryData(const BinaryData &other);
-    BinaryData(uchar *data, const uint size);
-    BinaryData(const uint size, const bool set_zero = false);
+    // BinaryData(uchar *data, const uint size);
+    BinaryData(const uint size);
     ~BinaryData();
 
     BinaryData &operator=(const BinaryData &other);
@@ -36,12 +35,12 @@ public:
         return lhs;
     }
 
-    void Dump(uchar *data);
-    void Load(uchar *data, uint size);
+    std::vector<uchar> Dump();
+    void Load(std::vector<uchar> data);
     void Reset();
-    void Random(uint size);
-    void Random(PRG &prg, uint size);
-    uint Size() { return this->size_; }
+    void Resize(const uint size);
+    void Random(PRG *prg = NULL);
+    uint Size() { return this->data_.size(); }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
 };

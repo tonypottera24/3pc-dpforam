@@ -4,11 +4,11 @@ template <typename K, typename D>
 DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2],
                        uint n, uint data_size, uint tau, uint ssot_threshold, uint pseudo_dpf_threshold) : party_(party), peer_(peer), tau_(tau), ssot_threshold_(ssot_threshold), pseudo_dpf_threshold_(pseudo_dpf_threshold) {
     debug_print("DPFORAM n = %u, data_size = %u, tau = %u\n", n, data_size, tau);
-    this->InitArray(this->write_array_13_, n, data_size, true);
+    this->InitArray(this->write_array_13_, n, data_size);
 
     if (n > 1) {
         for (uint b = 0; b < 2; b++) {
-            this->InitArray(this->read_array_23_[b], n, data_size, true);
+            this->InitArray(this->read_array_23_[b], n, data_size);
         }
 
         uint pos_data_per_block = 1 << this->tau_;
@@ -46,9 +46,10 @@ void DPFORAM<K, D>::Reset() {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::InitArray(std::vector<D> &array, const uint n, const uint data_size, bool set_zero) {
+void DPFORAM<K, D>::InitArray(std::vector<D> &array, const uint n, const uint data_size) {
+    array.resize(n);
     for (uint i = 0; i < n; i++) {
-        array.emplace_back(data_size, set_zero);
+        array[i].Resize(data_size);
     }
 }
 
@@ -88,7 +89,7 @@ D DPFORAM<K, D>::GetLatestData(D v_read_13,
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = v_read_13.Size();
-    D v_out_13;
+    D v_out_13(data_size);
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
@@ -97,7 +98,7 @@ D DPFORAM<K, D>::GetLatestData(D v_read_13,
 
         SSOT::P2<D>(this->peer_, 2, data_size, count_band);
 
-        v_out_13.Random(this->peer_[P1].PRG(), data_size);
+        v_out_13.Random(this->peer_[P1].PRG());
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
         D v_read_12 = this->peer_[P2].template ReadData<D>(data_size) + v_read_13;
@@ -111,8 +112,8 @@ D DPFORAM<K, D>::GetLatestData(D v_read_13,
         std::vector<D> v = {v_read_13, v_cache_13};
         const uint b1 = is_cached_23[P2];
         v_out_13 = SSOT::P1(this->peer_, b1, v, count_band);
-        D tmp;
-        tmp.Random(this->peer_[P2].PRG(), data_size);
+        D tmp(data_size);
+        tmp.Random(this->peer_[P2].PRG());
         v_out_13 -= tmp;
     }
     return v_out_13;
@@ -142,10 +143,11 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     // read data from block
     std::vector<BinaryData> old_data_array_23[2];
     for (uint b = 0; b < 2; b++) {
-        uchar old_block_data[old_block_23[b].Size()];
-        old_block_23[b].Dump(old_block_data);
+        std::vector<uchar> dump = old_block_23[b].Dump();
+        old_data_array_23[b].resize(data_per_block);
         for (uint i = 0; i < data_per_block; i++) {
-            old_data_array_23[b].emplace_back(&old_block_data[i * data_size], data_size);
+            std::vector<uchar> data(dump.begin() + data_size * i, dump.begin() + data_size * (i + 1));
+            old_data_array_23[b][i].Load(data);
         }
     }
     BinaryData old_data_13 = PIR::PIR<BinaryData>(this->peer_, this->fss_, old_data_array_23, data_index_23, this->pseudo_dpf_threshold_, !read_only);
@@ -155,9 +157,8 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     old_data_23[1].Print("old_data_23[1]");
 
     for (uint b = 0; b < 2; b++) {
-        uchar old_data_23_bytes[data_size];
-        old_data_23[b].Dump(old_data_23_bytes);
-        cache_index_23[b] = bytes_to_uint(old_data_23_bytes, old_data_23[b].Size());
+        std::vector<uchar> dump = old_data_23[b].Dump();
+        cache_index_23[b] = bytes_to_uint(dump.data(), dump.size());
         is_cached_23[b] = cache_index_23[b] & 1;
         cache_index_23[b] = (cache_index_23[b] >> 1) % n;
     }
@@ -166,31 +167,32 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
         // TODO only 1 party need to write
         BinaryData new_block_13 = old_block_13;
 
-        std::vector<BinaryData> data_array_13;
+        std::vector<BinaryData> data_array_13(data_per_block);
 
-        uchar new_block_data[new_block_13.Size()];
-        new_block_13.Dump(new_block_data);
+        std::vector<uchar> dump = new_block_13.Dump();
         for (uint i = 0; i < data_per_block; i++) {
-            data_array_13.emplace_back(&new_block_data[i * data_size], data_size);
+            std::vector<uchar> data(dump.begin() + data_size * i, dump.begin() + data_size * (i + 1));
+            data_array_13[i].Load(data);
         }
         uint new_cache_index = (this->cache_array_23_[0].size() << 1) + 1;
         debug_print("new_cache_index = %u\n", new_cache_index);
 
-        uchar new_cache_index_bytes[data_size];
-        uint_to_bytes(new_cache_index, new_cache_index_bytes, data_size);
-        BinaryData new_data_13 = BinaryData(new_cache_index_bytes, data_size);
+        std::vector<uchar> new_cache_index_bytes(data_size);
+        uint_to_bytes(new_cache_index, new_cache_index_bytes.data(), data_size);
+        BinaryData new_data_13;
+        new_data_13.Load(new_cache_index_bytes);
         new_data_13.Print("new_data_13");
 
         BinaryData delta_data_13 = new_data_13 - old_data_13;
         delta_data_13.Print("delta_data_13");
 
         PIW::PIW(this->party_, this->peer_, this->fss_, data_array_13, data_index_23, delta_data_13, this->pseudo_dpf_threshold_, !read_only);
-        uchar data_array_13_bytes[data_size];
-        for (uint i = 0; i < data_per_block; i++) {
-            data_array_13[i].Dump(data_array_13_bytes);
-            memcpy(&new_block_data[i * data_size], data_array_13_bytes, data_size);
+        std::vector<uchar> new_block_data;
+        for (uint i = 0; i < data_array_13.size(); i++) {
+            std::vector<uchar> dump = data_array_13[i].Dump();
+            new_block_data.insert(new_block_data.end(), dump.begin(), dump.end());
         }
-        new_block_13.Load(new_block_data, data_per_block * data_size);
+        new_block_13.Load(new_block_data);
         new_block_13.Print("new_block_13");
 
         this->position_map_->Write(block_index_23, old_block_13, new_block_13, !read_only);
@@ -323,9 +325,10 @@ void DPFORAM<K, D>::Test(uint iterations) {
     if (key_value) {
         uint key_size = K().Size();
         std::vector<K> key_array_33[3];
+        key_array_33[2].resize(n);
         for (uint i = 0; i < n; i++) {
-            key_array_33[2].emplace_back();
-            key_array_33[2][i].Random(key_size);
+            key_array_33[2][i].Resize(key_size);
+            key_array_33[2][i].Random();
         }
 
         key_array_33[0] = write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], n, key_size, false);
@@ -341,11 +344,12 @@ void DPFORAM<K, D>::Test(uint iterations) {
         // fprintf(stderr, "Test, iteration = %u\n", iteration);
 
         uint index_23[2];
-        K key_23[2];
+        uint key_size = K().Size();
+        K key_23[2] = {K(key_size), K(key_size)};
 
         if (key_value) {
-            key_23[0].Random(this->peer_[0].PRG(), key_23[0].Size());
-            key_23[1].Random(this->peer_[1].PRG(), key_23[1].Size());
+            key_23[0].Random(this->peer_[0].PRG());
+            key_23[1].Random(this->peer_[1].PRG());
 
             t1 = std::chrono::high_resolution_clock::now();
             KeyToIndex(key_23, index_23, true);
@@ -385,7 +389,8 @@ void DPFORAM<K, D>::Test(uint iterations) {
         // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         debug_print("\nTest, ========== Write random data ==========\n");
         D new_data_13[3];
-        new_data_13[2].Random(this->DataSize());
+        new_data_13[2].Resize(this->DataSize());
+        new_data_13[2].Random();
         new_data_13[2].Print("new_data_13[2]");
 
         t1 = std::chrono::high_resolution_clock::now();
@@ -454,13 +459,13 @@ void DPFORAM<K, D>::Test(uint iterations) {
 }
 
 template class DPFORAM<BinaryData, BinaryData>;
-// template class DPFORAM<BinaryData, ZpData>;
+template class DPFORAM<BinaryData, ZpData>;
 template class DPFORAM<BinaryData, ECData>;
 
-// template class DPFORAM<ZpData, BinaryData>;
-// template class DPFORAM<ZpData, ZpData>;
-// template class DPFORAM<ZpData, ECData>;
+template class DPFORAM<ZpData, BinaryData>;
+template class DPFORAM<ZpData, ZpData>;
+template class DPFORAM<ZpData, ECData>;
 
 template class DPFORAM<ECData, BinaryData>;
-// template class DPFORAM<ECData, ZpData>;
+template class DPFORAM<ECData, ZpData>;
 template class DPFORAM<ECData, ECData>;

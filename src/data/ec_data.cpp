@@ -8,12 +8,12 @@ ECData::ECData() {
     // EC_POINT_add(this->curve_, this->data_, this->data_, this->g_, this->bn_ctx_);
 }
 
-ECData::ECData(uchar *data, const uint size) {
-    this->data_ = EC_POINT_new(this->curve_);
-    EC_POINT_oct2point(this->curve_, this->data_, data, size, this->bn_ctx_);
-}
+// ECData::ECData(uchar *data, const uint size) {
+//     this->data_ = EC_POINT_new(this->curve_);
+//     EC_POINT_oct2point(this->curve_, this->data_, data, size, this->bn_ctx_);
+// }
 
-ECData::ECData(const uint size, const bool set_zero) {
+ECData::ECData(const uint size) {
     this->data_ = EC_POINT_new(this->curve_);
     EC_POINT_set_to_infinity(this->curve_, this->data_);
     // this->data_ = EC_POINT_dup(this->g_, this->curve_);
@@ -58,38 +58,40 @@ bool ECData::operator==(const ECData &rhs) {
     return EC_POINT_cmp(this->curve_, this->data_, rhs.data_, this->bn_ctx_) == 0;
 }
 
-void ECData::Dump(uchar *data) {
-    EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_COMPRESSED, data, this->Size(), this->bn_ctx_);
+std::vector<uchar> ECData::Dump() {
+    uint size = EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_COMPRESSED, NULL, 0, this->bn_ctx_);
+    std::vector<uchar> data(size);
+    EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_COMPRESSED, data.data(), size, this->bn_ctx_);
+    return data;
 }
 
-void ECData::Load(uchar *data, uint size) {
-    EC_POINT_oct2point(this->curve_, this->data_, data, size, this->bn_ctx_);
+void ECData::Load(std::vector<uchar> data) {
+    EC_POINT_oct2point(this->curve_, this->data_, data.data(), data.size(), this->bn_ctx_);
 }
 
 void ECData::Reset() {
-    // this->data_ = this->curve_.Identity();
+    EC_POINT_set_to_infinity(this->curve_, this->data_);
 }
 
-void ECData::Random(uint size) {
-    PRG prg;
-    this->Random(prg, size);
+void ECData::Resize(const uint size) {
 }
 
-void ECData::Random(PRG &prg, uint size) {
-    // debug_print("ECData::Random start\n");
-    // BN_CTX_start(this->bn_ctx_);
-    // BIGNUM *x = BN_CTX_get(this->bn_ctx_);
-    // BIGNUM *q = BN_CTX_get(this->bn_ctx_);
-    // EC_GROUP_get_order(this->curve_, q, this->bn_ctx_);
-    // prg.RandBn(x, q);
-    // const EC_POINT *g = EC_GROUP_get0_generator(this->curve_);
-    // EC_POINT_copy(this->data_, g);
-    // EC_POINT_mul(this->curve_, this->data_, x, NULL, NULL, this->bn_ctx_);
-    // BN_CTX_end(this->bn_ctx_);
-    // debug_print("ECData::Random end\n");
-
+void ECData::Random(PRG *prg) {
+    if (prg == NULL) prg = this->prg_;
+    debug_print("ECData::Random start\n");
+    BN_CTX_start(this->bn_ctx_);
+    BIGNUM *x = BN_CTX_get(this->bn_ctx_);
+    BIGNUM *q = BN_CTX_get(this->bn_ctx_);
+    EC_GROUP_get_order(this->curve_, q, this->bn_ctx_);
+    prg->RandBn(x, q);
     const EC_POINT *g = EC_GROUP_get0_generator(this->curve_);
     EC_POINT_copy(this->data_, g);
+    EC_POINT_mul(this->curve_, this->data_, x, NULL, NULL, this->bn_ctx_);
+    BN_CTX_end(this->bn_ctx_);
+    debug_print("ECData::Random end\n");
+
+    // const EC_POINT *g = EC_GROUP_get0_generator(this->curve_);
+    // EC_POINT_copy(this->data_, g);
 
     // bool v = x.GetBit(0);
     // while (true) {
@@ -111,16 +113,13 @@ void ECData::Print(const char *title) {
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
-    uchar s[this->Size()];
-    this->Dump(s);
-    print_bytes(s, this->Size(), "");
+    std::vector<uchar> s = this->Dump();
+    print_bytes(s.data(), s.size(), "");
 
     // debug_print("point2bn: ");
     BIGNUM *x = BN_new();
     BIGNUM *y = BN_new();
     EC_POINT_get_affine_coordinates(this->curve_, this->data_, x, y, this->bn_ctx_);
-    char *hex_x = BN_bn2hex(x);
-    char *hex_y = BN_bn2hex(y);
-    debug_print("x = %s\n", hex_x);
-    debug_print("y = %s\n", hex_y);
+    debug_print("x = %s\n", BN_bn2dec(x));
+    debug_print("y = %s\n", BN_bn2dec(y));
 }

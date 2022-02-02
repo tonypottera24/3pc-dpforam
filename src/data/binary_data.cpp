@@ -3,102 +3,77 @@
 BinaryData::BinaryData() {
 }
 
-BinaryData::BinaryData(uchar *data, const uint size) {
-    if (size == 0) return;
-    this->Resize(size);
-    memcpy(this->data_, data, this->size_);
-}
+// BinaryData::BinaryData(uchar *data, const uint size) {
+//     if (size == 0) return;
+//     this->data_.resize(size);
+//     memcpy(this->data_.data(), data, size);
+// }
 
-BinaryData::BinaryData(const uint size, const bool set_zero) {
-    if (size == 0) return;
-    this->Resize(size);
-    if (set_zero) {
-        this->Reset();
-    }
+BinaryData::BinaryData(const uint size) {
+    this->data_.resize(size);
+    this->Reset();
 }
 
 BinaryData::BinaryData(const BinaryData &other) {
-    if (other.size_ == 0) return;
-    this->Resize(other.size_);
-    memcpy(this->data_, other.data_, other.size_);
+    this->data_ = other.data_;
 }
 
 BinaryData::~BinaryData() {
-    if (this->data_ == NULL) return;
-    delete[] this->data_;
 }
 
 BinaryData &BinaryData::operator=(const BinaryData &other) {
     // copy operation
     if (this == &other) return *this;
-    this->Resize(other.size_);
-    if (other.size_ > 0) {
-        memcpy(this->data_, other.data_, other.size_);
-    }
+    this->data_ = other.data_;
     return *this;
 }
 
-// BinaryData &BinaryData::operator=(BinaryData &&other) noexcept {
-//     // move operation
-//     if (this == &other) {
-//         return *this;
-//     }
-
-//     delete[] this->data_;
-//     this->data_ = std::exchange(other.data_, nullptr);
-//     this->size_ = std::exchange(other.size_, 0);
-//     return *this;
-// }
-
 BinaryData BinaryData::operator-() {
-    for (uint i = 0; i < this->size_; i++) {
+    for (uint i = 0; i < this->data_.size(); i++) {
         this->data_[i] = ~this->data_[i];
     }
     return *this;
 }
 
 BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
-    assert(this->size_ == rhs.size_);
-    xor_bytes(this->data_, rhs.data_, rhs.size_, this->data_);
+    assert(this->data_.size() == rhs.data_.size());
+    xor_bytes(this->data_.data(), this->data_.data(), rhs.data_.data(), this->data_.size());
     return *this;
 }
 
 BinaryData &BinaryData::operator-=(const BinaryData &rhs) {
-    assert(this->size_ == rhs.size_);
-    xor_bytes(this->data_, rhs.data_, rhs.size_, this->data_);
+    assert(this->data_.size() == rhs.data_.size());
+    xor_bytes(this->data_.data(), this->data_.data(), rhs.data_.data(), this->data_.size());
     return *this;
 }
 
 bool BinaryData::operator==(const BinaryData &rhs) {
-    return this->size_ == rhs.size_ && memcmp(this->data_, rhs.data_, size_) == 0;
+    return this->data_.size() == rhs.data_.size() &&
+           memcmp(this->data_.data(), rhs.data_.data(), this->data_.size()) == 0;
 }
 
-void BinaryData::Dump(uchar *data) {
-    memcpy(data, this->data_, this->size_);
+std::vector<uchar> BinaryData::Dump() {
+    return this->data_;
 }
 
-void BinaryData::Load(uchar *data, uint size) {
-    this->Resize(size);
-    if (size > 0) {
-        memcpy(this->data_, data, size);
-    }
+void BinaryData::Load(std::vector<uchar> data) {
+    this->data_ = data;
 }
 
 void BinaryData::Reset() {
-    if (this->data_ != NULL) {
-        memset(this->data_, 0, this->size_);
+    if (this->data_.size() > 0) {
+        memset(this->data_.data(), 0, this->data_.size());
     }
 }
 
-void BinaryData::Random(uint size) {
-    PRG prg;
-    this->Random(prg, size);
+void BinaryData::Resize(const uint size) {
+    this->data_.resize(size);
 }
 
-void BinaryData::Random(PRG &prg, uint size) {
-    this->Resize(size);
-    if (size > 0) {
-        prg.RandBytes(this->data_, size);
+void BinaryData::Random(PRG *prg) {
+    if (prg == NULL) prg = this->prg_;
+    if (this->data_.size() > 0) {
+        prg->RandBytes(this->data_.data(), this->data_.size());
     }
 }
 
@@ -107,18 +82,8 @@ void BinaryData::Print(const char *title) {
         debug_print("%s ", title);
     }
     debug_print("0x");
-    for (uint i = 0; i < this->size_; i++) {
+    for (uint i = 0; i < this->data_.size(); i++) {
         debug_print("%02X", this->data_[i]);
     }
     debug_print("\n");
-}
-
-void BinaryData::Resize(uint size) {
-    if (this->size_ == size) return;
-    if (this->data_ != NULL) {
-        delete[] this->data_;
-        this->data_ = NULL;
-    }
-    if (size > 0) this->data_ = new uchar[size];
-    this->size_ = size;
 }

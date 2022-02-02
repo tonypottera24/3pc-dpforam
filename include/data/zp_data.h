@@ -1,47 +1,52 @@
-// #ifndef ZP_DATA_H_
-// #define ZP_DATA_H_
+#ifndef ZP_DATA_H_
+#define ZP_DATA_H_
 
-// #include <inttypes.h>
+#include <inttypes.h>
 
-// #include "typedef.h"
-// #include "util.h"
+#include "typedef.h"
+#include "util.h"
 
-// class ZpData {
-// private:
-//     BIGNUM *data_;
-//     static const inline Integer p_ = Integer("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
-//     const bool is_symmetric_ = false;
+class ZpData {
+private:
+    BIGNUM *data_;
+    static const inline BIGNUM *p_ = BN_get0_nist_prime_256();
+    // const static inline uint size_ = 64;
+    static inline BN_CTX *bn_ctx_ = BN_CTX_new();
+    const bool is_symmetric_ = false;
+    static inline PRG *prg_ = new PRG();
 
-// public:
-//     ZpData();
-//     ZpData(const ZpData &other);
-//     ZpData(uchar *data, const uint size);
-//     ZpData(const uint size, const bool set_zero = false);
-//     ~ZpData();
+public:
+    ZpData();
+    ZpData(const ZpData &other);
+    // ZpData(uchar *data, const uint size);
+    ZpData(const uint size);
+    ~ZpData();
 
-//     ZpData &operator=(const ZpData &other);
-//     // ZpData &operator=(ZpData &&other) noexcept;
-//     ZpData operator-();
-//     ZpData &operator+=(const ZpData &rhs);
-//     ZpData &operator-=(const ZpData &rhs);
-//     bool operator==(const ZpData &rhs);
-//     friend ZpData operator+(ZpData lhs, const ZpData &rhs) {
-//         lhs += rhs;
-//         return lhs;
-//     }
-//     friend ZpData operator-(ZpData lhs, const ZpData &rhs) {
-//         lhs -= rhs;
-//         return lhs;
-//     }
+    ZpData &operator=(const ZpData &other);
+    ZpData operator-();
+    ZpData &operator+=(const ZpData &rhs);
+    ZpData &operator-=(const ZpData &rhs);
+    bool operator==(const ZpData &rhs);
+    friend ZpData operator+(ZpData lhs, const ZpData &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend ZpData operator-(ZpData lhs, const ZpData &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
 
-//     void Dump(uchar *data);
-//     void Load(uchar *data, uint size);
-//     void Reset();
-//     void Random(uint size);
-//     void Random(PRG &prg, uint size);
-//     uint Size() { return this->p_.MinEncodedSize(); }
-//     bool IsSymmetric() { return this->is_symmetric_; }
-//     void Print(const char *title = "");
-// };
+    std::vector<uchar> Dump();
+    void Load(std::vector<uchar> data);
+    void Reset();
+    void Resize(const uint size);
+    void Random(PRG *prg = NULL);
+    uint Size() {
+        return BN_num_bytes(this->p_);
+        // return this->size_;
+    }
+    bool IsSymmetric() { return this->is_symmetric_; }
+    void Print(const char *title = "");
+};
 
-// #endif /* ZP_DATA_H_ */
+#endif /* ZP_DATA_H_ */

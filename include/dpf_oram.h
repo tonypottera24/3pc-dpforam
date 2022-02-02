@@ -41,7 +41,7 @@ private:
 private:
     void Init();
     void InitPositionMap();
-    void InitArray(std::vector<D> &array, const uint n, const uint data_size, bool set_zero);
+    void InitArray(std::vector<D> &array, const uint n, const uint data_size);
     void ResetArray(std::vector<D> &array);
     void PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index = -1);
 

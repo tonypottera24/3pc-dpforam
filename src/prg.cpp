@@ -30,7 +30,7 @@ void PRG::RandBytes(uchar *data, uint size) {
     }
 }
 
-void PRG::RandBn(BIGNUM *bn, BIGNUM *p) {
+void PRG::RandBn(BIGNUM *bn, const BIGNUM *p) {
     uint p_size = BN_num_bytes(p);
     uchar r[p_size];
     this->RandBytes(r, p_size);

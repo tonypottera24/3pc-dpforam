@@ -35,7 +35,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     }
 
     uint data_size = array_23[0][0].Size();
-    D v_sum[2] = {D(data_size, true), D(data_size, true)};
+    D v_sum[2] = {D(data_size), D(data_size)};
     for (uint b = 0; b < 2; b++) {
         std::vector<bool> dpf_out;
         if (pseudo) {
@@ -69,9 +69,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
     const uint digest_size = 4;
     const uint digest_size_log = digest_size * 8;
     uchar digest[digest_size];
-    uint key_size = key_array_13[0].Size();
-    uchar key_buffer[key_size];
-    debug_print("GG00, digest_size = %u, key_size = %u\n", digest_size, key_size);
     const EVP_MD *sha256 = EVP_sha256();
 
     uint v_sum = 0;
@@ -82,12 +79,12 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
         for (uint b = 0; b < 2; b++) {
             bool is_0 = false;
             std::vector<BinaryData> query_23;
-            key.Dump(key_buffer);
+            std::vector<uchar> key_dump = key.Dump();
             if (b == 1) {
-                key_buffer[0] ^= 1;
+                key_dump[0] ^= 1;
             }
             EVP_DigestInit_ex(md_ctx, sha256, NULL);
-            EVP_DigestUpdate(md_ctx, key_buffer, key_size);
+            EVP_DigestUpdate(md_ctx, key_dump.data(), key_dump.size());
             uint sha256_digest_size;
             EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
             memcpy(digest, sha256_digest, digest_size);
@@ -112,17 +109,15 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
         // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         // fprintf(stderr, "time1 = %llu\n", time);
 
-        std::string key_array_dump[key_array_13.size()];
+        std::vector<uchar> key_dump_array[key_array_13.size()];
         uint64_t key_array_digest[key_array_13.size()];
         std::unordered_map<uint64_t, uint> exists;
         for (uint i = 0; i < key_array_13.size(); i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            key.Dump(key_buffer);
-            std::string dump_string((char *)key_buffer, key_size);
-            key_array_dump[i] = dump_string;
+            key_dump_array[i] = key.Dump();
 
             EVP_DigestInit_ex(md_ctx, sha256, NULL);
-            EVP_DigestUpdate(md_ctx, key_buffer, key_size);
+            EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
             uint sha256_digest_size;
             EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 
@@ -147,9 +142,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
                     v_sum ^= i;
                 }
             } else {  // collision
-                key_array_dump[i][0] ^= 1;
+                key_dump_array[i][0] ^= 1;
                 EVP_DigestInit_ex(md_ctx, sha256, NULL);
-                EVP_DigestUpdate(md_ctx, key_array_dump[i].c_str(), key_size);
+                EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
                 uint sha256_digest_size;
                 EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 
@@ -180,13 +175,13 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
     uint n = array_13.size();
     debug_print("[%lu]SSOT_PIR, n = %u, index_23 = (%u, %u)\n", array_13.size(), n, index_23[0], index_23[1]);
     uint data_size = array_13[0].Size();
-    D v_out_13;
+    D v_out_13(data_size);
     if (party == 2) {
         // const uint P1 = 0, P0 = 1;
         const uint P0 = 1;
         peer[P0].WriteData(array_13, count_band);
         SSOT::P2<D>(peer, n, data_size, count_band);
-        v_out_13.Random(peer[P0].PRG(), data_size);
+        v_out_13.Random(peer[P0].PRG());
     } else if (party == 0) {
         const uint P2 = 0, P1 = 1;
 
@@ -196,8 +191,8 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
         }
         v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, count_band);
 
-        D tmp;
-        tmp.Random(peer[P2].PRG(), data_size);
+        D tmp(data_size);
+        tmp.Random(peer[P2].PRG());
         v_out_13 -= tmp;
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;

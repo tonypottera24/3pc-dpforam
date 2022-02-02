@@ -13,8 +13,8 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, 
     } else {
         v_delta_13.Print("v_delta_13");
 
-        D v_delta_33[2];
-        v_delta_33[0].Random(data_size);
+        D v_delta_33[2] = {D(data_size), D(data_size)};
+        v_delta_33[0].Random();
         v_delta_33[1] = v_delta_13 - v_delta_33[0];
         v_delta_33[0].Print("v_delta_33[0]");
         v_delta_33[1].Print("v_delta_33[1]");

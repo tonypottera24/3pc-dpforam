@@ -14,15 +14,14 @@
 #include "peer.h"
 #include "typedef.h"
 
-void xor_bytes(const uchar *a, const uchar *b, uint len, uchar *out);
-void xor_bytes(const uchar *input_a, const uchar *input_b, const uchar *input_c, uint len, uchar *output);
+void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uint len);
+void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uchar *c, const uint len);
 
 void uint_to_bytes(uint value, uchar *bytes, uint len);
 uint bytes_to_uint(const uchar *b, uint len);
 void rand_bytes(uchar *bytes, const uint len);
 bool rand_bool();
-uint rand_uint();
-uint rand_uint(PRG &prg);
+uint rand_uint(PRG *prg = NULL);
 uint64_t timestamp();
 
 uint bit_length(uint n);

@@ -5,8 +5,8 @@ Socket &Peer::Socket() {
     return this->socket_;
 }
 
-PRG &Peer::PRG() {
-    return this->prg_;
+PRG *Peer::PRG() {
+    return &this->prg_;
 }
 
 uint Peer::Bandwidth() {
