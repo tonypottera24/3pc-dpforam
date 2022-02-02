@@ -110,12 +110,12 @@ uint pow2_ceil(const uint n) {
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {
     if (array_index == -1) {
-        printf("%s: 0x", array_name);
+        debug_print("%s: 0x", array_name);
     } else {
-        printf("%s[%llu]: 0x", array_name, array_index);
+        debug_print("%s[%llu]: 0x", array_name, array_index);
     }
     for (uint i = 0; i < len; i++) {
-        printf("%02X", bytes[i]);
+        debug_print("%02X", bytes[i]);
     }
-    printf("\n");
+    debug_print("\n");
 }

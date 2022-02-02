@@ -47,10 +47,7 @@ void DPFORAM<K, D>::Reset() {
 
 template <typename K, typename D>
 void DPFORAM<K, D>::InitArray(std::vector<D> &array, const uint n, const uint data_size) {
-    array.resize(n);
-    for (uint i = 0; i < n; i++) {
-        array[i].Resize(data_size);
-    }
+    array.resize(n, D(data_size));
 }
 
 template <typename K, typename D>
@@ -58,20 +55,6 @@ void DPFORAM<K, D>::ResetArray(std::vector<D> &array) {
     for (uint i = 0; i < array.size(); i++) {
         array[i].Reset();
     }
-}
-
-template <typename K, typename D>
-void DPFORAM<K, D>::PrintArray(std::vector<D> &array, const char *array_name, const int64_t array_index) {
-    if (array_index == -1) {
-        debug_print("%s:\n", array_name);
-    } else {
-        debug_print("%s[%llu]:\n", array_name, array_index);
-    }
-    for (uint i = 0; i < array.size(); i++) {
-        debug_print("[%u] ", i);
-        array[i].Print();
-    }
-    debug_print("\n");
 }
 
 template <typename K, typename D>
@@ -296,11 +279,12 @@ void DPFORAM<K, D>::PrintMetadata() {
     debug_print("cache_size: %lu\n", this->cache_array_23_[0].size());
     debug_print("position_map_: %d\n", (this->position_map_ != NULL));
 
-    this->PrintArray(this->read_array_23_[0], "read_array_23", 0);
-    this->PrintArray(this->read_array_23_[1], "read_array_23", 1);
-    this->PrintArray(this->write_array_13_, "write_array");
-    this->PrintArray(this->cache_array_23_[0], "cache_23", 0);
-    this->PrintArray(this->cache_array_23_[1], "cache_23", 1);
+    print_array(this->key_array_13_, "key_array");
+    print_array(this->read_array_23_[0], "read_array_23", 0);
+    print_array(this->read_array_23_[1], "read_array_23", 1);
+    print_array(this->write_array_13_, "write_array");
+    print_array(this->cache_array_23_[0], "cache_23", 0);
+    print_array(this->cache_array_23_[1], "cache_23", 1);
 
     debug_print("========== PrintMetadata ==========\n");
 }
@@ -325,9 +309,8 @@ void DPFORAM<K, D>::Test(uint iterations) {
     if (key_value) {
         uint key_size = K().Size();
         std::vector<K> key_array_33[3];
-        key_array_33[2].resize(n);
+        key_array_33[2].resize(n, K(key_size));
         for (uint i = 0; i < n; i++) {
-            key_array_33[2][i].Resize(key_size);
             key_array_33[2][i].Random();
         }
 
@@ -348,17 +331,32 @@ void DPFORAM<K, D>::Test(uint iterations) {
         K key_23[2] = {K(key_size), K(key_size)};
 
         if (key_value) {
-            key_23[0].Random(this->peer_[0].PRG());
-            key_23[1].Random(this->peer_[1].PRG());
+            // key_23[0].Random(this->peer_[0].PRG());
+            // key_23[1].Random(this->peer_[1].PRG());
+            uint index_33[3];
+            index_33[2] = rand_uint() % n;
+            this->peer_[0].WriteUInt(index_33[2], false);
+            this->peer_[1].WriteUInt(index_33[2], false);
+            index_33[0] = this->peer_[0].ReadUInt();
+            index_33[1] = this->peer_[1].ReadUInt();
+            uint index = index_33[0] ^ index_33[1] ^ index_33[2];
+            if (this->party_ == 2) {
+                key_23[0].Random(this->peer_[0].PRG());
+                key_23[1].Random(this->peer_[1].PRG());
+            } else {
+                key_23[this->party_].Random(this->peer_[this->party_].PRG());
+                this->peer_[1 - this->party_].WriteData(key_23[this->party_], false);
+                K k = this->peer_[1 - this->party_].template ReadData<K>(key_size);
+                key_23[1 - this->party_] = this->key_array_13_[index] - key_23[this->party_] - k;
+            }
 
             t1 = std::chrono::high_resolution_clock::now();
             KeyToIndex(key_23, index_23, true);
             t2 = std::chrono::high_resolution_clock::now();
             party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         } else {
-            uint rand_range = n - 1;
-            index_23[0] = rand_uint(this->peer_[0].PRG()) % rand_range;
-            index_23[1] = rand_uint(this->peer_[1].PRG()) % rand_range;
+            index_23[0] = rand_uint(this->peer_[0].PRG()) % n;
+            index_23[1] = rand_uint(this->peer_[1].PRG()) % n;
             // debug_print( "Test, rand_range = %llu, index_13 = %llu, index_23 = (%llu, %llu)\n", rand_range, index_13, index_23[0], index_23[1]);
         }
 

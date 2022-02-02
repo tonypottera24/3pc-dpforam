@@ -68,10 +68,17 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uchar *index, const uint l
 
 bool FSS1Bit::Eval(BinaryData &query, uchar *index) {
     std::vector<uchar> dump = query.Dump();
-    uint128 out = EVAL(&aes_key_, dump.data(), index);
-    uint index_res = index[0] & 255;
-    uint64_t *val = (uint64_t *)&out;
-    return (val[index_res >> 6] >> (index_res & 127)) & 1ULL;
+    uint128 dpf_out = EVAL(&aes_key_, dump.data(), index);
+    // uint index_res = index[0] & 255;
+    // uint64_t *val = (uint64_t *)&out;
+    // return (val[index_res >> 6] >> (index_res & 127)) & 1ULL;
+    std::vector<bool> dpf_out_bits(128);
+    to_bit_vector(dpf_out, dpf_out_bits.begin());
+    bool out = false;
+    for (uint i = 0; i < dpf_out_bits.size(); i++) {
+        out ^= dpf_out_bits[i];
+    }
+    return out;
 }
 
 std::vector<bool> FSS1Bit::EvalAll(BinaryData &query, const uint log_n) {

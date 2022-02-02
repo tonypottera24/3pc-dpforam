@@ -1,6 +1,8 @@
 #ifndef FSS_H_
 #define FSS_H_
 
+#include <vector>
+
 #include "binary_data.h"
 #include "libdpf/libdpf.h"
 #include "peer.h"
