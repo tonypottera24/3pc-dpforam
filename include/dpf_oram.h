@@ -19,6 +19,7 @@
 #include "ssot.h"
 #include "util.h"
 #include "zp_data.h"
+#include "zp_debug_data.h"
 template <typename K, typename D>
 class DPFORAM {
 private:

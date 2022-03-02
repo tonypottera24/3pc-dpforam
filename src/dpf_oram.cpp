@@ -457,13 +457,21 @@ void DPFORAM<K, D>::Test(uint iterations) {
 }
 
 template class DPFORAM<BinaryData, BinaryData>;
-template class DPFORAM<BinaryData, ZpData>;
 template class DPFORAM<BinaryData, ECData>;
+template class DPFORAM<BinaryData, ZpData>;
+template class DPFORAM<BinaryData, ZpDebugData>;
 
 template class DPFORAM<ZpData, BinaryData>;
-template class DPFORAM<ZpData, ZpData>;
 template class DPFORAM<ZpData, ECData>;
+template class DPFORAM<ZpData, ZpData>;
+template class DPFORAM<ZpData, ZpDebugData>;
 
 template class DPFORAM<ECData, BinaryData>;
-template class DPFORAM<ECData, ZpData>;
 template class DPFORAM<ECData, ECData>;
+template class DPFORAM<ECData, ZpData>;
+template class DPFORAM<ECData, ZpDebugData>;
+
+template class DPFORAM<ZpDebugData, BinaryData>;
+template class DPFORAM<ZpDebugData, ECData>;
+template class DPFORAM<ZpDebugData, ZpData>;
+template class DPFORAM<ZpDebugData, ZpDebugData>;

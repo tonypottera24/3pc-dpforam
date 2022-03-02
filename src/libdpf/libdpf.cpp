@@ -31,6 +31,10 @@ uint128 dpf_set_lsb_zero(uint128 input) {
     }
 }
 
+int getbit(const uint64_t x, const uint64_t n, const uint64_t b) {
+    return (x >> (n - b)) & 1;
+}
+
 void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *bit1,
          int *bit2) {
     input = dpf_set_lsb_zero(input);
@@ -52,9 +56,9 @@ void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *b
     *output2 = dpf_set_lsb_zero(stash[1]);
 }
 
-int GEN(AES_KEY *key, uchar *alpha, const uint log_n, uchar **k0, uchar **k1) {
+int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0, uchar **k1) {
     uint maxlayer = max((int)log_n - 7, 0);
-    //int maxlayer = n;
+    // int maxlayer = n;
 
     uint128 s[maxlayer + 1][2];
     int t[maxlayer + 1][2];
@@ -77,7 +81,7 @@ int GEN(AES_KEY *key, uchar *alpha, const uint log_n, uchar **k0, uchar **k1) {
         PRG(key, s[i - 1][1], &s1[LEFT], &s1[RIGHT], &t1[LEFT], &t1[RIGHT]);
 
         int keep, lose;
-        int alphabit = getbit(alpha, i);
+        int alphabit = getbit(alpha, log_n, i);
         if (alphabit == 0) {
             keep = LEFT;
             lose = RIGHT;
@@ -112,8 +116,8 @@ int GEN(AES_KEY *key, uchar *alpha, const uint log_n, uchar **k0, uchar **k1) {
     finalblock = dpf_zero_block();
     finalblock = dpf_reverse_lsb(finalblock);
 
-    // char shift = (alpha)&127;
-    char shift = alpha[0];
+    char shift = (alpha)&127;
+    // char shift = alpha[0];
     if (shift & 64) {
         finalblock = dpf_left_shirt(finalblock, 64);
     }
@@ -135,7 +139,7 @@ int GEN(AES_KEY *key, uchar *alpha, const uint log_n, uchar **k0, uchar **k1) {
     if (shift & 1) {
         finalblock = dpf_left_shirt(finalblock, 1);
     }
-    //dpf_cb(finalblock);
+    // dpf_cb(finalblock);
     finalblock = dpf_reverse_lsb(finalblock);
 
     finalblock = uint128_xor(finalblock, s[maxlayer][0]);
@@ -176,7 +180,7 @@ int GEN(AES_KEY *key, uchar *alpha, const uint log_n, uchar **k0, uchar **k1) {
     return size;
 }
 
-uint128 EVAL(AES_KEY *key, uchar *k, uchar *x) {
+uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
     int log_n = k[0];
     int max_layer = max(log_n - 7, 0);
 
@@ -209,8 +213,7 @@ uint128 EVAL(AES_KEY *key, uchar *k, uchar *x) {
             tR = tR ^ tCW[i - 1][1];
         }
 
-        int xbit = getbit(x, i);
-        // int xbit = x[i];
+        int xbit = getbit(x, log_n, i);
         if (xbit == 0) {
             s[i] = sL;
             t[i] = tL;
@@ -238,8 +241,8 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     int maxlayer = max(n - 7, 0);
     uint64_t maxlayeritem = 1 << maxlayer;
 
-    //block s[2][maxlayeritem];
-    //int t[2][maxlayeritem];
+    // block s[2][maxlayeritem];
+    // int t[2][maxlayeritem];
     uint128 *s[2];
     int *t[2];
     for (int b = 0; b < 2; b++) {
@@ -264,8 +267,8 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
 
     memcpy(&finalblock, &k[18 * (maxlayer + 1)], 16);
 
-    //block sL, sR;
-    //int tL, tR;
+    // block sL, sR;
+    // int tL, tR;
     for (uint i = 1; i <= maxlayer; i++) {
         uint64_t itemnumber = 1 << (i - 1);
         //#pragma omp parallel for

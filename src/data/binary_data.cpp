@@ -13,6 +13,7 @@ BinaryData::BinaryData(const BinaryData &other) {
 }
 
 BinaryData::~BinaryData() {
+    // this->data_.clear();
 }
 
 BinaryData &BinaryData::operator=(const BinaryData &other) {

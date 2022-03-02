@@ -32,7 +32,7 @@ inline uint divide_ceil(const uint n, const uint q) {
 }
 uint pow2_ceil(const uint n);
 
-inline bool getbit(uchar *a, const uint i) {
+inline bool get_buffer_bit(uchar *a, const uint i) {
     return (a[i >> 3] >> (i & 7)) & 1;
 }
 

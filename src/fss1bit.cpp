@@ -50,7 +50,7 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uchar *index, const uint log_n, const bool is_symmetric) {
+std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric) {
     uchar *query_23_bytes[2];
     uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
     std::vector<BinaryData> query_23(2);
@@ -61,24 +61,22 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::Gen(uchar *index, const uint l
     }
     bool is_0 = true;
     if (!is_symmetric) {
-        is_0 = this->Eval(query_23[0], index) > this->Eval(query_23[1], index);
+        is_0 = this->Eval(query_23[0], index);
     }
     return std::make_pair(query_23, is_0);
 }
 
-bool FSS1Bit::Eval(BinaryData &query, uchar *index) {
+bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
     std::vector<uchar> dump = query.Dump();
     uint128 dpf_out = EVAL(&aes_key_, dump.data(), index);
-    // uint index_res = index[0] & 255;
-    // uint64_t *val = (uint64_t *)&out;
-    // return (val[index_res >> 6] >> (index_res & 127)) & 1ULL;
-    std::vector<bool> dpf_out_bits(128);
-    to_bit_vector(dpf_out, dpf_out_bits.begin());
-    bool out = false;
-    for (uint i = 0; i < dpf_out_bits.size(); i++) {
-        out ^= dpf_out_bits[i];
+    uint64_t index_mod = index % 128;
+    uint64_t *val = (uint64_t *)&dpf_out;
+    if (index_mod < 64ll) {
+        return (1ll << index_mod) & val[0];
+    } else {
+        index_mod -= 64;
+        return (1ll << index_mod) & val[1];
     }
-    return out;
 }
 
 std::vector<bool> FSS1Bit::EvalAll(BinaryData &query, const uint log_n) {
@@ -117,7 +115,7 @@ std::pair<std::vector<BinaryData>, bool> FSS1Bit::PseudoGen(Peer peer[2], const 
 
 bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
     std::vector<uchar> dump = query.Dump();
-    return getbit(dump.data(), index);
+    return get_buffer_bit(dump.data(), index);
 }
 
 std::vector<bool> FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n) {

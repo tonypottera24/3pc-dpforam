@@ -116,6 +116,7 @@ int main(int argc, char *argv[]) {
     // DPFORAM<ECData, ECData> dpf_oram = DPFORAM<ECData, ECData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     // DPFORAM<ZpData, BinaryData> dpf_oram = DPFORAM<ZpData, BinaryData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     // DPFORAM<ZpData, ZpData> dpf_oram = DPFORAM<ZpData, ZpData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
+    // DPFORAM<BinaryData, ZpDebugData> dpf_oram = DPFORAM<BinaryData, ZpDebugData>(party, peer, n, data_size, tau, ssot_threshold, pseudo_dpf_threshold);
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 

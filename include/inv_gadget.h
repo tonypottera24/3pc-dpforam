@@ -12,7 +12,7 @@ template <typename D>
 void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool count_band) {
     const uint P1 = inv ? 0 : 1;
     const uint P2 = inv ? 1 : 0;
-    debug_print("inv::P0 inv = %u\n", inv);
+    // debug_print("inv::P0 inv = %u\n", inv);
 
     std::vector<D> p(2, D(data_size));
     for (uint b = 0; b < 2; b++) {
@@ -32,7 +32,7 @@ template <typename D>
 void P1(Peer peer[2], D m[2], const bool inv, bool count_band) {
     const uint P2 = inv ? 0 : 1;
     const uint P0 = inv ? 1 : 0;
-    debug_print("inv::P1 inv = %u\n", inv);
+    // debug_print("inv::P1 inv = %u\n", inv);
 
     uchar s;
     peer[P0].Socket().Read(&s, 1);
@@ -52,7 +52,7 @@ template <typename D>
 D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
     const uint P0 = inv ? 0 : 1;
     const uint P1 = inv ? 1 : 0;
-    debug_print("inv::P2 inv = %u\n", inv);
+    // debug_print("inv::P2 inv = %u\n", inv);
 
     uchar bb;
     peer[P0].Socket().Read(&bb, 1);
@@ -64,9 +64,8 @@ D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
 
 template <typename D>
 D Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
+    debug_print("Inv, is_0 = %u\n", is_0);
     uint data_size = v[0].Size();
-
-    // debug_print("is_0 = %u\n", is_0);
 
     P0<D>(peer, is_0, data_size, false, count_band);
     D r(data_size);
