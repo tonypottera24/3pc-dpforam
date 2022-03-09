@@ -95,6 +95,7 @@ void ECData::Random(PRG *prg) {
 }
 
 void ECData::Print(const char *title) {
+#ifdef DEBUG
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
@@ -106,4 +107,5 @@ void ECData::Print(const char *title) {
     // EC_POINT_get_affine_coordinates(this->curve_, this->data_, x, y, this->bn_ctx_);
     // debug_print("x = %s\n", BN_bn2hex(x));
     // debug_print("y = %s\n", BN_bn2hex(y));
+#endif
 }

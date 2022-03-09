@@ -119,16 +119,11 @@ bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
 }
 
 std::vector<bool> FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n) {
-    uint index_byte = 0, index_bit = 0;
+    // uint index_byte = 0, index_bit = 0;
     std::vector<uchar> dpf_out = query.Dump();
     std::vector<bool> dpf_out_evaluated(n);
     for (uint i = 0; i < n; i++) {
-        dpf_out_evaluated[i] = (dpf_out[index_byte] >> index_bit) & 1;
-        index_bit++;
-        if (index_bit == 8) {
-            index_byte++;
-            index_bit = 0;
-        }
+        dpf_out_evaluated[i] = get_buffer_bit(dpf_out.data(), i);
     }
     return dpf_out_evaluated;
 }

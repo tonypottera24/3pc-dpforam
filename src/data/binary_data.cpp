@@ -73,6 +73,7 @@ void BinaryData::Random(PRG *prg) {
 }
 
 void BinaryData::Print(const char *title) {
+#ifdef DEBUG
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
@@ -81,4 +82,5 @@ void BinaryData::Print(const char *title) {
         debug_print("%02X", this->data_[i]);
     }
     debug_print("\n");
+#endif
 }

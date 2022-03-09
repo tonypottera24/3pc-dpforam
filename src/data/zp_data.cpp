@@ -68,8 +68,10 @@ void ZpData::Random(PRG *prg) {
 }
 
 void ZpData::Print(const char *title) {
+#ifdef DEBUG
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
     debug_print("%s\n", BN_bn2dec(this->data_));
+#endif
 }

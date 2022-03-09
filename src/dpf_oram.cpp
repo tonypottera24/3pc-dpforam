@@ -191,7 +191,7 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
     uint n = this->Size();
     if (n == 1) {
         return this->write_array_13_[0];
-    } else if (n >= this->ssot_threshold_) {
+    } else if (n <= this->ssot_threshold_) {
         return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
     } else {
         return DPF_Read(index_23, read_only);
