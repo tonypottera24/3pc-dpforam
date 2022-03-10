@@ -64,7 +64,7 @@ void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint in
 template <typename D>
 std::vector<D> write_read_data(Peer &write_peer, std::vector<D> &data, Peer &read_peer, const uint size, const uint data_size, bool count_band) {
     std::vector<D> new_data;
-    uint data_per_block = std::max(1024 / data_size, 1U);
+    uint data_per_block = std::max(1024 * 2 / data_size, 1U);
     uint round = divide_ceil(size, data_per_block);
     for (uint r = 0; r < round; r++) {
         std::vector<D> tmp_write_data;
@@ -81,6 +81,7 @@ std::vector<D> write_read_data(Peer &write_peer, std::vector<D> &data, Peer &rea
 
 template <typename D>
 void print_array(std::vector<D> &array, const char *array_name, const int64_t array_index = -1) {
+#ifdef DEBUG
     if (array_index == -1) {
         debug_print("%s:\n", array_name);
     } else {
@@ -91,6 +92,7 @@ void print_array(std::vector<D> &array, const char *array_name, const int64_t ar
         array[i].Print();
     }
     debug_print("\n");
+#endif
 }
 
 #endif /* UTIL_H_ */

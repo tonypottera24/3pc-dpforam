@@ -271,6 +271,7 @@ void DPFORAM<K, D>::Flush(bool count_band) {
 
 template <typename K, typename D>
 void DPFORAM<K, D>::PrintMetadata() {
+#ifdef DEBUG
     debug_print("========== PrintMetadata ==========\n");
     debug_print("party_: %u\n", this->party_);
     debug_print("tau_: %u\n", this->tau_);
@@ -287,6 +288,7 @@ void DPFORAM<K, D>::PrintMetadata() {
     print_array(this->cache_array_23_[1], "cache_23", 1);
 
     debug_print("========== PrintMetadata ==========\n");
+#endif
 }
 
 template <typename K, typename D>
