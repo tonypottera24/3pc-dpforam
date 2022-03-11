@@ -8,8 +8,8 @@ void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uint len) {
         if (len - offset > sizeof(uint64_t)) {
             uint64_t *aa = (uint64_t *)&a[offset];
             uint64_t *bb = (uint64_t *)&b[offset];
-            uint64_t o = (*aa) ^ (*bb);
-            memcpy(&r[offset], &o, sizeof(uint64_t));
+            uint64_t *rr = (uint64_t *)&r[offset];
+            (*rr) = (*aa) ^ (*bb);
         } else {
             for (uint i = offset; i < len; i++) {
                 r[i] = a[i] ^ b[i];
@@ -109,6 +109,7 @@ uint pow2_ceil(const uint n) {
 }
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {
+#ifdef DEBUG
     if (array_index == -1) {
         debug_print("%s: 0x", array_name);
     } else {
@@ -118,4 +119,5 @@ void print_bytes(const uchar *bytes, const uint len, const char *array_name, con
         debug_print("%02X", bytes[i]);
     }
     debug_print("\n");
+#endif
 }
