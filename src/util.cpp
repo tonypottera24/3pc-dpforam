@@ -95,7 +95,7 @@ uint byte_length(uint n) {
 }
 
 uint log2(const uint n) {
-    assert((n > 0) && "uint64_log2 n <= 0");
+    assert(n > 0);
     return bit_length(n) - 1;
 }
 

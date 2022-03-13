@@ -103,6 +103,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
         query_23[0] = peer[1].template ReadData<BinaryData>(query_23[1].Size());
     }
     std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, count_band);
+
     for (uint b = 0; b < 2; b++) {
         std::vector<bool> dpf_out;
         if (pseudo) {
@@ -120,7 +121,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 }
 
 template <typename D>
-void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint index_23[2], D v_delta_13, uint pseudo_dpf_threshold, bool count_band) {
+void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint index_23[2], D v_delta_13, bool count_band) {
     uint n = pow2_ceil(array_13.size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
@@ -128,7 +129,7 @@ void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const
     if (n == 1) {
         array_13[0] += v_delta_13;
     } else {
-        bool pseudo = (n <= pseudo_dpf_threshold);
+        bool pseudo = (n <= PSEUDO_DPF_THRESHOLD);
         DPF_PIW(party, peer, fss, array_13, n, log_n, clean_index_23, v_delta_13, pseudo, count_band);
     }
 }

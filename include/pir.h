@@ -44,7 +44,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
             dpf_out = fss.EvalAll(query_23[b], log_n);
         }
         for (uint i = 0; i < array_23[0].size(); i++) {
-            debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
+            // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
                 v_sum[b] += array_23[b][i];
             }
@@ -59,8 +59,9 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 }
 
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const K key_23[2], uint index_n, EVP_MD_CTX *md_ctx, uchar *sha256_digest, bool count_band) {
-    debug_print("[%lu]DPF_KEY_PIR\n", key_array_13.size());
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_array_13, const K key_23[2], EVP_MD_CTX *md_ctx, uchar *sha256_digest, bool count_band) {
+    uint n = key_array_13.size();
+    debug_print("[%u]DPF_KEY_PIR\n", n);
 
     // std::chrono::high_resolution_clock::time_point t1, t2;
     // t1 = std::chrono::high_resolution_clock::now();
@@ -194,7 +195,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> key_arra
     // t2 = std::chrono::high_resolution_clock::now();
     // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
     // fprintf(stderr, "time4 = %llu\n", time);
-    return v_sum % index_n;
+    return v_sum % n;
 }
 
 template <typename D>
@@ -231,7 +232,7 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
 }
 
 template <typename D>
-D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], uint pseudo_dpf_threshold, bool count_band) {
+D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], bool count_band) {
     uint n = pow2_ceil(array_23[0].size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
@@ -239,7 +240,7 @@ D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_2
     if (n == 1) {
         return array_23[0][0];
     } else {
-        bool pseudo = (n <= pseudo_dpf_threshold);
+        bool pseudo = (n <= PSEUDO_DPF_THRESHOLD);
         return DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, pseudo, count_band);
     }
 }

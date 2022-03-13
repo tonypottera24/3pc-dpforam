@@ -5,6 +5,7 @@
 
 #include "peer.h"
 #include "typedef.h"
+#include "util.h"
 
 namespace inv_gadget {
 

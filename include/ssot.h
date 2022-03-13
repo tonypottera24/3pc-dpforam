@@ -5,7 +5,7 @@ namespace SSOT {
 template <typename D>
 void P2(Peer peer[2], const uint n, const uint data_size, bool count_band) {
     const uint P1 = 0, P0 = 1;
-    // fprintf(stderr, "SSOT::P2, data_size = %u\n", data_size);
+    debug_print("SSOT::P2, data_size = %u\n", data_size);
 
     D delta(data_size);
     delta.Random();
@@ -34,7 +34,7 @@ void P2(Peer peer[2], const uint n, const uint data_size, bool count_band) {
 template <typename D>
 D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
     const uint P2 = 0, P1 = 1;
-    // fprintf(stderr, "SSOT::P0, b0 = %u, data_size = %u\n", b0, data_size);
+    debug_print("SSOT::P0, b0 = %u\n", b0);
     // Receive x0, x1, y, alpha from P2
 
     uint n = u.size();
@@ -73,7 +73,7 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
 template <typename D>
 D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
     const uint P0 = 0, P2 = 1;
-    // fprintf(stderr, "SSOT::P1, b1 = %u, data_size = %u\n", b1, data_size);
+    debug_print("SSOT::P1, b1 = %u\n", b1);
     // print_bytes(v01[0], data_size, "v01", 0);
     // print_bytes(v01[1], data_size, "v01", 1);
     // Receive y0, y1, x, beta from P2
