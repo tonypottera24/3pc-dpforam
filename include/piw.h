@@ -51,7 +51,8 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                     if (d == 0) {
                         peer[P1].WriteData(w0, count_band);
                     } else {
-                        D w1 = peer[P1].ReadData<D>(data_size);
+                        D w1(data_size);
+                        peer[P1].ReadData(w1);
                         v_out_33[1] = w0 + w1;
                         v_out_33[1].Print("v_out_33[1]");
                     }
@@ -66,7 +67,8 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                     D w1 = SSOT::P1(peer, is_02, v, count_band);
                     w1.Print("w1");
                     if (d == 0) {
-                        D w0 = peer[P0].ReadData<D>(data_size);
+                        D w0(data_size);
+                        peer[P0].ReadData(w0);
                         v_out_33[0] = w0 + w1;
                         v_out_33[0].Print("v_out_33[0]");
                     } else {
@@ -92,15 +94,15 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
         uint data_length = divide_ceil(n, 8);
         std::tie(query_23, is_0) = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric);
         peer[0].WriteData(query_23[0], count_band);
-        query_23[0] = peer[1].template ReadData<BinaryData>(query_23[0].Size());
+        peer[1].ReadData(query_23[0]);
     } else {
         std::tie(query_23, is_0) = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric);
 
         peer[0].WriteData(query_23[0], count_band);
         peer[1].WriteData(query_23[1], count_band);
 
-        query_23[1] = peer[0].template ReadData<BinaryData>(query_23[0].Size());
-        query_23[0] = peer[1].template ReadData<BinaryData>(query_23[1].Size());
+        peer[0].ReadData(query_23[1]);
+        peer[1].ReadData(query_23[0]);
     }
     std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, count_band);
 

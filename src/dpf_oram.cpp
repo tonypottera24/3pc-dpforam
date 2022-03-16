@@ -3,6 +3,10 @@
 template <typename K, typename D>
 DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer) {
     debug_print("DPFORAM n = %u, data_size = %u\n", n, data_size);
+    this->last_read_block_13_.Resize(data_size * DATA_PER_BLOCK);
+    this->last_read_block_13_.Reset();
+    this->last_read_data_13_.Resize(data_size);
+    this->last_read_data_13_.Reset();
     this->InitArray(this->write_array_13_, n, data_size);
 
     if (n > DATA_PER_BLOCK) {
@@ -64,12 +68,11 @@ void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
 }
 
 template <typename K, typename D>
-BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band) {
+void DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, BulkData<D> &out_block_13, const bool is_cached_23[2], bool count_band) {
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = read_block_13.Size();
     debug_print("data_size = %u\n", data_size);
-    BulkData<D> out_block_13(data_size);
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
@@ -81,8 +84,13 @@ BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D>
         out_block_13.Random(this->peer_[P1].PRG());
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
-        BulkData<D> read_block_12 = this->peer_[P2].template ReadData<BulkData<D>>(data_size) + read_block_13;
-        BulkData<D> cache_block_12 = this->peer_[P2].template ReadData<BulkData<D>>(data_size) + cache_block_13;
+        BulkData<D> read_block_12(data_size);
+        this->peer_[P2].ReadData(read_block_12);
+        read_block_12 += read_block_13;
+
+        BulkData<D> cache_block_12(data_size);
+        this->peer_[P2].ReadData(cache_block_12);
+        cache_block_12 += cache_block_13;
 
         std::vector<BulkData<D>> u = {read_block_12, cache_block_12};
         const uint b0 = is_cached_23[P1] ^ is_cached_23[P2];
@@ -96,7 +104,6 @@ BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D>
         tmp.Random(this->peer_[P2].PRG());
         out_block_13 -= tmp;
     }
-    return out_block_13;
 }
 
 template <typename K, typename D>
@@ -151,13 +158,13 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
         // } else if (n <= SSOT_THRESHOLD) {
         //     return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
     } else {
-        this->last_read_block_13_ = DPF_Read(block_index_23, read_only);
+        DPF_Read(block_index_23, this->last_read_block_13_, read_only);
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
     // std::vector<std::vector<D>> last_read_block_23 = ShareTwoThird(this->peer_, this->last_read_block_13_.data_, !read_only);
     // this->last_read_data_13_ = PIR::PIR<D>(this->peer_, this->fss_, last_read_block_23.data(), data_index_23, !read_only);
 
-    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, !read_only);
+    PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, this->last_read_data_13_, !read_only);
 
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
@@ -165,11 +172,13 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
 }
 
 template <typename K, typename D>
-BulkData<D> DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
+void DPFORAM<K, D>::DPF_Read(const uint index_23[2], BulkData<D> &v_out_13, bool read_only) {
     debug_print("[%u]DPF_Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
-    BulkData<D> v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, !read_only);
-    v_read_13.Print("v_read_13");
+    uint data_size = this->read_array_23_[0][0].Size();
+    BulkData<D> v_read_13(data_size);
+    PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, v_read_13, !read_only);
+    // v_read_13.Print("v_read_13");
 
     uint cache_index_23[2];
     bool is_cached_23[2];
@@ -179,12 +188,14 @@ BulkData<D> DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
     debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
-        return v_read_13;
-    }
-    BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, !read_only);
-    v_cache_13.Print("v_cache_13");
+        v_out_13 = v_read_13;
+    } else {
+        BulkData<D> v_cache_13(data_size);
+        PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, v_cache_13, !read_only);
+        v_cache_13.Print("v_cache_13");
 
-    return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
+        GetLatestData(v_read_13, v_cache_13, v_out_13, is_cached_23, !read_only);
+    }
 }
 
 template <typename K, typename D>
@@ -334,7 +345,8 @@ void DPFORAM<K, D>::Test(uint iterations) {
             } else {
                 key_23[this->party_].Random(this->peer_[this->party_].PRG());
                 this->peer_[1 - this->party_].WriteData(key_23[this->party_], false);
-                K k = this->peer_[1 - this->party_].template ReadData<K>(key_size);
+                K k(key_size);
+                this->peer_[1 - this->party_].ReadData(k);
                 key_23[1 - this->party_] = this->key_array_13_[index] - key_23[this->party_] - k;
             }
 
@@ -374,8 +386,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         debug_print("\nTest, ========== Write random data ==========\n");
-        D new_data_13[3];
-        new_data_13[2].Resize(this->DataSize());
+        std::vector<D> new_data_13(3, D(this->DataSize()));
         new_data_13[2].Random();
         new_data_13[2].Print("new_data_13[2]");
 
@@ -393,7 +404,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
             KeyToIndex(key_23, index_23, false);
         }
 
-        D verify_data_13[3];
+        std::vector<D> verify_data_13(3, D(this->DataSize()));
         verify_data_13[2] = this->Read(index_23, true);
 
         verify_data_13[2].Print("verify_data_13[2]");
@@ -402,15 +413,15 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         this->peer_[0].WriteData(verify_data_13[2], false);
         this->peer_[1].WriteData(verify_data_13[2], false);
-        verify_data_13[0] = this->peer_[0].template ReadData<D>(this->DataSize());
-        verify_data_13[1] = this->peer_[1].template ReadData<D>(this->DataSize());
+        this->peer_[0].ReadData(verify_data_13[0]);
+        this->peer_[1].ReadData(verify_data_13[1]);
         D verify_data = verify_data_13[0] + verify_data_13[1] + verify_data_13[2];
         verify_data.Print("verify_data");
 
         this->peer_[0].WriteData(new_data_13[2], false);
         this->peer_[1].WriteData(new_data_13[2], false);
-        new_data_13[0] = this->peer_[0].template ReadData<D>(this->DataSize());
-        new_data_13[1] = this->peer_[1].template ReadData<D>(this->DataSize());
+        this->peer_[0].ReadData(new_data_13[0]);
+        this->peer_[1].ReadData(new_data_13[1]);
         D new_data = new_data_13[0] + new_data_13[1] + new_data_13[2];
         new_data.Print("new_data");
 

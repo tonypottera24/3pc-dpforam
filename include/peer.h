@@ -24,13 +24,12 @@ public:
     uint64_t ReadLong();
 
     template <typename D>
-    D ReadData(const uint size) {
+    void ReadData(D &data) {
         // fprintf(stderr, "ReadData, size = %u\n", size);
-        std::vector<uchar> buffer(size);
-        this->socket_.Read(buffer.data(), size);
-        D data;
+        uint data_size = data.Size();
+        std::vector<uchar> buffer(data_size);
+        this->socket_.Read(buffer.data(), data_size);
         data.Load(buffer);
-        return data;
     }
 
     template <typename D>
@@ -41,16 +40,17 @@ public:
     }
 
     template <typename D>
-    std::vector<D> ReadData(const uint size, const uint data_size) {
+    void ReadData(std::vector<D> &data) {
+        uint size = data.size();
+        uint data_size = data[0].Size();
         uint buffer_size = size * data_size;
         uchar buffer[buffer_size];
         this->socket_.Read(buffer, buffer_size);
-        std::vector<D> data(size);
         for (uint i = 0; i < size; i++) {
             std::vector<uchar> buf(buffer + data_size * i, buffer + data_size * (i + 1));
+            // TODO turn to array design?
             data[i].Load(buf);
         }
-        return data;
     }
 
     template <typename D>

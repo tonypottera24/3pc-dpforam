@@ -39,7 +39,8 @@ void P1(Peer peer[2], D m[2], const bool inv, bool count_band) {
     peer[P0].Socket().Read(&s, 1);
 
     uint data_size = m[0].Size();
-    std::vector<D> p = peer[P0].template ReadData<D>(2, data_size);
+    std::vector<D> p(2, D(data_size));
+    peer[P0].ReadData(p);
 
     std::vector<D> mm;
     for (uint b = 0; b < 2; b++) {
@@ -57,8 +58,10 @@ D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
 
     uchar bb;
     peer[P0].Socket().Read(&bb, 1);
-    D pb = peer[P0].template ReadData<D>(data_size);
-    std::vector<D> mm = peer[P1].template ReadData<D>(2, data_size);
+    D pb(data_size);
+    peer[P0].ReadData(pb);
+    std::vector<D> mm(2, D(data_size));
+    peer[P1].ReadData(mm);
 
     return mm[bb] - pb;
 }

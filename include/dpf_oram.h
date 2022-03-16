@@ -48,8 +48,8 @@ private:
     void InitArray(std::vector<BulkData<D>> &array, const uint n, const uint data_size);
     void ResetArray(std::vector<BulkData<D>> &array);
 
-    BulkData<D> GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band);
-    BulkData<D> DPF_Read(const uint index_23[2], bool read_only);
+    void GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, BulkData<D> &out_block_13, const bool is_cached_23[2], bool count_band);
+    void DPF_Read(const uint index_23[2], BulkData<D> &v_out_13, bool read_only);
     void DPF_Write(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band);
     void ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached[2], bool read_only);
     void AppendCache(BulkData<D> &new_block_13, bool count_band);

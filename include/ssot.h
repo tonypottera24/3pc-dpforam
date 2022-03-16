@@ -39,7 +39,8 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
 
     uint n = u.size();
     uint data_size = u[0].Size();
-    D y = peer[P2].template ReadData<D>(data_size);
+    D y(data_size);
+    peer[P2].ReadData(y);
 
     uint alpha = rand_uint(peer[P2].PRG()) % n;
 
@@ -64,7 +65,7 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
     // peer[P1].WriteData(uu, count_band);
 
     // // Receive v0' and v1' from P1
-    // std::vector<D> vv = peer[P1].template ReadData<D>(n, data_size);
+    // std::vector<D> vv = peer[P1].ReadData(n, data_size);
 
     std::vector<D> vv = write_read_data(peer[P1], uu, peer[P1], n, data_size, count_band);
     return vv[b0] - y;
@@ -80,7 +81,8 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
 
     uint n = v.size();
     uint data_size = v[0].Size();
-    D x = peer[P2].template ReadData<D>(data_size);
+    D x(data_size);
+    peer[P2].ReadData(x);
 
     uint beta = rand_uint(peer[P2].PRG()) % n;
 
@@ -105,7 +107,7 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
     // peer[P0].WriteData(vv, count_band);
 
     // // Receive u0' and u1' from P0
-    // std::vector<D> uu = peer[P0].template ReadData<D>(n, data_size);
+    // std::vector<D> uu = peer[P0].ReadData(n, data_size);
 
     std::vector<D> uu = write_read_data(peer[P0], vv, peer[P0], n, data_size, count_band);
     return uu[b1] - x;

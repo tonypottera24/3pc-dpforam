@@ -41,14 +41,16 @@ void print_bytes(const uchar *bytes, const uint len, const char *array_name, con
 template <typename D>
 std::vector<D> ShareTwoThird(Peer peer[2], D &v_in_13, bool count_band) {
     peer[1].WriteData(v_in_13, count_band);
-    D v_out = peer[0].template ReadData<D>(v_in_13.Size());
+    uint data_size = v_in_13.Size();
+    D v_out(data_size);
+    peer[0].ReadData(v_out);
     return {v_out, v_in_13};
 }
 
 template <typename D>
 std::vector<std::vector<D>> ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, bool count_band) {
     // peer[1].WriteData(v_in_13, count_band);
-    // std::vector<D> v_out = peer[0].template ReadData<D>(v_in_13.size(), v_in_13[0].Size());
+    // std::vector<D> v_out = peer[0].ReadData(v_in_13.size(), v_in_13[0].Size());
     std::vector<D> v_out = write_read_data(peer[1], v_in_13, peer[0], v_in_13.size(), v_in_13[0].Size(), count_band);
     return {v_out, v_in_13};
 }
@@ -73,7 +75,8 @@ std::vector<D> write_read_data(Peer &write_peer, std::vector<D> &data, Peer &rea
         tmp_write_data.insert(tmp_write_data.begin(), data.begin() + start_index, data.begin() + end_index);
         write_peer.WriteData(tmp_write_data, count_band);
 
-        std::vector<D> tmp_read_data = read_peer.ReadData<D>(end_index - start_index, data_size);
+        std::vector<D> tmp_read_data(end_index - start_index, D(data_size));
+        read_peer.ReadData(tmp_read_data);
         new_data.insert(new_data.end(), tmp_read_data.begin(), tmp_read_data.end());
     }
     return new_data;
