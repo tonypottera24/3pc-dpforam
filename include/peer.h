@@ -34,7 +34,7 @@ public:
     }
 
     template <typename D>
-    void WriteData(D data, bool count_band) {
+    void WriteData(D &data, bool count_band) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
         std::vector<uchar> dump = data.Dump();
         this->socket_.Write(dump.data(), dump.size(), count_band);

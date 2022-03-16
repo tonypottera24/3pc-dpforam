@@ -4,7 +4,7 @@
 namespace PIW {
 
 template <typename D>
-std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, bool count_band) {
+std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, bool count_band) {
     debug_print("FindDeltaData, is_0 = %u\n", is_0);
     const bool is_symmetric = v_delta_13.IsSymmetric();
     const uint data_size = v_delta_13.Size();
@@ -80,7 +80,7 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D v_delta_13, 
 }
 
 template <typename D>
-void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint n, const uint log_n, const uint index_23[2], D v_delta_13, bool pseudo, bool count_band) {
+void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint n, const uint log_n, const uint index_23[2], D &v_delta_13, bool pseudo, bool count_band) {
     debug_print("[%lu]DPF_PIW, index_23 = (%u, %u), n = %lu, log_n = %u, new n = %u\n", array_13.size(), index_23[0], index_23[1], array_13.size(), log_n, n);
     v_delta_13.Print("v_delta_13");
     const bool is_symmetric = array_13[0].IsSymmetric();
@@ -121,7 +121,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 }
 
 template <typename D>
-void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint index_23[2], D v_delta_13, bool count_band) {
+void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint index_23[2], D &v_delta_13, bool count_band) {
     uint n = pow2_ceil(array_13.size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};

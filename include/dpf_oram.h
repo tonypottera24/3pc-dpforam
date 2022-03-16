@@ -48,11 +48,11 @@ private:
     void InitArray(std::vector<BulkData<D>> &array, const uint n, const uint data_size);
     void ResetArray(std::vector<BulkData<D>> &array);
 
-    BulkData<D> GetLatestData(BulkData<D> read_block_13, BulkData<D> cache_block_13, const bool is_cached_23[2], bool count_band);
+    BulkData<D> GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band);
     BulkData<D> DPF_Read(const uint index_23[2], bool read_only);
-    void DPF_Write(const uint index_23[2], BulkData<D> old_block_13, BulkData<D> new_block_13, bool count_band);
+    void DPF_Write(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band);
     void ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached[2], bool read_only);
-    void AppendCache(BulkData<D> new_block_13, bool count_band);
+    void AppendCache(BulkData<D> &new_block_13, bool count_band);
     void Flush(bool count_band);
 
 public:
@@ -62,7 +62,7 @@ public:
     void KeyToIndex(K key_23[2], uint index_23[2], bool count_band);
 
     D Read(const uint index_23[2], bool read_only);
-    void Write(const uint index_23[2], D new_data_13, bool count_band);
+    void Write(const uint index_23[2], D &new_data_13, bool count_band);
 
     void PrintMetadata();
     inline uint Size() {

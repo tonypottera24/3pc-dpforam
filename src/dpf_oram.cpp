@@ -64,7 +64,7 @@ void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
 }
 
 template <typename K, typename D>
-BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> read_block_13, BulkData<D> cache_block_13, const bool is_cached_23[2], bool count_band) {
+BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band) {
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = read_block_13.Size();
@@ -154,9 +154,13 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
         this->last_read_block_13_ = DPF_Read(block_index_23, read_only);
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
-    std::vector<std::vector<D>> last_read_block_23 = ShareTwoThird(this->peer_, this->last_read_block_13_.data_, !read_only);
-    this->last_read_data_13_ = PIR::PIR<D>(this->peer_, this->fss_, last_read_block_23.data(), data_index_23, !read_only);
+    // std::vector<std::vector<D>> last_read_block_23 = ShareTwoThird(this->peer_, this->last_read_block_13_.data_, !read_only);
+    // this->last_read_data_13_ = PIR::PIR<D>(this->peer_, this->fss_, last_read_block_23.data(), data_index_23, !read_only);
+
+    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, !read_only);
+
     this->last_read_data_13_.Print("this->last_read_data_13_");
+
     return this->last_read_data_13_;
 }
 
@@ -179,11 +183,12 @@ BulkData<D> DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
     }
     BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, !read_only);
     v_cache_13.Print("v_cache_13");
+
     return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Write(const uint index_23[2], D v_new_13, bool count_band) {
+void DPFORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) {
     debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -210,7 +215,7 @@ void DPFORAM<K, D>::Write(const uint index_23[2], D v_new_13, bool count_band) {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> old_block_13, BulkData<D> new_block_13, bool count_band) {
+void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band) {
     debug_print("[%u]DPF_Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     BulkData<D> delta_block_13 = new_block_13 - old_block_13;
@@ -223,7 +228,7 @@ void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> old_block_13, 
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::AppendCache(BulkData<D> new_block_13, bool count_band) {
+void DPFORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
     debug_print("[%u]AppendCache\n", this->Size());
     std::vector<BulkData<D>> new_block_23 = ShareTwoThird(this->peer_, new_block_13, count_band);
     for (uint b = 0; b < 2; b++) {
