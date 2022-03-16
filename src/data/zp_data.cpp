@@ -51,7 +51,7 @@ std::vector<uchar> ZpData::Dump() {
     return data;
 }
 
-void ZpData::Load(std::vector<uchar> data) {
+void ZpData::Load(std::vector<uchar> &data) {
     BN_bin2bn(data.data(), data.size(), this->data_);
 }
 

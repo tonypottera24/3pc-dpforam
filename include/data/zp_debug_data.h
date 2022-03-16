@@ -34,7 +34,7 @@ public:
     }
 
     std::vector<uchar> Dump();
-    void Load(std::vector<uchar> data);
+    void Load(std::vector<uchar> &data);
     void Reset();
     void Resize(const uint size);
     void Random(PRG *prg = NULL);

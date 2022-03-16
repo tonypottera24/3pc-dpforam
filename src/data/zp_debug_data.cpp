@@ -46,7 +46,7 @@ std::vector<uchar> ZpDebugData::Dump() {
     return data;
 }
 
-void ZpDebugData::Load(std::vector<uchar> data) {
+void ZpDebugData::Load(std::vector<uchar> &data) {
     memcpy((uchar *)&(this->data_), data.data(), data.size());
 }
 

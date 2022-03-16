@@ -106,7 +106,7 @@ public:
         return data;
     }
 
-    void Load(std::vector<uchar> data) {
+    void Load(std::vector<uchar> &data) {
         uint data_size = data.size() / DATA_PER_BLOCK;
         for (uint i = 0; i < DATA_PER_BLOCK; i++) {
             std::vector<uchar> data_item(data.begin() + data_size * i, data.begin() + data_size * (i + 1));

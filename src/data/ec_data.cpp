@@ -53,7 +53,7 @@ std::vector<uchar> ECData::Dump() {
     return data;
 }
 
-void ECData::Load(std::vector<uchar> data) {
+void ECData::Load(std::vector<uchar> &data) {
     EC_POINT_oct2point(this->curve_, this->data_, data.data(), data.size(), this->bn_ctx_);
 }
 

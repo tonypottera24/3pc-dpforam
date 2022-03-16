@@ -51,7 +51,7 @@ std::vector<uchar> BinaryData::Dump() {
     return this->data_;
 }
 
-void BinaryData::Load(std::vector<uchar> data) {
+void BinaryData::Load(std::vector<uchar> &data) {
     this->data_ = data;
 }
 

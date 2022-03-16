@@ -9,6 +9,11 @@ DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) :
     this->last_read_data_13_.Reset();
     this->InitArray(this->write_array_13_, n, data_size);
 
+    fprintf(stderr, "DPFORAM, n = %u, data_size = %u\n", n, data_size);
+    fprintf(stderr, "DPFORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
+    fprintf(stderr, "DPFORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
+    fprintf(stderr, "\n");
+
     if (n > DATA_PER_BLOCK) {
         for (uint b = 0; b < 2; b++) {
             this->InitArray(this->read_array_23_[b], n, data_size);
