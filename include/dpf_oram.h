@@ -61,7 +61,7 @@ public:
 
     void KeyToIndex(K key_23[2], uint index_23[2], bool count_band);
 
-    D Read(const uint index_23[2], bool read_only);
+    void Read(const uint index_23[2], D &v_out_13, bool read_only);
     void Write(const uint index_23[2], D &new_data_13, bool count_band);
 
     void PrintMetadata();

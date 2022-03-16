@@ -39,20 +39,18 @@ inline bool get_buffer_bit(uchar *a, const uint i) {
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
 template <typename D>
-std::vector<D> ShareTwoThird(Peer peer[2], D &v_in_13, bool count_band) {
+void ShareTwoThird(Peer peer[2], D &v_in_13, D v_out_23[2], bool count_band) {
+    v_out_23[1] = v_in_13;
     peer[1].WriteData(v_in_13, count_band);
-    uint data_size = v_in_13.Size();
-    D v_out(data_size);
-    peer[0].ReadData(v_out);
-    return {v_out, v_in_13};
+    peer[0].ReadData(v_out_23[0]);
 }
 
 template <typename D>
-std::vector<std::vector<D>> ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, bool count_band) {
+void ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, std::vector<D> v_out_23[2], bool count_band) {
     // peer[1].WriteData(v_in_13, count_band);
     // std::vector<D> v_out = peer[0].ReadData(v_in_13.size(), v_in_13[0].Size());
-    std::vector<D> v_out = write_read_data(peer[1], v_in_13, peer[0], v_in_13.size(), v_in_13[0].Size(), count_band);
-    return {v_out, v_in_13};
+    v_out_23[1] = v_in_13;
+    write_read_data(peer[1], v_in_13, peer[0], v_out_23[0], count_band);
 }
 
 template <typename D>
@@ -64,22 +62,25 @@ void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint in
 }
 
 template <typename D>
-std::vector<D> write_read_data(Peer &write_peer, std::vector<D> &data, Peer &read_peer, const uint size, const uint data_size, bool count_band) {
-    std::vector<D> new_data;
+void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_peer, std::vector<D> &read_data, bool count_band) {
+    uint size = write_data.size();
+    uint data_size = write_data[0].Size();
     uint data_per_block = std::max(1024 * 2 / data_size, 1U);
     uint round = divide_ceil(size, data_per_block);
     for (uint r = 0; r < round; r++) {
         std::vector<D> tmp_write_data;
         uint start_index = data_per_block * r;
         uint end_index = std::min(data_per_block * (r + 1), size);
-        tmp_write_data.insert(tmp_write_data.begin(), data.begin() + start_index, data.begin() + end_index);
+        tmp_write_data.insert(tmp_write_data.begin(), write_data.begin() + start_index, write_data.begin() + end_index);
         write_peer.WriteData(tmp_write_data, count_band);
 
         std::vector<D> tmp_read_data(end_index - start_index, D(data_size));
         read_peer.ReadData(tmp_read_data);
-        new_data.insert(new_data.end(), tmp_read_data.begin(), tmp_read_data.end());
+        for (uint i = 0; i < tmp_read_data.size(); i++) {
+            read_data[start_index + i] = tmp_read_data[i];
+        }
+        // read_data.insert(new_data.end(), tmp_read_data.begin(), tmp_read_data.end());
     }
-    return new_data;
 }
 
 template <typename D>

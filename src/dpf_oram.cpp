@@ -113,8 +113,11 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
     // this->position_map_->PrintMetadata();
 
     // read block from array
-    BinaryData old_cache_index_13 = this->position_map_->Read(index_23, read_only);
-    std::vector<BinaryData> old_cache_index_23 = ShareTwoThird<BinaryData>(this->peer_, old_cache_index_13, !read_only);
+    uint pos_data_size = this->position_map_->DataSize();
+    BinaryData old_cache_index_13(pos_data_size);
+    this->position_map_->Read(index_23, old_cache_index_13, read_only);
+    BinaryData old_cache_index_23[2] = {BinaryData(pos_data_size), BinaryData(pos_data_size)};
+    ShareTwoThird(this->peer_, old_cache_index_13, old_cache_index_23, !read_only);
     old_cache_index_13.Print("old_index_13");
 
     for (uint b = 0; b < 2; b++) {
@@ -143,7 +146,7 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 }
 
 template <typename K, typename D>
-D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
+void DPFORAM<K, D>::Read(const uint index_23[2], D &v_out_13, bool read_only) {
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -168,7 +171,7 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
 
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
-    return this->last_read_data_13_;
+    v_out_13 = this->last_read_data_13_;
 }
 
 template <typename K, typename D>
@@ -241,7 +244,9 @@ void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> &old_block_13,
 template <typename K, typename D>
 void DPFORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
     debug_print("[%u]AppendCache\n", this->Size());
-    std::vector<BulkData<D>> new_block_23 = ShareTwoThird(this->peer_, new_block_13, count_band);
+    uint data_size = new_block_13.Size();
+    BulkData<D> new_block_23[2] = {BulkData<D>(data_size), BulkData<D>(data_size)};
+    ShareTwoThird(this->peer_, new_block_13, new_block_23, count_band);
     for (uint b = 0; b < 2; b++) {
         this->cache_array_23_[b].push_back(new_block_23[b]);
     }
@@ -257,7 +262,11 @@ void DPFORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
 template <typename K, typename D>
 void DPFORAM<K, D>::Flush(bool count_band) {
     debug_print("[%u]Flush\n", this->Size());
-    std::vector<std::vector<BulkData<D>>> array_23 = ShareTwoThird(this->peer_, this->write_array_13_, count_band);
+    uint size = this->write_array_13_.size();
+    std::vector<BulkData<D>> array_23[2];
+    array_23[0].resize(size);
+    array_23[1].resize(size);
+    ShareTwoThird(this->peer_, this->write_array_13_, array_23, count_band);
     for (uint b = 0; b < 2; b++) {
         this->read_array_23_[b] = array_23[b];
     }
@@ -313,8 +322,8 @@ void DPFORAM<K, D>::Test(uint iterations) {
             key_array_33[2][i].Random();
         }
 
-        key_array_33[0] = write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], n, key_size, false);
-        key_array_33[1] = write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], n, key_size, false);
+        write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], key_array_33[0], false);
+        write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], key_array_33[1], false);
 
         for (uint i = 0; i < n; i++) {
             K k = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
@@ -367,10 +376,13 @@ void DPFORAM<K, D>::Test(uint iterations) {
         this->peer_[0].ReadUInt();
         this->peer_[1].ReadUInt();
 
+        uint data_size = this->DataSize();
+
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
         t1 = std::chrono::high_resolution_clock::now();
-        D old_data_13 = this->Read(index_23, false);
+        D old_data_13(data_size);
+        this->Read(index_23, old_data_13, false);
         t2 = std::chrono::high_resolution_clock::now();
         uint64_t delta_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         party_time += delta_time;
@@ -386,7 +398,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         debug_print("\nTest, ========== Write random data ==========\n");
-        std::vector<D> new_data_13(3, D(this->DataSize()));
+        std::vector<D> new_data_13(3, D(data_size));
         new_data_13[2].Random();
         new_data_13[2].Print("new_data_13[2]");
 
@@ -404,8 +416,8 @@ void DPFORAM<K, D>::Test(uint iterations) {
             KeyToIndex(key_23, index_23, false);
         }
 
-        std::vector<D> verify_data_13(3, D(this->DataSize()));
-        verify_data_13[2] = this->Read(index_23, true);
+        std::vector<D> verify_data_13(3, D(data_size));
+        this->Read(index_23, verify_data_13[2], true);
 
         verify_data_13[2].Print("verify_data_13[2]");
 

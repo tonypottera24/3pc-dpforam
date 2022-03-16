@@ -21,11 +21,11 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
     bool is_0 = false;
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        std::tie(query_23, is_0) = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric);
+        query_23 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, is_0);
         peer[0].WriteData(query_23[0], count_band);
         peer[1].ReadData(query_23[0]);
     } else {
-        std::tie(query_23, is_0) = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric);
+        query_23 = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, is_0);
 
         peer[0].WriteData(query_23[0], count_band);
         peer[1].WriteData(query_23[1], count_band);
@@ -36,12 +36,12 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
 
     uint data_size = array_23[0][0].Size();
     D v_sum[2] = {D(data_size), D(data_size)};
+    std::vector<bool> dpf_out(n);
     for (uint b = 0; b < 2; b++) {
-        std::vector<bool> dpf_out;
         if (pseudo) {
-            dpf_out = fss.PseudoEvalAll(query_23[b], n);
+            fss.PseudoEvalAll(query_23[b], n, dpf_out);
         } else {
-            dpf_out = fss.EvalAll(query_23[b], log_n);
+            fss.EvalAll(query_23[b], log_n, dpf_out);
         }
         for (uint i = 0; i < array_23[0].size(); i++) {
             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
@@ -96,7 +96,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             std::vector<BinaryData> query_23;
             bool is_0 = false;
 
-            std::tie(query_23, is_0) = fss.Gen(digest_uint, digest_size_log, true);
+            query_23 = fss.Gen(digest_uint, digest_size_log, true, is_0);
 
             peer[0].WriteUInt(query_23[0].Size(), count_band);
             peer[1].WriteUInt(query_23[1].Size(), count_band);

@@ -4,12 +4,12 @@
 namespace PIW {
 
 template <typename D>
-std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, bool count_band) {
+void FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, D v_out_33[2], bool count_band) {
     debug_print("FindDeltaData, is_0 = %u\n", is_0);
     const bool is_symmetric = v_delta_13.IsSymmetric();
     const uint data_size = v_delta_13.Size();
     if (is_symmetric) {
-        return ShareTwoThird<D>(peer, v_delta_13, count_band);
+        ShareTwoThird(peer, v_delta_13, v_out_33, count_band);
     } else {
         v_delta_13.Print("v_delta_13");
 
@@ -19,7 +19,6 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
         v_delta_33[0].Print("v_delta_33[0]");
         v_delta_33[1].Print("v_delta_33[1]");
 
-        std::vector<D> v_out_33(2);
         for (uint d = 0; d < 2; d++) {
             for (uint offset = 0; offset < 3; offset++) {
                 uint party_index = (party + offset) % 3;
@@ -77,7 +76,6 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                 }
             }
         }
-        return v_out_33;
     }
 }
 
@@ -87,16 +85,17 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     v_delta_13.Print("v_delta_13");
     const bool is_symmetric = array_13[0].IsSymmetric();
 
+    uint data_size = array_13[0].Size();
     std::vector<BinaryData> query_23;
     bool is_0 = false;
 
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        std::tie(query_23, is_0) = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric);
+        query_23 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, is_0);
         peer[0].WriteData(query_23[0], count_band);
         peer[1].ReadData(query_23[0]);
     } else {
-        std::tie(query_23, is_0) = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric);
+        query_23 = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, is_0);
 
         peer[0].WriteData(query_23[0], count_band);
         peer[1].WriteData(query_23[1], count_band);
@@ -104,14 +103,15 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
         peer[0].ReadData(query_23[1]);
         peer[1].ReadData(query_23[0]);
     }
-    std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, count_band);
+    D v_delta_33[2] = {D(data_size), D(data_size)};
+    FindDeltaData(party, peer, is_0, v_delta_13, v_delta_33, count_band);
 
+    std::vector<bool> dpf_out(n);
     for (uint b = 0; b < 2; b++) {
-        std::vector<bool> dpf_out;
         if (pseudo) {
-            dpf_out = fss.PseudoEvalAll(query_23[b], n);
+            fss.PseudoEvalAll(query_23[b], n, dpf_out);
         } else {
-            dpf_out = fss.EvalAll(query_23[b], log_n);
+            fss.EvalAll(query_23[b], log_n, dpf_out);
         }
         for (uint i = 0; i < array_13.size(); i++) {
             // debug_print("[%llu]DPF_PIW, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);

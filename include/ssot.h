@@ -67,7 +67,8 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
     // // Receive v0' and v1' from P1
     // std::vector<D> vv = peer[P1].ReadData(n, data_size);
 
-    std::vector<D> vv = write_read_data(peer[P1], uu, peer[P1], n, data_size, count_band);
+    std::vector<D> vv(n, D(data_size));
+    write_read_data(peer[P1], uu, peer[P1], vv, count_band);
     return vv[b0] - y;
 }
 
@@ -109,7 +110,8 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
     // // Receive u0' and u1' from P0
     // std::vector<D> uu = peer[P0].ReadData(n, data_size);
 
-    std::vector<D> uu = write_read_data(peer[P0], vv, peer[P0], n, data_size, count_band);
+    std::vector<D> uu(n, D(data_size));
+    write_read_data(peer[P0], vv, peer[P0], uu, count_band);
     return uu[b1] - x;
 }
 
