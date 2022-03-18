@@ -86,16 +86,16 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     const bool is_symmetric = array_13[0].IsSymmetric();
 
     uint data_size = array_13[0].Size();
-    std::vector<BinaryData> query_23;
+    BinaryData query_23[2];
     bool is_0 = false;
 
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        query_23 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, is_0);
+        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, query_23, is_0);
         peer[0].WriteData(query_23[0], count_band);
         peer[1].ReadData(query_23[0]);
     } else {
-        query_23 = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, is_0);
+        fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23, is_0);
 
         peer[0].WriteData(query_23[0], count_band);
         peer[1].WriteData(query_23[1], count_band);

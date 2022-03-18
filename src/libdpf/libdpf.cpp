@@ -31,7 +31,7 @@ uint128 dpf_set_lsb_zero(uint128 input) {
     }
 }
 
-int getbit(const uint64_t x, const uint64_t n, const uint64_t b) {
+static int getbit(const uint64_t x, const int n, const int b) {
     return (x >> (n - b)) & 1;
 }
 
@@ -56,14 +56,14 @@ void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *b
     *output2 = dpf_set_lsb_zero(stash[1]);
 }
 
-int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0, uchar **k1) {
-    uint maxlayer = max((int)log_n - 7, 0);
-    // int maxlayer = n;
+int GEN(AES_KEY *key, uint64_t alpha, const int log_n, uchar **k0, uchar **k1) {
+    int max_layer = max(log_n - 7, 0);
+    // int max_layer = n;
 
-    uint128 s[maxlayer + 1][2];
-    int t[maxlayer + 1][2];
-    uint128 sCW[maxlayer];
-    int tCW[maxlayer][2];
+    uint128 s[max_layer + 1][2];
+    int t[max_layer + 1][2];
+    uint128 sCW[max_layer];
+    int tCW[max_layer][2];
 
     s[0][0] = dpf_random_block();
     s[0][1] = dpf_random_block();
@@ -76,7 +76,7 @@ int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0, uchar **k1) 
 #define LEFT 0
 #define RIGHT 1
     int t0[2], t1[2];
-    for (uint i = 1; i <= maxlayer; i++) {
+    for (int i = 1; i <= max_layer; i++) {
         PRG(key, s[i - 1][0], &s0[LEFT], &s0[RIGHT], &t0[LEFT], &t0[RIGHT]);
         PRG(key, s[i - 1][1], &s1[LEFT], &s1[RIGHT], &t1[LEFT], &t1[RIGHT]);
 
@@ -112,42 +112,41 @@ int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0, uchar **k1) 
         }
     }
 
-    uint128 finalblock;
-    finalblock = dpf_zero_block();
-    finalblock = dpf_reverse_lsb(finalblock);
+    uint128 final_block;
+    final_block = dpf_zero_block();
+    final_block = dpf_reverse_lsb(final_block);
 
     char shift = (alpha)&127;
-    // char shift = alpha[0];
     if (shift & 64) {
-        finalblock = dpf_left_shirt(finalblock, 64);
+        final_block = dpf_left_shirt(final_block, 64);
     }
     if (shift & 32) {
-        finalblock = dpf_left_shirt(finalblock, 32);
+        final_block = dpf_left_shirt(final_block, 32);
     }
     if (shift & 16) {
-        finalblock = dpf_left_shirt(finalblock, 16);
+        final_block = dpf_left_shirt(final_block, 16);
     }
     if (shift & 8) {
-        finalblock = dpf_left_shirt(finalblock, 8);
+        final_block = dpf_left_shirt(final_block, 8);
     }
     if (shift & 4) {
-        finalblock = dpf_left_shirt(finalblock, 4);
+        final_block = dpf_left_shirt(final_block, 4);
     }
     if (shift & 2) {
-        finalblock = dpf_left_shirt(finalblock, 2);
+        final_block = dpf_left_shirt(final_block, 2);
     }
     if (shift & 1) {
-        finalblock = dpf_left_shirt(finalblock, 1);
+        final_block = dpf_left_shirt(final_block, 1);
     }
-    // dpf_cb(finalblock);
-    finalblock = dpf_reverse_lsb(finalblock);
+    // dpf_cb(final_block);
+    final_block = dpf_reverse_lsb(final_block);
 
-    finalblock = uint128_xor(finalblock, s[maxlayer][0]);
-    finalblock = uint128_xor(finalblock, s[maxlayer][1]);
+    final_block = uint128_xor(final_block, s[max_layer][0]);
+    final_block = uint128_xor(final_block, s[max_layer][1]);
 
     uchar *buff0;
     uchar *buff1;
-    int size = 1 + 16 + 1 + 18 * maxlayer + 16;
+    int size = 1 + 16 + 1 + 18 * max_layer + 16;
     //	buff0 = (uchar*) malloc(size);
     //	buff1 = (uchar*) malloc(size);
     buff0 = new uchar[size];
@@ -161,18 +160,18 @@ int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0, uchar **k1) 
     buff0[0] = log_n;
     memcpy(&buff0[1], &s[0][0], 16);
     buff0[17] = t[0][0];
-    for (uint i = 1; i <= maxlayer; i++) {
+    for (int i = 1; i <= max_layer; i++) {
         memcpy(&buff0[18 * i], &sCW[i - 1], 16);
         buff0[18 * i + 16] = tCW[i - 1][0];
         buff0[18 * i + 17] = tCW[i - 1][1];
     }
-    memcpy(&buff0[18 * maxlayer + 18], &finalblock, 16);
+    memcpy(&buff0[18 * max_layer + 18], &final_block, 16);
 
     buff1[0] = log_n;
-    memcpy(&buff1[18], &buff0[18], 18 * (maxlayer));
+    memcpy(&buff1[18], &buff0[18], 18 * (max_layer));
     memcpy(&buff1[1], &s[0][1], 16);
     buff1[17] = t[0][1];
-    memcpy(&buff1[18 * maxlayer + 18], &finalblock, 16);
+    memcpy(&buff1[18 * max_layer + 18], &final_block, 16);
 
     *k0 = buff0;
     *k1 = buff1;
@@ -182,7 +181,7 @@ int GEN(AES_KEY *key, uint64_t alpha, const uint log_n, uchar **k0, uchar **k1) 
 
 uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
     int log_n = k[0];
-    int max_layer = max(log_n - 7, 0);
+    int max_layer = max((int)log_n - 7, 0);
 
     uint128 s[max_layer + 1];
     int t[max_layer + 1];
@@ -193,7 +192,7 @@ uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
     memcpy(&s[0], &k[1], 16);
     t[0] = k[17];
 
-    for (uint i = 1; i <= max_layer; i++) {
+    for (int i = 1; i <= max_layer; i++) {
         memcpy(&sCW[i - 1], &k[18 * i], 16);
         tCW[i - 1][0] = k[18 * i + 16];
         tCW[i - 1][1] = k[18 * i + 17];
@@ -203,7 +202,7 @@ uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
 
     uint128 sL, sR;
     int tL, tR;
-    for (uint i = 1; i <= max_layer; i++) {
+    for (int i = 1; i <= max_layer; i++) {
         PRG(key, s[i - 1], &sL, &sR, &tL, &tR);
 
         if (t[i - 1] == 1) {
@@ -238,38 +237,38 @@ uint128 EVAL(AES_KEY *key, uchar *k, uint64_t x) {
 
 uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
     int n = k[0];
-    int maxlayer = max(n - 7, 0);
-    uint64_t maxlayeritem = 1 << maxlayer;
+    int max_layer = max(n - 7, 0);
+    uint64_t max_layer_item = 1 << max_layer;
 
-    // block s[2][maxlayeritem];
-    // int t[2][maxlayeritem];
+    // block s[2][max_layer_item];
+    // int t[2][max_layer_item];
     uint128 *s[2];
     int *t[2];
     for (int b = 0; b < 2; b++) {
-        s[b] = new uint128[maxlayeritem];
-        t[b] = new int[maxlayeritem];
+        s[b] = new uint128[max_layer_item];
+        t[b] = new int[max_layer_item];
     }
 
     int curlayer = 1;
 
-    uint128 sCW[maxlayer];
-    int tCW[maxlayer][2];
-    uint128 finalblock;
+    uint128 sCW[max_layer];
+    int tCW[max_layer][2];
+    uint128 final_block;
 
     memcpy(&s[0][0], &k[1], 16);
     t[0][0] = k[17];
 
-    for (uint i = 1; i <= maxlayer; i++) {
+    for (int i = 1; i <= max_layer; i++) {
         memcpy(&sCW[i - 1], &k[18 * i], 16);
         tCW[i - 1][0] = k[18 * i + 16];
         tCW[i - 1][1] = k[18 * i + 17];
     }
 
-    memcpy(&finalblock, &k[18 * (maxlayer + 1)], 16);
+    memcpy(&final_block, &k[18 * (max_layer + 1)], 16);
 
     // block sL, sR;
     // int tL, tR;
-    for (uint i = 1; i <= maxlayer; i++) {
+    for (int i = 1; i <= max_layer; i++) {
         uint64_t itemnumber = 1 << (i - 1);
         //#pragma omp parallel for
         for (uint64_t j = 0; j < itemnumber; j++) {
@@ -292,7 +291,7 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
         curlayer = 1 - curlayer;
     }
 
-    uint64_t itemnumber = 1 << maxlayer;
+    uint64_t itemnumber = 1 << max_layer;
     uint128 *res = (uint128 *)malloc(sizeof(uint128) * itemnumber);
 
     //#pragma omp parallel for
@@ -304,11 +303,11 @@ uint128 *EVALFULL(AES_KEY *key, const uchar *k) {
         }
 
         if (t[1 - curlayer][j] == 1) {
-            res[j] = uint128_xor(res[j], finalblock);
+            res[j] = uint128_xor(res[j], final_block);
         }
     }
 
-    for (uint b = 0; b < 2; b++) {
+    for (int b = 0; b < 2; b++) {
         delete[] s[b];
         delete[] t[b];
     }

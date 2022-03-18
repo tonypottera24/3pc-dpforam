@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
     SSOT_THRESHOLD = 1 << log_ssot_threshold;
     fprintf(stderr, "SSOT threshold %u\n", SSOT_THRESHOLD);
 
-    uint log_pseudo_dpf_threshold = vm["log_pseudo_dpf_threshold"].as<uint>();
-    PSEUDO_DPF_THRESHOLD = 1 << log_pseudo_dpf_threshold;
+    LOG_PSEUDO_DPF_THRESHOLD = vm["log_pseudo_dpf_threshold"].as<uint>();
+    PSEUDO_DPF_THRESHOLD = 1 << LOG_PSEUDO_DPF_THRESHOLD;
     fprintf(stderr, "Pseudo DPF threshold %u\n", PSEUDO_DPF_THRESHOLD);
 
     uint threads = vm["threads"].as<uint>();

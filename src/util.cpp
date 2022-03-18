@@ -27,8 +27,8 @@ void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uchar *c, const u
             uint64_t *aa = (uint64_t *)&a[offset];
             uint64_t *bb = (uint64_t *)&b[offset];
             uint64_t *cc = (uint64_t *)&c[offset];
-            uint64_t o = (*aa) ^ (*bb) ^ (*cc);
-            memcpy(&r[offset], &o, sizeof(uint64_t));
+            uint64_t *rr = (uint64_t *)&r[offset];
+            (*rr) = (*aa) ^ (*bb) ^ (*cc);
         } else {
             for (uint i = offset; i < len; i++) {
                 r[i] = a[i] ^ b[i] ^ c[i];
@@ -74,38 +74,6 @@ uint64_t timestamp() {
     // return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
     using namespace std::chrono;
     return duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
-}
-
-uint bit_length(uint n) {
-    uint bit_length = 0;
-    while (n != 0) {
-        n >>= 1;
-        bit_length++;
-    }
-    return bit_length;
-}
-
-uint byte_length(uint n) {
-    uint byte_length = 0;
-    while (n != 0) {
-        n >>= 8;
-        byte_length++;
-    }
-    return byte_length;
-}
-
-uint log2(const uint n) {
-    assert(n > 0);
-    return bit_length(n) - 1;
-}
-
-uint pow2_ceil(const uint n) {
-    uint log_n = log2(n);
-    uint clean_n = 1 << log_n;
-    if (clean_n < n) {
-        clean_n <<= 1;
-    }
-    return clean_n;
 }
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {

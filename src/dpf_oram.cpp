@@ -9,10 +9,10 @@ DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) :
     this->last_read_data_13_.Reset();
     this->InitArray(this->write_array_13_, n, data_size);
 
-    fprintf(stderr, "DPFORAM, n = %u, data_size = %u\n", n, data_size);
-    fprintf(stderr, "DPFORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
-    fprintf(stderr, "DPFORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
-    fprintf(stderr, "\n");
+    // fprintf(stderr, "DPFORAM, n = %u, data_size = %u\n", n, data_size);
+    // fprintf(stderr, "DPFORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
+    // fprintf(stderr, "DPFORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
+    // fprintf(stderr, "\n");
 
     if (n > DATA_PER_BLOCK) {
         for (uint b = 0; b < 2; b++) {
@@ -169,8 +169,10 @@ void DPFORAM<K, D>::Read(const uint index_23[2], D &v_out_13, bool read_only) {
         DPF_Read(block_index_23, this->last_read_block_13_, read_only);
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
-    // std::vector<std::vector<D>> last_read_block_23 = ShareTwoThird(this->peer_, this->last_read_block_13_.data_, !read_only);
-    // this->last_read_data_13_ = PIR::PIR<D>(this->peer_, this->fss_, last_read_block_23.data(), data_index_23, !read_only);
+
+    // std::vector<D> last_read_block_23[2];
+    // ShareTwoThird(this->peer_, this->last_read_block_13_.data_, last_read_block_23, !read_only);
+    // PIR::PIR(this->peer_, this->fss_, last_read_block_23, data_index_23, this->last_read_data_13_, !read_only);
 
     PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, this->last_read_data_13_, !read_only);
 

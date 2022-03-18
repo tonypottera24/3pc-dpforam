@@ -15,17 +15,22 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
     debug_print("[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // only accept power of 2 n
+
+    // std::chrono::high_resolution_clock::time_point t1, t2;
+    // t1 = std::chrono::high_resolution_clock::now();
+    // uint64_t time;
+
     const bool is_symmetric = array_23[0][0].IsSymmetric();
 
-    std::vector<BinaryData> query_23;
+    BinaryData query_23[2];
     bool is_0 = false;
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        query_23 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, is_0);
+        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, query_23, is_0);
         peer[0].WriteData(query_23[0], count_band);
         peer[1].ReadData(query_23[0]);
     } else {
-        query_23 = fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, is_0);
+        fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23, is_0);
 
         peer[0].WriteData(query_23[0], count_band);
         peer[1].WriteData(query_23[1], count_band);
@@ -34,9 +39,14 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
         peer[1].ReadData(query_23[0]);
     }
 
+    // t2 = std::chrono::high_resolution_clock::now();
+    // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // fprintf(stderr, "time1 = %llu\n", time);
+
     uint data_size = array_23[0][0].Size();
     D v_sum[2] = {D(data_size), D(data_size)};
     std::vector<bool> dpf_out(n);
+
     for (uint b = 0; b < 2; b++) {
         if (pseudo) {
             fss.PseudoEvalAll(query_23[b], n, dpf_out);
@@ -51,11 +61,19 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
         }
     }
 
+    // t2 = std::chrono::high_resolution_clock::now();
+    // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // fprintf(stderr, "time2 = %llu\n", time);
+
     if (is_symmetric) {
         v_out_13 = v_sum[0] + v_sum[1];
     } else {
         v_out_13 = inv_gadget::Inv(peer, is_0, v_sum, count_band);
     }
+
+    // t2 = std::chrono::high_resolution_clock::now();
+    // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // fprintf(stderr, "time3 = %llu\n", time);
 }
 
 template <typename K>
@@ -93,10 +111,10 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 
             // print_bytes(digest, digest_size, "digest");
 
-            std::vector<BinaryData> query_23;
+            BinaryData query_23[2];
             bool is_0 = false;
 
-            query_23 = fss.Gen(digest_uint, digest_size_log, true, is_0);
+            fss.Gen(digest_uint, digest_size_log, true, query_23, is_0);
 
             peer[0].WriteUInt(query_23[0].Size(), count_band);
             peer[1].WriteUInt(query_23[1].Size(), count_band);
