@@ -106,7 +106,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     D v_delta_33[2] = {D(data_size), D(data_size)};
     FindDeltaData(party, peer, is_0, v_delta_13, v_delta_33, count_band);
 
-    std::vector<bool> dpf_out(n);
+    std::vector<uchar> dpf_out(n);
     for (uint b = 0; b < 2; b++) {
         if (pseudo) {
             fss.PseudoEvalAll(query_23[b], n, dpf_out);

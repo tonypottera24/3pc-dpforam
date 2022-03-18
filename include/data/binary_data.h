@@ -9,11 +9,12 @@
 
 class BinaryData {
 private:
-    std::vector<uchar> data_;
     const bool is_symmetric_ = true;
     static inline PRG *prg_ = new PRG();
 
 public:
+    std::vector<uchar> data_;
+
     BinaryData();
     BinaryData(const BinaryData &other);
     BinaryData(const uint size);
@@ -34,7 +35,7 @@ public:
         return lhs;
     }
 
-    std::vector<uchar> Dump();
+    void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);
     void Reset();
     void Resize(const uint size);

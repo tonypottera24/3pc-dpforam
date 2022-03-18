@@ -41,7 +41,7 @@ public:
         return lhs;
     }
 
-    std::vector<uchar> Dump();
+    void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);
     void Reset();
     void Resize(const uint size);

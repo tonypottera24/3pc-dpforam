@@ -97,19 +97,22 @@ public:
         return true;
     }
 
-    std::vector<uchar> Dump() {
-        std::vector<uchar> data;
+    void Dump(std::vector<uchar> &data) {
+        data.resize(this->Size());
+        std::vector<uchar> dump;
         for (uint i = 0; i < this->data_.size(); i++) {
-            std::vector<uchar> dump = this->data_[i].Dump();
-            data.insert(data.end(), dump.begin(), dump.end());
+            this->data_[i].Dump(dump);
+            memcpy(data.data() + i * dump.size(), dump.data(), dump.size());
+            // data.insert(data.end(), dump.begin(), dump.end());
         }
-        return data;
     }
 
     void Load(std::vector<uchar> &data) {
         uint data_size = data.size() / DATA_PER_BLOCK;
+        std::vector<uchar> data_item(data_size);
         for (uint i = 0; i < DATA_PER_BLOCK; i++) {
-            std::vector<uchar> data_item(data.begin() + data_size * i, data.begin() + data_size * (i + 1));
+            memcpy(data_item.data(), data.data() + data_size * i, data_size);
+            // std::vector<uchar> data_item(data.begin() + data_size * i, data.begin() + data_size * (i + 1));
             this->data_[i].Load(data_item);
         }
     }

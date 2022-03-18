@@ -40,10 +40,9 @@ bool ZpDebugData::operator==(const ZpDebugData &rhs) {
     return (this->data_ % this->p_) == (rhs.data_ % this->p_);
 }
 
-std::vector<uchar> ZpDebugData::Dump() {
-    std::vector<uchar> data(sizeof(uint));
+void ZpDebugData::Dump(std::vector<uchar> &data) {
+    data.resize(sizeof(uint));
     memcpy(data.data(), (uchar *)&(this->data_), sizeof(uint));
-    return data;
 }
 
 void ZpDebugData::Load(std::vector<uchar> &data) {

@@ -28,17 +28,30 @@ const uint64_t masks[64] = {0x0000000000000001ULL, 0x0000000000000002ULL,
                             0x0800000000000000ULL, 0x1000000000000000ULL, 0x2000000000000000ULL,
                             0x4000000000000000ULL, 0x8000000000000000ULL};
 
-void to_bit_vector(const uint64_t input, std::vector<bool>::iterator output, uint size) {
-    // #pragma omp simd aligned(output, masks : 16)
+// void to_bit_vector(const uint64_t input, std::vector<bool>::iterator output, uint size) {
+//     // #pragma omp simd aligned(output, masks : 16)
+//     for (uint i = 0; i < size; i++) {
+//         output[i] = (input & masks[i]) != 0ULL;
+//     }
+// }
+
+// void to_bit_vector(uint128 input, std::vector<bool>::iterator output) {
+//     uint64_t *val = (uint64_t *)&input;
+//     to_bit_vector(val[0], output, 64);
+//     to_bit_vector(val[1], output + 64, 64);
+// }
+
+void to_byte_vector(uint64_t input, uchar *output, uint size) {
+#pragma omp simd aligned(output, masks : 16)
     for (uint i = 0; i < size; i++) {
-        output[i] = (input & masks[i]) != 0ULL;
+        output[i] = (input & masks[i]) != 0ul;
     }
 }
 
-void to_bit_vector(uint128 input, std::vector<bool>::iterator output) {
+void to_byte_vector(uint128 input, uchar *output) {
     uint64_t *val = (uint64_t *)&input;
-    to_bit_vector(val[0], output, 64);
-    to_bit_vector(val[1], output + 64, 64);
+    to_byte_vector(val[0], output, 64);
+    to_byte_vector(val[1], output + 64, 64);
 }
 
 FSS1Bit::FSS1Bit() {
@@ -64,8 +77,7 @@ void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, Bin
 }
 
 bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
-    std::vector<uchar> dump = query.Dump();
-    uint128 dpf_out = EVAL(&aes_key_, dump.data(), index);
+    uint128 dpf_out = EVAL(&aes_key_, query.data_.data(), index);
     uint64_t index_mod = index % 128;
     uint64_t *val = (uint64_t *)&dpf_out;
     if (index_mod < 64ll) {
@@ -76,17 +88,16 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
     }
 }
 
-void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<bool> &dpf_out) {
+void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &dpf_out) {
     uint n = 1 << log_n;
-    std::vector<uchar> dump = query.Dump();
-    uint128 *res = EVALFULL(&aes_key_, dump.data());
+    uint128 *res = EVALFULL(&aes_key_, query.data_.data());
     if (log_n <= 6) {
-        to_bit_vector(((uint64_t *)res)[0], dpf_out.begin(), n);
+        to_byte_vector(((uint64_t *)res)[0], dpf_out.data(), n);
     } else {
         uint max_layer = std::max((int)log_n - 7, 0);
         uint64_t groups = 1ULL << max_layer;
         for (uint64_t i = 0; i < groups; i++) {
-            to_bit_vector(res[i], dpf_out.begin() + (i << 7));
+            to_byte_vector(res[i], dpf_out.data() + (i << 7));
         }
     }
     free(res);
@@ -97,7 +108,7 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
         query_23[b].Resize(byte_length);
         query_23[b].Random(peer[1 - b].PRG());
     }
-    std::vector<uchar> dpf_out = query_23[0].Dump();
+    std::vector<uchar> dpf_out = query_23[0].data_;
     uint index_byte = index >> 3;
     uint index_bit = index & 7;
     dpf_out[index_byte] ^= 1 << index_bit;
@@ -108,14 +119,12 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
 }
 
 bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
-    std::vector<uchar> dump = query.Dump();
-    return get_buffer_bit(dump.data(), index);
+    return get_buffer_bit(query.data_.data(), index);
 }
 
-void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<bool> &dpf_out) {
+void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> &dpf_out) {
     // uint index_byte = 0, index_bit = 0;
-    std::vector<uchar> query_dump = query.Dump();
     for (uint i = 0; i < n; i++) {
-        dpf_out[i] = get_buffer_bit(query_dump.data(), i);
+        dpf_out[i] = get_buffer_bit(query.data_.data(), i);
     }
 }

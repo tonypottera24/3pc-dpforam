@@ -44,11 +44,10 @@ bool ZpData::operator==(const ZpData &rhs) {
     return BN_cmp(this->data_, rhs.data_) == 0;
 }
 
-std::vector<uchar> ZpData::Dump() {
+void ZpData::Dump(std::vector<uchar> &data) {
     uint size = BN_num_bytes(this->data_);
-    std::vector<uchar> data(size);
+    data.resize(size);
     BN_bn2bin(this->data_, data.data());
-    return data;
 }
 
 void ZpData::Load(std::vector<uchar> &data) {
