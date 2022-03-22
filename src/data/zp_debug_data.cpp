@@ -25,15 +25,13 @@ ZpDebugData ZpDebugData::operator-() {
     return *this;
 }
 
-ZpDebugData &ZpDebugData::operator+=(const ZpDebugData &rhs) {
-    this->data_ = (this->data_ + rhs.data_) % this->p_;
-    return *this;
+void ZpDebugData::Add(const ZpDebugData &a, const ZpDebugData &b, ZpDebugData &r) {
+    r.data_ = (a.data_ + b.data_) % ZpDebugData::p_;
 }
 
-ZpDebugData &ZpDebugData::operator-=(const ZpDebugData &rhs) {
-    uint neg = this->p_ - rhs.data_;
-    this->data_ = (this->data_ + neg) % this->p_;
-    return *this;
+void ZpDebugData::Minus(const ZpDebugData &a, const ZpDebugData &b, ZpDebugData &r) {
+    uint neg = ZpDebugData::p_ - b.data_;
+    r.data_ = (a.data_ + neg) % ZpDebugData::p_;
 }
 
 bool ZpDebugData::operator==(const ZpDebugData &rhs) {

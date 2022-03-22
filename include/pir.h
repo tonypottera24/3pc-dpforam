@@ -15,6 +15,7 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
     debug_print("[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // only accept power of 2 n
+    // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
 
     // std::chrono::high_resolution_clock::time_point t1, t2;
     // t1 = std::chrono::high_resolution_clock::now();
@@ -48,17 +49,26 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
     std::vector<uchar> dpf_out(n);
 
     for (uint b = 0; b < 2; b++) {
+        // t2 = std::chrono::high_resolution_clock::now();
+        // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // fprintf(stderr, "time1.1 = %llu\n", time);
         if (pseudo) {
             fss.PseudoEvalAll(query_23[b], n, dpf_out);
         } else {
             fss.EvalAll(query_23[b], log_n, dpf_out);
         }
+        // t2 = std::chrono::high_resolution_clock::now();
+        // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // fprintf(stderr, "time1.2 = %llu\n", time);
         for (uint i = 0; i < array_23[0].size(); i++) {
             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
-                v_sum[b] += array_23[b][i];
+                D::Add(v_sum[b], array_23[b][i], v_sum[b]);
             }
         }
+        // t2 = std::chrono::high_resolution_clock::now();
+        // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // fprintf(stderr, "time1.3 = %llu\n", time);
     }
 
     // t2 = std::chrono::high_resolution_clock::now();
@@ -66,9 +76,9 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
     // fprintf(stderr, "time2 = %llu\n", time);
 
     if (is_symmetric) {
-        v_out_13 = v_sum[0] + v_sum[1];
+        D::Add(v_sum[0], v_sum[1], v_out_13);
     } else {
-        v_out_13 = inv_gadget::Inv(peer, is_0, v_sum, count_band);
+        inv_gadget::Inv(peer, is_0, v_sum, v_out_13, count_band);
     }
 
     // t2 = std::chrono::high_resolution_clock::now();
@@ -88,11 +98,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     const uint digest_size = 4;
     const uint digest_size_log = digest_size * 8;
     const EVP_MD *sha256 = EVP_sha256();
+    uint key_size = key_array_13[0].Size();
+    K key(key_size);
 
     uint v_sum = 0;
     if (party == 2) {
         const uint P0 = 1;
-        K key = key_23[0] + key_23[1];
+        K::Add(key_23[0], key_23[1], key);
         key.Print("key");
         std::vector<uchar> key_dump;
         key.Dump(key_dump);
@@ -140,7 +152,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         uint64_t key_array_digest[key_array_13.size()];
         std::unordered_map<uint64_t, uint> exists;
         for (uint i = 0; i < key_array_13.size(); i++) {
-            K key = key_array_13[i] - key_23[1 - party];
+            K::Minus(key_array_13[i], key_23[1 - party], key);
 
             // t2 = std::chrono::high_resolution_clock::now();
             // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
@@ -236,17 +248,17 @@ void SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint ind
         std::vector<D> u(n, D(data_size));
         peer[P2].ReadData(u);
         for (uint i = 0; i < n; i++) {
-            u[i] += array_13[i];
+            D::Add(u[i], array_13[i], u[i]);
         }
-        v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, count_band);
+        SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, v_out_13, count_band);
 
         D tmp(data_size);
         tmp.Random(peer[P2].PRG());
-        v_out_13 -= tmp;
+        D::Minus(v_out_13, tmp, v_out_13);
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;
         const uint P2 = 1;
-        v_out_13 = SSOT::P1(peer, index_23[P2], array_13, count_band);
+        SSOT::P1(peer, index_23[P2], array_13, v_out_13, count_band);
     }
 }
 

@@ -1,6 +1,6 @@
 #include "util.h"
 
-void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uint len) {
+void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len) {
     // for (uint64_t i = 0; i < len; i++) {
     //     out[i] = a[i] ^ b[i];
     // }
@@ -18,7 +18,7 @@ void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uint len) {
     }
 }
 
-void xor_bytes(uchar *r, const uchar *a, const uchar *b, const uchar *c, const uint len) {
+void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uchar *r, const uint len) {
     // for (uint64_t i = 0; i < len; i++) {
     //     output[i] = a[i] ^ b[i] ^ c[i];
     // }

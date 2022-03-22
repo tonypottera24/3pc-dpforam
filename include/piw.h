@@ -15,7 +15,7 @@ void FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, D v_out_3
 
         D v_delta_33[2] = {D(data_size), D(data_size)};
         v_delta_33[0].Random();
-        v_delta_33[1] = v_delta_13 - v_delta_33[0];
+        D::Minus(v_delta_13, v_delta_33[0], v_delta_33[1]);
         v_delta_33[0].Print("v_delta_33[0]");
         v_delta_33[1].Print("v_delta_33[1]");
 
@@ -43,16 +43,16 @@ void FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, D v_out_3
                     debug_print("FindDeltaData, P0, is_02 = %u\n", is_02);
                     v_delta_33[1].Print("v_delta_33[1]");
                     (-v_delta_33[1]).Print("-v_delta_33[1]");
-                    std::vector<D>
-                        u = {v_delta_33[1], -v_delta_33[1]};
-                    D w0 = SSOT::P0(peer, is_02, u, count_band);
+                    std::vector<D> u = {v_delta_33[1], -v_delta_33[1]};
+                    D w0(data_size);
+                    SSOT::P0(peer, is_02, u, w0, count_band);
                     w0.Print("w0");
                     if (d == 0) {
                         peer[P1].WriteData(w0, count_band);
                     } else {
                         D w1(data_size);
                         peer[P1].ReadData(w1);
-                        v_out_33[1] = w0 + w1;
+                        D::Add(w0, w1, v_out_33[1]);
                         v_out_33[1].Print("v_out_33[1]");
                     }
                 } else {  // P1
@@ -63,12 +63,13 @@ void FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, D v_out_3
                     v_delta_33[0].Print("v_delta_33[0]");
                     (-v_delta_33[0]).Print("-v_delta_33[0]");
                     std::vector<D> v = {v_delta_33[0], -v_delta_33[0]};
-                    D w1 = SSOT::P1(peer, is_02, v, count_band);
+                    D w1(data_size);
+                    SSOT::P1(peer, is_02, v, w1, count_band);
                     w1.Print("w1");
                     if (d == 0) {
                         D w0(data_size);
                         peer[P0].ReadData(w0);
-                        v_out_33[0] = w0 + w1;
+                        D::Add(w0, w1, v_out_33[0]);
                         v_out_33[0].Print("v_out_33[0]");
                     } else {
                         peer[P0].WriteData(w1, count_band);
@@ -116,7 +117,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
         for (uint i = 0; i < array_13.size(); i++) {
             // debug_print("[%llu]DPF_PIW, i = %llu, ii = %llu, dpf_out = %u\n", this->Size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
-                array_13[i] += v_delta_33[b];
+                D::Add(array_13[i], v_delta_33[b], array_13[i]);
             }
         }
     }
@@ -129,7 +130,7 @@ void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
     debug_print("[%lu]PIW, index_23 = (%u, %u), n = %u\n", array_13.size(), index_23[0], index_23[1], n);
     if (n == 1) {
-        array_13[0] += v_delta_13;
+        D::Add(array_13[0], v_delta_13, array_13[0]);
     } else {
         bool pseudo = (n <= PSEUDO_DPF_THRESHOLD);
         DPF_PIW(party, peer, fss, array_13, n, log_n, clean_index_23, v_delta_13, pseudo, count_band);

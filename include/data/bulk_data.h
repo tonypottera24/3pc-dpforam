@@ -16,15 +16,6 @@ private:
 public:
     std::vector<D> data_;
 
-    friend BulkData operator+(BulkData lhs, const BulkData &rhs) {
-        lhs += rhs;
-        return lhs;
-    }
-    friend BulkData operator-(BulkData lhs, const BulkData &rhs) {
-        lhs -= rhs;
-        return lhs;
-    }
-
     uint Size() {
         if (this->data_.size() == 0) {
             return 0;
@@ -73,20 +64,18 @@ public:
         return *this;
     }
 
-    BulkData<D> &operator+=(const BulkData &rhs) {
-        assert(this->data_.size() == rhs.data_.size());
-        for (uint i = 0; i < this->data_.size(); i++) {
-            this->data_[i] += rhs.data_[i];
+    static void Add(const BulkData<D> &a, const BulkData<D> &b, BulkData<D> &r) {
+        assert(a.data_.size() == b.data_.size() && a.data_.size() == r.data_.size());
+        for (uint i = 0; i < a.data_.size(); i++) {
+            D::Add(a.data_[i], b.data_[i], r.data_[i]);
         }
-        return *this;
     }
 
-    BulkData<D> &operator-=(const BulkData &rhs) {
-        assert(this->data_.size() == rhs.data_.size());
-        for (uint i = 0; i < this->data_.size(); i++) {
-            this->data_[i] -= rhs.data_[i];
+    static void Minus(const BulkData<D> &a, const BulkData<D> &b, BulkData<D> &r) {
+        assert(a.data_.size() == b.data_.size() && a.data_.size() == r.data_.size());
+        for (uint i = 0; i < a.data_.size(); i++) {
+            D::Minus(a.data_[i], b.data_[i], r.data_[i]);
         }
-        return *this;
     }
 
     bool operator==(const BulkData &rhs) {

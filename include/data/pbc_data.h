@@ -30,17 +30,9 @@
 
 //     PBCData &operator=(const PBCData &other);
 //     PBCData operator-();
-//     PBCData &operator+=(const PBCData &rhs);
-//     PBCData &operator-=(const PBCData &rhs);
+// static void Add(const PBCData &a, const PBCData &b, PBCData &r);
+// static void Minus(const PBCData &a, const PBCData &b, PBCData &r);
 //     bool operator==(const PBCData &rhs);
-//     friend PBCData operator+(PBCData lhs, const PBCData &rhs) {
-//         lhs += rhs;
-//         return lhs;
-//     }
-//     friend PBCData operator-(PBCData lhs, const PBCData &rhs) {
-//         lhs -= rhs;
-//         return lhs;
-//     }
 
 //     void Dump(std::vector<uchar> &data);
 //     void Load(std::vector<uchar> &data);

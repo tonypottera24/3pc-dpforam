@@ -35,7 +35,7 @@ typedef __m128i uint128;
         })
 
 uint128 dpf_seed(uint128 *seed);
-uint128 dpf_random_block(void);
+uint128 dpf_random_block();
 uint128 *dpf_allocate_blocks(size_t nblocks);
 
 void dpf_cb(uint128 input);

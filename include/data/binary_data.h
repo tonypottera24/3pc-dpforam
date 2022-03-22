@@ -23,17 +23,10 @@ public:
     BinaryData &operator=(const BinaryData &other);
     // BinaryData &operator=(BinaryData &&other) noexcept;
     BinaryData operator-();
-    BinaryData &operator+=(const BinaryData &rhs);
-    BinaryData &operator-=(const BinaryData &rhs);
     bool operator==(const BinaryData &rhs);
-    friend BinaryData operator+(BinaryData lhs, const BinaryData &rhs) {
-        lhs += rhs;
-        return lhs;
-    }
-    friend BinaryData operator-(BinaryData lhs, const BinaryData &rhs) {
-        lhs -= rhs;
-        return lhs;
-    }
+
+    static void Add(const BinaryData &a, const BinaryData &b, BinaryData &r);
+    static void Minus(const BinaryData &a, const BinaryData &b, BinaryData &r);
 
     void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);

@@ -31,16 +31,14 @@ ECData ECData::operator-() {
     return *this;
 }
 
-ECData &ECData::operator+=(const ECData &rhs) {
-    EC_POINT_add(this->curve_, this->data_, this->data_, rhs.data_, this->bn_ctx_);
-    return *this;
+void ECData::Add(const ECData &a, const ECData &b, ECData &r) {
+    EC_POINT_add(ECData::curve_, r.data_, a.data_, b.data_, ECData::bn_ctx_);
 }
 
-ECData &ECData::operator-=(const ECData &rhs) {
-    EC_POINT_invert(this->curve_, this->data_, this->bn_ctx_);
-    EC_POINT_add(this->curve_, this->data_, this->data_, rhs.data_, this->bn_ctx_);
-    EC_POINT_invert(this->curve_, this->data_, this->bn_ctx_);
-    return *this;
+void ECData::Minus(const ECData &a, const ECData &b, ECData &r) {
+    EC_POINT_copy(r.data_, b.data_);
+    EC_POINT_invert(ECData::curve_, r.data_, ECData::bn_ctx_);
+    EC_POINT_add(ECData::curve_, a.data_, r.data_, r.data_, ECData::bn_ctx_);
 }
 
 bool ECData::operator==(const ECData &rhs) {

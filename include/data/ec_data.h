@@ -11,13 +11,13 @@
 #include "util.h"
 
 class ECData {
-private:
+public:
     EC_POINT *data_;
     const static inline EC_GROUP *curve_ = EC_GROUP_new_by_curve_name(NID_secp256k1);
+    static inline BN_CTX *bn_ctx_ = BN_CTX_new();
     const static inline EC_POINT *g_ = EC_GROUP_get0_generator(EC_GROUP_new_by_curve_name(NID_secp256k1));
     const static inline uint size_ = 65;
     // const static inline uint size_ = 33;
-    static inline BN_CTX *bn_ctx_ = BN_CTX_new();
     const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
 
@@ -29,17 +29,10 @@ public:
 
     ECData &operator=(const ECData &other);
     ECData operator-();
-    ECData &operator+=(const ECData &rhs);
-    ECData &operator-=(const ECData &rhs);
     bool operator==(const ECData &rhs);
-    friend ECData operator+(ECData lhs, const ECData &rhs) {
-        lhs += rhs;
-        return lhs;
-    }
-    friend ECData operator-(ECData lhs, const ECData &rhs) {
-        lhs -= rhs;
-        return lhs;
-    }
+
+    static void Add(const ECData &a, const ECData &b, ECData &r);
+    static void Minus(const ECData &a, const ECData &b, ECData &r);
 
     void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);

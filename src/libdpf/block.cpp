@@ -42,7 +42,7 @@ uint128 dpf_random_block(void) {
 }
 
 uint128 *dpf_allocate_blocks(size_t nblocks) {
-    //int res;
+    // int res;
     uint128 *blks = NULL;
     blks = (uint128 *)calloc(nblocks, sizeof(uint128));
     /* res = posix_memalign((void **) &blks, 128, sizeof(block) * nblocks); */
@@ -67,7 +67,7 @@ void _output_bit_to_bit(uint64_t input) {
 void dpf_cb(uint128 input) {
     uint64_t *val = (uint64_t *)&input;
 
-    //fprintf(stderr,"%016lx%016lx\n", val[0], val[1]);
+    // fprintf(stderr,"%016lx%016lx\n", val[0], val[1]);
     _output_bit_to_bit(val[0]);
     _output_bit_to_bit(val[1]);
     fprintf(stderr, "\n");

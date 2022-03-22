@@ -1,6 +1,10 @@
 #ifndef FSS_H_
 #define FSS_H_
 
+#include <string.h>
+#include <x86intrin.h>
+
+#include <algorithm>
 #include <vector>
 
 #include "binary_data.h"

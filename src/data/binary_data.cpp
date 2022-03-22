@@ -30,16 +30,14 @@ BinaryData BinaryData::operator-() {
     return *this;
 }
 
-BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
-    assert(this->data_.size() == rhs.data_.size());
-    xor_bytes(this->data_.data(), this->data_.data(), rhs.data_.data(), this->data_.size());
-    return *this;
+void BinaryData::Add(const BinaryData &a, const BinaryData &b, BinaryData &r) {
+    assert(a.data_.size() == b.data_.size() && a.data_.size() == r.data_.size());
+    xor_bytes(a.data_.data(), b.data_.data(), r.data_.data(), a.data_.size());
 }
 
-BinaryData &BinaryData::operator-=(const BinaryData &rhs) {
-    assert(this->data_.size() == rhs.data_.size());
-    xor_bytes(this->data_.data(), this->data_.data(), rhs.data_.data(), this->data_.size());
-    return *this;
+void BinaryData::Minus(const BinaryData &a, const BinaryData &b, BinaryData &r) {
+    assert(a.data_.size() == b.data_.size() && a.data_.size() == r.data_.size());
+    xor_bytes(a.data_.data(), b.data_.data(), r.data_.data(), a.data_.size());
 }
 
 bool BinaryData::operator==(const BinaryData &rhs) {

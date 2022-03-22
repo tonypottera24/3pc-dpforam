@@ -82,10 +82,10 @@ int main(int argc, char *argv[]) {
     PSEUDO_DPF_THRESHOLD = 1 << LOG_PSEUDO_DPF_THRESHOLD;
     fprintf(stderr, "Pseudo DPF threshold %u\n", PSEUDO_DPF_THRESHOLD);
 
-    uint threads = vm["threads"].as<uint>();
+    // uint threads = vm["threads"].as<uint>();
     uint iterations = vm["iterations"].as<uint>();
 
-    omp_set_num_threads(threads);
+    // omp_set_num_threads(threads);
 
     Peer peer[2];
     // fprintf(stderr, "Initilizing server %s:%u...\n", ip.c_str(), port);
