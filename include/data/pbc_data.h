@@ -42,7 +42,7 @@
 //         return lhs;
 //     }
 
-//     void Dump(std::vector<uchar> &data);
+//     std::vector<uchar> Dump();
 //     void Load(std::vector<uchar> &data);
 //     void Reset();
 //     void Resize(const uint size);

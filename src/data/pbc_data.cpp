@@ -44,7 +44,7 @@
 //     return element_cmp(this->data_, rhs.data_) == 0;
 // }
 
-// void PBCData::Dump(std::vector<uchar> &data) {
+// std::vector<uchar> PBCData::Dump() {
 //     EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_UNCOMPRESSED, data.data(), data.size(), this->bn_ctx_);
 // }
 

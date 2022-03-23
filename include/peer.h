@@ -35,8 +35,7 @@ public:
     template <typename D>
     void WriteData(D &data, bool count_band) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
-        std::vector<uchar> dump;
-        data.Dump(dump);
+        std::vector<uchar> dump = data.Dump();
         this->socket_.Write(dump.data(), dump.size(), count_band);
     }
 
@@ -57,9 +56,8 @@ public:
     template <typename D>
     void WriteData(std::vector<D> &data, bool count_band) {
         std::vector<uchar> buffer;
-        std::vector<uchar> dump;
         for (uint i = 0; i < data.size(); i++) {
-            data[i].Dump(dump);
+            std::vector<uchar> dump = data[i].Dump();
             buffer.insert(buffer.end(), dump.begin(), dump.end());
         }
         this->socket_.Write(buffer.data(), buffer.size(), count_band);
