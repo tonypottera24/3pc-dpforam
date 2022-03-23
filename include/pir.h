@@ -100,7 +100,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         const uint P0 = 1;
         K key = key_23[0] + key_23[1];
         key.Print("key");
-        std::vector<uchar> key_dump = key.Dump();
+        std::vector<uchar> key_dump;
+        key.Dump(key_dump);
         // print_bytes(key_dump.data(), key_dump.size(), "key_dump");
 
         for (uint b = 0; b < 2; b++) {
@@ -151,7 +152,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
             // fprintf(stderr, "time1.1 = %llu\n", time);
 
-            key_dump_array[i] = key.Dump();
+            key.Dump(key_dump_array[i]);
 
             // t2 = std::chrono::high_resolution_clock::now();
             // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();

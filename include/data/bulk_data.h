@@ -97,13 +97,14 @@ public:
         return *this;
     }
 
-    std::vector<uchar> Dump() {
-        std::vector<uchar> data;
+    void Dump(std::vector<uchar> &data) {
+        data.resize(this->Size());
+        std::vector<uchar> dump;
         for (uint i = 0; i < this->data_.size(); i++) {
-            std::vector<uchar> dump = this->data_[i].Dump();
-            data.insert(data.end(), dump.begin(), dump.end());
+            this->data_[i].Dump(dump);
+            memcpy(data.data() + i * dump.size(), dump.data(), dump.size());
+            // data.insert(data.end(), dump.begin(), dump.end());
         }
-        return data;
     }
 
     void Load(std::vector<uchar> &data) {
