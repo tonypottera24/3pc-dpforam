@@ -100,10 +100,10 @@ void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_pe
         uint start_index = data_per_block * r;
         uint end_index = std::min(data_per_block * (r + 1), size);
         tmp_write_data.insert(tmp_write_data.begin(), write_data.begin() + start_index, write_data.begin() + end_index);
-        write_peer.WriteData(tmp_write_data, count_band);
+        write_peer.WriteDataVector(tmp_write_data, count_band);
 
         std::vector<D> tmp_read_data(end_index - start_index, D(data_size));
-        read_peer.ReadData(tmp_read_data);
+        read_peer.ReadDataVector(tmp_read_data);
         for (uint i = 0; i < tmp_read_data.size(); i++) {
             read_data[start_index + i] = tmp_read_data[i];
         }

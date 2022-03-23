@@ -11,14 +11,16 @@ class BinaryData {
 private:
     const bool is_symmetric_ = true;
     static inline PRG *prg_ = new PRG();
-
-public:
     std::vector<uchar> data_;
 
+public:
     BinaryData();
     BinaryData(const BinaryData &other);
     BinaryData(const uint size);
     ~BinaryData();
+
+    // inline std::vector<uchar> &GetData() { return this->data_; }
+    // inline void SetData(std::vector<uchar> &data) { return this->data_; }
 
     BinaryData &operator=(const BinaryData &other);
     // BinaryData &operator=(BinaryData &&other) noexcept;
@@ -36,7 +38,7 @@ public:
         return lhs;
     }
 
-    void Dump(std::vector<uchar> &data);
+    std::vector<uchar> Dump();
     void Load(std::vector<uchar> &data);
     void Reset();
     void Resize(const uint size);

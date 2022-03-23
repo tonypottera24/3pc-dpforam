@@ -128,7 +128,7 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 
     std::vector<uchar> dump;
     for (uint b = 0; b < 2; b++) {
-        old_cache_index_23[b].Dump(dump);
+        dump = old_cache_index_23[b].Dump();
         cache_index_23[b] = bytes_to_uint(dump.data(), dump.size());
         is_cached_23[b] = cache_index_23[b] & 1;
         cache_index_23[b] = (cache_index_23[b] >> 1) % n;
@@ -176,7 +176,8 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
     // ShareTwoThird(this->peer_, this->last_read_block_13_.data_, last_read_block_23, !read_only);
     // PIR::PIR(this->peer_, this->fss_, last_read_block_23, data_index_23, this->last_read_data_13_, !read_only);
 
-    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, !read_only);
+    std::vector<D> last_read_block_13_data = this->last_read_block_13_.GetData();
+    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, last_read_block_13_data, data_index_23, !read_only);
 
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
@@ -217,14 +218,16 @@ void DPFORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) 
         data_index_23[b] = index_23[b] % DATA_PER_BLOCK;
     }
 
-    BulkData<D> new_block_13 = this->last_read_block_13_;
-
     v_new_13.Print("v_new_13");
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
     D v_delta_13 = v_new_13 - this->last_read_data_13_;
 
-    PIW::PIW(this->party_, this->peer_, this->fss_, new_block_13.data_, data_index_23, v_delta_13, count_band);
+    BulkData<D> new_block_13 = this->last_read_block_13_;
+    std::vector<D> new_block_13_data = new_block_13.GetData();
+
+    PIW::PIW(this->party_, this->peer_, this->fss_, new_block_13_data, data_index_23, v_delta_13, count_band);
+    new_block_13.SetData(new_block_13_data);
 
     if (this->write_array_13_.size() == 1) {
         this->write_array_13_[0] = new_block_13;

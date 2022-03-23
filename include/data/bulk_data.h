@@ -12,9 +12,16 @@ template <typename D>
 class BulkData {
 private:
     static inline PRG *prg_ = new PRG();
+    std::vector<D> data_;
 
 public:
-    std::vector<D> data_;
+    std::vector<D> GetData() {
+        return this->data_;
+    }
+
+    void SetData(std::vector<D> &data) {
+        this->data_ = data;
+    }
 
     friend BulkData operator+(BulkData lhs, const BulkData &rhs) {
         lhs += rhs;
@@ -39,7 +46,7 @@ public:
             return this->data_[0].IsSymmetric();
         }
     }
-    std::vector<D> Data() { return this->data_; }
+    inline std::vector<D> &Data() { return this->data_; }
 
     BulkData() {
         this->data_.resize(DATA_PER_BLOCK);
@@ -97,14 +104,14 @@ public:
         return *this;
     }
 
-    void Dump(std::vector<uchar> &data) {
-        data.resize(this->Size());
+    std::vector<uchar> Dump() {
+        std::vector<uchar> data;
         std::vector<uchar> dump;
         for (uint i = 0; i < this->data_.size(); i++) {
-            this->data_[i].Dump(dump);
-            memcpy(data.data() + i * dump.size(), dump.data(), dump.size());
-            // data.insert(data.end(), dump.begin(), dump.end());
+            dump = this->data_[i].Dump();
+            data.insert(data.end(), dump.begin(), dump.end());
         }
+        return data;
     }
 
     void Load(std::vector<uchar> &data) {
@@ -147,6 +154,120 @@ public:
             this->data_[i].Print();
         }
         debug_print("\n");
+#endif
+    }
+};
+
+template <>
+class BulkData<BinaryData> {
+private:
+    static inline PRG *prg_ = new PRG();
+    BinaryData data_;
+
+public:
+    friend BulkData operator+(BulkData lhs, const BulkData &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend BulkData operator-(BulkData lhs, const BulkData &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
+
+    uint Size() {
+        return this->data_.Size();
+    }
+
+    bool IsSymmetric() {
+        return true;
+    }
+
+    std::vector<BinaryData> GetData() {
+        uint data_size = this->data_.Size() / DATA_PER_BLOCK;
+        std::vector<uchar> dump = this->data_.Dump();
+        std::vector<BinaryData> data(DATA_PER_BLOCK, BinaryData(data_size));
+        for (uint i = 0; i < DATA_PER_BLOCK; i++) {
+            std::vector<uchar> buffer(dump.begin() + i * data_size, dump.begin() + (i + 1) * data_size);
+            data[i].Load(buffer);
+        }
+        return data;
+    }
+
+    void SetData(std::vector<BinaryData> &data) {
+        assert(data.size() == DATA_PER_BLOCK);
+        std::vector<uchar> buffer;
+        for (uint i = 0; i < DATA_PER_BLOCK; i++) {
+            std::vector<uchar> data_dump = data[i].Dump();
+            buffer.insert(buffer.end(), data_dump.begin(), data_dump.end());
+        }
+        this->data_.Load(buffer);
+    }
+
+    BulkData() {
+    }
+
+    BulkData(const uint size) {
+        this->Resize(size);
+        this->Reset();
+    }
+
+    BulkData(const BulkData &other) {
+        this->data_ = other.data_;
+    }
+
+    ~BulkData() {
+        // this->data_.clear();
+    }
+
+    BulkData<BinaryData> &operator=(const BulkData<BinaryData> &other) {
+        // copy operation
+        if (this == &other) return *this;
+        this->data_ = other.data_;
+        return *this;
+    }
+
+    BulkData<BinaryData> operator-() {
+        this->data_ = -this->data_;
+        return *this;
+    }
+
+    bool operator==(const BulkData<BinaryData> &rhs) {
+        return this->data_ == rhs.data_;
+    }
+
+    BulkData<BinaryData> &operator+=(const BulkData<BinaryData> &rhs) {
+        this->data_ += rhs.data_;
+        return *this;
+    }
+
+    BulkData<BinaryData> &operator-=(const BulkData<BinaryData> &rhs) {
+        this->data_ -= rhs.data_;
+        return *this;
+    }
+
+    std::vector<uchar> Dump() {
+        return this->data_.Dump();
+    }
+
+    void Load(std::vector<uchar> &data) {
+        this->data_.Load(data);
+    }
+
+    void Reset() {
+        this->data_.Reset();
+    }
+
+    void Resize(const uint size) {
+        this->data_.Resize(size);
+    }
+
+    void Random(PRG *prg = NULL) {
+        this->data_.Random(prg);
+    }
+
+    void Print(const char *title = "") {
+#ifdef DEBUG
+        this->data_.Print(title);
 #endif
     }
 };

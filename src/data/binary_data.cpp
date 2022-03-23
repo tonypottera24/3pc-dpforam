@@ -47,8 +47,8 @@ bool BinaryData::operator==(const BinaryData &rhs) {
            memcmp(this->data_.data(), rhs.data_.data(), this->data_.size()) == 0;
 }
 
-void BinaryData::Dump(std::vector<uchar> &data) {
-    data = this->data_;
+std::vector<uchar> BinaryData::Dump() {
+    return this->data_;
 }
 
 void BinaryData::Load(std::vector<uchar> &data) {

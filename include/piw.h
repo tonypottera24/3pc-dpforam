@@ -47,7 +47,7 @@ void FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, D v_out_3
                     D w0 = SSOT::P0(peer, is_02, u, count_band);
                     w0.Print("w0");
                     if (d == 0) {
-                        peer[P1].WriteData(w0, count_band);
+                        peer[P1].WriteData<D>(w0, count_band);
                     } else {
                         D w1(data_size);
                         peer[P1].ReadData(w1);

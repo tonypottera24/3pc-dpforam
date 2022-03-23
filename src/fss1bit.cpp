@@ -72,7 +72,7 @@ void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, Bin
 }
 
 bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
-    uint128 dpf_out = EVAL(&aes_key_, query.data_.data(), index);
+    uint128 dpf_out = EVAL(&aes_key_, query.Dump().data(), index);
     uint64_t index_mod = index % 128;
     uint64_t *val = (uint64_t *)&dpf_out;
     if (index_mod < 64ll) {
@@ -85,7 +85,7 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
 
 void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &dpf_out) {
     uint n = 1 << log_n;
-    uint128 *res = EVALFULL(&aes_key_, query.data_.data());
+    uint128 *res = EVALFULL(&aes_key_, query.Dump().data());
     if (log_n <= 6) {
         to_byte_vector(((uint64_t *)res)[0], dpf_out.data(), n);
     } else {
@@ -103,7 +103,7 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
         query_23[b].Resize(byte_length);
         query_23[b].Random(peer[1 - b].PRG());
     }
-    std::vector<uchar> dpf_out = query_23[0].data_;
+    std::vector<uchar> dpf_out = query_23[0].Dump();
     uint index_byte = index >> 3;
     uint index_bit = index & 7;
     dpf_out[index_byte] ^= 1 << index_bit;
@@ -114,12 +114,12 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
 }
 
 bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
-    return get_buffer_bit(query.data_.data(), index);
+    return get_buffer_bit(query.Dump().data(), index);
 }
 
 void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> &dpf_out) {
     // uint index_byte = 0, index_bit = 0;
     for (uint i = 0; i < n; i++) {
-        dpf_out[i] = get_buffer_bit(query.data_.data(), i);
+        dpf_out[i] = get_buffer_bit(query.Dump().data(), i);
     }
 }
