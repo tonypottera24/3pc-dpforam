@@ -2,6 +2,13 @@
 
 void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len) {
     uint offset = 0;
+    for (uint i = offset; i + sizeof(uint128) <= len; i += sizeof(uint128)) {
+        uint128 *aa = (uint128 *)&a[offset];
+        uint128 *bb = (uint128 *)&b[offset];
+        uint128 *rr = (uint128 *)&r[offset];
+        (*rr) = (*aa) ^ (*bb);
+        offset = i + sizeof(uint128);
+    }
     for (uint i = offset; i + sizeof(uint64_t) <= len; i += sizeof(uint64_t)) {
         uint64_t *aa = (uint64_t *)&a[offset];
         uint64_t *bb = (uint64_t *)&b[offset];
@@ -30,6 +37,14 @@ void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len) {
 
 void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uchar *r, const uint len) {
     uint offset = 0;
+    for (uint i = offset; i + sizeof(uint128) <= len; i += sizeof(uint128)) {
+        uint128 *aa = (uint128 *)&a[offset];
+        uint128 *bb = (uint128 *)&b[offset];
+        uint128 *cc = (uint128 *)&c[offset];
+        uint128 *rr = (uint128 *)&r[offset];
+        (*rr) = (*aa) ^ (*bb) ^ (*cc);
+        offset = i + sizeof(uint128);
+    }
     for (uint i = offset; i + sizeof(uint64_t) <= len; i += sizeof(uint64_t)) {
         uint64_t *aa = (uint64_t *)&a[offset];
         uint64_t *bb = (uint64_t *)&b[offset];
