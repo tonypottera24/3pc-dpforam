@@ -7,7 +7,7 @@
 #include "util.h"
 
 class ZpDebugData {
-public:
+private:
     uint data_ = 0;
     const static uint p_ = 11;
     const bool is_symmetric_ = false;
@@ -21,10 +21,17 @@ public:
 
     ZpDebugData &operator=(const ZpDebugData &other);
     ZpDebugData operator-();
+    ZpDebugData &operator+=(const ZpDebugData &rhs);
+    ZpDebugData &operator-=(const ZpDebugData &rhs);
     bool operator==(const ZpDebugData &rhs);
-
-    static void Add(const ZpDebugData &a, const ZpDebugData &b, ZpDebugData &r);
-    static void Minus(const ZpDebugData &a, const ZpDebugData &b, ZpDebugData &r);
+    friend ZpDebugData operator+(ZpDebugData lhs, const ZpDebugData &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend ZpDebugData operator-(ZpDebugData lhs, const ZpDebugData &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
 
     void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);

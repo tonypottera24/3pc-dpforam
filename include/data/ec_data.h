@@ -11,7 +11,7 @@
 #include "util.h"
 
 class ECData {
-public:
+private:
     EC_POINT *data_;
     const static inline EC_GROUP *curve_ = EC_GROUP_new_by_curve_name(NID_secp256k1);
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
@@ -29,10 +29,17 @@ public:
 
     ECData &operator=(const ECData &other);
     ECData operator-();
+    ECData &operator+=(const ECData &rhs);
+    ECData &operator-=(const ECData &rhs);
     bool operator==(const ECData &rhs);
-
-    static void Add(const ECData &a, const ECData &b, ECData &r);
-    static void Minus(const ECData &a, const ECData &b, ECData &r);
+    friend ECData operator+(ECData lhs, const ECData &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend ECData operator-(ECData lhs, const ECData &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
 
     void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);

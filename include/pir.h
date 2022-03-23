@@ -11,7 +11,7 @@
 namespace PIR {
 
 template <typename D>
-void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, const uint log_n, const uint index_23[2], D &v_out_13, bool pseudo, bool count_band) {
+D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, const uint log_n, const uint index_23[2], bool pseudo, bool count_band) {
     debug_print("[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // only accept power of 2 n
@@ -63,7 +63,7 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
         for (uint i = 0; i < array_23[0].size(); i++) {
             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
-                D::Add(v_sum[b], array_23[b][i], v_sum[b]);
+                v_sum[b] += array_23[b][i];
             }
         }
         // t2 = std::chrono::high_resolution_clock::now();
@@ -76,14 +76,10 @@ void DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint 
     // fprintf(stderr, "time2 = %llu\n", time);
 
     if (is_symmetric) {
-        D::Add(v_sum[0], v_sum[1], v_out_13);
+        return v_sum[0] + v_sum[1];
     } else {
-        inv_gadget::Inv(peer, is_0, v_sum, v_out_13, count_band);
+        return inv_gadget::Inv(peer, is_0, v_sum, count_band);
     }
-
-    // t2 = std::chrono::high_resolution_clock::now();
-    // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    // fprintf(stderr, "time3 = %llu\n", time);
 }
 
 template <typename K>
@@ -98,13 +94,11 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     const uint digest_size = 4;
     const uint digest_size_log = digest_size * 8;
     const EVP_MD *sha256 = EVP_sha256();
-    uint key_size = key_array_13[0].Size();
-    K key(key_size);
 
     uint v_sum = 0;
     if (party == 2) {
         const uint P0 = 1;
-        K::Add(key_23[0], key_23[1], key);
+        K key = key_23[0] + key_23[1];
         key.Print("key");
         std::vector<uchar> key_dump;
         key.Dump(key_dump);
@@ -152,7 +146,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         uint64_t key_array_digest[key_array_13.size()];
         std::unordered_map<uint64_t, uint> exists;
         for (uint i = 0; i < key_array_13.size(); i++) {
-            K::Minus(key_array_13[i], key_23[1 - party], key);
+            K key = key_array_13[i] - key_23[1 - party];
 
             // t2 = std::chrono::high_resolution_clock::now();
             // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
@@ -231,11 +225,12 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 }
 
 template <typename D>
-void SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], D &v_out_13, bool count_band) {
+D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], bool count_band) {
     // TODO n may not be power of 2
     uint n = array_13.size();
     debug_print("[%lu]SSOT_PIR, n = %u, index_23 = (%u, %u)\n", array_13.size(), n, index_23[0], index_23[1]);
     uint data_size = array_13[0].Size();
+    D v_out_13(data_size);
     if (party == 2) {
         // const uint P1 = 0, P0 = 1;
         const uint P0 = 1;
@@ -248,31 +243,32 @@ void SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint ind
         std::vector<D> u(n, D(data_size));
         peer[P2].ReadData(u);
         for (uint i = 0; i < n; i++) {
-            D::Add(u[i], array_13[i], u[i]);
+            u[i] += array_13[i];
         }
-        SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, v_out_13, count_band);
+        v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, count_band);
 
         D tmp(data_size);
         tmp.Random(peer[P2].PRG());
-        D::Minus(v_out_13, tmp, v_out_13);
+        v_out_13 -= tmp;
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;
         const uint P2 = 1;
-        SSOT::P1(peer, index_23[P2], array_13, v_out_13, count_band);
+        v_out_13 = SSOT::P1(peer, index_23[P2], array_13, count_band);
     }
+    return v_out_13;
 }
 
 template <typename D>
-void PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], D &v_out_13, bool count_band) {
+D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], bool count_band) {
     uint n = pow2_ceil(array_23[0].size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
     debug_print("[%lu]PIR, n = %u\n", array_23[0].size(), n);
     if (n == 1) {
-        v_out_13 = array_23[0][0];
+        return array_23[0][0];
     } else {
         bool pseudo = (n <= PSEUDO_DPF_THRESHOLD);
-        DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, v_out_13, pseudo, count_band);
+        return DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, pseudo, count_band);
     }
 }
 

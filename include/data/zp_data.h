@@ -7,7 +7,7 @@
 #include "util.h"
 
 class ZpData {
-public:
+private:
     BIGNUM *data_;
     static const inline BIGNUM *p_ = BN_get0_nist_prime_256();
     // const static inline uint size_ = 64;
@@ -23,10 +23,17 @@ public:
 
     ZpData &operator=(const ZpData &other);
     ZpData operator-();
+    ZpData &operator+=(const ZpData &rhs);
+    ZpData &operator-=(const ZpData &rhs);
     bool operator==(const ZpData &rhs);
-
-    static void Add(const ZpData &a, const ZpData &b, ZpData &r);
-    static void Minus(const ZpData &a, const ZpData &b, ZpData &r);
+    friend ZpData operator+(ZpData lhs, const ZpData &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend ZpData operator-(ZpData lhs, const ZpData &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
 
     void Dump(std::vector<uchar> &data);
     void Load(std::vector<uchar> &data);

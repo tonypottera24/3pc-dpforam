@@ -30,12 +30,14 @@ ZpData ZpData::operator-() {
     return *this;
 }
 
-void ZpData::Add(const ZpData &a, const ZpData &b, ZpData &r) {
-    BN_mod_add(r.data_, a.data_, b.data_, ZpData::p_, ZpData::bn_ctx_);
+ZpData &ZpData::operator+=(const ZpData &rhs) {
+    BN_mod_add(this->data_, this->data_, rhs.data_, this->p_, this->bn_ctx_);
+    return *this;
 }
 
-void ZpData::Minus(const ZpData &a, const ZpData &b, ZpData &r) {
-    BN_mod_sub(r.data_, a.data_, b.data_, ZpData::p_, ZpData::bn_ctx_);
+ZpData &ZpData::operator-=(const ZpData &rhs) {
+    BN_mod_sub(this->data_, this->data_, rhs.data_, this->p_, this->bn_ctx_);
+    return *this;
 }
 
 bool ZpData::operator==(const ZpData &rhs) {

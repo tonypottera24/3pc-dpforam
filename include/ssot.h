@@ -18,10 +18,10 @@ void P2(Peer peer[2], const uint n, const uint data_size, bool count_band) {
         x.Random(peer[P0].PRG());
         y.Random(peer[P1].PRG());
         if (i == beta) {
-            D::Add(x, delta, xx);
+            xx = x + delta;
         }
         if (i == alpha) {
-            D::Minus(y, delta, yy);
+            yy = y - delta;
         }
     }
 
@@ -32,7 +32,7 @@ void P2(Peer peer[2], const uint n, const uint data_size, bool count_band) {
 }
 
 template <typename D>
-void P0(Peer peer[2], const uint b0, std::vector<D>& u, D& v_out, bool count_band) {
+D P0(Peer peer[2], const uint b0, std::vector<D>& u, bool count_band) {
     const uint P2 = 0, P1 = 1;
     debug_print("SSOT::P0, b0 = %u\n", b0);
     // Receive x0, x1, y, alpha from P2
@@ -60,7 +60,7 @@ void P0(Peer peer[2], const uint b0, std::vector<D>& u, D& v_out, bool count_ban
     // Send u0' and u1' to P1
     std::vector<D> uu(n, D(data_size));
     for (uint i = 0; i < n; i++) {
-        D::Add(u[b0 ^ i], x[t ^ i], uu[i]);
+        uu[i] = u[b0 ^ i] + x[t ^ i];
     }
     // peer[P1].WriteData(uu, count_band);
 
@@ -69,11 +69,11 @@ void P0(Peer peer[2], const uint b0, std::vector<D>& u, D& v_out, bool count_ban
 
     std::vector<D> vv(n, D(data_size));
     write_read_data(peer[P1], uu, peer[P1], vv, count_band);
-    D::Minus(vv[b0], y, v_out);
+    return vv[b0] - y;
 }
 
 template <typename D>
-void P1(Peer peer[2], const uint b1, std::vector<D>& v, D& v_out, bool count_band) {
+D P1(Peer peer[2], const uint b1, std::vector<D>& v, bool count_band) {
     const uint P0 = 0, P2 = 1;
     debug_print("SSOT::P1, b1 = %u\n", b1);
     // print_bytes(v01[0], data_size, "v01", 0);
@@ -103,7 +103,7 @@ void P1(Peer peer[2], const uint b1, std::vector<D>& v, D& v_out, bool count_ban
     // Send v0' and v1' to P0
     std::vector<D> vv(n, D(data_size));
     for (uint i = 0; i < n; i++) {
-        D::Add(v[b1 ^ i], y[s ^ i], vv[i]);
+        vv[i] = v[b1 ^ i] + y[s ^ i];
     }
     // peer[P0].WriteData(vv, count_band);
 
@@ -112,7 +112,7 @@ void P1(Peer peer[2], const uint b1, std::vector<D>& v, D& v_out, bool count_ban
 
     std::vector<D> uu(n, D(data_size));
     write_read_data(peer[P0], vv, peer[P0], uu, count_band);
-    D::Minus(uu[b1], x, v_out);
+    return uu[b1] - x;
 }
 
 };  // namespace SSOT

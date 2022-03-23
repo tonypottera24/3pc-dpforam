@@ -73,11 +73,12 @@ void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, BulkData<D> &out_block_13, const bool is_cached_23[2], bool count_band) {
+BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band) {
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = read_block_13.Size();
     debug_print("data_size = %u\n", data_size);
+    BulkData<D> out_block_13(data_size);
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
@@ -91,24 +92,25 @@ void DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache
         const uint P2 = 0, P1 = 1;
         BulkData<D> read_block_12(data_size);
         this->peer_[P2].ReadData(read_block_12);
-        BulkData<D>::Add(read_block_12, read_block_13, read_block_12);
+        read_block_12 += read_block_13;
 
         BulkData<D> cache_block_12(data_size);
         this->peer_[P2].ReadData(cache_block_12);
-        BulkData<D>::Add(cache_block_12, cache_block_13, cache_block_12);
+        cache_block_12 += cache_block_13;
 
         std::vector<BulkData<D>> u = {read_block_12, cache_block_12};
         const uint b0 = is_cached_23[P1] ^ is_cached_23[P2];
-        SSOT::P0(this->peer_, b0, u, out_block_13, count_band);
+        out_block_13 = SSOT::P0(this->peer_, b0, u, count_band);
     } else if (this->party_ == 1) {
         const uint P2 = 1;
         std::vector<BulkData<D>> v = {read_block_13, cache_block_13};
         const uint b1 = is_cached_23[P2];
-        SSOT::P1(this->peer_, b1, v, out_block_13, count_band);
+        out_block_13 = SSOT::P1(this->peer_, b1, v, count_band);
         BulkData<D> tmp(data_size);
         tmp.Random(this->peer_[P2].PRG());
-        BulkData<D>::Minus(out_block_13, tmp, out_block_13);
+        out_block_13 -= tmp;
     }
+    return out_block_13;
 }
 
 template <typename K, typename D>
@@ -119,8 +121,7 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 
     // read block from array
     uint pos_data_size = this->position_map_->DataSize();
-    BinaryData old_cache_index_13(pos_data_size);
-    this->position_map_->Read(index_23, old_cache_index_13, read_only);
+    BinaryData old_cache_index_13 = this->position_map_->Read(index_23, read_only);
     BinaryData old_cache_index_23[2] = {BinaryData(pos_data_size), BinaryData(pos_data_size)};
     ShareTwoThird(this->peer_, old_cache_index_13, old_cache_index_23, !read_only);
     old_cache_index_13.Print("old_index_13");
@@ -152,7 +153,7 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Read(const uint index_23[2], D &v_out_13, bool read_only) {
+D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -167,7 +168,7 @@ void DPFORAM<K, D>::Read(const uint index_23[2], D &v_out_13, bool read_only) {
         // } else if (n <= SSOT_THRESHOLD) {
         //     return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
     } else {
-        DPF_Read(block_index_23, this->last_read_block_13_, read_only);
+        this->last_read_block_13_ = DPF_Read(block_index_23, read_only);
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
 
@@ -175,37 +176,33 @@ void DPFORAM<K, D>::Read(const uint index_23[2], D &v_out_13, bool read_only) {
     // ShareTwoThird(this->peer_, this->last_read_block_13_.data_, last_read_block_23, !read_only);
     // PIR::PIR(this->peer_, this->fss_, last_read_block_23, data_index_23, this->last_read_data_13_, !read_only);
 
-    PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, this->last_read_data_13_, !read_only);
+    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, this->last_read_block_13_.data_, data_index_23, !read_only);
 
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
-    v_out_13 = this->last_read_data_13_;
+    return this->last_read_data_13_;
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::DPF_Read(const uint index_23[2], BulkData<D> &v_out_13, bool read_only) {
+BulkData<D> DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
     debug_print("[%u]DPF_Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
-    uint data_size = this->read_array_23_[0][0].Size();
-    BulkData<D> v_read_13(data_size);
-    PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, v_read_13, !read_only);
-    // v_read_13.Print("v_read_13");
+    BulkData<D> v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, !read_only);
 
     uint cache_index_23[2];
     bool is_cached_23[2];
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
     }
-    debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
+    // debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
-        v_out_13 = v_read_13;
+        return v_read_13;
     } else {
-        BulkData<D> v_cache_13(data_size);
-        PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, v_cache_13, !read_only);
+        BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, !read_only);
         v_cache_13.Print("v_cache_13");
 
-        GetLatestData(v_read_13, v_cache_13, v_out_13, is_cached_23, !read_only);
+        return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
     }
 }
 
@@ -225,9 +222,7 @@ void DPFORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) 
     v_new_13.Print("v_new_13");
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
-    uint data_size = v_new_13.Size();
-    D v_delta_13(data_size);
-    D::Minus(v_new_13, this->last_read_data_13_, v_delta_13);
+    D v_delta_13 = v_new_13 - this->last_read_data_13_;
 
     PIW::PIW(this->party_, this->peer_, this->fss_, new_block_13.data_, data_index_23, v_delta_13, count_band);
 
@@ -242,12 +237,7 @@ template <typename K, typename D>
 void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band) {
     debug_print("[%u]DPF_Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
-    uint bulk_data_size = old_block_13.Size();
-    BulkData<D> delta_block_13(bulk_data_size);
-    BulkData<D>::Minus(new_block_13, old_block_13, delta_block_13);
-
-    this->write_array_13_[0].Print("this->write_array_13_[0]");
-    delta_block_13.Print("delta_block_13");
+    BulkData<D> delta_block_13 = new_block_13 - old_block_13;
 
     PIW::PIW(this->party_, this->peer_, this->fss_, this->write_array_13_, index_23, delta_block_13, count_band);
     this->AppendCache(new_block_13, count_band);
@@ -338,9 +328,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
         write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], key_array_33[1], false);
 
         for (uint i = 0; i < n; i++) {
-            K k(key_size);
-            K::Add(key_array_33[0][i], key_array_33[1][i], k);
-            K::Add(k, key_array_33[2][i], k);
+            K k = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
             this->key_array_13_.push_back(k);
         }
     }
@@ -370,8 +358,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
                 this->peer_[1 - this->party_].WriteData(key_23[this->party_], false);
                 K k(key_size);
                 this->peer_[1 - this->party_].ReadData(k);
-                K::Minus(this->key_array_13_[index], key_23[this->party_], key_23[1 - this->party_]);
-                K::Minus(key_23[1 - this->party_], k, key_23[1 - this->party_]);
+                key_23[1 - this->party_] = this->key_array_13_[index] - key_23[this->party_] - k;
             }
 
             t1 = std::chrono::high_resolution_clock::now();
@@ -396,8 +383,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
         t1 = std::chrono::high_resolution_clock::now();
-        D old_data_13(data_size);
-        this->Read(index_23, old_data_13, false);
+        D old_data_13 = this->Read(index_23, false);
         t2 = std::chrono::high_resolution_clock::now();
         uint64_t delta_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         party_time += delta_time;
@@ -432,7 +418,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
         }
 
         std::vector<D> verify_data_13(3, D(data_size));
-        this->Read(index_23, verify_data_13[2], true);
+        verify_data_13[2] = this->Read(index_23, true);
 
         verify_data_13[2].Print("verify_data_13[2]");
 
@@ -442,18 +428,14 @@ void DPFORAM<K, D>::Test(uint iterations) {
         this->peer_[1].WriteData(verify_data_13[2], false);
         this->peer_[0].ReadData(verify_data_13[0]);
         this->peer_[1].ReadData(verify_data_13[1]);
-        D verify_data(data_size);
-        D::Add(verify_data_13[0], verify_data_13[1], verify_data);
-        D::Add(verify_data, verify_data_13[2], verify_data);
+        D verify_data = verify_data_13[0] + verify_data_13[1] + verify_data_13[2];
         verify_data.Print("verify_data");
 
         this->peer_[0].WriteData(new_data_13[2], false);
         this->peer_[1].WriteData(new_data_13[2], false);
         this->peer_[0].ReadData(new_data_13[0]);
         this->peer_[1].ReadData(new_data_13[1]);
-        D new_data(data_size);
-        D::Add(new_data_13[0], new_data_13[1], new_data);
-        D::Add(new_data, new_data_13[2], new_data);
+        D new_data = new_data_13[0] + new_data_13[1] + new_data_13[2];
         new_data.Print("new_data");
 
         if (verify_data == new_data) {

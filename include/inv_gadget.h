@@ -44,14 +44,14 @@ void P1(Peer peer[2], D m[2], const bool inv, bool count_band) {
 
     std::vector<D> mm(2);
     for (uint b = 0; b < 2; b++) {
-        D::Add(m[b ^ s], p[b ^ s], mm[b]);
+        mm[b] = m[b ^ s] + p[b ^ s];
     }
 
     peer[P2].WriteData(mm, count_band);
 }
 
 template <typename D>
-void P2(Peer peer[2], const uint data_size, const bool inv, D& v_out, bool count_band) {
+D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
     const uint P0 = inv ? 0 : 1;
     const uint P1 = inv ? 1 : 0;
     // debug_print("inv::P2 inv = %u\n", inv);
@@ -63,34 +63,31 @@ void P2(Peer peer[2], const uint data_size, const bool inv, D& v_out, bool count
     std::vector<D> mm(2, D(data_size));
     peer[P1].ReadData(mm);
 
-    D::Minus(mm[bb], pb, v_out);
+    return mm[bb] - pb;
 }
 
 template <typename D>
-void Inv(Peer peer[2], const bool is_0, D v[2], D& v_out, bool count_band) {
+D Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
     debug_print("Inv, is_0 = %u\n", is_0);
     uint data_size = v[0].Size();
 
     P0<D>(peer, is_0, data_size, false, count_band);
     D r(data_size);
     r.Random();
-    D m[2] = {D(data_size), D(data_size)};
-    D::Minus(v[1], r, m[0]);
-    D::Minus(-v[1], r, m[1]);
+    D m[2] = {v[1] - r, -v[1] - r};
     P1<D>(peer, m, false, count_band);
-    D mb(data_size);
-    P2(peer, data_size, false, mb, count_band);
-    D::Add(r, mb, v_out);
+    D mb = P2<D>(peer, data_size, false, count_band);
+    D v_inv = r + mb;
 
     // inv
     P0<D>(peer, !is_0, data_size, true, count_band);
     r.Random();
-    D::Minus(v[0], r, m[0]);
-    D::Minus(-v[0], r, m[1]);
+    m[0] = v[0] - r;
+    m[1] = -v[0] - r;
     P1(peer, m, true, count_band);
-    P2(peer, data_size, true, mb, count_band);
-    D::Add(v_out, r, v_out);
-    D::Add(v_out, mb, v_out);
+    mb = P2<D>(peer, data_size, true, count_band);
+    v_inv += r + mb;
+    return v_inv;
 }
 
 }  // namespace inv_gadget
