@@ -1,7 +1,7 @@
 #include "dpf_oram.h"
 
 template <typename K, typename D>
-DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer) {
+DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer), n_(n) {
     debug_print("DPFORAM n = %u, data_size = %u\n", n, data_size);
     this->last_read_block_13_.Resize(data_size * DATA_PER_BLOCK);
     this->last_read_block_13_.Reset();
@@ -261,7 +261,6 @@ void DPFORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
             this->position_map_->Reset();
         }
     }
-    debug_print("[%u]AppendCache GG\n", this->Size());
 }
 
 template <typename K, typename D>

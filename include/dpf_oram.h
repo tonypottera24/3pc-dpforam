@@ -29,6 +29,7 @@ private:
     uint party_;
     FSS1Bit fss_;
     Peer *peer_;
+    uint n_;
 
     std::vector<K> key_array_13_;
     std::vector<BulkData<D>> read_array_23_[2];
@@ -66,7 +67,7 @@ public:
 
     void PrintMetadata();
     inline uint Size() {
-        return this->write_array_13_.size() * DATA_PER_BLOCK;
+        return this->n_;
     }
     inline uint DataSize() {
         return this->write_array_13_[0].Size() / DATA_PER_BLOCK;

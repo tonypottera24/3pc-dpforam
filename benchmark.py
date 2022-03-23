@@ -28,8 +28,8 @@ PARTY = int(args.party)
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
-LOG_N = range(10, 25)
-# LOG_N = 20
+LOG_N = range(10, 28)
+# LOG_N = 25
 # TAU = range(1, 10)
 TAU = 5
 DATA_SIZE = 4
@@ -61,10 +61,10 @@ for logn in LOG_N:
 
 print("bandwidths")
 for i, v in enumerate(LOG_N):
-    print(f"({v}, {round(bandwidths[i] / 1000)})", end="")
+    print(f"({v}, {round(bandwidths[i] / 1000, 2)})", end="")
 print("\n")
 
 print("execution_times")
 for i, v in enumerate(LOG_N):
-    print(f"({v}, {round(execution_times[i] / 1000)})", end="")
+    print(f"({v}, {round(execution_times[i] / 1000, 2)})", end="")
 print()
