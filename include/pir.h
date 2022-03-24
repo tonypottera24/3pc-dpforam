@@ -62,17 +62,18 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 }
 
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], EVP_MD_CTX *md_ctx, uchar *sha256_digest, bool count_band) {
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], EVP_MD_CTX *md_ctx, uchar *md5_digest, bool count_band) {
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
-    std::chrono::high_resolution_clock::time_point t1, t2;
-    t1 = std::chrono::high_resolution_clock::now();
-    uint64_t time;
+    // std::chrono::high_resolution_clock::time_point t1, t2;
+    // t1 = std::chrono::high_resolution_clock::now();
+    // uint64_t time;
 
     const uint digest_size = 4;
     const uint digest_size_log = digest_size * 8;
-    const EVP_MD *sha256 = EVP_sha256();
+    const EVP_MD *evp_md5 = EVP_md5();
+    uint md5_digest_size;
 
     uint v_sum = 0;
     if (party == 2) {
@@ -87,12 +88,11 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 key_dump[0] ^= 1;
             }
 
-            EVP_DigestInit_ex(md_ctx, sha256, NULL);
+            EVP_DigestInit_ex(md_ctx, evp_md5, NULL);
             EVP_DigestUpdate(md_ctx, key_dump.data(), key_dump.size());
-            uint sha256_digest_size;
-            EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+            EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
             uint64_t digest_uint;
-            memcpy(&digest_uint, sha256_digest, digest_size);
+            memcpy(&digest_uint, md5_digest, digest_size);
 
             // print_bytes(digest, digest_size, "digest");
 
@@ -116,9 +116,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             query[b].Resize(query_size);
             peer[party].ReadData(query[b]);
         }
-        t2 = std::chrono::high_resolution_clock::now();
-        time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        fprintf(stderr, "time1 = %llu\n", time);
+        // t2 = std::chrono::high_resolution_clock::now();
+        // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // fprintf(stderr, "time1 = %llu\n", time);
 
         std::vector<uchar> key_dump_array[key_array_13.size()];
         uint64_t key_array_digest[key_array_13.size()];
@@ -126,32 +126,31 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         for (uint i = 0; i < key_array_13.size(); i++) {
             K key = key_array_13[i] - key_23[1 - party];
 
-            t2 = std::chrono::high_resolution_clock::now();
-            time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            fprintf(stderr, "time1.1 = %llu\n", time);
+            // t2 = std::chrono::high_resolution_clock::now();
+            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            // fprintf(stderr, "time1.1 = %llu\n", time);
 
             key_dump_array[i] = key.Dump();
 
-            t2 = std::chrono::high_resolution_clock::now();
-            time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            fprintf(stderr, "time1.2 = %llu\n", time);
+            // t2 = std::chrono::high_resolution_clock::now();
+            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            // fprintf(stderr, "time1.2 = %llu\n", time);
 
-            EVP_DigestInit_ex(md_ctx, sha256, NULL);
+            EVP_DigestInit_ex(md_ctx, evp_md5, NULL);
             EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
-            uint sha256_digest_size;
-            EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+            EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
 
-            t2 = std::chrono::high_resolution_clock::now();
-            time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            fprintf(stderr, "time1.3 = %llu\n", time);
+            // t2 = std::chrono::high_resolution_clock::now();
+            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            // fprintf(stderr, "time1.3 = %llu\n", time);
 
             uint64_t digest_uint;
-            memcpy(&digest_uint, sha256_digest, digest_size);
+            memcpy(&digest_uint, md5_digest, digest_size);
             key_array_digest[i] = digest_uint;
 
-            t2 = std::chrono::high_resolution_clock::now();
-            time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            fprintf(stderr, "time1.4 = %llu\n", time);
+            // t2 = std::chrono::high_resolution_clock::now();
+            // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            // fprintf(stderr, "time1.4 = %llu\n", time);
 
             if (exists.find(digest_uint) == exists.end()) {
                 exists[digest_uint] = 1;
@@ -159,9 +158,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 exists[digest_uint]++;
             }
         }
-        t2 = std::chrono::high_resolution_clock::now();
-        time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        fprintf(stderr, "time2 = %llu\n", time);
+        // t2 = std::chrono::high_resolution_clock::now();
+        // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // fprintf(stderr, "time2 = %llu\n", time);
 
         for (uint i = 0; i < key_array_13.size(); i++) {
             uint64_t key_digest = key_array_digest[i];
@@ -174,31 +173,30 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 }
             } else {  // collision
                 key_dump_array[i][0] ^= 1;
-                EVP_DigestInit_ex(md_ctx, sha256, NULL);
+                EVP_DigestInit_ex(md_ctx, evp_md5, NULL);
                 EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
-                uint sha256_digest_size;
-                EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+                EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
 
                 uint64_t sha256_digest_uint64;
-                memcpy((uchar *)&sha256_digest_uint64, sha256_digest, digest_size);
+                memcpy((uchar *)&sha256_digest_uint64, md5_digest, digest_size);
                 if (fss.Eval(query[1], sha256_digest_uint64)) {
                     v_sum ^= i;
                 }
                 // collision can still happen...
             }
         }
-        t2 = std::chrono::high_resolution_clock::now();
-        time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        fprintf(stderr, "time3 = %llu\n", time);
+        // t2 = std::chrono::high_resolution_clock::now();
+        // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        // fprintf(stderr, "time3 = %llu\n", time);
 
         if (party == 0) {
             const uint P2 = 0;
             v_sum ^= rand_uint(peer[P2].PRG());
         }
     }
-    t2 = std::chrono::high_resolution_clock::now();
-    time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    fprintf(stderr, "time4 = %llu\n", time);
+    // t2 = std::chrono::high_resolution_clock::now();
+    // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    // fprintf(stderr, "time4 = %llu\n", time);
     return v_sum % n;
 }
 

@@ -40,8 +40,8 @@ private:
     D last_read_data_13_;
     BulkData<D> last_read_block_13_;
 
-    static inline EVP_MD_CTX *md_ctx_ = EVP_MD_CTX_new();
-    static inline uchar *sha256_digest_ = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()));
+    EVP_MD_CTX *md_ctx_ = EVP_MD_CTX_new();
+    uchar *md5_digest_ = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_md5()));
 
 private:
     void Init();

@@ -28,7 +28,7 @@ PARTY = int(args.party)
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
-LOG_N = range(10, 20)
+LOG_N = range(10, 18)
 # LOG_N = 25
 # TAU = range(1, 10)
 TAU = 5

@@ -36,7 +36,7 @@ DPFORAM<K, D>::~DPFORAM() {
     }
     this->write_array_13_.clear();
     EVP_MD_CTX_free(this->md_ctx_);
-    OPENSSL_free(this->sha256_digest_);
+    OPENSSL_free(this->md5_digest_);
 }
 
 template <typename K, typename D>
@@ -67,7 +67,7 @@ void DPFORAM<K, D>::ResetArray(std::vector<BulkData<D>> &array) {
 template <typename K, typename D>
 void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
     debug_print("[%u]KeyToIndex\n", this->Size());
-    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->md_ctx_, this->sha256_digest_, count_band);
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->md_ctx_, this->md5_digest_, count_band);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, count_band);
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 }
