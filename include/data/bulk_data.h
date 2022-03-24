@@ -40,13 +40,9 @@ public:
         }
     }
     bool IsSymmetric() {
-        if (this->data_.size() == 0) {
-            return true;
-        } else {
-            return this->data_[0].IsSymmetric();
-        }
+        assert(this->data_.size() > 0);
+        return this->data_[0].IsSymmetric();
     }
-    inline std::vector<D> &Data() { return this->data_; }
 
     BulkData() {
         this->data_.resize(DATA_PER_BLOCK);

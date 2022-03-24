@@ -23,23 +23,10 @@ const uint64_t masks[64] = {0x0000000000000001ULL, 0x0000000000000002ULL,
                             0x0800000000000000ULL, 0x1000000000000000ULL, 0x2000000000000000ULL,
                             0x4000000000000000ULL, 0x8000000000000000ULL};
 
-// void to_bit_vector(const uint64_t input, std::vector<bool>::iterator output, uint size) {
-//     // #pragma omp simd aligned(output, masks : 16)
-//     for (uint i = 0; i < size; i++) {
-//         output[i] = (input & masks[i]) != 0ULL;
-//     }
-// }
-
-// void to_bit_vector(uint128 input, std::vector<bool>::iterator output) {
-//     uint64_t *val = (uint64_t *)&input;
-//     to_bit_vector(val[0], output, 64);
-//     to_bit_vector(val[1], output + 64, 64);
-// }
-
 void to_byte_vector(uint64_t input, uchar *output, uint size) {
 #pragma omp simd aligned(output, masks : 16)
     for (uint i = 0; i < size; i++) {
-        output[i] = (input & masks[i]) != 0ul;
+        output[i] = (input & masks[i]) != 0ULL;
     }
 }
 
