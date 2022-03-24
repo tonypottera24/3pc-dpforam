@@ -62,12 +62,7 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
     uint128 dpf_out = EVAL(&aes_key_, query.Dump().data(), index);
     uint64_t index_mod = index % 128;
     uint64_t *val = (uint64_t *)&dpf_out;
-    if (index_mod < 64ll) {
-        return (1ll << index_mod) & val[0];
-    } else {
-        index_mod -= 64;
-        return (1ll << index_mod) & val[1];
-    }
+    return (1ll << (index_mod % 64)) & val[index_mod / 64];
 }
 
 void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &dpf_out) {

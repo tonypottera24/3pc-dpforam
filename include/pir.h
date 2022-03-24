@@ -91,7 +91,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             EVP_DigestInit_ex(md_ctx, evp_md5, NULL);
             EVP_DigestUpdate(md_ctx, key_dump.data(), key_dump.size());
             EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
-            uint64_t digest_uint;
+            uint digest_uint;
             memcpy(&digest_uint, md5_digest, digest_size);
 
             // print_bytes(digest, digest_size, "digest");
@@ -121,8 +121,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         // fprintf(stderr, "time1 = %llu\n", time);
 
         std::vector<uchar> key_dump_array[key_array_13.size()];
-        uint64_t key_array_digest[key_array_13.size()];
-        std::unordered_map<uint64_t, uint> exists;
+        uint key_array_digest[key_array_13.size()];
+        std::unordered_map<uint, uint> exists;
         for (uint i = 0; i < key_array_13.size(); i++) {
             K key = key_array_13[i] - key_23[1 - party];
 
@@ -144,7 +144,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
             // fprintf(stderr, "time1.3 = %llu\n", time);
 
-            uint64_t digest_uint;
+            uint digest_uint;
             memcpy(&digest_uint, md5_digest, digest_size);
             key_array_digest[i] = digest_uint;
 
@@ -158,12 +158,20 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 exists[digest_uint]++;
             }
         }
+        for (uint i = 0; i < key_array_13.size(); i++) {
+            uint key_digest = key_array_digest[i];
+            uint ct = exists[key_digest];
+            // if (exists[key_digest] == 1) {
+            fprintf(stderr, "exists, i = %u, key_digest = %u, ct = %u\n", i, key_digest, ct);
+            // }
+        }
+
         // t2 = std::chrono::high_resolution_clock::now();
         // time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
         // fprintf(stderr, "time2 = %llu\n", time);
 
         for (uint i = 0; i < key_array_13.size(); i++) {
-            uint64_t key_digest = key_array_digest[i];
+            uint key_digest = key_array_digest[i];
             if (exists[key_digest] == 1) {
                 // debug_print("dpf i = %u, exists = 1\n", i);
                 // print_bytes((uchar *)&key_digest, digest_size, "key_digest");
@@ -172,12 +180,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                     v_sum ^= i;
                 }
             } else {  // collision
+                // fprintf(stderr, "collision, i = %u\n", i);
                 key_dump_array[i][0] ^= 1;
                 EVP_DigestInit_ex(md_ctx, evp_md5, NULL);
                 EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
                 EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
 
-                uint64_t sha256_digest_uint64;
+                uint sha256_digest_uint64;
                 memcpy((uchar *)&sha256_digest_uint64, md5_digest, digest_size);
                 if (fss.Eval(query[1], sha256_digest_uint64)) {
                     v_sum ^= i;
