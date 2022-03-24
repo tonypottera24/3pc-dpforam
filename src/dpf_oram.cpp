@@ -321,7 +321,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
     if (key_value) {
         uint key_size = K().Size();
         std::vector<K> key_array_33[3];
-        key_array_33[2].resize(n, K(key_size));
+        for (uint b = 0; b < 3; b++) {
+            key_array_33[b].resize(n, K(key_size));
+        }
         for (uint i = 0; i < n; i++) {
             key_array_33[2][i].Random();
         }
@@ -329,14 +331,14 @@ void DPFORAM<K, D>::Test(uint iterations) {
         write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], key_array_33[0], false);
         write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], key_array_33[1], false);
 
+        this->key_array_13_.resize(n);
         for (uint i = 0; i < n; i++) {
-            K k = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
-            this->key_array_13_.push_back(k);
+            this->key_array_13_[i] = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
         }
     }
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
-        // fprintf(stderr, "Test, iteration = %u\n", iteration);
+        debug_print("\nTest, iteration = %u\n", iteration);
 
         uint index_23[2];
         uint key_size = K().Size();
@@ -351,7 +353,7 @@ void DPFORAM<K, D>::Test(uint iterations) {
             this->peer_[1].WriteUInt(index_33[2], false);
             index_33[0] = this->peer_[0].ReadUInt();
             index_33[1] = this->peer_[1].ReadUInt();
-            uint index = index_33[0] ^ index_33[1] ^ index_33[2];
+            uint index = (index_33[0] ^ index_33[1] ^ index_33[2]) % n;
             if (this->party_ == 2) {
                 key_23[0].Random(this->peer_[0].PRG());
                 key_23[1].Random(this->peer_[1].PRG());
@@ -362,11 +364,14 @@ void DPFORAM<K, D>::Test(uint iterations) {
                 this->peer_[1 - this->party_].ReadData(k);
                 key_23[1 - this->party_] = this->key_array_13_[index] - key_23[this->party_] - k;
             }
+            key_23[0].Print("key_23[0]");
+            key_23[1].Print("key_23[1]");
 
             t1 = std::chrono::high_resolution_clock::now();
             KeyToIndex(key_23, index_23, true);
             t2 = std::chrono::high_resolution_clock::now();
             party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            debug_print("index = %u, index_23 = (%u, %u)\n", index, index_23[0], index_23[1]);
         } else {
             index_23[0] = rand_uint(this->peer_[0].PRG()) % n;
             index_23[1] = rand_uint(this->peer_[1].PRG()) % n;

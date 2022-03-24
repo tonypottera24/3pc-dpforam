@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint>()->default_value(2), "number of data (log)")(
+        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
         "data_size", po::value<uint>()->default_value(4), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(5), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(0), "ssot threshold (log)")(
@@ -111,13 +111,16 @@ int main(int argc, char *argv[]) {
 
     uint64_t start_time = timestamp();
     // DPFORAM<BinaryData, BinaryData> dpf_oram = DPFORAM<BinaryData, BinaryData>(party, peer, n, data_size);
+    // DPFORAM<BinaryData, ZpDebugData> dpf_oram = DPFORAM<BinaryData, ZpDebugData>(party, peer, n, data_size);
+    DPFORAM<ZpDebugData, BinaryData> dpf_oram = DPFORAM<ZpDebugData, BinaryData>(party, peer, n, data_size);
+
     // DPFORAM<BinaryData, ECData> dpf_oram = DPFORAM<BinaryData, ECData>(party, peer, n, data_size);
     // DPFORAM<BinaryData, ZpData> dpf_oram = DPFORAM<BinaryData, ZpData>(party, peer, n, data_size);
     // DPFORAM<ECData, BinaryData> dpf_oram = DPFORAM<ECData, BinaryData>(party, peer, n, data_size);
     // DPFORAM<ECData, ECData> dpf_oram = DPFORAM<ECData, ECData>(party, peer, n, data_size);
-    DPFORAM<ZpData, BinaryData> dpf_oram = DPFORAM<ZpData, BinaryData>(party, peer, n, data_size);
+    // DPFORAM<ZpData, BinaryData> dpf_oram = DPFORAM<ZpData, BinaryData>(party, peer, n, data_size);
     // DPFORAM<ZpData, ZpData> dpf_oram = DPFORAM<ZpData, ZpData>(party, peer, n, data_size);
-    // DPFORAM<BinaryData, ZpDebugData> dpf_oram = DPFORAM<BinaryData, ZpDebugData>(party, peer, n, data_size);
+
     uint64_t end_time = timestamp();
     fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
