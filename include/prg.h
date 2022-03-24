@@ -16,7 +16,7 @@ private:
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
 
 public:
-    const static inline EVP_MD *hash = EVP_sha256();
+    const static inline EVP_MD *evp_md_ = EVP_sha256();
     const static inline uint seed_size = EVP_MD_size(EVP_sha256());
 
 public:

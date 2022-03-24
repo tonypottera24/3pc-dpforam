@@ -18,7 +18,7 @@ void PRG::SetSeed(uchar *seed) {
 void PRG::RandBytes(uchar *data, uint size) {
     uint offset = 0;
     while (offset < size) {
-        EVP_DigestInit_ex(this->md_ctx_, this->hash, NULL);
+        EVP_DigestInit_ex2(this->md_ctx_, this->evp_md_, NULL);
         EVP_DigestUpdate(this->md_ctx_, this->seed_, seed_size);
         uint digest_size;
         EVP_DigestFinal_ex(this->md_ctx_, this->seed_, &digest_size);
