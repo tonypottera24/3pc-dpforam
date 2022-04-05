@@ -22,7 +22,6 @@ uint bytes_to_uint(const uchar *b, uint len);
 void rand_bytes(uchar *bytes, const uint len);
 bool rand_bool();
 uint rand_uint(PRG *prg = NULL);
-uint64_t timestamp();
 
 inline uint bit_length(uint n) {
     uint bit_length = 0;
@@ -125,6 +124,10 @@ void print_array(std::vector<D> &array, const char *array_name, const int64_t ar
     }
     debug_print("\n");
 #endif
+}
+
+inline uint64_t timestamp() {
+    return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 #endif /* UTIL_H_ */

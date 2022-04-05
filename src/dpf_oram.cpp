@@ -309,8 +309,8 @@ void DPFORAM<K, D>::Test(uint iterations) {
     bool key_value = !std::is_same<K, BinaryData>::value;
 
     uint64_t party_time = 0;
-    std::chrono::high_resolution_clock::time_point t1, t2;
     uint n = this->Size();
+    uint64_t t1;
 
     // socket seems need extra setup at first read/write
     this->peer_[0].WriteUInt(0, false);
@@ -367,10 +367,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
             key_23[0].Print("key_23[0]");
             key_23[1].Print("key_23[1]");
 
-            t1 = std::chrono::high_resolution_clock::now();
+            t1 = timestamp();
             KeyToIndex(key_23, index_23, true);
-            t2 = std::chrono::high_resolution_clock::now();
-            party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+            party_time += timestamp() - t1;
             debug_print("index = %u, index_23 = (%u, %u)\n", index, index_23[0], index_23[1]);
         } else {
             index_23[0] = rand_uint(this->peer_[0].PRG()) % n;
@@ -389,11 +388,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
-        t1 = std::chrono::high_resolution_clock::now();
+        t1 = timestamp();
         D old_data_13 = this->Read(index_23, false);
-        t2 = std::chrono::high_resolution_clock::now();
-        uint64_t delta_time = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        party_time += delta_time;
+        party_time += timestamp() - t1;
 
         old_data_13.Print("old_data_13");
 
@@ -410,10 +407,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
         new_data_13[2].Random();
         new_data_13[2].Print("new_data_13[2]");
 
-        t1 = std::chrono::high_resolution_clock::now();
+        t1 = timestamp();
         this->Write(index_23, new_data_13[2], true);
-        t2 = std::chrono::high_resolution_clock::now();
-        party_time += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        party_time += timestamp() - t1;
         // printf("Write random data party_time = %llu\n", party_time);
 
         this->PrintMetadata();

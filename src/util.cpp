@@ -105,14 +105,6 @@ uint rand_uint(PRG *prg) {
     return value;
 }
 
-uint64_t timestamp() {
-    // struct timeval tv;
-    // gettimeofday(&tv, NULL);
-    // return (uint64_t)tv.tv_sec * (uint64_t)1000000 + (uint64_t)tv.tv_usec;
-    using namespace std::chrono;
-    return duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
-}
-
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {
 #ifdef DEBUG
     if (array_index == -1) {

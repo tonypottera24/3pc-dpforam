@@ -5,7 +5,6 @@
 #include <inttypes.h>
 #include <omp.h>
 
-#include <chrono>
 #include <cmath>
 #include <iostream>
 
