@@ -15,27 +15,33 @@ typedef high_resolution_clock::time_point timestamp;
 
 class Record {
 private:
+    timestamp t1_;
+    duration<long long, std::nano> duration_;
+
 public:
-    uint64_t time;
-    uint64_t count;
-    uint64_t bandwidth;
+    uint64_t count_;
+    uint64_t bandwidth_;
 
     Record();
 
-    inline timestamp Start() {
-        return high_resolution_clock::now();
+    inline void Start() {
+        this->t1_ = high_resolution_clock::now();
     }
 
-    inline void End(timestamp t1) {
-        timestamp t2 = high_resolution_clock::now();
-        this->time += duration_cast<microseconds>(t2 - t1).count();
-        this->count++;
+    inline void End() {
+        this->duration_ += high_resolution_clock::now() - this->t1_;
+        this->count_++;
+    }
+
+    uint64_t Time() {
+        return duration_cast<microseconds>(this->duration_).count();
     }
 };
 
 // Top Level ORAM
 extern Record ORAM_READ;
 extern Record ORAM_WRITE;
+extern Record KEY_TO_INDEX;
 
 // Position map ORAM
 #define BENCHMARK_POSITION_MAP

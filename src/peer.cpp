@@ -23,11 +23,11 @@ uint Peer::ReadUInt() {
     return n;
 }
 
-void Peer::WriteLong(uint64_t n, bool count_band) {
+void Peer::WriteUint64(uint64_t n, bool count_band) {
     this->socket_.Write((uchar *)&n, sizeof(uint64_t), count_band);
 }
 
-uint64_t Peer::ReadLong() {
+uint64_t Peer::ReadUint64() {
     uint64_t n;
     this->socket_.Read((uchar *)&n, sizeof(uint64_t));
     return n;

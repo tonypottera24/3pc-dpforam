@@ -310,6 +310,7 @@ void ORAM<K, D>::Test(uint iterations) {
 
     uint64_t party_time = 0;
     uint n = this->Size();
+    Benchmark::timestamp t1;
 
     // socket seems need extra setup at first read/write
     this->peer_[0].WriteUInt(0, false);
@@ -366,9 +367,9 @@ void ORAM<K, D>::Test(uint iterations) {
             key_23[0].Print("key_23[0]");
             key_23[1].Print("key_23[1]");
 
-            t1 = get_time();
+            Benchmark::KEY_TO_INDEX.Start();
             KeyToIndex(key_23, index_23, true);
-            party_time += get_time_diff(t1, get_time());
+            Benchmark::KEY_TO_INDEX.End();
             debug_print("index = %u, index_23 = (%u, %u)\n", index, index_23[0], index_23[1]);
         } else {
             index_23[0] = rand_uint(this->peer_[0].PRG()) % n;
@@ -387,9 +388,9 @@ void ORAM<K, D>::Test(uint iterations) {
 
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
-        t1 = get_time();
+        Benchmark::ORAM_READ.Start();
         D old_data_13 = this->Read(index_23, false);
-        party_time += get_time_diff(t1, get_time());
+        Benchmark::ORAM_READ.End();
 
         old_data_13.Print("old_data_13");
 
@@ -406,9 +407,9 @@ void ORAM<K, D>::Test(uint iterations) {
         new_data_13[2].Random();
         new_data_13[2].Print("new_data_13[2]");
 
-        t1 = get_time();
+        Benchmark::ORAM_WRITE.Start();
         this->Write(index_23, new_data_13[2], true);
-        party_time += get_time_diff(t1, get_time());
+        Benchmark::ORAM_WRITE.End();
         // printf("Write random data party_time = %llu\n", party_time);
 
         this->PrintMetadata();
@@ -455,11 +456,11 @@ void ORAM<K, D>::Test(uint iterations) {
     total_bandwidth += this->peer_[0].ReadUInt();
     total_bandwidth += this->peer_[1].ReadUInt();
 
-    this->peer_[0].WriteLong(party_time, false);
-    this->peer_[1].WriteLong(party_time, false);
-    uint64_t max_time = party_time;
-    max_time = std::max(max_time, peer_[0].ReadLong());
-    max_time = std::max(max_time, peer_[1].ReadLong());
+    // this->peer_[0].WriteUint64(party_time, false);
+    // this->peer_[1].WriteUint64(party_time, false);
+    // uint64_t max_time = party_time;
+    // max_time = std::max(max_time, peer_[0].ReadUint64());
+    // max_time = std::max(max_time, peer_[1].ReadUint64());
 
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %u\n", this->Size());

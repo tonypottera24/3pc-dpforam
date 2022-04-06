@@ -1,14 +1,15 @@
 #include "benchmark.h"
 
 Benchmark::Record::Record() {
-    time = 0;
-    count = 0;
-    bandwidth = 0;
+    this->duration_ = duration<long long, std::nano>::zero();
+    this->count_ = 0;
+    this->bandwidth_ = 0;
 }
 
 // Top Level ORAM
 Benchmark::Record ORAM_READ;
 Benchmark::Record ORAM_WRITE;
+Benchmark::Record KEY_TO_INDEX;
 
 // Position map ORAM
 Benchmark::Record ORAM_READ_POSITION_MAP;

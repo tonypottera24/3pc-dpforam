@@ -20,8 +20,8 @@ public:
     void WriteUInt(uint n, bool count_band);
     uint ReadUInt();
 
-    void WriteLong(uint64_t n, bool count_band);
-    uint64_t ReadLong();
+    void WriteUint64(uint64_t n, bool count_band);
+    uint64_t ReadUint64();
 
     template <typename D>
     void ReadData(D &data) {

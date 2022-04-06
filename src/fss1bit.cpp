@@ -47,7 +47,7 @@ FSS1Bit::FSS1Bit() {
 
 void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, BinaryData query_23[2], bool &is_0) {
 #ifdef BENCHMARK_DPF_GEN
-    Benchmark::timestamp t1 = Benchmark::DPF_GEN.Start();
+    Benchmark::DPF_GEN.Start();
 #endif
     uchar *query_23_bytes[2];
     uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
@@ -60,27 +60,27 @@ void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, Bin
         is_0 = this->Eval(query_23[0], index);
     }
 #ifdef BENCHMARK_DPF_GEN
-    Benchmark::DPF_GEN.End(t1);
+    Benchmark::DPF_GEN.End();
 #endif
 }
 
 bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
 #ifdef BENCHMARK_DPF_EVAL
-    Benchmark::timestamp t1 = Benchmark::DPF_EVAL.Start();
+    Benchmark::DPF_EVAL.Start();
 #endif
     uint128 dpf_out = EVAL(&aes_key_, query.Dump().data(), index);
     uint64_t index_mod = index % 128;
     uint64_t *val = (uint64_t *)&dpf_out;
     bool result = (1ll << (index_mod % 64)) & val[index_mod / 64];
 #ifdef BENCHMARK_DPF_EVAL
-    Benchmark::DPF_EVAL.End(t1);
+    Benchmark::DPF_EVAL.End();
 #endif
     return result;
 }
 
 void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &dpf_out) {
 #ifdef BENCHMARK_DPF_EVAL_ALL
-    Benchmark::timestamp t1 = Benchmark::DPF_EVAL_ALL.Start();
+    Benchmark::DPF_EVAL_ALL.Start();
 #endif
     uint n = 1 << log_n;
     uint128 *res = EVALFULL(&aes_key_, query.Dump().data());
@@ -95,13 +95,13 @@ void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &d
     }
     free(res);
 #ifdef BENCHMARK_DPF_EVAL_ALL
-    Benchmark::DPF_EVAL_ALL.End(t1);
+    Benchmark::DPF_EVAL_ALL.End();
 #endif
 }
 
 void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric, BinaryData query_23[2], bool &is_0) {
 #ifdef BENCHMARK_PSEUDO_DPF_GEN
-    Benchmark::timestamp t1 = Benchmark::PSEUDO_DPF_GEN.Start();
+    Benchmark::PSEUDO_DPF_GEN.Start();
 #endif
     for (uint b = 0; b < 2; b++) {
         query_23[b].Resize(byte_length);
@@ -116,30 +116,30 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
 #ifdef BENCHMARK_PSEUDO_DPF_GEN
-    Benchmark::PSEUDO_DPF_GEN.End(t1);
+    Benchmark::PSEUDO_DPF_GEN.End();
 #endif
 }
 
 bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
 #ifdef BENCHMARK_PSEUDO_DPF_EVAL
-    Benchmark::timestamp t1 = Benchmark::PSEUDO_DPF_EVAL.Start();
+    Benchmark::PSEUDO_DPF_EVAL.Start();
 #endif
     bool result = get_buffer_bit(query.Dump().data(), index);
 #ifdef BENCHMARK_PSEUDO_DPF_EVAL
-    Benchmark::PSEUDO_DPF_EVAL.End(t1);
+    Benchmark::PSEUDO_DPF_EVAL.End();
 #endif
     return result;
 }
 
 void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> &dpf_out) {
 #ifdef BENCHMARK_PSEUDO_DPF_EVAL_ALL
-    Benchmark::timestamp t1 = Benchmark::PSEUDO_DPF_EVAL_ALL.Start();
+    Benchmark::PSEUDO_DPF_EVAL_ALL.Start();
 #endif
     // uint index_byte = 0, index_bit = 0;
     for (uint i = 0; i < n; i++) {
         dpf_out[i] = get_buffer_bit(query.Dump().data(), i);
     }
 #ifdef BENCHMARK_PSEUDO_DPF_EVAL_ALL
-    Benchmark::PSEUDO_DPF_EVAL_ALL.End(t1);
+    Benchmark::PSEUDO_DPF_EVAL_ALL.End();
 #endif
 }
