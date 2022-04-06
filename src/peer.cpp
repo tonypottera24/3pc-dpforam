@@ -9,12 +9,8 @@ PRG *Peer::PRG() {
     return &this->prg_;
 }
 
-uint Peer::Bandwidth() {
-    return this->socket_.Bandwidth();
-}
-
-void Peer::WriteUInt(uint n, bool count_band) {
-    this->socket_.Write((uchar *)&n, sizeof(uint), count_band);
+void Peer::WriteUInt(uint n, Benchmark::Record *benchmark) {
+    this->socket_.Write((uchar *)&n, sizeof(uint), benchmark);
 }
 
 uint Peer::ReadUInt() {
@@ -23,11 +19,11 @@ uint Peer::ReadUInt() {
     return n;
 }
 
-void Peer::WriteUint64(uint64_t n, bool count_band) {
-    this->socket_.Write((uchar *)&n, sizeof(uint64_t), count_band);
+void Peer::WriteUInt64(uint64_t n, Benchmark::Record *benchmark) {
+    this->socket_.Write((uchar *)&n, sizeof(uint64_t), benchmark);
 }
 
-uint64_t Peer::ReadUint64() {
+uint64_t Peer::ReadUInt64() {
     uint64_t n;
     this->socket_.Read((uchar *)&n, sizeof(uint64_t));
     return n;

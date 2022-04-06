@@ -11,7 +11,7 @@
 namespace PIR {
 
 template <typename D>
-D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, const uint log_n, const uint index_23[2], bool pseudo, bool count_band) {
+D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, const uint log_n, const uint index_23[2], bool pseudo, Benchmark::Record *benchmark) {
     debug_print("[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
     // only accept power of 2 n
@@ -24,13 +24,13 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
         fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, query_23, is_0);
-        peer[0].WriteData(query_23[0], count_band);
+        peer[0].WriteData(query_23[0], benchmark);
         peer[1].ReadData(query_23[0]);
     } else {
         fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23, is_0);
 
-        peer[0].WriteData(query_23[0], count_band);
-        peer[1].WriteData(query_23[1], count_band);
+        peer[0].WriteData(query_23[0], benchmark);
+        peer[1].WriteData(query_23[1], benchmark);
 
         peer[0].ReadData(query_23[1]);
         peer[1].ReadData(query_23[0]);
@@ -57,12 +57,12 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     if (is_symmetric) {
         return v_sum[0] + v_sum[1];
     } else {
-        return inv_gadget::Inv(peer, is_0, v_sum, count_band);
+        return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
     }
 }
 
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], EVP_MD_CTX *md_ctx, uchar *md5_digest, bool count_band) {
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], EVP_MD_CTX *md_ctx, uchar *md5_digest, Benchmark::Record *benchmark) {
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
@@ -101,11 +101,11 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 
             fss.Gen(digest_uint, digest_size_log, true, query_23, is_0);
 
-            peer[0].WriteUInt(query_23[0].Size(), count_band);
-            peer[1].WriteUInt(query_23[1].Size(), count_band);
+            peer[0].WriteUInt(query_23[0].Size(), benchmark);
+            peer[1].WriteUInt(query_23[1].Size(), benchmark);
 
-            peer[0].WriteData(query_23[0], count_band);
-            peer[1].WriteData(query_23[1], count_band);
+            peer[0].WriteData(query_23[0], benchmark);
+            peer[1].WriteData(query_23[1], benchmark);
         }
         v_sum = rand_uint(peer[P0].PRG()) % n;
     } else {  // party == 0 || party == 1
@@ -207,7 +207,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 }
 
 template <typename D>
-D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], bool count_band) {
+D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], Benchmark::Record *benchmark) {
     // TODO n may not be power of 2
     uint n = array_13.size();
     debug_print("[%lu]SSOT_PIR, n = %u, index_23 = (%u, %u)\n", array_13.size(), n, index_23[0], index_23[1]);
@@ -216,8 +216,8 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
     if (party == 2) {
         // const uint P1 = 0, P0 = 1;
         const uint P0 = 1;
-        peer[P0].WriteDataVector(array_13, count_band);
-        SSOT::P2<D>(peer, n, data_size, count_band);
+        peer[P0].WriteDataVector(array_13, benchmark);
+        SSOT::P2<D>(peer, n, data_size, benchmark);
         v_out_13.Random(peer[P0].PRG());
     } else if (party == 0) {
         const uint P2 = 0, P1 = 1;
@@ -227,7 +227,7 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
         for (uint i = 0; i < n; i++) {
             u[i] += array_13[i];
         }
-        v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, count_band);
+        v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, benchmark);
 
         D tmp(data_size);
         tmp.Random(peer[P2].PRG());
@@ -235,13 +235,13 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
     } else {  // this->party_ == 1
         // const uint P0 = 0, P2 = 1;
         const uint P2 = 1;
-        v_out_13 = SSOT::P1(peer, index_23[P2], array_13, count_band);
+        v_out_13 = SSOT::P1(peer, index_23[P2], array_13, benchmark);
     }
     return v_out_13;
 }
 
 template <typename D>
-D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], bool count_band) {
+D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], Benchmark::Record *benchmark) {
     uint n = pow2_ceil(array_23[0].size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
@@ -250,7 +250,7 @@ D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_2
         return array_23[0][0];
     } else {
         bool pseudo = (n <= PSEUDO_DPF_THRESHOLD);
-        return DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, pseudo, count_band);
+        return DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, pseudo, benchmark);
     }
 }
 

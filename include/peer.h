@@ -4,7 +4,9 @@
 #include "prg.h"
 #include "socket.h"
 #include "typedef.h"
-
+namespace Benchmark {
+class Record;
+};
 class Peer {
 private:
     Socket socket_;
@@ -15,13 +17,12 @@ public:
 
     PRG *PRG();
     Socket &Socket();
-    uint Bandwidth();
 
-    void WriteUInt(uint n, bool count_band);
+    void WriteUInt(uint n, Benchmark::Record *benchmark);
     uint ReadUInt();
 
-    void WriteUint64(uint64_t n, bool count_band);
-    uint64_t ReadUint64();
+    void WriteUInt64(uint64_t n, Benchmark::Record *benchmark);
+    uint64_t ReadUInt64();
 
     template <typename D>
     void ReadData(D &data) {
@@ -47,21 +48,21 @@ public:
     }
 
     template <typename D>
-    void WriteDataVector(std::vector<D> &data, bool count_band) {
+    void WriteDataVector(std::vector<D> &data, Benchmark::Record *benchmark) {
         std::vector<uchar> buffer;
         std::vector<uchar> dump;
         for (uint i = 0; i < data.size(); i++) {
             dump = data[i].Dump();
             buffer.insert(buffer.end(), dump.begin(), dump.end());
         }
-        this->socket_.Write(buffer.data(), buffer.size(), count_band);
+        this->socket_.Write(buffer.data(), buffer.size(), benchmark);
     }
 
     template <typename D>
-    void WriteData(D &data, bool count_band) {
+    void WriteData(D &data, Benchmark::Record *benchmark) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
         const std::vector<uchar> dump = data.Dump();
-        this->socket_.Write(dump.data(), dump.size(), count_band);
+        this->socket_.Write(dump.data(), dump.size(), benchmark);
     }
 
     void Close();

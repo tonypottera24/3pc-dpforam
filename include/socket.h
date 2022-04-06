@@ -12,14 +12,18 @@
 #include <cstring>
 #include <vector>
 
+// #include "benchmark.h"
 #include "typedef.h"
+
+namespace Benchmark {
+class Record;
+};
 
 class Socket {
 private:
     int socket_fd_;
     FILE *stream_;
     char *buffer_;
-    uint bandwidth_ = 0;
 
     void SetStream();
 
@@ -27,11 +31,10 @@ public:
     void InitServer(const char *server_ip, const uint port);
     void InitClient(const char *ip, uint port);
     void SetNoDelay();
-    void Write(const uchar *data, uint data_size, bool count_band = true);
+    void Write(const uchar *data, uint data_size, Benchmark::Record *benchmark);
     void Read(uchar *data, uint data_size);
     void Flush();
     void Close();
-    uint Bandwidth();
 };
 
 #endif /* SIMPLE_SOCKET_H_ */

@@ -4,13 +4,13 @@
 namespace PIW {
 
 template <typename D>
-std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, bool count_band) {
+std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, Benchmark::Record *benchmark) {
     debug_print("FindDeltaData, is_0 = %u\n", is_0);
     const bool is_symmetric = v_delta_13.IsSymmetric();
     const uint data_size = v_delta_13.Size();
     std::vector<D> v_out_33(2, D(data_size));
     if (is_symmetric) {
-        ShareTwoThird(peer, v_delta_13, v_out_33.data(), count_band);
+        ShareTwoThird(peer, v_delta_13, v_out_33.data(), benchmark);
     } else {
         v_delta_13.Print("v_delta_13");
 
@@ -34,9 +34,9 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                     }
                     debug_print("FindDeltaData, P2, d = %u, is_0 = %u, is_02 = (%u, %u)\n", d, is_0, is_02[0], is_02[1]);
                     for (uint b = 0; b < 2; b++) {
-                        peer[b].Socket().Write(&is_02[b], 1, count_band);
+                        peer[b].Socket().Write(&is_02[b], 1, benchmark);
                     }
-                    SSOT::P2<D>(peer, 2, data_size, count_band);
+                    SSOT::P2<D>(peer, 2, data_size, benchmark);
                 } else if (party_index == 0) {  // P0
                     uint P2 = 0, P1 = 1;
                     uchar is_02;
@@ -45,10 +45,10 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                     v_delta_33[1].Print("v_delta_33[1]");
                     (-v_delta_33[1]).Print("-v_delta_33[1]");
                     std::vector<D> u = {v_delta_33[1], -v_delta_33[1]};
-                    D w0 = SSOT::P0(peer, is_02, u, count_band);
+                    D w0 = SSOT::P0(peer, is_02, u, benchmark);
                     w0.Print("w0");
                     if (d == 0) {
-                        peer[P1].WriteData(w0, count_band);
+                        peer[P1].WriteData(w0, benchmark);
                     } else {
                         D w1(data_size);
                         peer[P1].ReadData(w1);
@@ -63,7 +63,7 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                     v_delta_33[0].Print("v_delta_33[0]");
                     (-v_delta_33[0]).Print("-v_delta_33[0]");
                     std::vector<D> v = {v_delta_33[0], -v_delta_33[0]};
-                    D w1 = SSOT::P1(peer, is_02, v, count_band);
+                    D w1 = SSOT::P1(peer, is_02, v, benchmark);
                     w1.Print("w1");
                     if (d == 0) {
                         D w0(data_size);
@@ -71,7 +71,7 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                         v_out_33[0] = w0 + w1;
                         v_out_33[0].Print("v_out_33[0]");
                     } else {
-                        peer[P0].WriteData(w1, count_band);
+                        peer[P0].WriteData(w1, benchmark);
                     }
                 }
             }
@@ -81,7 +81,7 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
 }
 
 template <typename D>
-void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint n, const uint log_n, const uint index_23[2], D &v_delta_13, bool pseudo, bool count_band) {
+void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint n, const uint log_n, const uint index_23[2], D &v_delta_13, bool pseudo, Benchmark::Record *benchmark) {
     debug_print("[%lu]DPF_PIW, index_23 = (%u, %u), n = %lu, log_n = %u, new n = %u\n", array_13.size(), index_23[0], index_23[1], array_13.size(), log_n, n);
     v_delta_13.Print("v_delta_13");
     const bool is_symmetric = array_13[0].IsSymmetric();
@@ -92,20 +92,20 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
         fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, query_23, is_0);
-        peer[0].WriteData(query_23[0], count_band);
+        peer[0].WriteData(query_23[0], benchmark);
         peer[1].ReadData(query_23[0]);
     } else {
         fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23, is_0);
 
-        peer[0].WriteData(query_23[0], count_band);
-        peer[1].WriteData(query_23[1], count_band);
+        peer[0].WriteData(query_23[0], benchmark);
+        peer[1].WriteData(query_23[1], benchmark);
 
         peer[0].ReadData(query_23[1]);
         peer[1].ReadData(query_23[0]);
     }
     debug_print("is_0 = %u\n", is_0);
 
-    std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, count_band);
+    std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, benchmark);
     v_delta_33[0].Print("v_delta_33[0]");
     v_delta_33[1].Print("v_delta_33[1]");
 
@@ -126,7 +126,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 }
 
 template <typename D>
-void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint index_23[2], D &v_delta_13, bool count_band) {
+void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint index_23[2], D &v_delta_13, Benchmark::Record *benchmark) {
     uint n = pow2_ceil(array_13.size());
     uint log_n = log2(n);
     uint clean_index_23[2] = {index_23[0] % n, index_23[1] % n};
@@ -135,7 +135,7 @@ void PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const
         array_13[0] += v_delta_13;
     } else {
         bool pseudo = (n <= PSEUDO_DPF_THRESHOLD);
-        DPF_PIW(party, peer, fss, array_13, n, log_n, clean_index_23, v_delta_13, pseudo, count_band);
+        DPF_PIW(party, peer, fss, array_13, n, log_n, clean_index_23, v_delta_13, pseudo, benchmark);
     }
 }
 

@@ -65,15 +65,15 @@ void ORAM<K, D>::ResetArray(std::vector<BulkData<D>> &array) {
 }
 
 template <typename K, typename D>
-void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
+void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *benchmark) {
     debug_print("[%u]KeyToIndex\n", this->Size());
-    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->md_ctx_, this->md5_digest_, count_band);
-    ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, count_band);
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->md_ctx_, this->md5_digest_, benchmark);
+    ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, benchmark);
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 }
 
 template <typename K, typename D>
-BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band) {
+BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], Benchmark::Record *benchmark) {
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = read_block_13.Size();
@@ -82,10 +82,10 @@ BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &c
     if (this->party_ == 2) {
         const uint P1 = 0, P0 = 1;
 
-        this->peer_[P0].WriteData(read_block_13, count_band);
-        this->peer_[P0].WriteData(cache_block_13, count_band);
+        this->peer_[P0].WriteData(read_block_13, benchmark);
+        this->peer_[P0].WriteData(cache_block_13, benchmark);
 
-        SSOT::P2<BulkData<D>>(this->peer_, 2, data_size, count_band);
+        SSOT::P2<BulkData<D>>(this->peer_, 2, data_size, benchmark);
 
         out_block_13.Random(this->peer_[P1].PRG());
     } else if (this->party_ == 0) {
@@ -100,12 +100,12 @@ BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &c
 
         std::vector<BulkData<D>> u = {read_block_12, cache_block_12};
         const uint b0 = is_cached_23[P1] ^ is_cached_23[P2];
-        out_block_13 = SSOT::P0(this->peer_, b0, u, count_band);
+        out_block_13 = SSOT::P0(this->peer_, b0, u, benchmark);
     } else if (this->party_ == 1) {
         const uint P2 = 1;
         std::vector<BulkData<D>> v = {read_block_13, cache_block_13};
         const uint b1 = is_cached_23[P2];
-        out_block_13 = SSOT::P1(this->peer_, b1, v, count_band);
+        out_block_13 = SSOT::P1(this->peer_, b1, v, benchmark);
         BulkData<D> tmp(data_size);
         tmp.Random(this->peer_[P2].PRG());
         out_block_13 -= tmp;
@@ -114,16 +114,16 @@ BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &c
 }
 
 template <typename K, typename D>
-void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached_23[2], bool read_only) {
+void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached_23[2], bool read_only, Benchmark::Record *benchmark) {
     debug_print("[%u]ReadPositionMap, index_23 = (%u, %u), read_only = %d\n", this->Size(), index_23[0], index_23[1], read_only);
     uint n = this->write_array_13_.size();
     // this->position_map_->PrintMetadata();
 
     // read block from array
     uint pos_data_size = this->position_map_->DataSize();
-    BinaryData old_cache_index_13 = this->position_map_->Read(index_23, read_only);
+    BinaryData old_cache_index_13 = this->position_map_->Read(index_23, read_only, benchmark);
     BinaryData old_cache_index_23[2] = {BinaryData(pos_data_size), BinaryData(pos_data_size)};
-    ShareTwoThird(this->peer_, old_cache_index_13, old_cache_index_23, !read_only);
+    ShareTwoThird(this->peer_, old_cache_index_13, old_cache_index_23, benchmark);
     old_cache_index_13.Print("old_index_13");
 
     std::vector<uchar> dump;
@@ -146,14 +146,14 @@ void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2],
         new_cache_index_13.Load(new_cache_index_bytes);
         new_cache_index_13.Print("new_cache_index_13");
 
-        this->position_map_->Write(index_23, new_cache_index_13, !read_only);
+        this->position_map_->Write(index_23, new_cache_index_13, benchmark);
         // this->position_map_->PrintMetadata();
     }
     // this->position_map_->PrintMetadata();
 }
 
 template <typename K, typename D>
-D ORAM<K, D>::Read(const uint index_23[2], bool read_only) {
+D ORAM<K, D>::Read(const uint index_23[2], bool read_only, Benchmark::Record *benchmark) {
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -168,16 +168,16 @@ D ORAM<K, D>::Read(const uint index_23[2], bool read_only) {
         // } else if (n <= SSOT_THRESHOLD) {
         //     return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
     } else {
-        this->last_read_block_13_ = DPFRead(block_index_23, read_only);
+        this->last_read_block_13_ = DPFRead(block_index_23, read_only, benchmark);
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
 
     // std::vector<D> last_read_block_23[2];
-    // ShareTwoThird(this->peer_, this->last_read_block_13_.data_, last_read_block_23, !read_only);
-    // PIR::PIR(this->peer_, this->fss_, last_read_block_23, data_index_23, this->last_read_data_13_, !read_only);
+    // ShareTwoThird(this->peer_, this->last_read_block_13_.data_, last_read_block_23, benchmark);
+    // PIR::PIR(this->peer_, this->fss_, last_read_block_23, data_index_23, this->last_read_data_13_, benchmark);
 
     std::vector<D> last_read_block_13_data = this->last_read_block_13_.GetData();
-    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, last_read_block_13_data, data_index_23, !read_only);
+    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, last_read_block_13_data, data_index_23, benchmark);
 
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
@@ -185,30 +185,30 @@ D ORAM<K, D>::Read(const uint index_23[2], bool read_only) {
 }
 
 template <typename K, typename D>
-BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only) {
+BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only, Benchmark::Record *benchmark) {
     debug_print("[%u]DPFRead, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
-    BulkData<D> v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, !read_only);
+    BulkData<D> v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, benchmark);
 
     uint cache_index_23[2];
     bool is_cached_23[2];
     if (this->position_map_ != NULL) {
-        ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only);
+        ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, benchmark);
     }
     // debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
         return v_read_13;
     } else {
-        BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, !read_only);
+        BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, benchmark);
         v_cache_13.Print("v_cache_13");
 
-        return GetLatestData(v_read_13, v_cache_13, is_cached_23, !read_only);
+        return GetLatestData(v_read_13, v_cache_13, is_cached_23, benchmark);
     }
 }
 
 template <typename K, typename D>
-void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) {
+void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, Benchmark::Record *benchmark) {
     debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -226,37 +226,37 @@ void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) {
     BulkData<D> new_block_13 = this->last_read_block_13_;
     std::vector<D> new_block_13_data = new_block_13.GetData();
 
-    PIW::PIW(this->party_, this->peer_, this->fss_, new_block_13_data, data_index_23, v_delta_13, count_band);
+    PIW::PIW(this->party_, this->peer_, this->fss_, new_block_13_data, data_index_23, v_delta_13, benchmark);
     new_block_13.SetData(new_block_13_data);
 
     if (this->write_array_13_.size() == 1) {
         this->write_array_13_[0] = new_block_13;
     } else {
-        DPFWrite(block_index_23, this->last_read_block_13_, new_block_13, count_band);
+        DPFWrite(block_index_23, this->last_read_block_13_, new_block_13, benchmark);
     }
 }
 
 template <typename K, typename D>
-void ORAM<K, D>::DPFWrite(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band) {
+void ORAM<K, D>::DPFWrite(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, Benchmark::Record *benchmark) {
     debug_print("[%u]DPFWrite, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     BulkData<D> delta_block_13 = new_block_13 - old_block_13;
 
-    PIW::PIW(this->party_, this->peer_, this->fss_, this->write_array_13_, index_23, delta_block_13, count_band);
-    this->AppendCache(new_block_13, count_band);
+    PIW::PIW(this->party_, this->peer_, this->fss_, this->write_array_13_, index_23, delta_block_13, benchmark);
+    this->AppendCache(new_block_13, benchmark);
 }
 
 template <typename K, typename D>
-void ORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
+void ORAM<K, D>::AppendCache(BulkData<D> &new_block_13, Benchmark::Record *benchmark) {
     debug_print("[%u]AppendCache\n", this->Size());
     uint data_size = new_block_13.Size();
     BulkData<D> new_block_23[2] = {BulkData<D>(data_size), BulkData<D>(data_size)};
-    ShareTwoThird(this->peer_, new_block_13, new_block_23, count_band);
+    ShareTwoThird(this->peer_, new_block_13, new_block_23, benchmark);
     for (uint b = 0; b < 2; b++) {
         this->cache_array_23_[b].push_back(new_block_23[b]);
     }
     if (this->cache_array_23_[0].size() == this->read_array_23_[0].size()) {
-        this->Flush(count_band);
+        this->Flush(benchmark);
         if (this->position_map_ != NULL) {
             this->position_map_->Reset();
         }
@@ -264,13 +264,13 @@ void ORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
 }
 
 template <typename K, typename D>
-void ORAM<K, D>::Flush(bool count_band) {
+void ORAM<K, D>::Flush(Benchmark::Record *benchmark) {
     debug_print("[%u]Flush\n", this->Size());
     uint size = this->write_array_13_.size();
     std::vector<BulkData<D>> array_23[2];
     array_23[0].resize(size);
     array_23[1].resize(size);
-    ShareTwoThird(this->peer_, this->write_array_13_, array_23, count_band);
+    ShareTwoThird(this->peer_, this->write_array_13_, array_23, benchmark);
     for (uint b = 0; b < 2; b++) {
         this->read_array_23_[b] = array_23[b];
     }
@@ -308,13 +308,11 @@ void ORAM<K, D>::Test(uint iterations) {
 
     bool key_value = !std::is_same<K, BinaryData>::value;
 
-    uint64_t party_time = 0;
     uint n = this->Size();
-    Benchmark::timestamp t1;
 
     // socket seems need extra setup at first read/write
-    this->peer_[0].WriteUInt(0, false);
-    this->peer_[1].WriteUInt(0, false);
+    this->peer_[0].WriteUInt(0, NULL);
+    this->peer_[1].WriteUInt(0, NULL);
     this->peer_[0].ReadUInt();
     this->peer_[1].ReadUInt();
 
@@ -328,8 +326,8 @@ void ORAM<K, D>::Test(uint iterations) {
             key_array_33[2][i].Random();
         }
 
-        write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], key_array_33[0], false);
-        write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], key_array_33[1], false);
+        write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], key_array_33[0], NULL);
+        write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], key_array_33[1], NULL);
 
         this->key_array_13_.resize(n);
         for (uint i = 0; i < n; i++) {
@@ -349,8 +347,8 @@ void ORAM<K, D>::Test(uint iterations) {
             // key_23[1].Random(this->peer_[1].PRG());
             uint index_33[3];
             index_33[2] = rand_uint() % n;
-            this->peer_[0].WriteUInt(index_33[2], false);
-            this->peer_[1].WriteUInt(index_33[2], false);
+            this->peer_[0].WriteUInt(index_33[2], NULL);
+            this->peer_[1].WriteUInt(index_33[2], NULL);
             index_33[0] = this->peer_[0].ReadUInt();
             index_33[1] = this->peer_[1].ReadUInt();
             uint index = (index_33[0] ^ index_33[1] ^ index_33[2]) % n;
@@ -359,7 +357,7 @@ void ORAM<K, D>::Test(uint iterations) {
                 key_23[1].Random(this->peer_[1].PRG());
             } else {
                 key_23[this->party_].Random(this->peer_[this->party_].PRG());
-                this->peer_[1 - this->party_].WriteData(key_23[this->party_], false);
+                this->peer_[1 - this->party_].WriteData(key_23[this->party_], NULL);
                 K k(key_size);
                 this->peer_[1 - this->party_].ReadData(k);
                 key_23[1 - this->party_] = this->key_array_13_[index] - key_23[this->party_] - k;
@@ -368,7 +366,7 @@ void ORAM<K, D>::Test(uint iterations) {
             key_23[1].Print("key_23[1]");
 
             Benchmark::KEY_TO_INDEX.Start();
-            KeyToIndex(key_23, index_23, true);
+            KeyToIndex(key_23, index_23, &Benchmark::KEY_TO_INDEX);
             Benchmark::KEY_TO_INDEX.End();
             debug_print("index = %u, index_23 = (%u, %u)\n", index, index_23[0], index_23[1]);
         } else {
@@ -379,8 +377,8 @@ void ORAM<K, D>::Test(uint iterations) {
 
         // this->PrintMetadata();
 
-        this->peer_[0].WriteUInt(0, false);
-        this->peer_[1].WriteUInt(0, false);
+        this->peer_[0].WriteUInt(0, NULL);
+        this->peer_[1].WriteUInt(0, NULL);
         this->peer_[0].ReadUInt();
         this->peer_[1].ReadUInt();
 
@@ -389,15 +387,15 @@ void ORAM<K, D>::Test(uint iterations) {
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
         Benchmark::ORAM_READ.Start();
-        D old_data_13 = this->Read(index_23, false);
+        D old_data_13 = this->Read(index_23, false, &Benchmark::ORAM_READ);
         Benchmark::ORAM_READ.End();
 
         old_data_13.Print("old_data_13");
 
         this->PrintMetadata();
 
-        this->peer_[0].WriteUInt(0, false);
-        this->peer_[1].WriteUInt(0, false);
+        this->peer_[0].WriteUInt(0, NULL);
+        this->peer_[1].WriteUInt(0, NULL);
         this->peer_[0].ReadUInt();
         this->peer_[1].ReadUInt();
 
@@ -408,7 +406,7 @@ void ORAM<K, D>::Test(uint iterations) {
         new_data_13[2].Print("new_data_13[2]");
 
         Benchmark::ORAM_WRITE.Start();
-        this->Write(index_23, new_data_13[2], true);
+        this->Write(index_23, new_data_13[2], &Benchmark::ORAM_WRITE);
         Benchmark::ORAM_WRITE.End();
         // printf("Write random data party_time = %llu\n", party_time);
 
@@ -417,25 +415,25 @@ void ORAM<K, D>::Test(uint iterations) {
         // fprintf(stderr, "\nTest, ========== Read validation data  ==========\n");
         debug_print("\nTest, ========== Read validation data ==========\n");
         if (key_value) {
-            KeyToIndex(key_23, index_23, false);
+            KeyToIndex(key_23, index_23, NULL);
         }
 
         std::vector<D> verify_data_13(3, D(data_size));
-        verify_data_13[2] = this->Read(index_23, true);
+        verify_data_13[2] = this->Read(index_23, true, NULL);
 
         verify_data_13[2].Print("verify_data_13[2]");
 
         this->PrintMetadata();
 
-        this->peer_[0].WriteData(verify_data_13[2], false);
-        this->peer_[1].WriteData(verify_data_13[2], false);
+        this->peer_[0].WriteData(verify_data_13[2], NULL);
+        this->peer_[1].WriteData(verify_data_13[2], NULL);
         this->peer_[0].ReadData(verify_data_13[0]);
         this->peer_[1].ReadData(verify_data_13[1]);
         D verify_data = verify_data_13[0] + verify_data_13[1] + verify_data_13[2];
         verify_data.Print("verify_data");
 
-        this->peer_[0].WriteData(new_data_13[2], false);
-        this->peer_[1].WriteData(new_data_13[2], false);
+        this->peer_[0].WriteData(new_data_13[2], NULL);
+        this->peer_[1].WriteData(new_data_13[2], NULL);
         this->peer_[0].ReadData(new_data_13[0]);
         this->peer_[1].ReadData(new_data_13[1]);
         D new_data = new_data_13[0] + new_data_13[1] + new_data_13[2];
@@ -449,25 +447,16 @@ void ORAM<K, D>::Test(uint iterations) {
         }
     }
 
-    uint party_bandwidth = this->peer_[0].Bandwidth() + this->peer_[1].Bandwidth();
-    this->peer_[0].WriteUInt(party_bandwidth, false);
-    this->peer_[1].WriteUInt(party_bandwidth, false);
-    uint total_bandwidth = party_bandwidth;
-    total_bandwidth += this->peer_[0].ReadUInt();
-    total_bandwidth += this->peer_[1].ReadUInt();
-
-    // this->peer_[0].WriteUint64(party_time, false);
-    // this->peer_[1].WriteUint64(party_time, false);
-    // uint64_t max_time = party_time;
-    // max_time = std::max(max_time, peer_[0].ReadUint64());
-    // max_time = std::max(max_time, peer_[1].ReadUint64());
-
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %u\n", this->Size());
-    // fprintf(stderr, "Party Bandwidth(byte): %llu\n", party_bandwidth / iterations);
-    // fprintf(stderr, "Party execution time(microsec): %llu\n", party_time / iterations);
-    fprintf(stderr, "Total Bandwidth(byte): %u\n", total_bandwidth / iterations);
-    fprintf(stderr, "Max Execution time(microsec): %llu\n", max_time / iterations);
+
+    Benchmark::ORAM_READ.PrintTotal(this->peer_, "ORAM_READ", iterations);
+    Benchmark::ORAM_WRITE.PrintTotal(this->peer_, "ORAM_WRITE", iterations);
+    Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, "KEY_TO_INDEX", iterations);
+
+    Benchmark::Record total = Benchmark::ORAM_READ + Benchmark::ORAM_WRITE + Benchmark::KEY_TO_INDEX;
+    total.PrintTotal(this->peer_, "total", iterations);
+
     fprintf(stderr, "\n");
 }
 

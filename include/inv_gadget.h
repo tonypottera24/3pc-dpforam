@@ -10,7 +10,7 @@
 namespace inv_gadget {
 
 template <typename D>
-void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool count_band) {
+void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, Benchmark::Record *benchmark) {
     const uint P1 = inv ? 0 : 1;
     const uint P2 = inv ? 1 : 0;
     // debug_print("inv::P0 inv = %u\n", inv);
@@ -22,15 +22,15 @@ void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, bool c
     uchar s = rand_bool();
     uchar bb = b ^ s;
 
-    peer[P1].Socket().Write(&s, 1, count_band);
-    peer[P1].WriteDataVector(p, count_band);
+    peer[P1].Socket().Write(&s, 1, benchmark);
+    peer[P1].WriteDataVector(p, benchmark);
 
-    peer[P2].Socket().Write(&bb, 1, count_band);
-    peer[P2].WriteData(p[b], count_band);
+    peer[P2].Socket().Write(&bb, 1, benchmark);
+    peer[P2].WriteData(p[b], benchmark);
 }
 
 template <typename D>
-void P1(Peer peer[2], D m[2], const bool inv, bool count_band) {
+void P1(Peer peer[2], D m[2], const bool inv, Benchmark::Record *benchmark) {
     const uint P2 = inv ? 0 : 1;
     const uint P0 = inv ? 1 : 0;
     // debug_print("inv::P1 inv = %u\n", inv);
@@ -47,11 +47,11 @@ void P1(Peer peer[2], D m[2], const bool inv, bool count_band) {
         mm[b] = m[b ^ s] + p[b ^ s];
     }
 
-    peer[P2].WriteDataVector(mm, count_band);
+    peer[P2].WriteDataVector(mm, benchmark);
 }
 
 template <typename D>
-D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
+D P2(Peer peer[2], const uint data_size, const bool inv, Benchmark::Record *benchmark) {
     const uint P0 = inv ? 0 : 1;
     const uint P1 = inv ? 1 : 0;
     // debug_print("inv::P2 inv = %u\n", inv);
@@ -67,25 +67,25 @@ D P2(Peer peer[2], const uint data_size, const bool inv, bool count_band) {
 }
 
 template <typename D>
-D Inv(Peer peer[2], const bool is_0, D v[2], bool count_band) {
+D Inv(Peer peer[2], const bool is_0, D v[2], Benchmark::Record *benchmark) {
     debug_print("Inv, is_0 = %u\n", is_0);
     uint data_size = v[0].Size();
 
-    P0<D>(peer, is_0, data_size, false, count_band);
+    P0<D>(peer, is_0, data_size, false, benchmark);
     D r(data_size);
     r.Random();
     D m[2] = {v[1] - r, -v[1] - r};
-    P1<D>(peer, m, false, count_band);
-    D mb = P2<D>(peer, data_size, false, count_band);
+    P1<D>(peer, m, false, benchmark);
+    D mb = P2<D>(peer, data_size, false, benchmark);
     D v_inv = r + mb;
 
     // inv
-    P0<D>(peer, !is_0, data_size, true, count_band);
+    P0<D>(peer, !is_0, data_size, true, benchmark);
     r.Random();
     m[0] = v[0] - r;
     m[1] = -v[0] - r;
-    P1(peer, m, true, count_band);
-    mb = P2<D>(peer, data_size, true, count_band);
+    P1(peer, m, true, benchmark);
+    mb = P2<D>(peer, data_size, true, benchmark);
     v_inv += r + mb;
     return v_inv;
 }

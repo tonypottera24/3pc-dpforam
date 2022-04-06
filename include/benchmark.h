@@ -2,10 +2,12 @@
 #define BENCHMARK_H_
 
 #include <inttypes.h>
+#include <sys/types.h>
 
 #include <chrono>
+#include <cstdio>
 
-#include "util.h"
+#include "peer.h"
 
 namespace Benchmark {
 
@@ -15,27 +17,41 @@ typedef high_resolution_clock::time_point timestamp;
 
 class Record {
 private:
-    timestamp t1_;
+    timestamp last_start_time_;
     duration<long long, std::nano> duration_;
+    uint64_t bandwidth_;
+    uint64_t count_;
 
 public:
-    uint64_t count_;
-    uint64_t bandwidth_;
-
     Record();
 
+    Record &operator=(const Record &other);
+    Record &operator+=(const Record &rhs);
+    Record &operator-=(const Record &rhs);
+
+    friend Record operator+(Record lhs, const Record &rhs) {
+        lhs += rhs;
+        return lhs;
+    }
+    friend Record operator-(Record lhs, const Record &rhs) {
+        lhs -= rhs;
+        return lhs;
+    }
+
     inline void Start() {
-        this->t1_ = high_resolution_clock::now();
+        this->last_start_time_ = high_resolution_clock::now();
     }
 
     inline void End() {
-        this->duration_ += high_resolution_clock::now() - this->t1_;
+        this->duration_ += high_resolution_clock::now() - this->last_start_time_;
         this->count_++;
     }
 
-    uint64_t Time() {
-        return duration_cast<microseconds>(this->duration_).count();
-    }
+    void AddBandwidth(uint64_t n);
+    uint64_t GetTime();
+
+    void Print();
+    void PrintTotal(Peer peer[2], const char *title = "", uint64_t iteration = 1);
 };
 
 // Top Level ORAM
@@ -57,19 +73,19 @@ extern Record ORAM_WRITE_POSITION_MAP;
 // extern Record DPF_PIW;
 
 // DPF
-#define BENCHMARK_DPF_GEN
+// #define BENCHMARK_DPF_GEN
 extern Record DPF_GEN;
-#define BENCHMARK_DPF_EVAL
+// #define BENCHMARK_DPF_EVAL
 extern Record DPF_EVAL;
-#define BENCHMARK_DPF_EVAL_FULL
+// #define BENCHMARK_DPF_EVAL_FULL
 extern Record DPF_EVAL_ALL;
 
 // PSEUDO_DPF
-#define BENCHMARK_PSEUDO_DPF_GEN
+// #define BENCHMARK_PSEUDO_DPF_GEN
 extern Record PSEUDO_DPF_GEN;
-#define BENCHMARK_PSEUDO_DPF_EVAL
+// #define BENCHMARK_PSEUDO_DPF_EVAL
 extern Record PSEUDO_DPF_EVAL;
-#define BENCHMARK_PSEUDO_DPF_EVAL_FULL
+// #define BENCHMARK_PSEUDO_DPF_EVAL_FULL
 extern Record PSEUDO_DPF_EVAL_ALL;
 
 };  // namespace Benchmark

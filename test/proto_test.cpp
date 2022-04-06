@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     uchar seed[PRG::seed_size];
     RAND_bytes(seed, PRG::seed_size);
     peer[1].PRG()->SetSeed(seed);
-    peer[1].Socket().Write(seed, PRG::seed_size, false);
+    peer[1].Socket().Write(seed, PRG::seed_size, NULL);
     peer[0].Socket().Read(seed, PRG::seed_size);
     peer[0].PRG()->SetSeed(seed);
 

@@ -1,5 +1,7 @@
 #include "socket.h"
 
+#include "benchmark.h"
+
 #define BUFF_BYTES 1024 * 16
 
 void error(const char *msg) {
@@ -75,7 +77,7 @@ void Socket::SetNoDelay() {
     }
 }
 
-void Socket::Write(const uchar *data, uint data_size, bool count_band) {
+void Socket::Write(const uchar *data, uint data_size, Benchmark::Record *benchmark) {
     // fprintf(stderr, "Write, data_size = %u\n", data_size);
     uint offset = 0;
     while (offset < data_size) {
@@ -86,8 +88,8 @@ void Socket::Write(const uchar *data, uint data_size, bool count_band) {
         }
         offset += write_size;
     }
-    if (count_band) {
-        this->bandwidth_ += data_size;
+    if (benchmark != NULL) {
+        benchmark->AddBandwidth(data_size);
     }
     fflush(stream_);
 }
@@ -111,8 +113,4 @@ void Socket::Close() {
     fclose(stream_);
     delete[] buffer_;
     ::close(socket_fd_);
-}
-
-uint Socket::Bandwidth() {
-    return this->bandwidth_;
 }

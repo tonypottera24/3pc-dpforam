@@ -10,6 +10,7 @@
 #include <cmath>
 #include <thread>
 
+#include "benchmark.h"
 #include "libdpf/block.h"
 #include "peer.h"
 #include "typedef.h"
@@ -66,30 +67,30 @@ inline bool get_buffer_bit(uchar *a, const uint i) {
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
 template <typename D>
-void ShareTwoThird(Peer peer[2], D &v_in_13, D v_out_23[2], bool count_band) {
+void ShareTwoThird(Peer peer[2], D &v_in_13, D v_out_23[2], Benchmark::Record *benchmark) {
     v_out_23[1] = v_in_13;
-    peer[1].WriteData(v_in_13, count_band);
+    peer[1].WriteData(v_in_13, benchmark);
     peer[0].ReadData(v_out_23[0]);
 }
 
 template <typename D>
-void ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, std::vector<D> v_out_23[2], bool count_band) {
-    // peer[1].WriteData(v_in_13, count_band);
+void ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, std::vector<D> v_out_23[2], Benchmark::Record *benchmark) {
+    // peer[1].WriteData(v_in_13, benchmark);
     // std::vector<D> v_out = peer[0].ReadData(v_in_13.size(), v_in_13[0].Size());
     v_out_23[1] = v_in_13;
-    write_read_data(peer[1], v_in_13, peer[0], v_out_23[0], count_band);
+    write_read_data(peer[1], v_in_13, peer[0], v_out_23[0], benchmark);
 }
 
 template <typename D>
-void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint index_23[2], bool count_band) {
+void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint index_23[2], Benchmark::Record *benchmark) {
     uint rand_range = n;
-    peer[1].WriteUInt(index_13, count_band);
+    peer[1].WriteUInt(index_13, benchmark);
     index_23[0] = peer[0].ReadUInt() % rand_range;
     index_23[1] = index_13 % rand_range;
 }
 
 template <typename D>
-void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_peer, std::vector<D> &read_data, bool count_band) {
+void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_peer, std::vector<D> &read_data, Benchmark::Record *benchmark) {
     assert(write_data.size() == read_data.size());
     uint size = write_data.size();
     uint data_size = write_data[0].Size();
@@ -99,7 +100,7 @@ void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_pe
         uint start_index = data_per_block * r;
         uint end_index = std::min(data_per_block * (r + 1), size);
         std::vector<D> write_buffer(write_data.begin() + start_index, write_data.begin() + end_index);
-        write_peer.WriteDataVector(write_buffer, count_band);
+        write_peer.WriteDataVector(write_buffer, benchmark);
 
         std::vector<D> read_buffer(end_index - start_index, D(data_size));
         read_peer.ReadDataVector(read_buffer);

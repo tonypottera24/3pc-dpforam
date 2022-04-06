@@ -48,21 +48,21 @@ private:
     void InitArray(std::vector<BulkData<D>> &array, const uint n, const uint data_size);
     void ResetArray(std::vector<BulkData<D>> &array);
 
-    BulkData<D> GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band);
-    BulkData<D> DPFRead(const uint index_23[2], bool read_only);
-    void DPFWrite(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band);
-    void ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached[2], bool read_only);
-    void AppendCache(BulkData<D> &new_block_13, bool count_band);
-    void Flush(bool count_band);
+    BulkData<D> GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], Benchmark::Record *benchmark);
+    BulkData<D> DPFRead(const uint index_23[2], bool read_only, Benchmark::Record *benchmark);
+    void DPFWrite(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, Benchmark::Record *benchmark);
+    void ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached[2], bool read_only, Benchmark::Record *benchmark);
+    void AppendCache(BulkData<D> &new_block_13, Benchmark::Record *benchmark);
+    void Flush(Benchmark::Record *benchmark);
 
 public:
     ORAM(const uint party, Peer peer[2], uint n, uint data_size);
     ~ORAM();
 
-    void KeyToIndex(K key_23[2], uint index_23[2], bool count_band);
+    void KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *benchmark);
 
-    D Read(const uint index_23[2], bool read_only);
-    void Write(const uint index_23[2], D &new_data_13, bool count_band);
+    D Read(const uint index_23[2], bool read_only, Benchmark::Record *benchmark);
+    void Write(const uint index_23[2], D &new_data_13, Benchmark::Record *benchmark);
 
     void PrintMetadata();
     inline uint Size() {
