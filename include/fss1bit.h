@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <vector>
 
+#include "benchmark.h"
 #include "binary_data.h"
 #include "constant.h"
 #include "libdpf/libdpf.h"
 #include "peer.h"
 #include "typedef.h"
 #include "util.h"
-
 class FSS1Bit {
 private:
     AES_KEY aes_key_;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(DPFORAM)
+project(ORAM)
 
 find_package(OpenSSL REQUIRED)
 find_package(OpenMP REQUIRED)

@@ -144,7 +144,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         // }
 
         // bool collision_mode = true;
-        bool collision_mode = collision_ct > 1;
+        bool collision_mode = collision_ct > 2;
         // fprintf(stderr, "collision_ct = %u\n", collision_ct);
 
         BinaryData query[2];
@@ -154,7 +154,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             uint query_size = peer[party].ReadUInt();
             query[b].Resize(query_size);
             peer[party].ReadData(query[b]);
+        }
 
+        for (uint b = 0; b < 2; b++) {
             if (b == 0 || collision_mode) {
                 dpf_out[b].resize(digest_n);
                 fss.EvalAll(query[b], digest_size_log, dpf_out[b]);

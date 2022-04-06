@@ -1,17 +1,17 @@
-#include "dpf_oram.h"
+#include "oram.h"
 
 template <typename K, typename D>
-DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer), n_(n) {
-    debug_print("DPFORAM n = %u, data_size = %u\n", n, data_size);
+ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer), n_(n) {
+    debug_print("ORAM n = %u, data_size = %u\n", n, data_size);
     this->last_read_block_13_.Resize(data_size * DATA_PER_BLOCK);
     this->last_read_block_13_.Reset();
     this->last_read_data_13_.Resize(data_size);
     this->last_read_data_13_.Reset();
     this->InitArray(this->write_array_13_, n, data_size);
 
-    // fprintf(stderr, "DPFORAM, n = %u, data_size = %u\n", n, data_size);
-    // fprintf(stderr, "DPFORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
-    // fprintf(stderr, "DPFORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
+    // fprintf(stderr, "ORAM, n = %u, data_size = %u\n", n, data_size);
+    // fprintf(stderr, "ORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
+    // fprintf(stderr, "ORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
     // fprintf(stderr, "\n");
 
     if (n > DATA_PER_BLOCK) {
@@ -21,12 +21,12 @@ DPFORAM<K, D>::DPFORAM(const uint party, Peer peer[2], uint n, uint data_size) :
 
         uint pos_n = divide_ceil(n, DATA_PER_BLOCK);
         uint pos_data_size = byte_length(pos_n << 1);
-        this->position_map_ = new DPFORAM<BinaryData, BinaryData>(party, peer, pos_n, pos_data_size);
+        this->position_map_ = new ORAM<BinaryData, BinaryData>(party, peer, pos_n, pos_data_size);
     }
 }
 
 template <typename K, typename D>
-DPFORAM<K, D>::~DPFORAM() {
+ORAM<K, D>::~ORAM() {
     if (this->position_map_ != NULL) {
         delete this->position_map_;
     }
@@ -40,7 +40,7 @@ DPFORAM<K, D>::~DPFORAM() {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Reset() {
+void ORAM<K, D>::Reset() {
     debug_print("[%u]Reset\n", this->Size());
     for (uint b = 0; b < 2; b++) {
         ResetArray(read_array_23_[b]);
@@ -53,19 +53,19 @@ void DPFORAM<K, D>::Reset() {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::InitArray(std::vector<BulkData<D>> &array, const uint n, const uint data_size) {
+void ORAM<K, D>::InitArray(std::vector<BulkData<D>> &array, const uint n, const uint data_size) {
     array.resize(divide_ceil(n, DATA_PER_BLOCK), BulkData<D>(data_size * DATA_PER_BLOCK));
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::ResetArray(std::vector<BulkData<D>> &array) {
+void ORAM<K, D>::ResetArray(std::vector<BulkData<D>> &array) {
     for (uint i = 0; i < array.size(); i++) {
         array[i].Reset();
     }
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
+void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
     debug_print("[%u]KeyToIndex\n", this->Size());
     uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->md_ctx_, this->md5_digest_, count_band);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, count_band);
@@ -73,7 +73,7 @@ void DPFORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], bool count_band) {
 }
 
 template <typename K, typename D>
-BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band) {
+BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &cache_block_13, const bool is_cached_23[2], bool count_band) {
     debug_print("[%u]GetLatestData, is_cached_23 = (%u, %u)\n", this->Size(), is_cached_23[0], is_cached_23[1]);
 
     uint data_size = read_block_13.Size();
@@ -114,7 +114,7 @@ BulkData<D> DPFORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D>
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached_23[2], bool read_only) {
+void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2], bool is_cached_23[2], bool read_only) {
     debug_print("[%u]ReadPositionMap, index_23 = (%u, %u), read_only = %d\n", this->Size(), index_23[0], index_23[1], read_only);
     uint n = this->write_array_13_.size();
     // this->position_map_->PrintMetadata();
@@ -153,7 +153,7 @@ void DPFORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[
 }
 
 template <typename K, typename D>
-D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
+D ORAM<K, D>::Read(const uint index_23[2], bool read_only) {
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -168,7 +168,7 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
         // } else if (n <= SSOT_THRESHOLD) {
         //     return PIR::SSOT_PIR(this->party_, this->peer_, this->write_array_13_, index_23, !read_only);
     } else {
-        this->last_read_block_13_ = DPF_Read(block_index_23, read_only);
+        this->last_read_block_13_ = DPFRead(block_index_23, read_only);
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
 
@@ -185,8 +185,8 @@ D DPFORAM<K, D>::Read(const uint index_23[2], bool read_only) {
 }
 
 template <typename K, typename D>
-BulkData<D> DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
-    debug_print("[%u]DPF_Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
+BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only) {
+    debug_print("[%u]DPFRead, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     BulkData<D> v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, !read_only);
 
@@ -208,7 +208,7 @@ BulkData<D> DPFORAM<K, D>::DPF_Read(const uint index_23[2], bool read_only) {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) {
+void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) {
     debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     uint block_index_23[2];
@@ -232,13 +232,13 @@ void DPFORAM<K, D>::Write(const uint index_23[2], D &v_new_13, bool count_band) 
     if (this->write_array_13_.size() == 1) {
         this->write_array_13_[0] = new_block_13;
     } else {
-        DPF_Write(block_index_23, this->last_read_block_13_, new_block_13, count_band);
+        DPFWrite(block_index_23, this->last_read_block_13_, new_block_13, count_band);
     }
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band) {
-    debug_print("[%u]DPF_Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
+void ORAM<K, D>::DPFWrite(const uint index_23[2], BulkData<D> &old_block_13, BulkData<D> &new_block_13, bool count_band) {
+    debug_print("[%u]DPFWrite, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     BulkData<D> delta_block_13 = new_block_13 - old_block_13;
 
@@ -247,7 +247,7 @@ void DPFORAM<K, D>::DPF_Write(const uint index_23[2], BulkData<D> &old_block_13,
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
+void ORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
     debug_print("[%u]AppendCache\n", this->Size());
     uint data_size = new_block_13.Size();
     BulkData<D> new_block_23[2] = {BulkData<D>(data_size), BulkData<D>(data_size)};
@@ -264,7 +264,7 @@ void DPFORAM<K, D>::AppendCache(BulkData<D> &new_block_13, bool count_band) {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Flush(bool count_band) {
+void ORAM<K, D>::Flush(bool count_band) {
     debug_print("[%u]Flush\n", this->Size());
     uint size = this->write_array_13_.size();
     std::vector<BulkData<D>> array_23[2];
@@ -280,7 +280,7 @@ void DPFORAM<K, D>::Flush(bool count_band) {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::PrintMetadata() {
+void ORAM<K, D>::PrintMetadata() {
 #ifdef DEBUG
     debug_print("========== PrintMetadata ==========\n");
     debug_print("party_: %u\n", this->party_);
@@ -302,7 +302,7 @@ void DPFORAM<K, D>::PrintMetadata() {
 }
 
 template <typename K, typename D>
-void DPFORAM<K, D>::Test(uint iterations) {
+void ORAM<K, D>::Test(uint iterations) {
     // TODO remember to free memory
     fprintf(stderr, "Test, iterations = %u \n", iterations);
 
@@ -310,7 +310,6 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
     uint64_t party_time = 0;
     uint n = this->Size();
-    uint64_t t1;
 
     // socket seems need extra setup at first read/write
     this->peer_[0].WriteUInt(0, false);
@@ -367,9 +366,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
             key_23[0].Print("key_23[0]");
             key_23[1].Print("key_23[1]");
 
-            t1 = timestamp();
+            t1 = get_time();
             KeyToIndex(key_23, index_23, true);
-            party_time += timestamp() - t1;
+            party_time += get_time_diff(t1, get_time());
             debug_print("index = %u, index_23 = (%u, %u)\n", index, index_23[0], index_23[1]);
         } else {
             index_23[0] = rand_uint(this->peer_[0].PRG()) % n;
@@ -388,9 +387,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
 
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");
-        t1 = timestamp();
+        t1 = get_time();
         D old_data_13 = this->Read(index_23, false);
-        party_time += timestamp() - t1;
+        party_time += get_time_diff(t1, get_time());
 
         old_data_13.Print("old_data_13");
 
@@ -407,9 +406,9 @@ void DPFORAM<K, D>::Test(uint iterations) {
         new_data_13[2].Random();
         new_data_13[2].Print("new_data_13[2]");
 
-        t1 = timestamp();
+        t1 = get_time();
         this->Write(index_23, new_data_13[2], true);
-        party_time += timestamp() - t1;
+        party_time += get_time_diff(t1, get_time());
         // printf("Write random data party_time = %llu\n", party_time);
 
         this->PrintMetadata();
@@ -471,22 +470,22 @@ void DPFORAM<K, D>::Test(uint iterations) {
     fprintf(stderr, "\n");
 }
 
-template class DPFORAM<BinaryData, BinaryData>;
-template class DPFORAM<BinaryData, ECData>;
-template class DPFORAM<BinaryData, ZpData>;
-template class DPFORAM<BinaryData, ZpDebugData>;
+template class ORAM<BinaryData, BinaryData>;
+template class ORAM<BinaryData, ECData>;
+template class ORAM<BinaryData, ZpData>;
+template class ORAM<BinaryData, ZpDebugData>;
 
-template class DPFORAM<ZpData, BinaryData>;
-template class DPFORAM<ZpData, ECData>;
-template class DPFORAM<ZpData, ZpData>;
-template class DPFORAM<ZpData, ZpDebugData>;
+template class ORAM<ZpData, BinaryData>;
+template class ORAM<ZpData, ECData>;
+template class ORAM<ZpData, ZpData>;
+template class ORAM<ZpData, ZpDebugData>;
 
-template class DPFORAM<ECData, BinaryData>;
-template class DPFORAM<ECData, ECData>;
-template class DPFORAM<ECData, ZpData>;
-template class DPFORAM<ECData, ZpDebugData>;
+template class ORAM<ECData, BinaryData>;
+template class ORAM<ECData, ECData>;
+template class ORAM<ECData, ZpData>;
+template class ORAM<ECData, ZpDebugData>;
 
-template class DPFORAM<ZpDebugData, BinaryData>;
-template class DPFORAM<ZpDebugData, ECData>;
-template class DPFORAM<ZpDebugData, ZpData>;
-template class DPFORAM<ZpDebugData, ZpDebugData>;
+template class ORAM<ZpDebugData, BinaryData>;
+template class ORAM<ZpDebugData, ECData>;
+template class ORAM<ZpDebugData, ZpData>;
+template class ORAM<ZpDebugData, ZpDebugData>;

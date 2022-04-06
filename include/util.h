@@ -126,8 +126,4 @@ void print_array(std::vector<D> &array, const char *array_name, const int64_t ar
 #endif
 }
 
-inline uint64_t timestamp() {
-    return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-}
-
 #endif /* UTIL_H_ */

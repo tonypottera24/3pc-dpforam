@@ -9,7 +9,7 @@
 #include <boost/program_options.hpp>
 #include <thread>
 
-#include "dpf_oram.h"
+#include "oram.h"
 #include "peer.h"
 #include "socket.h"
 #include "util.h"
@@ -109,22 +109,22 @@ int main(int argc, char *argv[]) {
 
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
-    uint64_t start_time = timestamp();
-    // DPFORAM<BinaryData, BinaryData> dpf_oram = DPFORAM<BinaryData, BinaryData>(party, peer, n, data_size);
-    // DPFORAM<BinaryData, ZpDebugData> dpf_oram = DPFORAM<BinaryData, ZpDebugData>(party, peer, n, data_size);
-    DPFORAM<ZpDebugData, BinaryData> dpf_oram = DPFORAM<ZpDebugData, BinaryData>(party, peer, n, data_size);
+    // uint64_t start_time = timestamp();
+    // ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, data_size);
+    // ORAM<BinaryData, ZpDebugData> oram = ORAM<BinaryData, ZpDebugData>(party, peer, n, data_size);
+    ORAM<ZpDebugData, BinaryData> oram = ORAM<ZpDebugData, BinaryData>(party, peer, n, data_size);
 
-    // DPFORAM<BinaryData, ECData> dpf_oram = DPFORAM<BinaryData, ECData>(party, peer, n, data_size);
-    // DPFORAM<BinaryData, ZpData> dpf_oram = DPFORAM<BinaryData, ZpData>(party, peer, n, data_size);
-    // DPFORAM<ECData, BinaryData> dpf_oram = DPFORAM<ECData, BinaryData>(party, peer, n, data_size);
-    // DPFORAM<ECData, ECData> dpf_oram = DPFORAM<ECData, ECData>(party, peer, n, data_size);
-    // DPFORAM<ZpData, BinaryData> dpf_oram = DPFORAM<ZpData, BinaryData>(party, peer, n, data_size);
-    // DPFORAM<ZpData, ZpData> dpf_oram = DPFORAM<ZpData, ZpData>(party, peer, n, data_size);
+    // ORAM<BinaryData, ECData> oram = ORAM<BinaryData, ECData>(party, peer, n, data_size);
+    // ORAM<BinaryData, ZpData> oram = ORAM<BinaryData, ZpData>(party, peer, n, data_size);
+    // ORAM<ECData, BinaryData> oram = ORAM<ECData, BinaryData>(party, peer, n, data_size);
+    // ORAM<ECData, ECData> oram = ORAM<ECData, ECData>(party, peer, n, data_size);
+    // ORAM<ZpData, BinaryData> oram = ORAM<ZpData, BinaryData>(party, peer, n, data_size);
+    // ORAM<ZpData, ZpData> oram = ORAM<ZpData, ZpData>(party, peer, n, data_size);
 
-    uint64_t end_time = timestamp();
-    fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
+    // uint64_t end_time = timestamp();
+    // fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);
 
-    dpf_oram.Test(iterations);
+    oram.Test(iterations);
 
     for (uint b = 0; b < 2; b++) {
         peer[b].Close();
