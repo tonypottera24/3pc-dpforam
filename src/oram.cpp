@@ -449,10 +449,24 @@ void ORAM<K, D>::Test(uint iterations) {
 
     fprintf(stderr, "\n");
     fprintf(stderr, "n = %u\n", this->Size());
+    fprintf(stderr, "\n");
 
+#ifdef BENCHMARK_DPF
+    Benchmark::DPF_GEN.PrintTotal(this->peer_, "DPF_GEN", iterations);
+    Benchmark::DPF_EVAL.PrintTotal(this->peer_, "DPF_EVAL", iterations);
+    Benchmark::DPF_EVAL_ALL.PrintTotal(this->peer_, "DPF_EVAL_ALL", iterations);
+    fprintf(stderr, "\n");
+
+    Benchmark::PSEUDO_DPF_GEN.PrintTotal(this->peer_, "PSEUDO_DPF_GEN", iterations);
+    Benchmark::PSEUDO_DPF_EVAL.PrintTotal(this->peer_, "PSEUDO_DPF_EVAL", iterations);
+    Benchmark::PSEUDO_DPF_EVAL_ALL.PrintTotal(this->peer_, "PSEUDO_DPF_EVAL_ALL", iterations);
+    fprintf(stderr, "\n");
+#endif
+
+    Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, "KEY_TO_INDEX", iterations);
     Benchmark::ORAM_READ.PrintTotal(this->peer_, "ORAM_READ", iterations);
     Benchmark::ORAM_WRITE.PrintTotal(this->peer_, "ORAM_WRITE", iterations);
-    Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, "KEY_TO_INDEX", iterations);
+    fprintf(stderr, "\n");
 
     Benchmark::Record total = Benchmark::ORAM_READ + Benchmark::ORAM_WRITE + Benchmark::KEY_TO_INDEX;
     total.PrintTotal(this->peer_, "total", iterations);

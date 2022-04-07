@@ -55,9 +55,9 @@ public:
 };
 
 // Top Level ORAM
+extern Record KEY_TO_INDEX;
 extern Record ORAM_READ;
 extern Record ORAM_WRITE;
-extern Record KEY_TO_INDEX;
 
 // Position map ORAM
 #define BENCHMARK_POSITION_MAP
@@ -73,19 +73,15 @@ extern Record ORAM_WRITE_POSITION_MAP;
 // extern Record DPF_PIW;
 
 // DPF
-// #define BENCHMARK_DPF_GEN
+#define BENCHMARK_DPF
 extern Record DPF_GEN;
-// #define BENCHMARK_DPF_EVAL
 extern Record DPF_EVAL;
-// #define BENCHMARK_DPF_EVAL_FULL
 extern Record DPF_EVAL_ALL;
 
 // PSEUDO_DPF
-// #define BENCHMARK_PSEUDO_DPF_GEN
+#define BENCHMARK_PSEUDO_DPF
 extern Record PSEUDO_DPF_GEN;
-// #define BENCHMARK_PSEUDO_DPF_EVAL
 extern Record PSEUDO_DPF_EVAL;
-// #define BENCHMARK_PSEUDO_DPF_EVAL_FULL
 extern Record PSEUDO_DPF_EVAL_ALL;
 
 };  // namespace Benchmark

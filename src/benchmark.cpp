@@ -68,9 +68,9 @@ void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t ite
 }
 
 // Top Level ORAM
+Benchmark::Record Benchmark::KEY_TO_INDEX;
 Benchmark::Record Benchmark::ORAM_READ;
 Benchmark::Record Benchmark::ORAM_WRITE;
-Benchmark::Record Benchmark::KEY_TO_INDEX;
 
 // Position map ORAM
 Benchmark::Record Benchmark::ORAM_READ_POSITION_MAP;
