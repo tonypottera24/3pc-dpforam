@@ -73,13 +73,13 @@ extern Record ORAM_WRITE_POSITION_MAP;
 // extern Record DPF_PIW;
 
 // DPF
-#define BENCHMARK_DPF
+// #define BENCHMARK_DPF
 extern Record DPF_GEN;
 extern Record DPF_EVAL;
 extern Record DPF_EVAL_ALL;
 
 // PSEUDO_DPF
-#define BENCHMARK_PSEUDO_DPF
+// #define BENCHMARK_PSEUDO_DPF
 extern Record PSEUDO_DPF_GEN;
 extern Record PSEUDO_DPF_EVAL;
 extern Record PSEUDO_DPF_EVAL_ALL;

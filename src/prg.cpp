@@ -1,8 +1,10 @@
 #include "prg.h"
 
 PRG::PRG() {
-    this->seed_ = (unsigned char *)OPENSSL_malloc(this->seed_size);
-    RAND_bytes(this->seed_, this->seed_size);
+    this->seed_ = (unsigned char *)OPENSSL_malloc(this->seed_size_);
+    RAND_bytes(this->seed_, this->seed_size_);
+    RAND_bytes(this->aes_key_, this->aes_key_size_);
+    RAND_bytes(this->aes_iv_, this->aes_iv_size_);
 }
 
 PRG::~PRG() {
@@ -12,21 +14,26 @@ PRG::~PRG() {
 }
 
 void PRG::SetSeed(uchar *seed) {
-    memcpy(this->seed_, seed, this->seed_size);
+    memcpy(this->aes_key_, seed, this->aes_key_size_);
+    memcpy(this->aes_iv_, seed + this->aes_key_size_, this->aes_iv_size_);
+    memcpy(this->seed_, seed + this->aes_key_size_ + this->aes_iv_size_, this->seed_size_);
 }
 
 void PRG::RandBytes(uchar *data, uint size) {
     uint offset = 0;
     while (offset < size) {
-        EVP_DigestInit_ex2(this->md_ctx_, this->evp_md_, NULL);
-        EVP_DigestUpdate(this->md_ctx_, this->seed_, seed_size);
-        uint digest_size;
-        EVP_DigestFinal_ex(this->md_ctx_, this->seed_, &digest_size);
-        if (offset + digest_size > size) {
-            digest_size = size - offset;
+        if (this->used_bytes_ == this->seed_size_) {
+            int block_size;
+            EVP_EncryptInit_ex(this->cipher_ctx_, this->evp_cipher_, NULL, this->aes_key_, this->aes_iv_);
+            EVP_EncryptUpdate(this->cipher_ctx_, this->seed_, &block_size, this->seed_, this->seed_size_);
+            EVP_EncryptFinal_ex(this->cipher_ctx_, this->seed_, &block_size);
+            this->used_bytes_ = 0;
         }
-        memcpy(&data[offset], this->seed_, digest_size);
-        offset += digest_size;
+
+        uint bytes_to_copy = std::min(this->seed_size_ - this->used_bytes_, size - offset);
+        memcpy(data + offset, this->seed_ + this->used_bytes_, bytes_to_copy);
+        offset += bytes_to_copy;
+        this->used_bytes_ += bytes_to_copy;
     }
 }
 
