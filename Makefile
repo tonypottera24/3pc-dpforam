@@ -27,7 +27,7 @@ TEST_OBJ := $(TEST_SRC:$(TEST_SRC_DIR)/%.cpp=$(TEST_OBJ_DIR)/%.o)
 TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
 
 
-CC = clang++-mp-13
+CC = clang++
 CFLAGS = -Wall -g -O2 -Werror --std=c++17 -DSHA256_ASM
 CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -maes -msse2 -fopenmp
 LDFLAGS = -L/opt/local/lib -Llib

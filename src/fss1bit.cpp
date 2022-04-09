@@ -136,8 +136,9 @@ void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> 
     Benchmark::PSEUDO_DPF_EVAL_ALL.Start();
 #endif
     // uint index_byte = 0, index_bit = 0;
+    std::vector<uchar> query_dump = query.Dump();
     for (uint i = 0; i < n; i++) {
-        dpf_out[i] = get_buffer_bit(query.Dump().data(), i);
+        dpf_out[i] = get_buffer_bit(query_dump.data(), i);
     }
 #ifdef BENCHMARK_PSEUDO_DPF
     Benchmark::PSEUDO_DPF_EVAL_ALL.End();
