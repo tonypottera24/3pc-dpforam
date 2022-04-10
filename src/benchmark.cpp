@@ -38,9 +38,9 @@ void Benchmark::Record::AddBandwidth(uint64_t n) {
 }
 
 void Benchmark::Record::Print() {
-    fprintf(stderr, "time: %llu\n", this->GetTime());
-    fprintf(stderr, "count: %llu\n", this->count_);
-    fprintf(stderr, "bandwidth: %llu\n", this->bandwidth_);
+    fprintf(stderr, "time: %lu\n", this->GetTime());
+    fprintf(stderr, "count: %lu\n", this->count_);
+    fprintf(stderr, "bandwidth: %lu\n", this->bandwidth_);
 }
 
 void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t iteration) {
@@ -64,7 +64,7 @@ void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t ite
         total_bandwidth += peer[1 - b].ReadUInt64();
     }
 
-    fprintf(stderr, "%s: (%llu, %llu, %llu)\n", title, avg_time / iteration, avg_count / iteration, total_bandwidth / iteration);
+    fprintf(stderr, "%s: (%lu, %lu, %lu)\n", title, avg_time / iteration, avg_count / iteration, total_bandwidth / iteration);
 }
 
 // Top Level ORAM

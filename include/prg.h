@@ -6,6 +6,7 @@
 #include <openssl/rand.h>
 
 #include <cmath>
+#include <cstring>
 #include <vector>
 
 #include "typedef.h"
