@@ -64,7 +64,7 @@ void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t ite
         total_bandwidth += peer[1 - b].ReadUInt64();
     }
 
-    fprintf(stderr, "%s: (%lu, %lu, %lu)\n", title, avg_time / iteration, avg_count / iteration, total_bandwidth / iteration);
+    fprintf(stderr, "%s %lu %lu %lu\n", title, avg_time / iteration, avg_count / iteration, total_bandwidth / iteration);
 }
 
 // Top Level ORAM

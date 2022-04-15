@@ -9,8 +9,8 @@ def start_benchmark(proto_test_arg):
 
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
-        bandwidth = int(stderr[-3].split(" ")[-1])
-        execution_time = int(stderr[-2].split(" ")[-1])
+        bandwidth = int(stderr[-2].split(" ")[-1])
+        execution_time = int(stderr[-2].split(" ")[1])
         print(f"bandwidth {bandwidth}")
         print(f"execution_time {execution_time}")
         return bandwidth, execution_time
@@ -28,7 +28,7 @@ PARTY = int(args.party)
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
-LOG_N = range(10, 18)
+LOG_N = range(10, 28)
 # LOG_N = 25
 # TAU = range(1, 10)
 TAU = 5
