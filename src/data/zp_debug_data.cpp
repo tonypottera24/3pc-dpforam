@@ -67,6 +67,6 @@ void ZpDebugData::Print(const char *title) {
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
-    debug_print("%d\n", this->data_);
+    debug_print("%u\n", this->data_);
 #endif
 }

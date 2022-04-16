@@ -110,7 +110,7 @@ void print_bytes(const uchar *bytes, const uint len, const char *array_name, con
     if (array_index == -1) {
         debug_print("%s: 0x", array_name);
     } else {
-        debug_print("%s[%llu]: 0x", array_name, array_index);
+        debug_print("%s[%ld]: 0x", array_name, array_index);
     }
     for (uint i = 0; i < len; i++) {
         debug_print("%02X", bytes[i]);

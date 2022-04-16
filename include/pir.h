@@ -62,15 +62,17 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 }
 
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], EVP_MD_CTX *md_ctx, uchar *md5_digest, Benchmark::Record *benchmark) {
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], Benchmark::Record *benchmark) {
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
     const uint digest_size = 2;
     const uint digest_size_log = digest_size * 8;
     const uint digest_n = 1 << digest_size_log;
-    const EVP_MD *evp_md5 = EVP_md5();
-    uint md5_digest_size;
+    const EVP_MD *evp_sha256 = EVP_sha256();
+    EVP_MD_CTX *md_ctx = EVP_MD_CTX_new();
+    uchar *sha256_digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(evp_sha256));
+    uint sha256_digest_size;
 
     uint v_sum = 0;
     if (party == 2) {
@@ -85,13 +87,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 key_dump[0] ^= 1;
             }
 
-            EVP_DigestInit_ex2(md_ctx, evp_md5, NULL);
+            EVP_DigestInit_ex2(md_ctx, evp_sha256, NULL);
             EVP_DigestUpdate(md_ctx, key_dump.data(), key_dump.size());
-            EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
-            // fprintf(stderr, "md5_digest_size = %u\n", md5_digest_size);
+            EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+            // fprintf(stderr, "sha256_digest_size = %u\n", sha256_digest_size);
             uint digest_uint;
-            // memcpy(&digest_uint, md5_digest, digest_size);
-            memcpy(&digest_uint, md5_digest, sizeof(uint));
+            // memcpy(&digest_uint, sha256_digest, digest_size);
+            memcpy(&digest_uint, sha256_digest, sizeof(uint));
             digest_uint %= digest_n;
 
             // print_bytes(digest, digest_size, "digest");
@@ -118,13 +120,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             K key = key_array_13[i] - key_23[1 - party];
             key_dump_array[i] = key.Dump();
 
-            EVP_DigestInit_ex2(md_ctx, evp_md5, NULL);
+            EVP_DigestInit_ex2(md_ctx, evp_sha256, NULL);
             EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
-            EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
+            EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 
             uint digest_uint;
-            // memcpy(&digest_uint, md5_digest, digest_size);
-            memcpy(&digest_uint, md5_digest, sizeof(uint));
+            // memcpy(&digest_uint, sha256_digest, digest_size);
+            memcpy(&digest_uint, sha256_digest, sizeof(uint));
             digest_uint %= digest_n;
             key_array_digest[i] = digest_uint;
 
@@ -176,13 +178,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             } else {  // collision
                 // fprintf(stderr, "collision, i = %u\n", i);
                 key_dump_array[i][0] ^= 1;
-                EVP_DigestInit_ex2(md_ctx, evp_md5, NULL);
+                EVP_DigestInit_ex2(md_ctx, evp_sha256, NULL);
                 EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
-                EVP_DigestFinal_ex(md_ctx, md5_digest, &md5_digest_size);
+                EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 
                 uint digest_uint;
-                // memcpy(&digest_uint, md5_digest, digest_size);
-                memcpy(&digest_uint, md5_digest, sizeof(uint));
+                // memcpy(&digest_uint, sha256_digest, digest_size);
+                memcpy(&digest_uint, sha256_digest, sizeof(uint));
                 digest_uint %= digest_n;
                 bool hit = false;
                 if (collision_mode) {
@@ -202,6 +204,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             v_sum ^= rand_uint(peer[P2].PRG()) % n;
         }
     }
+
+    EVP_MD_CTX_free(md_ctx);
+    OPENSSL_free(sha256_digest);
 
     return v_sum % n;
 }

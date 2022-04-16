@@ -117,7 +117,7 @@ void print_array(std::vector<D> &array, const char *array_name, const int64_t ar
     if (array_index == -1) {
         debug_print("%s:\n", array_name);
     } else {
-        debug_print("%s[%llu]:\n", array_name, array_index);
+        debug_print("%s[%ld]:\n", array_name, array_index);
     }
     for (uint i = 0; i < array.size(); i++) {
         debug_print("[%u] ", i);

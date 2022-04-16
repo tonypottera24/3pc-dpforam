@@ -9,7 +9,8 @@
 class ZpDebugData {
 private:
     uint data_ = 0;
-    const static uint p_ = 4294967291;
+    // const static uint p_ = 4294967291;
+    const static uint p_ = 2147483647;
     const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
 
