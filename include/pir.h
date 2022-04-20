@@ -71,17 +71,17 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     const uint digest_size_log = digest_size * 8;
     const uint digest_n = 1 << digest_size_log;
 
-    const EVP_MD *evp_sha256 = EVP_sha256();
-    EVP_MD_CTX *md_ctx = EVP_MD_CTX_new();
-    EVP_DigestInit_ex2(md_ctx, evp_sha256, NULL);
-    uchar *sha256_digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(evp_sha256));
+    // const EVP_MD *evp_sha256 = EVP_sha256();
+    // EVP_MD_CTX *md_ctx = EVP_MD_CTX_new();
+    // EVP_DigestInit_ex2(md_ctx, evp_sha256, NULL);
+    // uchar *sha256_digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(evp_sha256));
 
-    // EVP_CIPHER_CTX *cipher_ctx = EVP_CIPHER_CTX_new();
-    // const EVP_CIPHER *evp_cipher = EVP_aes_128_ecb();
-    // uint aes_block_size = EVP_CIPHER_get_block_size(evp_cipher);
-    // uchar *aes_key[2] = {(uchar *)"01234567890123456789012345678901", (uchar *)"01234567890123456789012345678902"};
-    // uchar *aes_iv[2] = {(uchar *)"0123456789012345", (uchar *)"0123456789012346"};
-    // uchar *aes_block = (unsigned char *)OPENSSL_malloc(aes_block_size);
+    EVP_CIPHER_CTX *cipher_ctx = EVP_CIPHER_CTX_new();
+    const EVP_CIPHER *evp_cipher = EVP_aes_128_ecb();
+    uint aes_block_size = EVP_CIPHER_get_block_size(evp_cipher);
+    uchar *aes_key[2] = {(uchar *)"01234567890123456789012345678901", (uchar *)"01234567890123456789012345678902"};
+    uchar *aes_iv[2] = {(uchar *)"0123456789012345", (uchar *)"0123456789012346"};
+    uchar *aes_block = (unsigned char *)OPENSSL_malloc(aes_block_size);
 
     uint v_sum = 0;
     if (party == 2) {
@@ -95,23 +95,23 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 #ifdef BENCHMARK_KEY_VALUE_HASH
             Benchmark::KEY_VALUE_HASH.Start();
 #endif
-            // int aes_block_size;
-            // EVP_CipherInit_ex2(cipher_ctx, evp_cipher, aes_key[b], aes_iv[b], 1, NULL);
-            // EVP_CipherUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump.data(), key_dump.size());
-            // EVP_CipherFinal_ex(cipher_ctx, aes_block, &aes_block_size);
+            int aes_block_size;
+            EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[b], aes_iv[b], NULL);
+            EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump.data(), key_dump.size());
+            EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
 
-            if (b == 1) key_dump[0] ^= 1;
-            uint sha256_digest_size;
-            EVP_DigestInit_ex2(md_ctx, NULL, NULL);
-            EVP_DigestUpdate(md_ctx, key_dump.data(), key_dump.size());
-            EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+            // if (b == 1) key_dump[0] ^= 1;
+            // uint sha256_digest_size;
+            // EVP_DigestInit_ex2(md_ctx, NULL, NULL);
+            // EVP_DigestUpdate(md_ctx, key_dump.data(), key_dump.size());
+            // EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 #ifdef BENCHMARK_KEY_VALUE_HASH
             Benchmark::KEY_VALUE_HASH.End();
 #endif
 
             uint digest_uint;
-            // memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
-            memcpy(&digest_uint, sha256_digest, std::min(sizeof(uint), (unsigned long)sha256_digest_size));
+            memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
+            // memcpy(&digest_uint, sha256_digest, std::min(sizeof(uint), (unsigned long)sha256_digest_size));
             digest_uint %= digest_n;
 
             BinaryData query_23[2];
@@ -132,6 +132,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         std::unordered_map<uint, uint> exists;
         uint collision_ct = 0;
 
+        EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[0], aes_iv[0], NULL);
+
         for (uint i = 0; i < n; i++) {
             K key = key_array_13[i] - key_23[1 - party];
             key_dump_array[i] = key.Dump();
@@ -139,22 +141,22 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 #ifdef BENCHMARK_KEY_VALUE_HASH
             Benchmark::KEY_VALUE_HASH.Start();
 #endif
-            // int aes_block_size;
-            // EVP_CipherInit_ex2(cipher_ctx, evp_cipher, aes_key[0], aes_iv[0], 1, NULL);
-            // EVP_CipherUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
-            // EVP_CipherFinal_ex(cipher_ctx, aes_block, &aes_block_size);
+            int aes_block_size;
+            EVP_EncryptInit_ex2(cipher_ctx, NULL, NULL, NULL, NULL);
+            EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
+            EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
 
-            uint sha256_digest_size;
-            EVP_DigestInit_ex2(md_ctx, NULL, NULL);
-            EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
-            EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+            // uint sha256_digest_size;
+            // EVP_DigestInit_ex2(md_ctx, NULL, NULL);
+            // EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
+            // EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 #ifdef BENCHMARK_KEY_VALUE_HASH
             Benchmark::KEY_VALUE_HASH.End();
 #endif
 
             uint digest_uint;
-            // memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
-            memcpy(&digest_uint, sha256_digest, std::min(sizeof(uint), (unsigned long)sha256_digest_size));
+            memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
+            // memcpy(&digest_uint, sha256_digest, std::min(sizeof(uint), (unsigned long)sha256_digest_size));
             digest_uint %= digest_n;
             key_array_digest[i] = digest_uint;
 
@@ -186,6 +188,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             }
         }
 
+        EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[1], aes_iv[1], NULL);
+
         for (uint i = 0; i < n; i++) {
             uint key_digest = key_array_digest[i];
             if (exists[key_digest] == 1) {
@@ -201,23 +205,23 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 #ifdef BENCHMARK_KEY_VALUE_HASH
                 Benchmark::KEY_VALUE_HASH.Start();
 #endif
-                // int aes_block_size;
-                // EVP_CipherInit_ex2(cipher_ctx, evp_cipher, aes_key[1], aes_iv[1], 1, NULL);
-                // EVP_CipherUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
-                // EVP_CipherFinal_ex(cipher_ctx, aes_block, &aes_block_size);
+                int aes_block_size;
+                EVP_EncryptInit_ex2(cipher_ctx, NULL, NULL, NULL, NULL);
+                EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
+                EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
 
-                key_dump_array[i][0] ^= 1;
-                uint sha256_digest_size;
-                EVP_DigestInit_ex2(md_ctx, NULL, NULL);
-                EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
-                EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
+                // key_dump_array[i][0] ^= 1;
+                // uint sha256_digest_size;
+                // EVP_DigestInit_ex2(md_ctx, NULL, NULL);
+                // EVP_DigestUpdate(md_ctx, key_dump_array[i].data(), key_dump_array[i].size());
+                // EVP_DigestFinal_ex(md_ctx, sha256_digest, &sha256_digest_size);
 #ifdef BENCHMARK_KEY_VALUE_HASH
                 Benchmark::KEY_VALUE_HASH.End();
 #endif
 
                 uint digest_uint;
-                // memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
-                memcpy(&digest_uint, sha256_digest, std::min(sizeof(uint), (unsigned long)sha256_digest_size));
+                memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
+                // memcpy(&digest_uint, sha256_digest, std::min(sizeof(uint), (unsigned long)sha256_digest_size));
                 digest_uint %= digest_n;
 
                 bool hit = false;
@@ -239,10 +243,10 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
     }
 
-    // EVP_CIPHER_CTX_free(cipher_ctx);
-    // OPENSSL_free(aes_block);
-    EVP_MD_CTX_free(md_ctx);
-    OPENSSL_free(sha256_digest);
+    EVP_CIPHER_CTX_free(cipher_ctx);
+    OPENSSL_free(aes_block);
+    // EVP_MD_CTX_free(md_ctx);
+    // OPENSSL_free(sha256_digest);
 
     return v_sum % n;
 }
