@@ -72,6 +72,10 @@ extern Record ORAM_WRITE_POSITION_MAP;
 // PIW
 // extern Record DPF_PIW;
 
+// KEY_VALUE
+// #define BENCHMARK_KEY_VALUE_HASH
+extern Record KEY_VALUE_HASH;
+
 // DPF
 // #define BENCHMARK_DPF
 extern Record DPF_GEN;
