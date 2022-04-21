@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     // uint64_t start_time = timestamp();
-    // ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, data_size);
-    ORAM<BinaryData, ZpDebugData> oram = ORAM<BinaryData, ZpDebugData>(party, peer, n, data_size);
+    ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, data_size);
+    // ORAM<BinaryData, ZpDebugData> oram = ORAM<BinaryData, ZpDebugData>(party, peer, n, data_size);
     // ORAM<ZpDebugData, BinaryData> oram = ORAM<ZpDebugData, BinaryData>(party, peer, n, data_size);
 
     // ORAM<BinaryData, ECData> oram = ORAM<BinaryData, ECData>(party, peer, n, data_size);

@@ -76,6 +76,10 @@ extern Record ORAM_WRITE_POSITION_MAP;
 // #define BENCHMARK_KEY_VALUE_HASH
 extern Record KEY_VALUE_HASH;
 
+// #define BENCHMARK_GROUP_PREPARE
+extern Record GROUP_PREPARE_READ;
+extern Record GROUP_PREPARE_WRITE;
+
 // DPF
 // #define BENCHMARK_DPF
 extern Record DPF_GEN;

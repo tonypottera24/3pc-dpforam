@@ -466,6 +466,12 @@ void ORAM<K, D>::Test(uint iterations) {
     fprintf(stderr, "\n");
 #endif
 
+#ifdef BENCHMARK_GROUP_PREPARE
+    Benchmark::GROUP_PREPARE_READ.PrintTotal(this->peer_, "GROUP_PREPARE_READ", iterations);
+    Benchmark::GROUP_PREPARE_WRITE.PrintTotal(this->peer_, "GROUP_PREPARE_WRITE", iterations);
+    fprintf(stderr, "\n");
+#endif
+
     Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, "KEY_TO_INDEX", iterations);
     Benchmark::ORAM_READ.PrintTotal(this->peer_, "ORAM_READ", iterations);
     Benchmark::ORAM_WRITE.PrintTotal(this->peer_, "ORAM_WRITE", iterations);

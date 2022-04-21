@@ -79,6 +79,10 @@ Benchmark::Record Benchmark::ORAM_WRITE_POSITION_MAP;
 // KEY_VALUE
 Benchmark::Record Benchmark::KEY_VALUE_HASH;
 
+// BENCHMARK_GROUP_PREPARE
+Benchmark::Record Benchmark::GROUP_PREPARE_READ;
+Benchmark::Record Benchmark::GROUP_PREPARE_WRITE;
+
 // DPF
 Benchmark::Record Benchmark::DPF_GEN;
 Benchmark::Record Benchmark::DPF_EVAL;

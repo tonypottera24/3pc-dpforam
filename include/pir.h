@@ -58,7 +58,14 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     if (is_symmetric) {
         return v_sum[0] + v_sum[1];
     } else {
-        return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
+#ifdef BENCHMARK_GROUP_PREPARE
+        Benchmark::GROUP_PREPARE_READ.Start();
+#endif
+        D ans = inv_gadget::Inv(peer, is_0, v_sum, benchmark);
+#ifdef BENCHMARK_GROUP_PREPARE
+        Benchmark::GROUP_PREPARE_READ.End();
+#endif
+        return ans;
     }
 }
 
