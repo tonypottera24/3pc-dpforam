@@ -30,10 +30,10 @@ NEXT_PORT = 9000 + (PARTY + 1) % 3
 
 # LOG_N = range(10, 28)  # binary - binary
 # LOG_N = range(10, 27)  # binary - Zp
-LOG_N = range(10, 26)  # Zp - binary
-# LOG_N = range(10, 19)
+# LOG_N = range(10, 26)  # Zp - binary
+LOG_N = range(10, 20)
 # LOG_N = 25
-# TAU = range(1, 10)
+# TAU = range(2, 20)
 TAU = 5
 DATA_SIZE = 4
 SSOT_THRESHOLD = 0
@@ -44,17 +44,24 @@ bandwidths = []
 execution_times = []
 
 for logn in LOG_N:
+    # for tau in TAU:
+    # for pdpf in PSEUDO_DPF_THRESHOLD:
     print(f"logn = {logn}")
+    # print(f"tau = {tau}")
+    # print(f"pdpf = {pdpf}")
     proto_test_arg = [
         "./bin/test/proto_test",
         "--party", str(PARTY),
         "--port", str(PORT),
         "--next_party_port", str(NEXT_PORT),
         "--log_n", str(logn),
+        # "--log_n", str(LOG_N),
         "--data_size", str(DATA_SIZE),
         "--tau", str(TAU),
+        # "--tau", str(tau),
         "--log_ssot_threshold", str(SSOT_THRESHOLD),
         "--log_pseudo_dpf_threshold", str(PSEUDO_DPF_THRESHOLD),
+        # "--log_pseudo_dpf_threshold", str(pdpf),
     ]
     bandwidth, execution_time = start_benchmark(proto_test_arg)
     bandwidths.append(bandwidth)

@@ -10,7 +10,7 @@ class ZpData {
 private:
     BIGNUM *data_;
     static const inline BIGNUM *p_ = BN_get0_nist_prime_256();
-    // const static inline uint size_ = 64;
+    const static inline uint size_ = BN_num_bytes(BN_get0_nist_prime_256());
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
     const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
@@ -41,8 +41,8 @@ public:
     void Resize(const uint size);
     void Random(PRG *prg = NULL);
     uint Size() {
-        return BN_num_bytes(this->p_);
-        // return this->size_;
+        // return BN_num_bytes(this->p_);
+        return this->size_;
     }
     bool IsSymmetric() { return this->is_symmetric_; }
     void Print(const char *title = "");
