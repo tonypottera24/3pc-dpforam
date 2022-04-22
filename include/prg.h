@@ -9,11 +9,17 @@
 #include <cstring>
 #include <vector>
 
+#include "libdpf/aes.h"
 #include "typedef.h"
 
 class PRG {
 private:
+    // uint128 seed_;
     uchar *seed_;
+    // AES_KEY rand_aes_key_;
+    // uint64_t current_rand_index_;
+    // static const uint seed_size_ = sizeof(uint128);
+
     uint used_bytes_ = 0;
 
     BN_CTX *bn_ctx_ = BN_CTX_new();
@@ -26,9 +32,35 @@ private:
     const static inline EVP_CIPHER *evp_cipher_ = EVP_aes_128_ecb();
     const static inline uint seed_size_ = EVP_CIPHER_get_block_size(EVP_aes_128_ecb());
 
-    // EVP_MD_CTX *md_ctx_;
-    // const static inline EVP_MD *evp_md_ = EVP_sha256();
-    // const static inline uint seed_size_ = EVP_MD_size(EVP_sha256());
+    // inline uint128 set_seed(uint128 *seed) {
+    //     uint128 cur_seed;
+    //     this->current_rand_index_ = 0;
+    //     if (seed) {
+    //         cur_seed = *seed;
+    //     } else {
+    //         if (RAND_bytes((uchar *)&cur_seed, 16) == 0) {
+    //             fprintf(stderr, "** unable to seed securely\n");
+    //             return _mm_setzero_si128();
+    //         }
+    //     }
+    //     AES_set_encrypt_key(cur_seed, &this->rand_aes_key_);
+    //     return cur_seed;
+    // }
+
+    // inline uint128 gen_random() {
+    //     uint128 out;
+    //     uint64_t *val;
+    //     int i;
+
+    //     out = _mm_setzero_si128();
+    //     val = (uint64_t *)&out;
+    //     val[0] = this->current_rand_index_++;
+    //     out = _mm_xor_si128(out, this->rand_aes_key_.rd_key[0]);
+    //     for (i = 1; i < 10; ++i) {
+    //         out = _mm_aesenc_si128(out, this->rand_aes_key_.rd_key[i]);
+    //     }
+    //     return _mm_aesenclast_si128(out, this->rand_aes_key_.rd_key[i]);
+    // }
 
 public:
     PRG();

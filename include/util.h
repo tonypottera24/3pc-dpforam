@@ -111,6 +111,8 @@ void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_pe
     }
 }
 
+std::vector<uchar> hash(std::vector<uchar> &input, uint len, AES_KEY &aes_key);
+
 template <typename D>
 void print_array(std::vector<D> &array, const char *array_name, const int64_t array_index = -1) {
 #ifdef DEBUG

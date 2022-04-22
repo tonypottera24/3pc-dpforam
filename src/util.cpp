@@ -105,6 +105,22 @@ uint rand_uint(PRG *prg) {
     return value;
 }
 
+std::vector<uchar> hash(std::vector<uchar> &input, uint len, AES_KEY &aes_key) {
+    uint n_blocks = divide_ceil(input.size(), sizeof(uint128));
+    uint128 digest[n_blocks];
+    memset(digest, 0, sizeof(uint128) * n_blocks);
+    memcpy(&digest, input.data(), input.size());
+    AES_ecb_encrypt_blks(digest, n_blocks, &aes_key);
+    uint128 digest_128 = digest[0];
+    for (uint i = 1; i < n_blocks; i++) {
+        digest_128 = _mm_xor_si128(digest_128, digest[i]);
+    }
+
+    std::vector<uchar> result(len);
+    memcpy(result.data(), &digest_128, len);
+    return result;
+}
+
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {
 #ifdef DEBUG
     if (array_index == -1) {

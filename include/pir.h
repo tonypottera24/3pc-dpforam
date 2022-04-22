@@ -85,6 +85,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     uchar *aes_iv[2] = {(uchar *)"0123456789012345", (uchar *)"0123456789012346"};
     uchar *aes_block = (unsigned char *)OPENSSL_malloc(aes_block_size);
 
+    // AES_KEY aes_key[2];
+    // uint128 userkey = _mm_set_epi64((__m64)597349ULL, (__m64)121379ULL);
+    // AES_set_encrypt_key(userkey, &aes_key[0]);
+    // userkey = _mm_set_epi64((__m64)121379ULL, (__m64)597349ULL);
+    // AES_set_encrypt_key(userkey, &aes_key[1]);
+    // std::vector<uchar> aes_block;
+
     uint v_sum = 0;
     if (party == 2) {
         const uint P0 = 1;
@@ -101,12 +108,15 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[b], aes_iv[b], NULL);
             EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump.data(), key_dump.size());
             EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
+
+            // aes_block = hash(key_dump, sizeof(uint), aes_key[b]);
 #ifdef BENCHMARK_KEY_VALUE_HASH
             Benchmark::KEY_VALUE_HASH.End();
 #endif
 
             uint digest_uint;
             memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
+            // memcpy(&digest_uint, aes_block.data(), sizeof(uint));
             digest_uint %= digest_n;
 
             BinaryData query_23[2];
@@ -127,10 +137,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 
         debug_print("GG start n = %u\n", n);
 
-        // std::vector<uchar> key_dump_array[n];
-        // std::unordered_map<uint, std::vector<uchar>> key_dump_array;
         std::vector<std::vector<uchar>> key_dump_array;
-        // uint key_array_digest[n];
         std::vector<uint> key_array_digest(n);
         std::unordered_map<uint, uint> exists;
         uint collision_ct = 0;
@@ -141,7 +148,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 
         for (uint i = 0; i < n; i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            // key_dump_array[i] = key.Dump();
             key_dump_array.push_back(key.Dump());
 
 #ifdef BENCHMARK_KEY_VALUE_HASH
@@ -151,12 +157,15 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             EVP_EncryptInit_ex2(cipher_ctx, NULL, NULL, NULL, NULL);
             EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
             EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
+
+            // aes_block = hash(key_dump_array[i], sizeof(uint), aes_key[0]);
 #ifdef BENCHMARK_KEY_VALUE_HASH
             Benchmark::KEY_VALUE_HASH.End();
 #endif
 
             uint digest_uint;
             memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
+            // memcpy(&digest_uint, aes_block.data(), sizeof(uint));
             digest_uint %= digest_n;
             key_array_digest[i] = digest_uint;
 
@@ -213,12 +222,15 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 EVP_EncryptInit_ex2(cipher_ctx, NULL, NULL, NULL, NULL);
                 EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
                 EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
+
+                // aes_block = hash(key_dump_array[i], sizeof(uint), aes_key[1]);
 #ifdef BENCHMARK_KEY_VALUE_HASH
                 Benchmark::KEY_VALUE_HASH.End();
 #endif
 
                 uint digest_uint;
                 memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
+                // memcpy(&digest_uint, aes_block.data(), sizeof(uint));
                 digest_uint %= digest_n;
 
                 bool hit = false;
