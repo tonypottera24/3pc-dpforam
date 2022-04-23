@@ -106,13 +106,17 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     debug_print("is_0 = %u\n", is_0);
 
 #ifdef BENCHMARK_GROUP_PREPARE
-    Benchmark::GROUP_PREPARE_WRITE.Start();
-#endif
+    std::vector<D> v_delta_33;
+    if (benchmark != NULL && !v_delta_13.IsSymmetric()) {
+        Benchmark::GROUP_PREPARE_WRITE.Start();
+        v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, &Benchmark::GROUP_PREPARE_WRITE);
+        uint64_t bandwidth = Benchmark::GROUP_PREPARE_WRITE.End();
+        benchmark->AddBandwidth(bandwidth);
+    } else {
+        v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, benchmark);
+    }
+#else
     std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, benchmark);
-    v_delta_33[0].Print("v_delta_33[0]");
-    v_delta_33[1].Print("v_delta_33[1]");
-#ifdef BENCHMARK_GROUP_PREPARE
-    Benchmark::GROUP_PREPARE_WRITE.End();
 #endif
 
     std::vector<uchar> dpf_out(n);

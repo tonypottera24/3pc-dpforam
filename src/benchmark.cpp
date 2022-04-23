@@ -2,8 +2,6 @@
 
 Benchmark::Record::Record() {
     this->duration_ = duration<long long, std::nano>::zero();
-    this->count_ = 0;
-    this->bandwidth_ = 0;
 }
 
 Benchmark::Record &Benchmark::Record::operator=(const Benchmark::Record &other) {
@@ -58,13 +56,14 @@ void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t ite
     }
     avg_count /= 3.0;
 
-    uint64_t total_bandwidth = this->bandwidth_;
+    uint64_t avg_bandwidth = this->bandwidth_;
     for (uint b = 0; b < 2; b++) {
         peer[b].WriteUInt64(this->bandwidth_, NULL);
-        total_bandwidth += peer[1 - b].ReadUInt64();
+        avg_bandwidth += peer[1 - b].ReadUInt64();
     }
+    avg_bandwidth /= 3.0;
 
-    fprintf(stderr, "%s %lu %lu %lu\n", title, avg_time / iteration, avg_count / iteration, total_bandwidth / iteration);
+    fprintf(stderr, "%s %lu %lu %lu\n", title, avg_time / iteration, avg_count / iteration, avg_bandwidth / iteration);
 }
 
 // Top Level ORAM

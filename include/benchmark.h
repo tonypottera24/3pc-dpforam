@@ -19,8 +19,9 @@ class Record {
 private:
     timestamp last_start_time_;
     duration<long long, std::nano> duration_;
-    uint64_t bandwidth_;
-    uint64_t count_;
+    uint64_t last_bandwidth_ = 0;
+    uint64_t bandwidth_ = 0;
+    uint64_t count_ = 0;
 
 public:
     Record();
@@ -40,11 +41,13 @@ public:
 
     inline void Start() {
         this->last_start_time_ = high_resolution_clock::now();
+        this->last_bandwidth_ = this->bandwidth_;
     }
 
-    inline void End() {
+    inline uint64_t End() {
         this->duration_ += high_resolution_clock::now() - this->last_start_time_;
         this->count_++;
+        return this->bandwidth_ - this->last_bandwidth_;
     }
 
     void AddBandwidth(uint64_t n);

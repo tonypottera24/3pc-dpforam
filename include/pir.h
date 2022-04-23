@@ -59,13 +59,20 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
         return v_sum[0] + v_sum[1];
     } else {
 #ifdef BENCHMARK_GROUP_PREPARE
-        Benchmark::GROUP_PREPARE_READ.Start();
+        if (benchmark != NULL) {
+            // Benchmark::GROUP_PREPARE_READ.Print();
+            Benchmark::GROUP_PREPARE_READ.Start();
+            D ans = inv_gadget::Inv(peer, is_0, v_sum, &Benchmark::GROUP_PREPARE_READ);
+            uint64_t bandwidth = Benchmark::GROUP_PREPARE_READ.End();
+            // Benchmark::GROUP_PREPARE_READ.Print();
+            benchmark->AddBandwidth(bandwidth);
+            return ans;
+        } else {
+            return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
+        }
+#else
+        return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
 #endif
-        D ans = inv_gadget::Inv(peer, is_0, v_sum, benchmark);
-#ifdef BENCHMARK_GROUP_PREPARE
-        Benchmark::GROUP_PREPARE_READ.End();
-#endif
-        return ans;
     }
 }
 

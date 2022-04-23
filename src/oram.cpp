@@ -381,6 +381,7 @@ void ORAM<K, D>::Test(uint iterations) {
         this->peer_[1].ReadUInt();
 
         uint data_size = this->DataSize();
+        // fprintf(stderr, "data_size = %u\n", data_size);
 
         // fprintf(stderr, "\nTest, ========== Read old data  ==========\n");
         debug_print("\nTest, ========== Read old data ==========\n");

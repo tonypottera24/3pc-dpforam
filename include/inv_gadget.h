@@ -70,6 +70,7 @@ template <typename D>
 D Inv(Peer peer[2], const bool is_0, D v[2], Benchmark::Record *benchmark) {
     debug_print("Inv, is_0 = %u\n", is_0);
     uint data_size = v[0].Size();
+    // fprintf(stderr, "data_size = %u\n", data_size);
 
     P0<D>(peer, is_0, data_size, false, benchmark);
     D r(data_size);
