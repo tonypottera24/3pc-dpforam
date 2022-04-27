@@ -11,7 +11,7 @@ private:
     uint data_ = 0;
     // const static uint p_ = 4294967291;
     const static uint p_ = 2147483647;
-    const bool is_symmetric_ = false;
+    static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
 
 public:
@@ -40,7 +40,7 @@ public:
     void Resize(const uint size);
     void Random(PRG *prg = NULL);
     uint Size() { return sizeof(uint); }
-    bool IsSymmetric() { return this->is_symmetric_; }
+    static bool IsSymmetric() { return is_symmetric_; }
     void Print(const char *title = "");
 };
 

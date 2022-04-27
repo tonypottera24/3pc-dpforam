@@ -39,9 +39,8 @@ public:
             return this->data_[0].Size() * DATA_PER_BLOCK;
         }
     }
-    bool IsSymmetric() {
-        assert(this->data_.size() > 0);
-        return this->data_[0].IsSymmetric();
+    static bool IsSymmetric() {
+        return D::IsSymmetric();
     }
 
     BulkData() {
@@ -174,7 +173,7 @@ public:
         return this->data_.Size();
     }
 
-    bool IsSymmetric() {
+    static bool IsSymmetric() {
         return true;
     }
 

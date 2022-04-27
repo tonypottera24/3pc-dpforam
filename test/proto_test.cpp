@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
+        "log_n", po::value<uint>()->default_value(19), "number of data (log)")(
         "data_size", po::value<uint>()->default_value(4), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(5), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(0), "ssot threshold (log)")(

@@ -18,17 +18,15 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     // only accept power of 2 n
     // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
 
-    const bool is_symmetric = array_23[0][0].IsSymmetric();
-
     BinaryData query_23[2];
     bool is_0 = false;
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, query_23, is_0);
+        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0);
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].ReadData(query_23[0]);
     } else {
-        fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23, is_0);
+        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0);
 
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].WriteData(query_23[1], benchmark);
@@ -55,7 +53,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
         }
     }
 
-    if (is_symmetric) {
+    if (D::IsSymmetric()) {
         return v_sum[0] + v_sum[1];
     } else {
 #ifdef BENCHMARK_GROUP_PREPARE
@@ -76,28 +74,71 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     }
 }
 
+class DPFKeyPIRCTX {
+private:
+    const uchar *aes_key_[2] = {(uchar *)"01234567890123456789012345678901", (uchar *)"67890123456789010123456789012345"};
+    const uchar *aes_iv_[2] = {(uchar *)"0123456789012345", (uchar *)"8901234501234567"};
+    EVP_CIPHER_CTX *cipher_ctx_[2];
+    const EVP_CIPHER *evp_cipher_;
+    uint aes_block_size_;
+    uchar *aes_block_;
+
+public:
+    std::vector<std::vector<uchar>> key_dump_array_;
+    std::vector<uint> key_array_digest_;
+    std::unordered_map<uint, uint> exists_;
+
+public:
+    DPFKeyPIRCTX(uint n) {
+        this->evp_cipher_ = EVP_aes_128_ecb();
+        for (uint b = 0; b < 2; b++) {
+            this->cipher_ctx_[b] = EVP_CIPHER_CTX_new();
+            EVP_EncryptInit_ex2(this->cipher_ctx_[b], this->evp_cipher_, this->aes_key_[b], this->aes_iv_[b], NULL);
+        }
+        this->aes_block_size_ = EVP_CIPHER_get_block_size(this->evp_cipher_);
+        this->aes_block_ = (unsigned char *)OPENSSL_malloc(this->aes_block_size_);
+
+        this->key_dump_array_.resize(n);
+        this->key_array_digest_.resize(n);
+    }
+
+    ~DPFKeyPIRCTX() {
+        for (uint b = 0; b < 2; b++) {
+            EVP_CIPHER_CTX_free(this->cipher_ctx_[b]);
+        }
+        OPENSSL_free(this->aes_block_);
+    }
+
+    inline uint Hash(uint b, uint digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
+#ifdef BENCHMARK_KEY_VALUE_HASH
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_HASH[b].Start();
+        }
+#endif
+        int aes_block_size;
+        EVP_EncryptInit_ex2(this->cipher_ctx_[b], NULL, NULL, NULL, NULL);
+        EVP_EncryptUpdate(this->cipher_ctx_[b], this->aes_block_, &aes_block_size, data.data(), data.size());
+        EVP_EncryptFinal_ex(this->cipher_ctx_[b], this->aes_block_, &aes_block_size);
+
+        uint digest_uint;
+        memcpy(&digest_uint, this->aes_block_, std::min(sizeof(uint), (unsigned long)aes_block_size));
+#ifdef BENCHMARK_KEY_VALUE_HASH
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_HASH[b].End();
+        }
+#endif
+        return digest_uint % digest_n;
+    }
+};
+
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], Benchmark::Record *benchmark) {
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], DPFKeyPIRCTX *dpf_key_pir_ctx, Benchmark::Record *benchmark) {
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
     const uint digest_size = 2;
     const uint digest_size_log = digest_size * 8;
     const uint digest_n = 1 << digest_size_log;
-
-    EVP_CIPHER_CTX *cipher_ctx = EVP_CIPHER_CTX_new();
-    const EVP_CIPHER *evp_cipher = EVP_aes_128_ecb();
-    uint aes_block_size = EVP_CIPHER_get_block_size(evp_cipher);
-    uchar *aes_key[2] = {(uchar *)"01234567890123456789012345678901", (uchar *)"01234567890123456789012345678902"};
-    uchar *aes_iv[2] = {(uchar *)"0123456789012345", (uchar *)"0123456789012346"};
-    uchar *aes_block = (unsigned char *)OPENSSL_malloc(aes_block_size);
-
-    // AES_KEY aes_key[2];
-    // uint128 userkey = _mm_set_epi64((__m64)597349ULL, (__m64)121379ULL);
-    // AES_set_encrypt_key(userkey, &aes_key[0]);
-    // userkey = _mm_set_epi64((__m64)121379ULL, (__m64)597349ULL);
-    // AES_set_encrypt_key(userkey, &aes_key[1]);
-    // std::vector<uchar> aes_block;
 
     uint v_sum = 0;
     if (party == 2) {
@@ -108,23 +149,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         print_bytes(key_dump.data(), key_dump.size(), "key_dump");
 
         for (uint b = 0; b < 2; b++) {
-#ifdef BENCHMARK_KEY_VALUE_HASH
-            Benchmark::KEY_VALUE_HASH.Start();
-#endif
-            int aes_block_size;
-            EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[b], aes_iv[b], NULL);
-            EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump.data(), key_dump.size());
-            EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
-
-            // aes_block = hash(key_dump, sizeof(uint), aes_key[b]);
-#ifdef BENCHMARK_KEY_VALUE_HASH
-            Benchmark::KEY_VALUE_HASH.End();
-#endif
-
-            uint digest_uint;
-            memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
-            // memcpy(&digest_uint, aes_block.data(), sizeof(uint));
-            digest_uint %= digest_n;
+            uint digest_uint = dpf_key_pir_ctx->Hash(b, digest_n, key_dump, benchmark);
 
             BinaryData query_23[2];
             bool is_0 = false;
@@ -138,43 +163,21 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             peer[1].WriteData(query_23[1], benchmark);
         }
         v_sum = rand_uint(peer[P0].PRG()) % n;
-
-        debug_print("GG success\n");
     } else {  // party == 0 || party == 1
-
-        debug_print("GG start n = %u\n", n);
-
-        std::vector<std::vector<uchar>> key_dump_array;
-        std::vector<uint> key_array_digest(n);
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_PREPARE.Start();
+        }
+#endif
         std::unordered_map<uint, uint> exists;
         uint collision_ct = 0;
 
-        EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[0], aes_iv[0], NULL);
-
-        debug_print("GG0\n");
-
         for (uint i = 0; i < n; i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            key_dump_array.push_back(key.Dump());
+            dpf_key_pir_ctx->key_dump_array_[i] = key.Dump();
 
-#ifdef BENCHMARK_KEY_VALUE_HASH
-            Benchmark::KEY_VALUE_HASH.Start();
-#endif
-            int aes_block_size;
-            EVP_EncryptInit_ex2(cipher_ctx, NULL, NULL, NULL, NULL);
-            EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
-            EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
-
-            // aes_block = hash(key_dump_array[i], sizeof(uint), aes_key[0]);
-#ifdef BENCHMARK_KEY_VALUE_HASH
-            Benchmark::KEY_VALUE_HASH.End();
-#endif
-
-            uint digest_uint;
-            memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
-            // memcpy(&digest_uint, aes_block.data(), sizeof(uint));
-            digest_uint %= digest_n;
-            key_array_digest[i] = digest_uint;
+            uint digest_uint = dpf_key_pir_ctx->Hash(0, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
+            dpf_key_pir_ctx->key_array_digest_[i] = digest_uint;
 
             if (exists.find(digest_uint) == exists.end()) {
                 exists[digest_uint] = 1;
@@ -183,35 +186,45 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 collision_ct++;
             }
         }
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_PREPARE.End();
+        }
+#endif
 
-        debug_print("GG1\n");
-
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_DPF.Start();
+        }
+#endif
         // bool collision_mode = true;
         bool collision_mode = collision_ct > 2;
         // fprintf(stderr, "collision_ct = %u\n", collision_ct);
 
         BinaryData query[2];
         std::vector<uchar> dpf_out[2];
-
         for (uint b = 0; b < 2; b++) {
             uint query_size = peer[party].ReadUInt();
             query[b].Resize(query_size);
             peer[party].ReadData(query[b]);
-        }
-
-        debug_print("GG2\n");
-
-        for (uint b = 0; b < 2; b++) {
             if (b == 0 || collision_mode) {
                 dpf_out[b].resize(digest_n);
                 fss.EvalAll(query[b], digest_size_log, dpf_out[b]);
             }
         }
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_DPF.End();
+        }
+#endif
 
-        EVP_EncryptInit_ex2(cipher_ctx, evp_cipher, aes_key[1], aes_iv[1], NULL);
-
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_EVALUATE.Start();
+        }
+#endif
         for (uint i = 0; i < n; i++) {
-            uint key_digest = key_array_digest[i];
+            uint key_digest = dpf_key_pir_ctx->key_array_digest_[i];
             if (exists[key_digest] == 1) {
                 // debug_print("dpf i = %u, exists = 1\n", i);
                 // print_bytes((uchar *)&key_digest, digest_size, "key_digest");
@@ -221,46 +234,29 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                     v_sum ^= i;
                 }
             } else {  // collision
-                      // fprintf(stderr, "collision, i = %u\n", i);
-#ifdef BENCHMARK_KEY_VALUE_HASH
-                Benchmark::KEY_VALUE_HASH.Start();
-#endif
-                int aes_block_size;
-                EVP_EncryptInit_ex2(cipher_ctx, NULL, NULL, NULL, NULL);
-                EVP_EncryptUpdate(cipher_ctx, aes_block, &aes_block_size, key_dump_array[i].data(), key_dump_array[i].size());
-                EVP_EncryptFinal_ex(cipher_ctx, aes_block, &aes_block_size);
-
-                // aes_block = hash(key_dump_array[i], sizeof(uint), aes_key[1]);
-#ifdef BENCHMARK_KEY_VALUE_HASH
-                Benchmark::KEY_VALUE_HASH.End();
-#endif
-
-                uint digest_uint;
-                memcpy(&digest_uint, aes_block, std::min(sizeof(uint), (unsigned long)aes_block_size));
-                // memcpy(&digest_uint, aes_block.data(), sizeof(uint));
-                digest_uint %= digest_n;
-
+                // fprintf(stderr, "collision, i = %u\n", i);
+                uint digest_uint = dpf_key_pir_ctx->Hash(1, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
                 bool hit = false;
                 if (collision_mode) {
                     hit = dpf_out[1][digest_uint];
                 } else {
                     hit = fss.Eval(query[1], digest_uint);
                 }
-                if (hit) {
-                    v_sum ^= i;
-                }
+                if (hit) v_sum ^= i;
                 // collision can still happen...
             }
         }
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_EVALUATE.End();
+        }
+#endif
 
         if (party == 0) {
             const uint P2 = 0;
             v_sum ^= rand_uint(peer[P2].PRG()) % n;
         }
     }
-
-    EVP_CIPHER_CTX_free(cipher_ctx);
-    OPENSSL_free(aes_block);
 
     return v_sum % n;
 }

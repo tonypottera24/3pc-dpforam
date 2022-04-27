@@ -75,19 +75,23 @@ Benchmark::Record Benchmark::ORAM_WRITE;
 Benchmark::Record Benchmark::ORAM_READ_POSITION_MAP;
 Benchmark::Record Benchmark::ORAM_WRITE_POSITION_MAP;
 
-// KEY_VALUE
-Benchmark::Record Benchmark::KEY_VALUE_HASH;
+// BENCHMARK_KEY_VALUE
+Benchmark::Record Benchmark::KEY_VALUE_PREPARE;
+Benchmark::Record Benchmark::KEY_VALUE_DPF;
+Benchmark::Record Benchmark::KEY_VALUE_EVALUATE;
+// BENCHMARK_KEY_VALUE_HASH
+Benchmark::Record Benchmark::KEY_VALUE_HASH[2];
 
 // BENCHMARK_GROUP_PREPARE
 Benchmark::Record Benchmark::GROUP_PREPARE_READ;
 Benchmark::Record Benchmark::GROUP_PREPARE_WRITE;
 
-// DPF
+// BENCHMARK_DPF
 Benchmark::Record Benchmark::DPF_GEN;
 Benchmark::Record Benchmark::DPF_EVAL;
 Benchmark::Record Benchmark::DPF_EVAL_ALL;
 
-// PSEUDO_DPF
+// BENCHMARK_PSEUDO_DPF
 Benchmark::Record Benchmark::PSEUDO_DPF_GEN;
 Benchmark::Record Benchmark::PSEUDO_DPF_EVAL;
 Benchmark::Record Benchmark::PSEUDO_DPF_EVAL_ALL;

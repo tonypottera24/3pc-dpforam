@@ -18,7 +18,7 @@ private:
     const static inline EC_POINT *g_ = EC_GROUP_get0_generator(EC_GROUP_new_by_curve_name(NID_secp256k1));
     const static inline uint size_ = 65;
     // const static inline uint size_ = 33;
-    const bool is_symmetric_ = false;
+    static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
 
 public:
@@ -51,7 +51,7 @@ public:
         // fprintf(stderr, "size = %u\n", size);
         return this->size_;
     }
-    bool IsSymmetric() { return this->is_symmetric_; }
+    static bool IsSymmetric() { return is_symmetric_; }
     void Print(const char *title = "");
 };
 

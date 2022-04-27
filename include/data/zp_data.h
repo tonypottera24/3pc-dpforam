@@ -12,7 +12,7 @@ private:
     static const inline BIGNUM *p_ = BN_get0_nist_prime_256();
     const static inline uint size_ = BN_num_bytes(BN_get0_nist_prime_256());
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
-    const bool is_symmetric_ = false;
+    static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
 
 public:
@@ -44,7 +44,7 @@ public:
         // return BN_num_bytes(this->p_);
         return this->size_;
     }
-    bool IsSymmetric() { return this->is_symmetric_; }
+    static bool IsSymmetric() { return is_symmetric_; }
     void Print(const char *title = "");
 };
 

@@ -6,10 +6,9 @@ namespace PIW {
 template <typename D>
 std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13, Benchmark::Record *benchmark) {
     debug_print("FindDeltaData, is_0 = %u\n", is_0);
-    const bool is_symmetric = v_delta_13.IsSymmetric();
     const uint data_size = v_delta_13.Size();
     std::vector<D> v_out_33(2, D(data_size));
-    if (is_symmetric) {
+    if (D::IsSymmetric()) {
         ShareTwoThird(peer, v_delta_13, v_out_33.data(), benchmark);
     } else {
         v_delta_13.Print("v_delta_13");
@@ -84,18 +83,17 @@ template <typename D>
 void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, const uint n, const uint log_n, const uint index_23[2], D &v_delta_13, bool pseudo, Benchmark::Record *benchmark) {
     debug_print("[%lu]DPF_PIW, index_23 = (%u, %u), n = %lu, log_n = %u, new n = %u\n", array_13.size(), index_23[0], index_23[1], array_13.size(), log_n, n);
     v_delta_13.Print("v_delta_13");
-    const bool is_symmetric = array_13[0].IsSymmetric();
 
     BinaryData query_23[2];
     bool is_0 = false;
 
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, is_symmetric, query_23, is_0);
+        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0);
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].ReadData(query_23[0]);
     } else {
-        fss.Gen(index_23[0] ^ index_23[1], log_n, is_symmetric, query_23, is_0);
+        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0);
 
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].WriteData(query_23[1], benchmark);
@@ -107,7 +105,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 
 #ifdef BENCHMARK_GROUP_PREPARE
     std::vector<D> v_delta_33;
-    if (benchmark != NULL && !v_delta_13.IsSymmetric()) {
+    if (benchmark != NULL && !D::IsSymmetric()) {
         Benchmark::GROUP_PREPARE_WRITE.Start();
         v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, &Benchmark::GROUP_PREPARE_WRITE);
         uint64_t bandwidth = Benchmark::GROUP_PREPARE_WRITE.End();

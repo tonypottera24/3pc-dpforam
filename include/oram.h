@@ -39,6 +39,8 @@ private:
     D last_read_data_13_;
     BulkData<D> last_read_block_13_;
 
+    PIR::DPFKeyPIRCTX *dpf_key_pir_ctx_;
+
 private:
     void Init();
     void InitPositionMap();

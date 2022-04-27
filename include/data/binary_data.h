@@ -9,7 +9,7 @@
 
 class BinaryData {
 private:
-    const bool is_symmetric_ = true;
+    static const bool is_symmetric_ = true;
     static inline PRG *prg_ = new PRG();
     std::vector<uchar> data_;
 
@@ -44,7 +44,7 @@ public:
     void Resize(const uint size);
     void Random(PRG *prg = NULL);
     uint Size() { return this->data_.size(); }
-    bool IsSymmetric() { return this->is_symmetric_; }
+    static bool IsSymmetric() { return is_symmetric_; }
     void Print(const char *title = "");
 };
 

@@ -3,6 +3,7 @@
 template <typename K, typename D>
 ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer), n_(n) {
     debug_print("ORAM n = %u, data_size = %u\n", n, data_size);
+
     this->last_read_block_13_.Resize(data_size * DATA_PER_BLOCK);
     this->last_read_block_13_.Reset();
     this->last_read_data_13_.Resize(data_size);
@@ -13,6 +14,10 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party
     // fprintf(stderr, "ORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
     // fprintf(stderr, "ORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
     // fprintf(stderr, "\n");
+    if (!K::IsSymmetric()) {
+        debug_print("init DPFKeyPIRCTX, n = %u\n", n);
+        this->dpf_key_pir_ctx_ = new PIR::DPFKeyPIRCTX(n);
+    }
 
     if (n > DATA_PER_BLOCK) {
         for (uint b = 0; b < 2; b++) {
@@ -27,6 +32,7 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party
 
 template <typename K, typename D>
 ORAM<K, D>::~ORAM() {
+    delete this->dpf_key_pir_ctx_;
     if (this->position_map_ != NULL) {
         delete this->position_map_;
     }
@@ -65,7 +71,7 @@ void ORAM<K, D>::ResetArray(std::vector<BulkData<D>> &array) {
 template <typename K, typename D>
 void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *benchmark) {
     debug_print("[%u]KeyToIndex\n", this->Size());
-    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, benchmark);
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->dpf_key_pir_ctx_, benchmark);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, benchmark);
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 }
@@ -462,8 +468,17 @@ void ORAM<K, D>::Test(uint iterations) {
     fprintf(stderr, "\n");
 #endif
 
+#ifdef BENCHMARK_KEY_VALUE
+    Benchmark::KEY_VALUE_PREPARE.PrintTotal(this->peer_, "KEY_VALUE_PREPARE", iterations);
+    Benchmark::KEY_VALUE_DPF.PrintTotal(this->peer_, "KEY_VALUE_DPF", iterations);
+    Benchmark::KEY_VALUE_EVALUATE.PrintTotal(this->peer_, "KEY_VALUE_EVALUATE", iterations);
+    fprintf(stderr, "\n");
+#endif
+
 #ifdef BENCHMARK_KEY_VALUE_HASH
-    Benchmark::KEY_VALUE_HASH.PrintTotal(this->peer_, "KEY_VALUE_HASH", iterations);
+    for (uint b = 0; b < 2; b++) {
+        Benchmark::KEY_VALUE_HASH[b].PrintTotal(this->peer_, "KEY_VALUE_HASH", iterations);
+    }
     fprintf(stderr, "\n");
 #endif
 
