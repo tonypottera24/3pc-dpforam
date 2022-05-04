@@ -68,6 +68,7 @@ void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t ite
 
 // Top Level ORAM
 Benchmark::Record Benchmark::KEY_TO_INDEX;
+uint Benchmark::KEY_TO_INDEX_COLLISION;
 Benchmark::Record Benchmark::ORAM_READ;
 Benchmark::Record Benchmark::ORAM_WRITE;
 

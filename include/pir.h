@@ -85,12 +85,12 @@ private:
 
 public:
     std::vector<std::vector<uchar>> key_dump_array_;
-    std::vector<uint> key_array_digest_;
-    std::unordered_map<uint, uint> exists_;
+    std::vector<uint64_t> key_array_digest_;
+    // std::unordered_map<uint, uint> exists_;
 
 public:
     DPFKeyPIRCTX(uint n) {
-        this->evp_cipher_ = EVP_aes_128_ecb();
+        this->evp_cipher_ = EVP_aes_128_cbc();
         for (uint b = 0; b < 2; b++) {
             this->cipher_ctx_[b] = EVP_CIPHER_CTX_new();
             EVP_EncryptInit_ex2(this->cipher_ctx_[b], this->evp_cipher_, this->aes_key_[b], this->aes_iv_[b], NULL);
@@ -109,7 +109,7 @@ public:
         OPENSSL_free(this->aes_block_);
     }
 
-    inline uint Hash(uint b, uint digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
+    inline uint64_t Hash(uint b, uint64_t digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_KEY_VALUE_HASH
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_HASH[b].Start();
@@ -120,8 +120,8 @@ public:
         EVP_EncryptUpdate(this->cipher_ctx_[b], this->aes_block_, &aes_block_size, data.data(), data.size());
         EVP_EncryptFinal_ex(this->cipher_ctx_[b], this->aes_block_, &aes_block_size);
 
-        uint digest_uint;
-        memcpy(&digest_uint, this->aes_block_, std::min(sizeof(uint), (unsigned long)aes_block_size));
+        uint64_t digest_uint;
+        memcpy(&digest_uint, this->aes_block_, std::min(sizeof(uint64_t), (unsigned long)aes_block_size));
 #ifdef BENCHMARK_KEY_VALUE_HASH
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_HASH[b].End();
@@ -136,9 +136,10 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
-    const uint digest_size = 2;
-    const uint digest_size_log = digest_size * 8;
-    const uint digest_n = 1 << digest_size_log;
+    const uint64_t digest_size = 3;
+    const uint64_t digest_size_log = digest_size * 8;
+    const uint64_t digest_n = 1ULL << digest_size_log;
+    bool eval_all[2] = {false, false};
 
     uint v_sum = 0;
     if (party == 2) {
@@ -149,7 +150,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         print_bytes(key_dump.data(), key_dump.size(), "key_dump");
 
         for (uint b = 0; b < 2; b++) {
-            uint digest_uint = dpf_key_pir_ctx->Hash(b, digest_n, key_dump, benchmark);
+            uint64_t digest_uint = dpf_key_pir_ctx->Hash(b, digest_n, key_dump, benchmark);
+            // debug_print("digest_uint = %lu\n", digest_uint);
 
             BinaryData query_23[2];
             bool is_0 = false;
@@ -169,14 +171,17 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             Benchmark::KEY_VALUE_PREPARE.Start();
         }
 #endif
-        std::unordered_map<uint, uint> exists;
+        std::unordered_map<uint64_t, uint> exists;
         uint collision_ct = 0;
 
         for (uint i = 0; i < n; i++) {
             K key = key_array_13[i] - key_23[1 - party];
             dpf_key_pir_ctx->key_dump_array_[i] = key.Dump();
 
-            uint digest_uint = dpf_key_pir_ctx->Hash(0, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
+            // print_bytes(dpf_key_pir_ctx->key_dump_array_[i].data(), dpf_key_pir_ctx->key_dump_array_[i].size(), "key_dump_array_");
+            uint64_t digest_uint = dpf_key_pir_ctx->Hash(0, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
+            // debug_print("digest_uint = %lu\n", digest_uint);
+
             dpf_key_pir_ctx->key_array_digest_[i] = digest_uint;
 
             if (exists.find(digest_uint) == exists.end()) {
@@ -185,6 +190,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 exists[digest_uint]++;
                 collision_ct++;
             }
+        }
+        if (benchmark != NULL) {
+            Benchmark::KEY_TO_INDEX_COLLISION += collision_ct;
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
@@ -197,8 +205,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             Benchmark::KEY_VALUE_DPF.Start();
         }
 #endif
-        // bool collision_mode = true;
-        bool collision_mode = collision_ct > 2;
+        // eval_all[1] = collision_ct > n / 10;
         // fprintf(stderr, "collision_ct = %u\n", collision_ct);
 
         BinaryData query[2];
@@ -207,7 +214,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             uint query_size = peer[party].ReadUInt();
             query[b].Resize(query_size);
             peer[party].ReadData(query[b]);
-            if (b == 0 || collision_mode) {
+            if (eval_all[b]) {
                 dpf_out[b].resize(digest_n);
                 fss.EvalAll(query[b], digest_size_log, dpf_out[b]);
             }
@@ -224,25 +231,18 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #endif
         for (uint i = 0; i < n; i++) {
-            uint key_digest = dpf_key_pir_ctx->key_array_digest_[i];
-            if (exists[key_digest] == 1) {
+            uint64_t digest_uint = dpf_key_pir_ctx->key_array_digest_[i];
+            if (exists[digest_uint] == 1) {
                 // debug_print("dpf i = %u, exists = 1\n", i);
-                // print_bytes((uchar *)&key_digest, digest_size, "key_digest");
-                // if (fss.Eval(query[0], key_digest)) {
-                if (dpf_out[0][key_digest]) {
-                    // debug_print("dpf i = %u, fss.Eval = true\n", i);
+                if (eval_all[0] ? dpf_out[0][digest_uint] : fss.Eval(query[0], digest_uint)) {
                     v_sum ^= i;
                 }
             } else {  // collision
                 // fprintf(stderr, "collision, i = %u\n", i);
-                uint digest_uint = dpf_key_pir_ctx->Hash(1, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
-                bool hit = false;
-                if (collision_mode) {
-                    hit = dpf_out[1][digest_uint];
-                } else {
-                    hit = fss.Eval(query[1], digest_uint);
+                uint64_t digest_uint = dpf_key_pir_ctx->Hash(1, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
+                if (eval_all[1] ? dpf_out[1][digest_uint] : fss.Eval(query[1], digest_uint)) {
+                    v_sum ^= i;
                 }
-                if (hit) v_sum ^= i;
                 // collision can still happen...
             }
         }

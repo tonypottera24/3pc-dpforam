@@ -59,6 +59,7 @@ public:
 
 // Top Level ORAM
 extern Record KEY_TO_INDEX;
+extern uint KEY_TO_INDEX_COLLISION;
 extern Record ORAM_READ;
 extern Record ORAM_WRITE;
 
@@ -80,7 +81,7 @@ extern Record ORAM_WRITE_POSITION_MAP;
 extern Record KEY_VALUE_PREPARE;
 extern Record KEY_VALUE_DPF;
 extern Record KEY_VALUE_EVALUATE;
-#define BENCHMARK_KEY_VALUE_HASH
+// #define BENCHMARK_KEY_VALUE_HASH
 extern Record KEY_VALUE_HASH[2];
 
 // #define BENCHMARK_GROUP_PREPARE

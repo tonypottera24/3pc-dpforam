@@ -14,8 +14,8 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party
     // fprintf(stderr, "ORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
     // fprintf(stderr, "ORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
     // fprintf(stderr, "\n");
-    if (!K::IsSymmetric()) {
-        debug_print("init DPFKeyPIRCTX, n = %u\n", n);
+    bool key_value = !std::is_same<K, BinaryData>::value;
+    if (key_value) {
         this->dpf_key_pir_ctx_ = new PIR::DPFKeyPIRCTX(n);
     }
 
@@ -206,7 +206,6 @@ BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only, Benchmar
     } else {
         BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, benchmark);
         v_cache_13.Print("v_cache_13");
-
         return GetLatestData(v_read_13, v_cache_13, is_cached_23, benchmark);
     }
 }
@@ -284,6 +283,21 @@ void ORAM<K, D>::Flush(Benchmark::Record *benchmark) {
 }
 
 template <typename K, typename D>
+void ORAM<K, D>::SetKeyValueArray(std::vector<K> &key_array_13) {
+    this->key_array_13_ = key_array_13;
+    // EVP_MD_CTX *md_ctx = EVP_MD_CTX_new();
+    // EVP_MD *evp_md = EVP_sha256();
+    // uint seed_size_ = EVP_MD_size(EVP_sha256());
+    // for (uint i = 0; i < key_array_13.size(); i++) {
+    //     uint digest_size;
+    //     EVP_DigestInit_ex2(md_ctx, evp_md, NULL);
+    //     EVP_DigestUpdate(md_ctx, key_array_13[i].data(), key_array_13[i].size());
+    //     EVP_DigestFinal_ex(md_ctx, this->seed_, &digest_size);
+    // }
+    // EVP_MD_CTX_free(md_ctx);
+}
+
+template <typename K, typename D>
 void ORAM<K, D>::PrintMetadata() {
 #ifdef DEBUG
     debug_print("========== PrintMetadata ==========\n");
@@ -333,10 +347,10 @@ void ORAM<K, D>::Test(uint iterations) {
         write_read_data(this->peer_[0], key_array_33[2], this->peer_[1], key_array_33[0], NULL);
         write_read_data(this->peer_[1], key_array_33[2], this->peer_[0], key_array_33[1], NULL);
 
-        this->key_array_13_.resize(n);
         for (uint i = 0; i < n; i++) {
-            this->key_array_13_[i] = key_array_33[0][i] + key_array_33[1][i] + key_array_33[2][i];
+            key_array_33[2][i] += key_array_33[0][i] + key_array_33[1][i];
         }
+        this->SetKeyValueArray(key_array_33[2]);
     }
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
@@ -350,7 +364,7 @@ void ORAM<K, D>::Test(uint iterations) {
             // key_23[0].Random(this->peer_[0].PRG());
             // key_23[1].Random(this->peer_[1].PRG());
             uint index_33[3];
-            index_33[2] = rand_uint() % n;
+            index_33[2] = rand_uint();
             this->peer_[0].WriteUInt(index_33[2], NULL);
             this->peer_[1].WriteUInt(index_33[2], NULL);
             index_33[0] = this->peer_[0].ReadUInt();
@@ -489,14 +503,19 @@ void ORAM<K, D>::Test(uint iterations) {
 #endif
 
     Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, "KEY_TO_INDEX", iterations);
+    fprintf(stderr, "KEY_TO_INDEX_COLLISION %u\n", Benchmark::KEY_TO_INDEX_COLLISION / iterations);
     Benchmark::ORAM_READ.PrintTotal(this->peer_, "ORAM_READ", iterations);
     Benchmark::ORAM_WRITE.PrintTotal(this->peer_, "ORAM_WRITE", iterations);
     fprintf(stderr, "\n");
 
     Benchmark::Record total = Benchmark::ORAM_READ + Benchmark::ORAM_WRITE + Benchmark::KEY_TO_INDEX;
-    total.PrintTotal(this->peer_, "total", iterations);
+    total.PrintTotal(this->peer_, "TOTAL", iterations);
 
     fprintf(stderr, "\n");
+
+    for (uint i = 0; i < n; i++) {
+        this->key_array_13_[i].Print();
+    }
 }
 
 template class ORAM<BinaryData, BinaryData>;

@@ -6,14 +6,22 @@ import subprocess
 
 def start_benchmark(proto_test_arg):
     out = subprocess.run(proto_test_arg, stderr=subprocess.PIPE)
-
+    result = {}
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
-        bandwidth = int(stderr[-2].split(" ")[-1])
-        execution_time = int(stderr[-2].split(" ")[1])
-        print(f"bandwidth {bandwidth}")
-        print(f"execution_time {execution_time}")
-        return bandwidth, execution_time
+        for log in stderr:
+            title = log.split(" ")[0]
+            if title == "TOTAL":
+                result["TOTAL_TIME"] = int(log.split(" ")[1])
+                result["TOTAL_BANDWIDTH"] = int(log.split(" ")[3])
+            elif title == "KEY_TO_INDEX":
+                result["KEY_TO_INDEX_TIME"] = int(log.split(" ")[1])
+                result["KEY_TO_INDEX_BANDWIDTH"] = int(log.split(" ")[3])
+            elif title == "KEY_TO_INDEX_COLLISION":
+                result["KEY_TO_INDEX_COLLISION"] = int(log.split(" ")[1])
+        for benchmark_key in BENCHMARK_KEY:
+            print(f"{benchmark_key} {result[benchmark_key]}")
+        return result
     else:
         print('error')
         print(out.stderr.decode("utf-8"))
@@ -30,7 +38,7 @@ NEXT_PORT = 9000 + (PARTY + 1) % 3
 
 # LOG_N = range(10, 28)  # binary - binary
 # LOG_N = range(10, 27)  # binary - Zp
-LOG_N = range(10, 26)  # Zp - binary
+LOG_N = range(10, 21)  # Zp - binary
 # LOG_N = range(10, 20)
 # LOG_N = 25
 # TAU = range(2, 20)
@@ -40,8 +48,17 @@ SSOT_THRESHOLD = 0
 # PSEUDO_DPF_THRESHOLD = range(LOG_N)
 PSEUDO_DPF_THRESHOLD = 5
 
-bandwidths = []
-execution_times = []
+BENCHMARK_KEY = [
+    "TOTAL_TIME",
+    "TOTAL_BANDWIDTH",
+    "KEY_TO_INDEX_TIME",
+    "KEY_TO_INDEX_BANDWIDTH",
+    "KEY_TO_INDEX_COLLISION"
+]
+
+results = {}
+for benchmark_key in BENCHMARK_KEY:
+    results[benchmark_key] = []
 
 for logn in LOG_N:
     # for tau in TAU:
@@ -63,18 +80,18 @@ for logn in LOG_N:
         "--log_pseudo_dpf_threshold", str(PSEUDO_DPF_THRESHOLD),
         # "--log_pseudo_dpf_threshold", str(pdpf),
     ]
-    bandwidth, execution_time = start_benchmark(proto_test_arg)
-    bandwidths.append(bandwidth)
-    execution_times.append(execution_time)
+    result = start_benchmark(proto_test_arg)
+    for k, v in result.items():
+        results[k].append(v)
     print()
 
 
-print("bandwidths")
-for i, v in enumerate(LOG_N):
-    print(f"({v}, {round(bandwidths[i] / 1000, 2)})", end="")
-print("\n")
-
-print("execution_times")
-for i, v in enumerate(LOG_N):
-    print(f"({v}, {round(execution_times[i] / 1000, 2)})", end="")
-print()
+for benchmark_key in BENCHMARK_KEY:
+    print(benchmark_key)
+    for i, v in enumerate(LOG_N):
+        if benchmark_key == "KEY_TO_INDEX_COLLISION":
+            r = round(results[benchmark_key][i] / pow(2, v) * 100, 2)
+        else:
+            r = round(results[benchmark_key][i] / 1000, 2)
+        print(f"({v}, {r})", end="")
+    print("\n")

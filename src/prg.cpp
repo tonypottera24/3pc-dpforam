@@ -1,11 +1,6 @@
 #include "prg.h"
 
 PRG::PRG() {
-    // uchar seed[sizeof(uint128)];
-    // RAND_bytes(seed, sizeof(uint128));
-    // this->set_seed((uint128 *)seed);
-    // this->seed_ = this->gen_random();
-
     this->seed_ = (unsigned char *)OPENSSL_malloc(this->seed_size_);
     RAND_bytes(this->seed_, this->seed_size_);
 
@@ -17,7 +12,6 @@ PRG::PRG() {
 
 PRG::~PRG() {
     EVP_CIPHER_CTX_free(this->cipher_ctx_);
-
     BN_CTX_free(this->bn_ctx_);
     OPENSSL_free(this->seed_);
 }
@@ -27,29 +21,44 @@ void PRG::SetSeed(uchar *seed) {
     memcpy(this->aes_iv_, seed + this->aes_key_size_, this->aes_iv_size_);
     memcpy(this->seed_, seed + this->aes_key_size_ + this->aes_iv_size_, this->seed_size_);
     EVP_EncryptInit_ex2(this->cipher_ctx_, this->evp_cipher_, this->aes_key_, this->aes_iv_, NULL);
-
-    // this->set_seed((uint128 *)seed);
-    // this->seed_ = gen_random();
 }
 
 void PRG::RandBytes(uchar *data, uint size) {
+    // fprintf(stderr, "RandBytes, size = %u, this->used_bytes_ = %u\n", size, this->used_bytes_);
+
+    // for (uint i = 0; i < this->seed_size_; i++) {
+    //     fprintf(stderr, "%02X", this->seed_[i]);
+    // }
+    // fprintf(stderr, "\n");
+
     uint offset = 0;
     while (offset < size) {
         if (this->used_bytes_ == this->seed_size_) {
-            // this->seed_ = this->gen_random();
             int block_size;
             EVP_EncryptInit_ex2(this->cipher_ctx_, NULL, NULL, NULL, NULL);
             EVP_EncryptUpdate(this->cipher_ctx_, this->seed_, &block_size, this->seed_, this->seed_size_);
             EVP_EncryptFinal_ex(this->cipher_ctx_, this->seed_, &block_size);
+            // fprintf(stderr, "seed_size = %u, block_size = %u\n", seed_size_, block_size);
+
+            // fprintf(stderr, "new seed ");
+            // for (uint i = 0; i < this->seed_size_; i++) {
+            //     fprintf(stderr, "%02X", this->seed_[i]);
+            // }
+            // fprintf(stderr, "\n");
 
             this->used_bytes_ = 0;
         }
 
         uint bytes_to_copy = std::min(this->seed_size_ - this->used_bytes_, size - offset);
-        // memcpy(data + offset, &this->seed_ + this->used_bytes_, bytes_to_copy);
         memcpy(data + offset, this->seed_ + this->used_bytes_, bytes_to_copy);
         offset += bytes_to_copy;
         this->used_bytes_ += bytes_to_copy;
+
+        // fprintf(stderr, "return data ");
+        // for (uint i = 0; i < size; i++) {
+        //     fprintf(stderr, "%02X", data[i]);
+        // }
+        // fprintf(stderr, "\n");
     }
 }
 
