@@ -5,7 +5,8 @@ import subprocess
 
 
 def start_benchmark(proto_test_arg):
-    out = subprocess.run(proto_test_arg, stderr=subprocess.PIPE)
+    out = subprocess.run(
+        proto_test_arg, stderr=subprocess.PIPE)
     result = {}
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
@@ -36,14 +37,15 @@ PARTY = int(args.party)
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
-# LOG_N = range(10, 28)  # binary - binary
+LOG_N = range(10, 28)  # binary - binary
 # LOG_N = range(10, 27)  # binary - Zp
-LOG_N = range(10, 25)  # Zp - binary
+# LOG_N = range(10, 25)  # Zp - binary
 # LOG_N = range(10, 20)
 # LOG_N = 25
 # TAU = range(2, 20)
 TAU = 5
-DATA_SIZE = 4
+# DATA_SIZE = 4
+DATA_SIZE = 32
 SSOT_THRESHOLD = 0
 # PSEUDO_DPF_THRESHOLD = range(LOG_N)
 PSEUDO_DPF_THRESHOLD = 5

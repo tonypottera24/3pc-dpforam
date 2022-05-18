@@ -10,7 +10,7 @@ class ZpData {
 private:
     BIGNUM *data_;
     static const inline BIGNUM *p_ = BN_get0_nist_prime_256();
-    const static inline uint size_ = BN_num_bytes(BN_get0_nist_prime_256());
+    const static inline uint size_ = BN_num_bytes(BN_get0_nist_prime_256());  // 32
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
     static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
@@ -41,7 +41,7 @@ public:
     }
 
     ZpData inline operator-() {
-        BN_mod_inverse(this->data_, this->data_, this->p_, this->bn_ctx_);
+        BN_mod_sub(this->data_, this->p_, this->data_, this->p_, this->bn_ctx_);
         return *this;
     }
 
@@ -87,7 +87,7 @@ public:
     }
 
     void inline Reset() {
-        BN_zero_ex(this->data_);
+        BN_zero(this->data_);
     }
 
     void inline Resize(const uint size) {}
@@ -98,8 +98,10 @@ public:
     }
 
     uint inline Size() {
+        // fprintf(stderr, "size = %u\n", this->size_);
         return this->size_;
     }
+
     static bool inline IsSymmetric() { return is_symmetric_; }
 
     void inline Print(const char *title = "") {

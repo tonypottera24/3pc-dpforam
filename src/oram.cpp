@@ -32,7 +32,9 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party
 
 template <typename K, typename D>
 ORAM<K, D>::~ORAM() {
-    delete this->dpf_key_pir_ctx_;
+    if (this->dpf_key_pir_ctx_ != NULL) {
+        delete this->dpf_key_pir_ctx_;
+    }
     if (this->position_map_ != NULL) {
         delete this->position_map_;
     }
@@ -192,15 +194,17 @@ BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only, Benchmar
     debug_print("[%u]DPFRead, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 
     BulkData<D> v_read_13 = PIR::PIR(this->peer_, this->fss_, this->read_array_23_, index_23, benchmark);
+    v_read_13.Print("v_read_13");
 
     uint cache_index_23[2];
     bool is_cached_23[2];
     if (this->position_map_ != NULL) {
         ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, benchmark);
     }
-    // debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
+    debug_print("cache_index_23 = (%u, %u), is_cached_23 = (%u, %u)\n", cache_index_23[0], cache_index_23[1], is_cached_23[0], is_cached_23[1]);
 
     if (this->cache_array_23_->size() == 0) {
+        debug_print("[%u]DPFRead cache_array_23_->size() == 0\n", this->Size());
         return v_read_13;
     } else {
         BulkData<D> v_cache_13 = PIR::PIR(this->peer_, this->fss_, this->cache_array_23_, cache_index_23, benchmark);
@@ -512,8 +516,11 @@ void ORAM<K, D>::Test(uint iterations) {
 
     fprintf(stderr, "\n");
 
-    for (uint i = 0; i < n; i++) {
-        this->key_array_13_[i].Print();
+    if (key_value) {
+        fprintf(stderr, "key_value list:\n");
+        for (uint i = 0; i < n; i++) {
+            this->key_array_13_[i].Print();
+        }
     }
 }
 

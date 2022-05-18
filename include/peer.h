@@ -15,14 +15,33 @@ private:
 public:
     Peer() {}
 
-    PRG *PRG();
-    Socket &Socket();
+    Socket inline &Socket() {
+        return this->socket_;
+    }
 
-    void WriteUInt(uint n, Benchmark::Record *benchmark);
-    uint ReadUInt();
+    PRG inline *PRG() {
+        return &this->prg_;
+    }
 
-    void WriteUInt64(uint64_t n, Benchmark::Record *benchmark);
-    uint64_t ReadUInt64();
+    void inline WriteUInt(uint n, Benchmark::Record *benchmark) {
+        this->socket_.Write((uchar *)&n, sizeof(uint), benchmark);
+    }
+
+    uint inline ReadUInt() {
+        uint n;
+        this->socket_.Read((uchar *)&n, sizeof(uint));
+        return n;
+    }
+
+    void inline WriteUInt64(uint64_t n, Benchmark::Record *benchmark) {
+        this->socket_.Write((uchar *)&n, sizeof(uint64_t), benchmark);
+    }
+
+    uint64_t inline ReadUInt64() {
+        uint64_t n;
+        this->socket_.Read((uchar *)&n, sizeof(uint64_t));
+        return n;
+    }
 
     template <typename D>
     void ReadData(D &data) {
@@ -61,7 +80,9 @@ public:
         this->socket_.Write(dump.data(), dump.size(), benchmark);
     }
 
-    void Close();
+    void Close() {
+        this->socket_.Close();
+    }
 };
 
 #endif /* PEER_H_ */

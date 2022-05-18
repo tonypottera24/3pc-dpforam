@@ -30,7 +30,6 @@ public:
     ~PRG();
     static uint SeedSize() {
         return aes_key_size_ + aes_iv_size_ + seed_size_;
-        // return seed_size_;
     }
     void SetSeed(uchar *seed);
     void RandBytes(uchar *data, uint size);

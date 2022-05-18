@@ -40,7 +40,7 @@ private:
     D last_read_data_13_;
     BulkData<D> last_read_block_13_;
 
-    PIR::DPFKeyPIRCTX *dpf_key_pir_ctx_;
+    PIR::DPFKeyPIRCTX *dpf_key_pir_ctx_ = NULL;
 
 private:
     void Init();

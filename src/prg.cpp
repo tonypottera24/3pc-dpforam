@@ -67,5 +67,5 @@ void PRG::RandBn(BIGNUM *bn, const BIGNUM *p) {
     uchar r[p_size];
     this->RandBytes(r, p_size);
     BN_bin2bn(r, p_size, bn);
-    BN_mod(bn, bn, p, this->bn_ctx_);
+    BN_nnmod(bn, bn, p, this->bn_ctx_);
 }
