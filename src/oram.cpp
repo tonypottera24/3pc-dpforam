@@ -130,9 +130,8 @@ void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2],
     ShareTwoThird(this->peer_, old_cache_index_13, old_cache_index_23, benchmark);
     old_cache_index_13.Print("old_index_13");
 
-    std::vector<uchar> dump;
     for (uint b = 0; b < 2; b++) {
-        dump = old_cache_index_23[b].Dump();
+        std::vector<uchar> dump = old_cache_index_23[b].DumpVector();
         cache_index_23[b] = bytes_to_uint(dump.data(), dump.size());
         is_cached_23[b] = cache_index_23[b] & 1;
         cache_index_23[b] = (cache_index_23[b] >> 1) % n;
@@ -147,7 +146,7 @@ void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2],
         std::vector<uchar> new_cache_index_bytes(data_size);
         uint_to_bytes(new_cache_index_uint, new_cache_index_bytes.data(), data_size);
         BinaryData new_cache_index_13;
-        new_cache_index_13.Load(new_cache_index_bytes);
+        new_cache_index_13.LoadVector(new_cache_index_bytes);
         new_cache_index_13.Print("new_cache_index_13");
 
         this->position_map_->Write(index_23, new_cache_index_13, benchmark);

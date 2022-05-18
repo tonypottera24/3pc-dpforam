@@ -15,18 +15,14 @@ private:
     static inline PRG *prg_ = new PRG();
 
 public:
-    ZpDebugData() {
-    }
-
-    ZpDebugData(const uint size) {
-    }
+    ZpDebugData() {}
+    ZpDebugData(const uint size) {}
 
     ZpDebugData(const ZpDebugData &other) {
         this->data_ = other.data_ % this->p_;
     }
 
-    ~ZpDebugData() {
-    }
+    ~ZpDebugData() {}
 
     ZpDebugData inline &operator=(const ZpDebugData &other) {
         // copy operation
@@ -58,33 +54,32 @@ public:
         return this->data_ == rhs.data_;
     }
 
-    ZpDebugData inline operator+(const ZpDebugData &rhs) const {
-        ZpDebugData result;
-        result.data_ = (this->data_ + rhs.data_) % this->p_;
-        return result;
+    friend inline ZpDebugData operator+(ZpDebugData lhs, const ZpDebugData &rhs) {
+        lhs += rhs;
+        return lhs;
     }
 
-    ZpDebugData inline operator-(const ZpDebugData &rhs) const {
-        ZpDebugData result;
-        if (this->data_ > rhs.data_) {
-            result.data_ = this->data_ - rhs.data_;
-        } else {
-            result.data_ = (this->data_ + (this->p_ - rhs.data_)) % this->p_;
-        }
-        return result;
+    friend inline ZpDebugData operator-(ZpDebugData lhs, const ZpDebugData &rhs) {
+        lhs -= rhs;
+        return lhs;
     }
 
-    // friend ZpDebugData operator+(ZpDebugData lhs, const ZpDebugData &rhs);
-    // friend ZpDebugData operator-(ZpDebugData lhs, const ZpDebugData &rhs);
+    void inline DumpBuffer(uchar *buffer) {
+        memcpy(buffer, &(this->data_), sizeof(uint));
+    }
 
-    std::vector<uchar> inline Dump() {
+    std::vector<uchar> inline DumpVector() {
         std::vector<uchar> data(sizeof(uint));
-        memcpy(data.data(), (uchar *)&(this->data_), sizeof(uint));
+        DumpBuffer(data.data());
         return data;
     }
 
-    void inline Load(std::vector<uchar> &data) {
-        memcpy((uchar *)&(this->data_), data.data(), data.size());
+    void inline LoadBuffer(uchar *buffer) {
+        memcpy(&(this->data_), buffer, sizeof(uint));
+    }
+
+    void inline LoadVector(std::vector<uchar> &data) {
+        LoadBuffer(data.data());
     }
 
     void inline Reset() {
@@ -101,7 +96,9 @@ public:
     }
 
     uint inline Size() { return sizeof(uint); }
+
     static inline bool IsSymmetric() { return is_symmetric_; }
+
     void Print(const char *title = "") {
 #ifdef DEBUG
         if (strlen(title) > 0) {

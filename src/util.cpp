@@ -74,6 +74,37 @@ void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uchar *r, const u
     }
 }
 
+void neg_bytes(const uchar *a, uchar *r, const uint len) {
+    uint offset = 0;
+    for (uint i = offset; i + sizeof(uint128) <= len; i += sizeof(uint128)) {
+        uint128 *aa = (uint128 *)&a[offset];
+        uint128 *rr = (uint128 *)&r[offset];
+        (*rr) = ~(*aa);
+        offset = i + sizeof(uint128);
+    }
+    for (uint i = offset; i + sizeof(uint64_t) <= len; i += sizeof(uint64_t)) {
+        uint64_t *aa = (uint64_t *)&a[offset];
+        uint64_t *rr = (uint64_t *)&r[offset];
+        (*rr) = ~(*aa);
+        offset = i + sizeof(uint64_t);
+    }
+    for (uint i = offset; i + sizeof(uint32_t) <= len; i += sizeof(uint32_t)) {
+        uint32_t *aa = (uint32_t *)&a[offset];
+        uint32_t *rr = (uint32_t *)&r[offset];
+        (*rr) = ~(*aa);
+        offset = i + sizeof(uint32_t);
+    }
+    for (uint i = offset; i + sizeof(uint16_t) <= len; i += sizeof(uint16_t)) {
+        uint16_t *aa = (uint16_t *)&a[offset];
+        uint16_t *rr = (uint16_t *)&r[offset];
+        (*rr) = ~(*aa);
+        offset = i + sizeof(uint16_t);
+    }
+    for (uint i = offset; i < len; i++) {
+        r[i] = ~a[i];
+    }
+}
+
 void uint_to_bytes(uint value, uchar *bytes, uint len) {
     // TODO check small endiens / large endiens... if small, some bytes may be truncated
     memcpy(bytes, &value, len);

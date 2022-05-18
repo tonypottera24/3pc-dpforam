@@ -109,7 +109,7 @@ public:
         OPENSSL_free(this->aes_block_);
     }
 
-    inline uint64_t Hash(uint b, uint64_t digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
+    uint64_t inline Hash(uint b, uint64_t digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_KEY_VALUE_HASH
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_HASH[b].Start();
@@ -141,12 +141,15 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     const uint64_t digest_n = 1ULL << digest_size_log;
     bool eval_all[2] = {false, false};
 
+    uint key_size = key_array_13[0].Size();
+    std::vector<uchar> key_dump(key_size);
+
     uint v_sum = 0;
     if (party == 2) {
         const uint P0 = 1;
         K key = key_23[0] + key_23[1];
         key.Print("key");
-        std::vector<uchar> key_dump = key.Dump();
+        key.DumpBuffer(key_dump.data());
         print_bytes(key_dump.data(), key_dump.size(), "key_dump");
 
         for (uint b = 0; b < 2; b++) {
@@ -173,13 +176,14 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 #endif
         std::unordered_map<uint64_t, uint> exists;
         uint collision_ct = 0;
-
+        K key(key_size);
         for (uint i = 0; i < n; i++) {
             K key = key_array_13[i] - key_23[1 - party];
-            dpf_key_pir_ctx->key_dump_array_[i] = key.Dump();
+            key.DumpBuffer(key_dump.data());
+            dpf_key_pir_ctx->key_dump_array_[i] = key_dump;
 
             // print_bytes(dpf_key_pir_ctx->key_dump_array_[i].data(), dpf_key_pir_ctx->key_dump_array_[i].size(), "key_dump_array_");
-            uint64_t digest_uint = dpf_key_pir_ctx->Hash(0, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
+            uint64_t digest_uint = dpf_key_pir_ctx->Hash(0, digest_n, key_dump, benchmark);
             // debug_print("digest_uint = %lu\n", digest_uint);
 
             dpf_key_pir_ctx->key_array_digest_[i] = digest_uint;

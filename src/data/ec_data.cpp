@@ -47,16 +47,6 @@ bool ECData::operator==(const ECData &rhs) {
     return EC_POINT_cmp(this->curve_, this->data_, rhs.data_, this->bn_ctx_) == 0;
 }
 
-std::vector<uchar> ECData::Dump() {
-    std::vector<uchar> data(this->Size());
-    EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_UNCOMPRESSED, data.data(), data.size(), this->bn_ctx_);
-    return data;
-}
-
-void ECData::Load(std::vector<uchar> &data) {
-    EC_POINT_oct2point(this->curve_, this->data_, data.data(), data.size(), this->bn_ctx_);
-}
-
 void ECData::Reset() {
     EC_POINT_set_to_infinity(this->curve_, this->data_);
 }
@@ -99,7 +89,7 @@ void ECData::Print(const char *title) {
     if (strlen(title) > 0) {
         debug_print("%s ", title);
     }
-    // std::vector<uchar> s = this->Dump();
+    // std::vector<uchar> s = this->DumpVector();
     // print_bytes(s.data(), s.size(), "");
 
     // BIGNUM *x = BN_new();

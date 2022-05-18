@@ -18,6 +18,8 @@
 void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len);
 void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uchar *r, const uint len);
 
+void neg_bytes(const uchar *a, uchar *r, const uint len);
+
 void uint_to_bytes(uint value, uchar *bytes, uint len);
 uint bytes_to_uint(const uchar *b, uint len);
 void rand_bytes(uchar *bytes, const uint len);

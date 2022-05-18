@@ -52,8 +52,8 @@ void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, Bin
     uchar *query_23_bytes[2];
     uint query_size = GEN(&aes_key_, index, log_n, &query_23_bytes[0], &query_23_bytes[1]);
     for (uint b = 0; b < 2; b++) {
-        std::vector<uchar> q(query_23_bytes[b], query_23_bytes[b] + query_size);
-        query_23[b].Load(q);
+        query_23[b].Resize(query_size);
+        query_23[b].LoadBuffer(query_23_bytes[b]);
         delete[] query_23_bytes[b];
     }
     if (!is_symmetric) {
@@ -68,7 +68,7 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index) {
 #ifdef BENCHMARK_DPF
     Benchmark::DPF_EVAL.Start();
 #endif
-    uint128 dpf_out = EVAL(&aes_key_, query.Dump().data(), index);
+    uint128 dpf_out = EVAL(&aes_key_, query.DumpVector().data(), index);
     uint64_t index_mod = index % 128;
     uint64_t *val = (uint64_t *)&dpf_out;
     bool result = (1ll << (index_mod % 64)) & val[index_mod / 64];
@@ -83,7 +83,7 @@ void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &d
     Benchmark::DPF_EVAL_ALL.Start();
 #endif
     uint n = 1 << log_n;
-    uint128 *res = EVALFULL(&aes_key_, query.Dump().data());
+    uint128 *res = EVALFULL(&aes_key_, query.DumpVector().data());
     if (log_n <= 6) {
         to_byte_vector(((uint64_t *)res)[0], dpf_out.data(), n);
     } else {
@@ -107,11 +107,11 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
         query_23[b].Resize(byte_length);
         query_23[b].Random(peer[1 - b].PRG());
     }
-    std::vector<uchar> dpf_out = query_23[0].Dump();
+    std::vector<uchar> dpf_out = query_23[0].DumpVector();
     uint index_byte = index >> 3;
     uint index_bit = index & 7;
     dpf_out[index_byte] ^= 1 << index_bit;
-    query_23[0].Load(dpf_out);
+    query_23[0].LoadBuffer(dpf_out.data());
     if (!is_symmetric) {
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
@@ -124,7 +124,7 @@ bool FSS1Bit::PseudoEval(BinaryData &query, const uint index) {
 #ifdef BENCHMARK_PSEUDO_DPF
     Benchmark::PSEUDO_DPF_EVAL.Start();
 #endif
-    bool result = get_buffer_bit(query.Dump().data(), index);
+    bool result = get_buffer_bit(query.DumpVector().data(), index);
 #ifdef BENCHMARK_PSEUDO_DPF
     Benchmark::PSEUDO_DPF_EVAL.End();
 #endif
@@ -136,7 +136,7 @@ void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> 
     Benchmark::PSEUDO_DPF_EVAL_ALL.Start();
 #endif
     // uint index_byte = 0, index_bit = 0;
-    std::vector<uchar> query_dump = query.Dump();
+    std::vector<uchar> query_dump = query.DumpVector();
     for (uint i = 0; i < n; i++) {
         dpf_out[i] = get_buffer_bit(query_dump.data(), i);
     }
