@@ -8,7 +8,7 @@
 
 class ZpData {
 private:
-    BIGNUM *data_;
+    BIGNUM *data_ = NULL;
     static const inline BIGNUM *p_ = BN_get0_nist_prime_256();
     const static inline uint size_ = BN_num_bytes(BN_get0_nist_prime_256());  // 32
     static inline BN_CTX *bn_ctx_ = BN_CTX_new();
@@ -94,7 +94,7 @@ public:
 
     void inline Random(PRG *prg = NULL) {
         if (prg == NULL) prg = this->prg_;
-        prg->RandBn(this->data_, this->p_);
+        prg->RandBn(this->data_, this->p_, this->bn_ctx_);
     }
 
     uint inline Size() {

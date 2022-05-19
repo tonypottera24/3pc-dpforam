@@ -516,12 +516,12 @@ void ORAM<K, D>::Test(uint iterations) {
 
     fprintf(stderr, "\n");
 
-    if (key_value) {
-        fprintf(stderr, "key_value list:\n");
-        for (uint i = 0; i < n; i++) {
-            this->key_array_13_[i].Print();
-        }
-    }
+    // if (key_value) {
+    //     fprintf(stderr, "key_value list:\n");
+    //     for (uint i = 0; i < n; i++) {
+    //         this->key_array_13_[i].Print();
+    //     }
+    // }
 }
 
 template class ORAM<BinaryData, BinaryData>;

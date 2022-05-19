@@ -60,7 +60,7 @@ void ECData::Random(PRG *prg) {
     BIGNUM *x = BN_CTX_get(this->bn_ctx_);
     BIGNUM *q = BN_CTX_get(this->bn_ctx_);
     EC_GROUP_get_order(this->curve_, q, this->bn_ctx_);
-    prg->RandBn(x, q);
+    prg->RandBn(x, q, this->bn_ctx_);
     EC_POINT_copy(this->data_, this->g_);
     EC_POINT_mul(this->curve_, this->data_, x, NULL, NULL, this->bn_ctx_);
     BN_CTX_end(this->bn_ctx_);

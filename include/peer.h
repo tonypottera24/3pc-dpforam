@@ -47,19 +47,19 @@ public:
     void ReadData(D &data) {
         // fprintf(stderr, "ReadData, size = %u\n", size);
         uint data_size = data.Size();
-        uchar buffer[data_size];
-        this->socket_.Read(buffer, data_size);
-        data.LoadBuffer(buffer);
+        std::vector<uchar> buffer(data_size);
+        this->socket_.Read(buffer.data(), buffer.size());
+        data.LoadBuffer(buffer.data());
     }
 
     template <typename D>
     void ReadDataVector(std::vector<D> &data) {
         uint data_size = data[0].Size();
         uint buffer_size = data.size() * data_size;
-        uchar buffer[buffer_size];
-        this->socket_.Read(buffer, buffer_size);
+        std::vector<uchar> buffer(buffer_size);
+        this->socket_.Read(buffer.data(), buffer.size());
         for (uint i = 0; i < data.size(); i++) {
-            data[i].LoadBuffer(buffer + i * data_size);
+            data[i].LoadBuffer(buffer.data() + i * data_size);
         }
     }
 

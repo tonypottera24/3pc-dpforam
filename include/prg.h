@@ -33,7 +33,7 @@ public:
     }
     void SetSeed(uchar *seed);
     void RandBytes(uchar *data, uint size);
-    void RandBn(BIGNUM *bn, const BIGNUM *p);
+    void RandBn(BIGNUM *bn, const BIGNUM *p, BN_CTX *bn_ctx);
 };
 
 #endif /* PRG_H_ */

@@ -62,10 +62,10 @@ void PRG::RandBytes(uchar *data, uint size) {
     }
 }
 
-void PRG::RandBn(BIGNUM *bn, const BIGNUM *p) {
+void PRG::RandBn(BIGNUM *bn, const BIGNUM *p, BN_CTX *bn_ctx) {
     uint p_size = BN_num_bytes(p);
     uchar r[p_size];
     this->RandBytes(r, p_size);
     BN_bin2bn(r, p_size, bn);
-    BN_nnmod(bn, bn, p, this->bn_ctx_);
+    BN_nnmod(bn, bn, p, bn_ctx);
 }
