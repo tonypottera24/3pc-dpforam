@@ -1,7 +1,7 @@
 #include "oram.h"
 
 template <typename K, typename D>
-ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party_(party), peer_(peer), n_(n) {
+ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint key_size, uint data_size) : party_(party), peer_(peer), n_(n) {
     debug_print("ORAM n = %u, data_size = %u\n", n, data_size);
 
     this->last_read_block_13_.Resize(data_size * DATA_PER_BLOCK);
@@ -16,7 +16,7 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party
     // fprintf(stderr, "\n");
     bool key_value = !std::is_same<K, BinaryData>::value;
     if (key_value) {
-        this->dpf_key_pir_ctx_ = new PIR::DPFKeyPIRCTX(n);
+        this->dpf_key_pir_ctx_ = new PIR::DPFKeyPIRCTX(n, key_size);
     }
 
     if (n > DATA_PER_BLOCK) {
@@ -26,7 +26,7 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint data_size) : party
 
         uint pos_n = divide_ceil(n, DATA_PER_BLOCK);
         uint pos_data_size = byte_length(pos_n << 1);
-        this->position_map_ = new ORAM<BinaryData, BinaryData>(party, peer, pos_n, pos_data_size);
+        this->position_map_ = new ORAM<BinaryData, BinaryData>(party, peer, pos_n, 0, pos_data_size);
     }
 }
 
@@ -38,6 +38,7 @@ ORAM<K, D>::~ORAM() {
     if (this->position_map_ != NULL) {
         delete this->position_map_;
     }
+    this->key_array_13_.clear();
     for (uint b = 0; b < 2; b++) {
         this->read_array_23_[b].clear();
         this->cache_array_23_[b].clear();
@@ -358,6 +359,7 @@ void ORAM<K, D>::Test(uint iterations) {
 
     for (uint iteration = 0; iteration < iterations; iteration++) {
         debug_print("\nTest, iteration = %u\n", iteration);
+        // fprintf(stderr, "\nTest, iteration = %u\n", iteration);
 
         uint index_23[2];
         uint key_size = K().Size();
@@ -515,13 +517,6 @@ void ORAM<K, D>::Test(uint iterations) {
     total.PrintTotal(this->peer_, "TOTAL", iterations);
 
     fprintf(stderr, "\n");
-
-    // if (key_value) {
-    //     fprintf(stderr, "key_value list:\n");
-    //     for (uint i = 0; i < n; i++) {
-    //         this->key_array_13_[i].Print();
-    //     }
-    // }
 }
 
 template class ORAM<BinaryData, BinaryData>;

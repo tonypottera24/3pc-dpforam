@@ -29,7 +29,9 @@ public:
         this->data_ = other.data_;
     }
 
-    ~BulkData() {}
+    ~BulkData() {
+        // this->data_.clear();
+    }
 
     BulkData<D> inline &operator=(const BulkData &other) {
         if (this == &other) return *this;
@@ -174,9 +176,7 @@ public:
         this->data_ = other.data_;
     }
 
-    ~BulkData() {
-        // this->data_.clear();
-    }
+    ~BulkData() {}
 
     BulkData<BinaryData> inline &operator=(const BulkData<BinaryData> &other) {
         if (this == &other) return *this;

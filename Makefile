@@ -28,9 +28,9 @@ TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
 
 
 CC = clang++
-CFLAGS = -Wall -g -O2 -Werror --std=c++17 -DSHA256_ASM -DAES_ENC
-CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -maes -msse2 -fopenmp
-LDFLAGS = -L/opt/local/lib -Llib -pthread -lboost_program_options
+CFLAGS = -Wall -g -O3 -Werror --std=c++17 -DSHA256_ASM -DAES_ENC
+CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -maes -msse2 -fopenmp -flto
+LDFLAGS = -L/opt/local/lib -Llib -pthread -lboost_program_options -flto
 LDLIBS = -lcrypto
 # -lboost_program_options-mt -lpbc -lgmp
 # -lcryptopp

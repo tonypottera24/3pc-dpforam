@@ -26,7 +26,9 @@ public:
         this->data_ = other.data_;
     }
 
-    ~BinaryData() {}
+    ~BinaryData() {
+        // this->data_.clear();
+    }
 
     BinaryData inline &operator=(const BinaryData &other) {
         // copy operation

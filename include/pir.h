@@ -79,9 +79,8 @@ private:
     const uchar *aes_key_[2] = {(uchar *)"01234567890123456789012345678901", (uchar *)"67890123456789010123456789012345"};
     const uchar *aes_iv_[2] = {(uchar *)"0123456789012345", (uchar *)"8901234501234567"};
     EVP_CIPHER_CTX *cipher_ctx_[2];
-    const EVP_CIPHER *evp_cipher_;
-    uint aes_block_size_;
-    uchar *aes_block_;
+    const EVP_CIPHER *evp_cipher_ = NULL;
+    uchar *aes_block_ = NULL;
 
 public:
     std::vector<std::vector<uchar>> key_dump_array_;
@@ -89,14 +88,15 @@ public:
     // std::unordered_map<uint, uint> exists_;
 
 public:
-    DPFKeyPIRCTX(uint n) {
+    DPFKeyPIRCTX(uint n, uint key_size) {
         this->evp_cipher_ = EVP_aes_128_cbc();
         for (uint b = 0; b < 2; b++) {
             this->cipher_ctx_[b] = EVP_CIPHER_CTX_new();
             EVP_EncryptInit_ex2(this->cipher_ctx_[b], this->evp_cipher_, this->aes_key_[b], this->aes_iv_[b], NULL);
         }
-        this->aes_block_size_ = EVP_CIPHER_get_block_size(this->evp_cipher_);
-        this->aes_block_ = (unsigned char *)OPENSSL_malloc(this->aes_block_size_);
+        uint aes_block_size = EVP_CIPHER_get_block_size(this->evp_cipher_);
+        uint block_ct = divide_ceil(key_size, aes_block_size);
+        this->aes_block_ = (unsigned char *)OPENSSL_malloc(block_ct * aes_block_size);
 
         this->key_dump_array_.resize(n);
         this->key_array_digest_.resize(n);
@@ -136,10 +136,12 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
+    // const uint64_t digest_size = 2;
     const uint64_t digest_size = 3;
     const uint64_t digest_size_log = digest_size * 8;
     const uint64_t digest_n = 1ULL << digest_size_log;
-    bool eval_all[2] = {false, false};
+    bool eval_all[2] = {n > KEY_VALUE_EVALALL_THRESHOLD, false};
+    // bool eval_all[2] = {false, false};
 
     uint key_size = key_array_13[0].Size();
     std::vector<uchar> key_dump(key_size);

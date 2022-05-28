@@ -56,7 +56,7 @@ private:
     void Flush(Benchmark::Record *benchmark);
 
 public:
-    ORAM(const uint party, Peer peer[2], uint n, uint data_size);
+    ORAM(const uint party, Peer peer[2], uint n, uint key_size, uint data_size);
     ~ORAM();
 
     void SetKeyValueArray(std::vector<K> &key_array_13);
