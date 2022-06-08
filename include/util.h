@@ -80,6 +80,7 @@ void ShareTwoThird(Peer peer[2], std::vector<D> &v_in_13, std::vector<D> v_out_2
     // peer[1].WriteData(v_in_13, benchmark);
     // std::vector<D> v_out = peer[0].ReadData(v_in_13.size(), v_in_13[0].Size());
     v_out_23[1] = v_in_13;
+    v_out_23[0].resize(v_in_13.size());
     write_read_data(peer[1], v_in_13, peer[0], v_out_23[0], benchmark);
 }
 

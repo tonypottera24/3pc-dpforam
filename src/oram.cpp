@@ -178,12 +178,12 @@ D ORAM<K, D>::Read(const uint index_23[2], bool read_only, Benchmark::Record *be
     }
     this->last_read_block_13_.Print("this->last_read_block_13_");
 
-    // std::vector<D> last_read_block_23[2];
-    // ShareTwoThird(this->peer_, this->last_read_block_13_.data_, last_read_block_23, benchmark);
-    // PIR::PIR(this->peer_, this->fss_, last_read_block_23, data_index_23, this->last_read_data_13_, benchmark);
-
     std::vector<D> last_read_block_13_data = this->last_read_block_13_.GetData();
-    this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, last_read_block_13_data, data_index_23, benchmark);
+    std::vector<D> last_read_block_23_data[2];
+    ShareTwoThird(this->peer_, last_read_block_13_data, last_read_block_23_data, benchmark);
+    this->last_read_data_13_ = PIR::PIR(this->peer_, this->fss_, last_read_block_23_data, data_index_23, benchmark);
+
+    // this->last_read_data_13_ = PIR::SSOT_PIR(this->party_, this->peer_, last_read_block_13_data, data_index_23, benchmark);
 
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
