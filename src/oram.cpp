@@ -149,7 +149,7 @@ void ORAM<K, D>::ReadPositionMap(const uint index_23[2], uint cache_index_23[2],
         std::vector<uchar> new_cache_index_bytes(data_size);
         uint_to_bytes(new_cache_index_uint, new_cache_index_bytes.data(), data_size);
         BinaryData new_cache_index_13;
-        new_cache_index_13.LoadVector(new_cache_index_bytes);
+        new_cache_index_13.LoadBuffer(new_cache_index_bytes.data());
         new_cache_index_13.Print("new_cache_index_13");
 
         this->position_map_->Write(index_23, new_cache_index_13, benchmark);

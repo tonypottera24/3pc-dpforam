@@ -111,10 +111,6 @@ public:
         }
     }
 
-    void LoadVector(std::vector<uchar> &data) {
-        LoadBuffer(data.data());
-    }
-
     std::vector<D> GetData() {
         return this->data_;
     }
@@ -230,10 +226,6 @@ public:
 
     void LoadBuffer(uchar *buffer) {
         this->data_.LoadBuffer(buffer);
-    }
-
-    void LoadVector(std::vector<uchar> &data) {
-        this->data_.LoadVector(data);
     }
 
     std::vector<BinaryData> GetData() {

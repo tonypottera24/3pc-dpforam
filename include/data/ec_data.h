@@ -41,23 +41,9 @@ public:
         return lhs;
     }
 
-    void DumpBuffer(uchar *buffer) {
-        EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_UNCOMPRESSED, buffer, this->Size(), this->bn_ctx_);
-    }
-
-    std::vector<uchar> DumpVector() {
-        std::vector<uchar> data(this->Size());
-        DumpBuffer(data.data());
-        return data;
-    }
-
-    void LoadBuffer(uchar *buffer) {
-        EC_POINT_oct2point(this->curve_, this->data_, buffer, this->Size(), this->bn_ctx_);
-    }
-
-    void LoadVector(std::vector<uchar> &data) {
-        LoadBuffer(data.data());
-    }
+    void DumpBuffer(uchar *buffer);
+    std::vector<uchar> DumpVector();
+    void LoadBuffer(uchar *buffer);
 
     void Reset();
     void Resize(const uint size);

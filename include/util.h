@@ -22,49 +22,20 @@ void neg_bytes(const uchar *a, uchar *r, const uint len);
 
 void uint_to_bytes(uint value, uchar *bytes, uint len);
 uint bytes_to_uint(const uchar *b, uint len);
+
 void rand_bytes(uchar *bytes, const uint len);
 bool rand_bool();
 uint rand_uint(PRG *prg = NULL);
 
-uint bit_length(uint n) {
-    uint bit_length = 0;
-    while (n != 0) {
-        n >>= 1;
-        bit_length++;
-    }
-    return bit_length;
-}
+uint bit_length(uint n);
+uint byte_length(uint n);
 
-uint byte_length(uint n) {
-    uint byte_length = 0;
-    while (n != 0) {
-        n >>= 8;
-        byte_length++;
-    }
-    return byte_length;
-}
+uint log2(const uint n);
+uint pow2_ceil(const uint n);
 
-uint log2(const uint n) {
-    assert(n > 0);
-    return bit_length(n) - 1;
-}
+uint divide_ceil(const uint n, const uint q);
 
-uint pow2_ceil(const uint n) {
-    uint log_n = log2(n);
-    uint clean_n = 1 << log_n;
-    if (clean_n < n) {
-        clean_n <<= 1;
-    }
-    return clean_n;
-}
-
-uint divide_ceil(const uint n, const uint q) {
-    return (n + q - 1) / q;
-}
-
-bool get_buffer_bit(uchar *a, const uint i) {
-    return (a[i >> 3] >> (i & 7)) & 1;
-}
+bool get_buffer_bit(uchar *a, const uint i);
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index = -1);
 
@@ -113,8 +84,6 @@ void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_pe
         // read_data.insert(new_data.end(), read_buffer.begin(), read_buffer.end());
     }
 }
-
-std::vector<uchar> hash(std::vector<uchar> &input, uint len, AES_KEY &aes_key);
 
 template <typename D>
 void print_array(std::vector<D> &array, const char *array_name, const int64_t array_index = -1) {

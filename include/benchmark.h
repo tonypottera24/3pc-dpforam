@@ -6,6 +6,8 @@
 
 #include <chrono>
 #include <cstdio>
+#include <iostream>
+#include <string>
 
 #include "peer.h"
 
@@ -17,6 +19,7 @@ typedef high_resolution_clock::time_point timestamp;
 
 class Record {
 private:
+    std::string name;
     timestamp last_start_time_;
     duration<long long, std::nano> duration_;
     uint64_t last_bandwidth_ = 0;
@@ -24,7 +27,7 @@ private:
     uint64_t count_ = 0;
 
 public:
-    Record();
+    Record(std::string name = std::string());
 
     Record &operator=(const Record &other);
     Record &operator+=(const Record &rhs);
@@ -39,16 +42,8 @@ public:
         return lhs;
     }
 
-    void Start() {
-        this->last_start_time_ = high_resolution_clock::now();
-        this->last_bandwidth_ = this->bandwidth_;
-    }
-
-    uint64_t End() {
-        this->duration_ += high_resolution_clock::now() - this->last_start_time_;
-        this->count_++;
-        return this->bandwidth_ - this->last_bandwidth_;
-    }
+    void Start();
+    uint64_t End();
 
     void AddBandwidth(uint64_t n);
     uint64_t GetTime();

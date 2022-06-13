@@ -136,20 +136,44 @@ uint rand_uint(PRG *prg) {
     return value;
 }
 
-std::vector<uchar> hash(std::vector<uchar> &input, uint len, AES_KEY &aes_key) {
-    uint n_blocks = divide_ceil(input.size(), sizeof(uint128));
-    uint128 digest[n_blocks];
-    memset(digest, 0, sizeof(uint128) * n_blocks);
-    memcpy(&digest, input.data(), input.size());
-    AES_ecb_encrypt_blks(digest, n_blocks, &aes_key);
-    uint128 digest_128 = digest[0];
-    for (uint i = 1; i < n_blocks; i++) {
-        digest_128 = _mm_xor_si128(digest_128, digest[i]);
+uint bit_length(uint n) {
+    uint bit_length = 0;
+    while (n != 0) {
+        n >>= 1;
+        bit_length++;
     }
+    return bit_length;
+}
 
-    std::vector<uchar> result(len);
-    memcpy(result.data(), &digest_128, len);
-    return result;
+uint byte_length(uint n) {
+    uint byte_length = 0;
+    while (n != 0) {
+        n >>= 8;
+        byte_length++;
+    }
+    return byte_length;
+}
+
+uint log2(const uint n) {
+    assert(n > 0);
+    return bit_length(n) - 1;
+}
+
+uint pow2_ceil(const uint n) {
+    uint log_n = log2(n);
+    uint clean_n = 1 << log_n;
+    if (clean_n < n) {
+        clean_n <<= 1;
+    }
+    return clean_n;
+}
+
+uint divide_ceil(const uint n, const uint q) {
+    return (n + q - 1) / q;
+}
+
+bool get_buffer_bit(uchar *a, const uint i) {
+    return (a[i >> 3] >> (i & 7)) & 1;
 }
 
 void print_bytes(const uchar *bytes, const uint len, const char *array_name, const int64_t array_index) {

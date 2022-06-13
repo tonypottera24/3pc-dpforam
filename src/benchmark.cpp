@@ -3,7 +3,8 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-Benchmark::Record::Record() {
+Benchmark::Record::Record(std::string name) {
+    this->name = name;
     this->duration_ = duration<long long, std::nano>::zero();
 }
 
@@ -30,6 +31,17 @@ Benchmark::Record &Benchmark::Record::operator-=(const Benchmark::Record &rhs) {
     return *this;
 }
 
+void Benchmark::Record::Start() {
+    this->last_start_time_ = high_resolution_clock::now();
+    this->last_bandwidth_ = this->bandwidth_;
+}
+
+uint64_t Benchmark::Record::End() {
+    this->duration_ += high_resolution_clock::now() - this->last_start_time_;
+    this->count_++;
+    return this->bandwidth_ - this->last_bandwidth_;
+}
+
 uint64_t Benchmark::Record::GetTime() {
     return duration_cast<microseconds>(this->duration_).count();
 }
@@ -39,9 +51,16 @@ void Benchmark::Record::AddBandwidth(uint64_t n) {
 }
 
 void Benchmark::Record::Print() {
-    fprintf(stderr, "time: %lu\n", this->GetTime());
-    fprintf(stderr, "count: %lu\n", this->count_);
-    fprintf(stderr, "bandwidth: %lu\n", this->bandwidth_);
+    json j = {
+        {"name", this->name},
+        {"time", this->GetTime()},
+        {"ct", this->count_},
+        {"bandwidth", this->bandwidth_},
+    };
+    std::cout << j.dump() << std::endl;
+    // fprintf(stderr, "time: %lu\n", this->GetTime());
+    // fprintf(stderr, "count: %lu\n", this->count_);
+    // fprintf(stderr, "bandwidth: %lu\n", this->bandwidth_);
 }
 
 void Benchmark::Record::PrintTotal(Peer peer[2], const char *title, uint64_t iteration) {

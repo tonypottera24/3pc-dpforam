@@ -2,7 +2,10 @@
 #define LIBDPF_BLOCK_H
 
 #include <emmintrin.h>
+#include <openssl/rand.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 #include <wmmintrin.h>
 #include <xmmintrin.h>
 

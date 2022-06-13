@@ -16,49 +16,17 @@ private:
     static inline PRG *prg_ = new PRG();
 
 public:
-    ZpData() {
-        this->data_ = BN_new();
-        this->Reset();
-    }
+    ZpData();
+    ZpData(const uint size);
+    ZpData(const ZpData &other);
+    ~ZpData();
 
-    ZpData(const uint size) {
-        this->data_ = BN_new();
-        this->Reset();
-    }
+    ZpData &operator=(const ZpData &other);
+    ZpData &operator+=(const ZpData &rhs);
+    ZpData &operator-=(const ZpData &rhs);
+    bool operator==(const ZpData &rhs);
 
-    ZpData(const ZpData &other) {
-        this->data_ = BN_dup(other.data_);
-    }
-
-    ~ZpData() {
-        BN_free(this->data_);
-    }
-
-    ZpData &operator=(const ZpData &other) {
-        if (this == &other) return *this;
-        BN_copy(this->data_, other.data_);
-        return *this;
-    }
-
-    ZpData operator-() {
-        BN_mod_sub(this->data_, this->p_, this->data_, this->p_, this->bn_ctx_);
-        return *this;
-    }
-
-    ZpData &operator+=(const ZpData &rhs) {
-        BN_mod_add(this->data_, this->data_, rhs.data_, this->p_, this->bn_ctx_);
-        return *this;
-    }
-
-    ZpData &operator-=(const ZpData &rhs) {
-        BN_mod_sub(this->data_, this->data_, rhs.data_, this->p_, this->bn_ctx_);
-        return *this;
-    }
-
-    bool operator==(const ZpData &rhs) {
-        return BN_cmp(this->data_, rhs.data_) == 0;
-    }
-
+    ZpData operator-();
     friend ZpData operator+(ZpData lhs, const ZpData &rhs) {
         lhs += rhs;
         return lhs;
@@ -68,50 +36,18 @@ public:
         return lhs;
     }
 
-    void DumpBuffer(uchar *buffer) {
-        BN_bn2binpad(this->data_, buffer, this->Size());
-    }
+    void DumpBuffer(uchar *buffer);
+    std::vector<uchar> DumpVector();
+    void LoadBuffer(uchar *buffer);
 
-    std::vector<uchar> DumpVector() {
-        std::vector<uchar> data(this->Size());
-        DumpBuffer(data.data());
-        return data;
-    }
+    void Reset();
+    void Resize(const uint size);
+    void Random(PRG *prg = NULL);
 
-    void LoadBuffer(uchar *buffer) {
-        BN_bin2bn(buffer, this->Size(), this->data_);
-    }
-
-    void LoadVector(std::vector<uchar> &data) {
-        LoadBuffer(data.data());
-    }
-
-    void Reset() {
-        BN_zero(this->data_);
-    }
-
-    void Resize(const uint size) {}
-
-    void Random(PRG *prg = NULL) {
-        if (prg == NULL) prg = this->prg_;
-        prg->RandBn(this->data_, this->p_, this->bn_ctx_);
-    }
-
-    uint Size() {
-        // fprintf(stderr, "size = %u\n", this->size_);
-        return this->size_;
-    }
-
+    uint Size() { return this->size_; }
     static bool IsSymmetric() { return is_symmetric_; }
 
-    void Print(const char *title = "") {
-#ifdef DEBUG
-        if (strlen(title) > 0) {
-            debug_print("%s ", title);
-        }
-        debug_print("%s\n", BN_bn2dec(this->data_));
-#endif
-    }
+    void Print(const char *title = "");
 };
 
 #endif /* ZP_DATA_H_ */
