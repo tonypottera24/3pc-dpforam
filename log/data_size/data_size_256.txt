@@ -1,0 +1,6 @@
+logn 1, data_size 256, tau 5, pdpf 5
+time elapsed: 0:00:00.094881
+Error
+terminate called after throwing an instance of 'boost::wrapexcept<boost::program_options::invalid_option_value>'
+  what():  the argument ('[0]') for option '--log_ssot_threshold' is invalid
+

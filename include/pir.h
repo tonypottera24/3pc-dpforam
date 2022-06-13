@@ -109,7 +109,7 @@ public:
         OPENSSL_free(this->aes_block_);
     }
 
-    uint64_t inline Hash(uint b, uint64_t digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
+    uint64_t Hash(uint b, uint64_t digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_KEY_VALUE_HASH
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_HASH[b].Start();

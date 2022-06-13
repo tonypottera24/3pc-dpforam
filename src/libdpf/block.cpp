@@ -26,7 +26,6 @@ uint128 dpf_seed(uint128 *seed) {
     return cur_seed;
 }
 
-// inline
 uint128 dpf_random_block(void) {
     uint128 out;
     uint64_t *val;

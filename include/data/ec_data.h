@@ -41,11 +41,11 @@ public:
         return lhs;
     }
 
-    void inline DumpBuffer(uchar *buffer) {
+    void DumpBuffer(uchar *buffer) {
         EC_POINT_point2oct(this->curve_, this->data_, POINT_CONVERSION_UNCOMPRESSED, buffer, this->Size(), this->bn_ctx_);
     }
 
-    std::vector<uchar> inline DumpVector() {
+    std::vector<uchar> DumpVector() {
         std::vector<uchar> data(this->Size());
         DumpBuffer(data.data());
         return data;

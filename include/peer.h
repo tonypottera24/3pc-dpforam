@@ -15,29 +15,29 @@ private:
 public:
     Peer() {}
 
-    Socket inline &Socket() {
+    Socket &Socket() {
         return this->socket_;
     }
 
-    PRG inline *PRG() {
+    PRG *PRG() {
         return &this->prg_;
     }
 
-    void inline WriteUInt(uint n, Benchmark::Record *benchmark) {
+    void WriteUInt(uint n, Benchmark::Record *benchmark) {
         this->socket_.Write((uchar *)&n, sizeof(uint), benchmark);
     }
 
-    uint inline ReadUInt() {
+    uint ReadUInt() {
         uint n;
         this->socket_.Read((uchar *)&n, sizeof(uint));
         return n;
     }
 
-    void inline WriteUInt64(uint64_t n, Benchmark::Record *benchmark) {
+    void WriteUInt64(uint64_t n, Benchmark::Record *benchmark) {
         this->socket_.Write((uchar *)&n, sizeof(uint64_t), benchmark);
     }
 
-    uint64_t inline ReadUInt64() {
+    uint64_t ReadUInt64() {
         uint64_t n;
         this->socket_.Read((uchar *)&n, sizeof(uint64_t));
         return n;

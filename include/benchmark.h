@@ -39,12 +39,12 @@ public:
         return lhs;
     }
 
-    inline void Start() {
+    void Start() {
         this->last_start_time_ = high_resolution_clock::now();
         this->last_bandwidth_ = this->bandwidth_;
     }
 
-    inline uint64_t End() {
+    uint64_t End() {
         this->duration_ += high_resolution_clock::now() - this->last_start_time_;
         this->count_++;
         return this->bandwidth_ - this->last_bandwidth_;

@@ -26,7 +26,7 @@ void rand_bytes(uchar *bytes, const uint len);
 bool rand_bool();
 uint rand_uint(PRG *prg = NULL);
 
-inline uint bit_length(uint n) {
+uint bit_length(uint n) {
     uint bit_length = 0;
     while (n != 0) {
         n >>= 1;
@@ -35,7 +35,7 @@ inline uint bit_length(uint n) {
     return bit_length;
 }
 
-inline uint byte_length(uint n) {
+uint byte_length(uint n) {
     uint byte_length = 0;
     while (n != 0) {
         n >>= 8;
@@ -44,12 +44,12 @@ inline uint byte_length(uint n) {
     return byte_length;
 }
 
-inline uint log2(const uint n) {
+uint log2(const uint n) {
     assert(n > 0);
     return bit_length(n) - 1;
 }
 
-inline uint pow2_ceil(const uint n) {
+uint pow2_ceil(const uint n) {
     uint log_n = log2(n);
     uint clean_n = 1 << log_n;
     if (clean_n < n) {
@@ -58,11 +58,11 @@ inline uint pow2_ceil(const uint n) {
     return clean_n;
 }
 
-inline uint divide_ceil(const uint n, const uint q) {
+uint divide_ceil(const uint n, const uint q) {
     return (n + q - 1) / q;
 }
 
-inline bool get_buffer_bit(uchar *a, const uint i) {
+bool get_buffer_bit(uchar *a, const uint i) {
     return (a[i >> 3] >> (i & 7)) & 1;
 }
 

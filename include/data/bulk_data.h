@@ -33,20 +33,20 @@ public:
         // this->data_.clear();
     }
 
-    BulkData<D> inline &operator=(const BulkData &other) {
+    BulkData<D> &operator=(const BulkData &other) {
         if (this == &other) return *this;
         this->data_ = other.data_;
         return *this;
     }
 
-    BulkData<D> inline operator-() {
+    BulkData<D> operator-() {
         for (uint i = 0; i < this->data_.size(); i++) {
             this->data_[i] = -this->data_[i];
         }
         return *this;
     }
 
-    bool inline operator==(const BulkData &rhs) {
+    bool operator==(const BulkData &rhs) {
         if (this->data_.size() != rhs.data_.size()) return false;
         for (uint i = 0; i < this->data_.size(); i++) {
             if (this->data_[i] != rhs.data_[i]) return false;
@@ -54,7 +54,7 @@ public:
         return true;
     }
 
-    BulkData<D> inline &operator+=(const BulkData &rhs) {
+    BulkData<D> &operator+=(const BulkData &rhs) {
         // assert(this->data_.size() == rhs.data_.size());
         for (uint i = 0; i < this->data_.size(); i++) {
             this->data_[i] += rhs.data_[i];
@@ -62,7 +62,7 @@ public:
         return *this;
     }
 
-    BulkData<D> inline &operator-=(const BulkData &rhs) {
+    BulkData<D> &operator-=(const BulkData &rhs) {
         // assert(this->data_.size() == rhs.data_.size());
         for (uint i = 0; i < this->data_.size(); i++) {
             this->data_[i] -= rhs.data_[i];
@@ -70,16 +70,16 @@ public:
         return *this;
     }
 
-    friend inline BulkData operator+(BulkData lhs, const BulkData &rhs) {
+    friend BulkData operator+(BulkData lhs, const BulkData &rhs) {
         lhs += rhs;
         return lhs;
     }
-    friend inline BulkData operator-(BulkData lhs, const BulkData &rhs) {
+    friend BulkData operator-(BulkData lhs, const BulkData &rhs) {
         lhs -= rhs;
         return lhs;
     }
 
-    uint inline Size() {
+    uint Size() {
         if (this->data_.size() == 0) {
             return 0;
         } else {
@@ -87,63 +87,63 @@ public:
         }
     }
 
-    static bool inline IsSymmetric() {
+    static bool IsSymmetric() {
         return D::IsSymmetric();
     }
 
-    void inline DumpBuffer(uchar *buffer) {
+    void DumpBuffer(uchar *buffer) {
         uint data_size = this->data_[0].Size();
         for (uint i = 0; i < this->data_.size(); i++) {
             this->data_[i].DumpBuffer(buffer + i * data_size);
         }
     }
 
-    std::vector<uchar> inline DumpVector() {
+    std::vector<uchar> DumpVector() {
         std::vector<uchar> data(this->Size());
         DumpBuffer(data.data());
         return data;
     }
 
-    void inline LoadBuffer(uchar *buffer) {
+    void LoadBuffer(uchar *buffer) {
         uint data_size = this->data_[0].Size();
         for (uint i = 0; i < DATA_PER_BLOCK; i++) {
             this->data_[i].LoadBuffer(buffer + i * data_size);
         }
     }
 
-    void inline LoadVector(std::vector<uchar> &data) {
+    void LoadVector(std::vector<uchar> &data) {
         LoadBuffer(data.data());
     }
 
-    std::vector<D> inline GetData() {
+    std::vector<D> GetData() {
         return this->data_;
     }
 
-    void inline SetData(std::vector<D> &data) {
+    void SetData(std::vector<D> &data) {
         this->data_ = data;
     }
 
-    void inline Reset() {
+    void Reset() {
         for (uint i = 0; i < this->data_.size(); i++) {
             this->data_[i].Reset();
         }
     }
 
-    void inline Resize(const uint size) {
+    void Resize(const uint size) {
         uint data_size = size / DATA_PER_BLOCK;
         for (uint i = 0; i < DATA_PER_BLOCK; i++) {
             this->data_[i].Resize(data_size);
         }
     }
 
-    void inline Random(PRG *prg = NULL) {
+    void Random(PRG *prg = NULL) {
         if (prg == NULL) prg = this->prg_;
         for (uint i = 0; i < this->data_.size(); i++) {
             this->data_[i].Random(prg);
         }
     }
 
-    void inline Print(const char *title = "") {
+    void Print(const char *title = "") {
 #ifdef DEBUG
         if (strlen(title) > 0) {
             debug_print("%s\n", title);
@@ -178,65 +178,65 @@ public:
 
     ~BulkData() {}
 
-    BulkData<BinaryData> inline &operator=(const BulkData<BinaryData> &other) {
+    BulkData<BinaryData> &operator=(const BulkData<BinaryData> &other) {
         if (this == &other) return *this;
         this->data_ = other.data_;
         return *this;
     }
 
-    BulkData<BinaryData> inline operator-() {
+    BulkData<BinaryData> operator-() {
         this->data_ = -this->data_;
         return *this;
     }
 
-    bool inline operator==(const BulkData<BinaryData> &rhs) {
+    bool operator==(const BulkData<BinaryData> &rhs) {
         return this->data_ == rhs.data_;
     }
 
-    BulkData<BinaryData> inline &operator+=(const BulkData<BinaryData> &rhs) {
+    BulkData<BinaryData> &operator+=(const BulkData<BinaryData> &rhs) {
         this->data_ += rhs.data_;
         return *this;
     }
 
-    BulkData<BinaryData> inline &operator-=(const BulkData<BinaryData> &rhs) {
+    BulkData<BinaryData> &operator-=(const BulkData<BinaryData> &rhs) {
         this->data_ -= rhs.data_;
         return *this;
     }
 
-    friend inline BulkData operator+(BulkData lhs, const BulkData &rhs) {
+    friend BulkData operator+(BulkData lhs, const BulkData &rhs) {
         lhs += rhs;
         return lhs;
     }
-    friend inline BulkData operator-(BulkData lhs, const BulkData &rhs) {
+    friend BulkData operator-(BulkData lhs, const BulkData &rhs) {
         lhs -= rhs;
         return lhs;
     }
 
-    uint inline Size() {
+    uint Size() {
         return this->data_.Size();
     }
 
-    static bool inline IsSymmetric() {
+    static bool IsSymmetric() {
         return true;
     }
 
-    void inline DumpBuffer(uchar *buffer) {
+    void DumpBuffer(uchar *buffer) {
         this->data_.DumpBuffer(buffer);
     }
 
-    std::vector<uchar> inline DumpVector() {
+    std::vector<uchar> DumpVector() {
         return this->data_.DumpVector();
     }
 
-    void inline LoadBuffer(uchar *buffer) {
+    void LoadBuffer(uchar *buffer) {
         this->data_.LoadBuffer(buffer);
     }
 
-    void inline LoadVector(std::vector<uchar> &data) {
+    void LoadVector(std::vector<uchar> &data) {
         this->data_.LoadVector(data);
     }
 
-    std::vector<BinaryData> inline GetData() {
+    std::vector<BinaryData> GetData() {
         uint data_size = this->data_.Size() / DATA_PER_BLOCK;
         std::vector<uchar> dump = this->data_.DumpVector();
         std::vector<BinaryData> data(DATA_PER_BLOCK, BinaryData(data_size));
@@ -246,7 +246,7 @@ public:
         return data;
     }
 
-    void inline SetData(std::vector<BinaryData> &data) {
+    void SetData(std::vector<BinaryData> &data) {
         assert(data.size() == DATA_PER_BLOCK);
         uint data_size = data[0].Size();
         std::vector<uchar> buffer(data_size * DATA_PER_BLOCK);
@@ -256,19 +256,19 @@ public:
         this->data_.LoadBuffer(buffer.data());
     }
 
-    void inline Reset() {
+    void Reset() {
         this->data_.Reset();
     }
 
-    void inline Resize(const uint size) {
+    void Resize(const uint size) {
         this->data_.Resize(size);
     }
 
-    void inline Random(PRG *prg = NULL) {
+    void Random(PRG *prg = NULL) {
         this->data_.Random(prg);
     }
 
-    void inline Print(const char *title = "") {
+    void Print(const char *title = "") {
 #ifdef DEBUG
         this->data_.Print(title);
 #endif

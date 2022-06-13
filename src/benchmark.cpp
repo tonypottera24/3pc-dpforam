@@ -1,5 +1,8 @@
 #include "benchmark.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 Benchmark::Record::Record() {
     this->duration_ = duration<long long, std::nano>::zero();
 }

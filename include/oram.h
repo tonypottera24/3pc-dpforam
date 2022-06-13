@@ -66,10 +66,10 @@ public:
     void Write(const uint index_23[2], D &new_data_13, Benchmark::Record *benchmark);
 
     void PrintMetadata();
-    inline uint Size() {
+    uint Size() {
         return this->n_;
     }
-    inline uint DataSize() {
+    uint DataSize() {
         return this->write_array_13_[0].Size() / DATA_PER_BLOCK;
     }
     void Reset();

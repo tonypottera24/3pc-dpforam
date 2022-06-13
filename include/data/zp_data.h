@@ -34,77 +34,77 @@ public:
         BN_free(this->data_);
     }
 
-    ZpData inline &operator=(const ZpData &other) {
+    ZpData &operator=(const ZpData &other) {
         if (this == &other) return *this;
         BN_copy(this->data_, other.data_);
         return *this;
     }
 
-    ZpData inline operator-() {
+    ZpData operator-() {
         BN_mod_sub(this->data_, this->p_, this->data_, this->p_, this->bn_ctx_);
         return *this;
     }
 
-    ZpData inline &operator+=(const ZpData &rhs) {
+    ZpData &operator+=(const ZpData &rhs) {
         BN_mod_add(this->data_, this->data_, rhs.data_, this->p_, this->bn_ctx_);
         return *this;
     }
 
-    ZpData inline &operator-=(const ZpData &rhs) {
+    ZpData &operator-=(const ZpData &rhs) {
         BN_mod_sub(this->data_, this->data_, rhs.data_, this->p_, this->bn_ctx_);
         return *this;
     }
 
-    bool inline operator==(const ZpData &rhs) {
+    bool operator==(const ZpData &rhs) {
         return BN_cmp(this->data_, rhs.data_) == 0;
     }
 
-    friend ZpData inline operator+(ZpData lhs, const ZpData &rhs) {
+    friend ZpData operator+(ZpData lhs, const ZpData &rhs) {
         lhs += rhs;
         return lhs;
     }
-    friend ZpData inline operator-(ZpData lhs, const ZpData &rhs) {
+    friend ZpData operator-(ZpData lhs, const ZpData &rhs) {
         lhs -= rhs;
         return lhs;
     }
 
-    void inline DumpBuffer(uchar *buffer) {
+    void DumpBuffer(uchar *buffer) {
         BN_bn2binpad(this->data_, buffer, this->Size());
     }
 
-    std::vector<uchar> inline DumpVector() {
+    std::vector<uchar> DumpVector() {
         std::vector<uchar> data(this->Size());
         DumpBuffer(data.data());
         return data;
     }
 
-    void inline LoadBuffer(uchar *buffer) {
+    void LoadBuffer(uchar *buffer) {
         BN_bin2bn(buffer, this->Size(), this->data_);
     }
 
-    void inline LoadVector(std::vector<uchar> &data) {
+    void LoadVector(std::vector<uchar> &data) {
         LoadBuffer(data.data());
     }
 
-    void inline Reset() {
+    void Reset() {
         BN_zero(this->data_);
     }
 
-    void inline Resize(const uint size) {}
+    void Resize(const uint size) {}
 
-    void inline Random(PRG *prg = NULL) {
+    void Random(PRG *prg = NULL) {
         if (prg == NULL) prg = this->prg_;
         prg->RandBn(this->data_, this->p_, this->bn_ctx_);
     }
 
-    uint inline Size() {
+    uint Size() {
         // fprintf(stderr, "size = %u\n", this->size_);
         return this->size_;
     }
 
-    static bool inline IsSymmetric() { return is_symmetric_; }
+    static bool IsSymmetric() { return is_symmetric_; }
 
-    void inline Print(const char *title = "") {
+    void Print(const char *title = "") {
 #ifdef DEBUG
         if (strlen(title) > 0) {
             debug_print("%s ", title);

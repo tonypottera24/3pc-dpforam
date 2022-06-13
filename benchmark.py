@@ -4,52 +4,93 @@ import argparse
 import subprocess
 import datetime
 
+
 BENCHMARK_KEY = [
-    "TOTAL_TIME",
-    "TOTAL_BANDWIDTH",
-    "KEY_TO_INDEX_TIME",
-    "KEY_TO_INDEX_BANDWIDTH",
-    "KEY_TO_INDEX_COLLISION"
+    "KEY_TO_INDEX",
+    "KEY_TO_INDEX_COLLISION",
+    "ORAM_READ",
+    "ORAM_WRITE",
+    "TOTAL",
 ]
 
 
+class BenchmarkRecord():
+    def __init__(self, stderr):
+        self.criteria = {}
+        for log in stderr:
+            key = log.split(" ")[0]
+            if key in BENCHMARK_KEY:
+                self.criteria[key] = self.__parse_log(log)
+
+    def __parse_log(self, log):
+        log = log.split(" ")
+        if len(log) == 2:
+            return {
+                "ct": int(log[1])
+            }
+        elif len(log) == 4:
+            return {
+                "time": int(log[1]),
+                "ct": int(log[2]),
+                "bandwidth": int(log[3]),
+            }
+        else:
+            raise NotImplementedError
+
+    def print(self):
+        for key in BENCHMARK_KEY:
+            log = self.criteria[key]
+            # print(f'log {log}')
+            if len(log) == 1:
+                print(f'{key} {log["ct"]}')
+            elif len(log) == 3:
+                print(
+                    f'{key}, time = {log["time"]}, ct = {log["ct"]}, bandwidth = {log["bandwidth"]}')
+            else:
+                raise NotImplementedError
+
+
 def start_benchmark(proto_test_args):
-    out = subprocess.run(
-        proto_test_args, stderr=subprocess.PIPE)
-    result = {}
+    t1 = datetime.datetime.now()
+    out = subprocess.run(proto_test_args, stderr=subprocess.PIPE)
+    t2 = datetime.datetime.now()
+    print(f'time elapsed: {t2 - t1}')
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
-        for log in stderr:
-            title = log.split(" ")[0]
-            if title == "TOTAL":
-                result["TOTAL_TIME"] = int(log.split(" ")[1])
-                result["TOTAL_BANDWIDTH"] = int(log.split(" ")[3])
-            elif title == "KEY_TO_INDEX":
-                result["KEY_TO_INDEX_TIME"] = int(log.split(" ")[1])
-                result["KEY_TO_INDEX_BANDWIDTH"] = int(log.split(" ")[3])
-            elif title == "KEY_TO_INDEX_COLLISION":
-                result["KEY_TO_INDEX_COLLISION"] = int(log.split(" ")[1])
-        for benchmark_key in BENCHMARK_KEY:
-            print(f"{benchmark_key} {result[benchmark_key]}")
-        print(
-            f"{datetime.timedelta(seconds=result['TOTAL_TIME']/1000*1.5)}")
-        return result
+        return BenchmarkRecord(stderr)
     else:
-        print('error')
+        print('Error')
         print(out.stderr.decode("utf-8"))
         exit(1)
 
 
-def print_output(x_axis):
-    for benchmark_key in BENCHMARK_KEY:
-        print(benchmark_key)
-        for i, x in enumerate(x_axis):
-            if benchmark_key == "KEY_TO_INDEX_COLLISION":
-                y = round(results[benchmark_key][i] / pow(2, x) * 100, 2)
-            else:
-                y = round(results[benchmark_key][i] / 1000, 2)
-            print(f"({x}, {y})", end="")
-        print("\n")
+def print_output(records, x_axis):
+    for key in BENCHMARK_KEY:
+        if key == "KEY_TO_INDEX_COLLISION":
+            print(f"{key} time")
+            for i, x in enumerate(x_axis):
+                # convert microsecond (us) to millisecond (ms)
+                y = round(records[i]["time"] / 1000, 2)
+                print(f"({x}, {y})", end="")
+            print("\n")
+
+            print(f"{key} ct")
+            for i, x in enumerate(x_axis):
+                y = records[i]["ct"]
+                print(f"({x}, {y})", end="")
+            print("\n")
+
+            print(f"{key} bandwidth")
+            for i, x in enumerate(x_axis):
+                y = records[i]["bandwidth"]
+                print(f"({x}, {y})", end="")
+            print("\n")
+        else:
+            print(f"{key} COLLISION")
+            for i, x in enumerate(x_axis):
+                y = round(records[i]["ct"] / pow(2, x) * 100, 2)
+                print(f"({x}, {y})", end="")
+            print("\n")
 
 
 parser = argparse.ArgumentParser()
@@ -60,6 +101,8 @@ PARTY = int(args.party)
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
+LOG_N = range(1, 20)  # data_size
+
 # LOG_N = range(10, 31)  # binary - binary 4
 # LOG_N = range(10, 31)  # binary - ZpDebugData
 # LOG_N = range(10, 23)  # ZpDebugData - binary
@@ -69,48 +112,48 @@ NEXT_PORT = 9000 + (PARTY + 1) % 3
 # LOG_N = range(10, 23)  # P256 - binary
 # LOG_N = range(10, 23)  # P256 - P256
 
-LOG_N = 25
+# LOG_N = 20
 # TAU = range(1, 20)
 
-TAU = 5
-DATA_SIZE = 4
-# DATA_SIZE = 32
-# DATA_SIZE = range(4, 129, 8)
-SSOT_THRESHOLD = 0
-PSEUDO_DPF_THRESHOLD = range(LOG_N)
-# PSEUDO_DPF_THRESHOLD = 5
+# DATA_SIZE = 4
+DATA_SIZE = [256]
+# DATA_SIZE = range(4, 129, 4)
 
-results = {}
-for benchmark_key in BENCHMARK_KEY:
-    results[benchmark_key] = []
+TAU = [5]
 
-# for logn in LOG_N:
-# for tau in TAU:
-for pdpf in PSEUDO_DPF_THRESHOLD:
-    # for data_size in DATA_SIZE:
-    # print(f"logn = {logn}")
-    # print(f"tau = {tau}")
-    print(f"pdpf = {pdpf}")
-    # print(f"data_size = {data_size}")
-    proto_test_args = [
-        "./bin/test/proto_test",
-        "--party", str(PARTY),
-        "--port", str(PORT),
-        "--next_party_port", str(NEXT_PORT),
-        # "--log_n", str(logn),
-        "--log_n", str(LOG_N),
-        "--data_size", str(DATA_SIZE),
-        # "--data_size", str(data_size),
-        "--tau", str(TAU),
-        # "--tau", str(tau),
-        "--log_ssot_threshold", str(SSOT_THRESHOLD),
-        # "--log_pseudo_dpf_threshold", str(PSEUDO_DPF_THRESHOLD),
-        "--log_pseudo_dpf_threshold", str(pdpf),
-    ]
-    result = start_benchmark(proto_test_args)
-    for k, v in result.items():
-        results[k].append(v)
-    print()
+# PSEUDO_DPF_THRESHOLD = range(LOG_N)
+PSEUDO_DPF_THRESHOLD = [5]
 
-# print_output(TAU)
-print_output(PSEUDO_DPF_THRESHOLD)
+records = []
+
+for logn in LOG_N:
+    for data_size in DATA_SIZE:
+        for tau in TAU:
+            for pdpf in PSEUDO_DPF_THRESHOLD:
+                print(
+                    f"logn {logn}, data_size {data_size}, tau {tau}, pdpf {pdpf}")
+                proto_test_args = [
+                    "./bin/test/proto_test",
+                    "--party", str(PARTY),
+                    "--port", str(PORT),
+                    "--next_party_port", str(NEXT_PORT),
+                    "--log_n", str(logn),
+                    "--data_size", str(data_size),
+                    "--tau", str(tau),
+                    "--log_pseudo_dpf_threshold", str(pdpf),
+                ]
+                record = start_benchmark(proto_test_args)
+                record.print()
+                records.append(record)
+                print()
+
+if len(LOG_N) > 1:
+    print_output(records, LOG_N)
+elif len(DATA_SIZE) > 1:
+    print_output(records, DATA_SIZE)
+elif len(TAU) > 1:
+    print_output(records, TAU)
+elif len(PSEUDO_DPF_THRESHOLD) > 1:
+    print_output(records, PSEUDO_DPF_THRESHOLD)
+else:
+    raise NotImplementedError
