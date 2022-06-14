@@ -77,7 +77,7 @@ public:
     void WriteData(D &data, Benchmark::Record *benchmark) {
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
         const std::vector<uchar> dump = data.DumpVector();
-        this->socket_.Write(dump.data(), data.size(), benchmark);
+        this->socket_.Write(dump.data(), dump.size(), benchmark);
     }
 
     void Close() {

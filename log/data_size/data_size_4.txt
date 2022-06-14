@@ -1,167 +1,210 @@
-logn = 1
-TOTAL_TIME 50
-TOTAL_BANDWIDTH 140
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.075000
+logn 1, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:10.518284
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 26, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 21, ct = 1, bandwidth = 8
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 47, ct = 2, bandwidth = 140
 
-logn = 2
-TOTAL_TIME 59
-TOTAL_BANDWIDTH 140
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.088500
+logn 2, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.030478
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 47, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 38, ct = 1, bandwidth = 8
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 86, ct = 2, bandwidth = 140
 
-logn = 3
-TOTAL_TIME 48
-TOTAL_BANDWIDTH 140
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.072000
+logn 3, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.018138
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 30, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 21, ct = 1, bandwidth = 8
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 52, ct = 2, bandwidth = 140
 
-logn = 4
-TOTAL_TIME 54
-TOTAL_BANDWIDTH 140
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.081000
+logn 4, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.019882
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 31, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 24, ct = 1, bandwidth = 8
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 55, ct = 2, bandwidth = 140
 
-logn = 5
-TOTAL_TIME 55
-TOTAL_BANDWIDTH 140
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.082500
+logn 5, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.019479
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 28, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 24, ct = 1, bandwidth = 8
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 53, ct = 2, bandwidth = 140
 
-logn = 6
-TOTAL_TIME 178
-TOTAL_BANDWIDTH 740
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.267000
+logn 6, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.041355
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 71, ct = 1, bandwidth = 305
+ORAM_WRITE, time = 63, ct = 1, bandwidth = 393
+ORAM_ACCESS_POSITION_MAP, time = 62, ct = 1, bandwidth = 42
+TOTAL, time = 197, ct = 3, bandwidth = 740
 
-logn = 7
-TOTAL_TIME 202
-TOTAL_BANDWIDTH 826
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.303000
+logn 7, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.043314
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 85, ct = 1, bandwidth = 391
+ORAM_WRITE, time = 58, ct = 1, bandwidth = 393
+ORAM_ACCESS_POSITION_MAP, time = 58, ct = 1, bandwidth = 42
+TOTAL, time = 202, ct = 3, bandwidth = 826
 
-logn = 8
-TOTAL_TIME 192
-TOTAL_BANDWIDTH 862
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.288000
+logn 8, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.045851
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 97, ct = 1, bandwidth = 433
+ORAM_WRITE, time = 57, ct = 1, bandwidth = 387
+ORAM_ACCESS_POSITION_MAP, time = 61, ct = 1, bandwidth = 42
+TOTAL, time = 216, ct = 3, bandwidth = 862
 
-logn = 9
-TOTAL_TIME 213
-TOTAL_BANDWIDTH 886
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.319500
+logn 9, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.044607
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 100, ct = 1, bandwidth = 455
+ORAM_WRITE, time = 54, ct = 1, bandwidth = 388
+ORAM_ACCESS_POSITION_MAP, time = 55, ct = 1, bandwidth = 42
+TOTAL, time = 210, ct = 3, bandwidth = 886
 
-logn = 10
-TOTAL_TIME 219
-TOTAL_BANDWIDTH 901
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.328500
+logn 10, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.042130
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 90, ct = 1, bandwidth = 468
+ORAM_WRITE, time = 47, ct = 1, bandwidth = 390
+ORAM_ACCESS_POSITION_MAP, time = 53, ct = 1, bandwidth = 42
+TOTAL, time = 192, ct = 3, bandwidth = 901
 
-logn = 11
-TOTAL_TIME 342
-TOTAL_BANDWIDTH 1201
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.513000
+logn 11, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.068321
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 110, ct = 1, bandwidth = 561
+ORAM_WRITE, time = 59, ct = 1, bandwidth = 413
+ORAM_ACCESS_POSITION_MAP, time = 182, ct = 1, bandwidth = 226
+TOTAL, time = 352, ct = 3, bandwidth = 1201
 
-logn = 12
-TOTAL_TIME 366
-TOTAL_BANDWIDTH 1361
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.549000
+logn 12, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.072379
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 113, ct = 1, bandwidth = 586
+ORAM_WRITE, time = 63, ct = 1, bandwidth = 332
+ORAM_ACCESS_POSITION_MAP, time = 202, ct = 1, bandwidth = 442
+TOTAL, time = 380, ct = 3, bandwidth = 1361
 
-logn = 13
-TOTAL_TIME 381
-TOTAL_BANDWIDTH 1451
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.571500
+logn 13, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.073340
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 118, ct = 1, bandwidth = 622
+ORAM_WRITE, time = 63, ct = 1, bandwidth = 368
+ORAM_ACCESS_POSITION_MAP, time = 205, ct = 1, bandwidth = 460
+TOTAL, time = 387, ct = 3, bandwidth = 1451
 
-logn = 14
-TOTAL_TIME 396
-TOTAL_BANDWIDTH 1536
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.594000
+logn 14, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.077488
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 127, ct = 1, bandwidth = 658
+ORAM_WRITE, time = 69, ct = 1, bandwidth = 404
+ORAM_ACCESS_POSITION_MAP, time = 209, ct = 1, bandwidth = 473
+TOTAL, time = 406, ct = 3, bandwidth = 1536
 
-logn = 15
-TOTAL_TIME 436
-TOTAL_BANDWIDTH 1619
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.654000
+logn 15, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.081737
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 137, ct = 1, bandwidth = 694
+ORAM_WRITE, time = 83, ct = 1, bandwidth = 440
+ORAM_ACCESS_POSITION_MAP, time = 217, ct = 1, bandwidth = 484
+TOTAL, time = 439, ct = 3, bandwidth = 1619
 
-logn = 16
-TOTAL_TIME 665
-TOTAL_BANDWIDTH 2008
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:00.997500
+logn 16, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.110542
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 158, ct = 1, bandwidth = 730
+ORAM_WRITE, time = 113, ct = 1, bandwidth = 476
+ORAM_ACCESS_POSITION_MAP, time = 341, ct = 1, bandwidth = 801
+TOTAL, time = 613, ct = 3, bandwidth = 2008
 
-logn = 17
-TOTAL_TIME 799
-TOTAL_BANDWIDTH 2279
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:01.198500
+logn 17, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.186489
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 273, ct = 1, bandwidth = 766
+ORAM_WRITE, time = 223, ct = 1, bandwidth = 512
+ORAM_ACCESS_POSITION_MAP, time = 584, ct = 1, bandwidth = 1000
+TOTAL, time = 1081, ct = 3, bandwidth = 2279
 
-logn = 18
-TOTAL_TIME 1112
-TOTAL_BANDWIDTH 2442
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:01.668000
+logn 18, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.180256
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 317, ct = 1, bandwidth = 802
+ORAM_WRITE, time = 293, ct = 1, bandwidth = 548
+ORAM_ACCESS_POSITION_MAP, time = 415, ct = 1, bandwidth = 1091
+TOTAL, time = 1026, ct = 3, bandwidth = 2442
 
-logn = 19
-TOTAL_TIME 1935
-TOTAL_BANDWIDTH 2598
-KEY_TO_INDEX_TIME 0
-KEY_TO_INDEX_BANDWIDTH 0
-KEY_TO_INDEX_COLLISION 0
-0:00:02.902500
+logn 19, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.294571
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 624, ct = 1, bandwidth = 838
+ORAM_WRITE, time = 605, ct = 1, bandwidth = 584
+ORAM_ACCESS_POSITION_MAP, time = 464, ct = 1, bandwidth = 1175
+TOTAL, time = 1694, ct = 3, bandwidth = 2598
 
-TOTAL_TIME
-(1, 0.05)(2, 0.06)(3, 0.05)(4, 0.05)(5, 0.06)(6, 0.18)(7, 0.2)(8, 0.19)(9, 0.21)(10, 0.22)(11, 0.34)(12, 0.37)(13, 0.38)(14, 0.4)(15, 0.44)(16, 0.67)(17, 0.8)(18, 1.11)(19, 1.94)
+logn 20, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.526342
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1287, ct = 1, bandwidth = 874
+ORAM_WRITE, time = 1276, ct = 1, bandwidth = 620
+ORAM_ACCESS_POSITION_MAP, time = 600, ct = 1, bandwidth = 1440
+TOTAL, time = 3164, ct = 3, bandwidth = 2935
 
-TOTAL_BANDWIDTH
-(1, 0.14)(2, 0.14)(3, 0.14)(4, 0.14)(5, 0.14)(6, 0.74)(7, 0.83)(8, 0.86)(9, 0.89)(10, 0.9)(11, 1.2)(12, 1.36)(13, 1.45)(14, 1.54)(15, 1.62)(16, 2.01)(17, 2.28)(18, 2.44)(19, 2.6)
+logn 21, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:03.960536
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2451, ct = 1, bandwidth = 910
+ORAM_WRITE, time = 2750, ct = 1, bandwidth = 656
+ORAM_ACCESS_POSITION_MAP, time = 850, ct = 1, bandwidth = 1830
+TOTAL, time = 6052, ct = 3, bandwidth = 3397
 
-KEY_TO_INDEX_TIME
-(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)
+logn 22, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:04.824816
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 4827, ct = 1, bandwidth = 946
+ORAM_WRITE, time = 5870, ct = 1, bandwidth = 692
+ORAM_ACCESS_POSITION_MAP, time = 1126, ct = 1, bandwidth = 2101
+TOTAL, time = 11824, ct = 3, bandwidth = 3740
 
-KEY_TO_INDEX_BANDWIDTH
-(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)
+logn 23, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:06.623503
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 9645, ct = 1, bandwidth = 982
+ORAM_WRITE, time = 11825, ct = 1, bandwidth = 728
+ORAM_ACCESS_POSITION_MAP, time = 2136, ct = 1, bandwidth = 2263
+TOTAL, time = 23607, ct = 3, bandwidth = 3974
 
-KEY_TO_INDEX_COLLISION
-(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)
+logn 24, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:09.881426
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 19019, ct = 1, bandwidth = 1018
+ORAM_WRITE, time = 23337, ct = 1, bandwidth = 764
+ORAM_ACCESS_POSITION_MAP, time = 2892, ct = 1, bandwidth = 2420
+TOTAL, time = 45249, ct = 3, bandwidth = 4203
 
+logn 25, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:16.355825
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 37401, ct = 1, bandwidth = 1054
+ORAM_WRITE, time = 45454, ct = 1, bandwidth = 800
+ORAM_ACCESS_POSITION_MAP, time = 5017, ct = 1, bandwidth = 2757
+TOTAL, time = 87873, ct = 3, bandwidth = 4612
+
+logn 26, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:29.268003
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 73380, ct = 1, bandwidth = 1090
+ORAM_WRITE, time = 92083, ct = 1, bandwidth = 836
+ORAM_ACCESS_POSITION_MAP, time = 9384, ct = 1, bandwidth = 3218
+TOTAL, time = 174849, ct = 3, bandwidth = 5145
+
+logn 27, data_size 4, tau 5, pdpf 5
+time elapsed: 0:00:55.211622

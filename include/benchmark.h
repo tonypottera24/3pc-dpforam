@@ -19,10 +19,12 @@ typedef high_resolution_clock::time_point timestamp;
 
 class Record {
 private:
-    std::string name;
     timestamp last_start_time_;
-    duration<long long, std::nano> duration_;
     uint64_t last_bandwidth_ = 0;
+
+public:
+    std::string name;
+    duration<long long, std::nano> duration_;
     uint64_t bandwidth_ = 0;
     uint64_t count_ = 0;
 
@@ -45,23 +47,20 @@ public:
     void Start();
     uint64_t End();
 
-    void AddBandwidth(uint64_t n);
     uint64_t GetTime();
 
     void Print();
-    void PrintTotal(Peer peer[2], const char *title = "", uint64_t iteration = 1);
+    void PrintTotal(Peer peer[2], uint64_t iteration = 1);
 };
 
 // Top Level ORAM
 extern Record KEY_TO_INDEX;
-extern uint KEY_TO_INDEX_COLLISION;
 extern Record ORAM_READ;
 extern Record ORAM_WRITE;
 
 // Position map ORAM
 #define BENCHMARK_POSITION_MAP
-extern Record ORAM_READ_POSITION_MAP;
-extern Record ORAM_WRITE_POSITION_MAP;
+extern Record ORAM_ACCESS_POSITION_MAP;
 
 // PIR
 // extern Record DPF_PIR;

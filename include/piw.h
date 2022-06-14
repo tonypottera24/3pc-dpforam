@@ -109,7 +109,7 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
         Benchmark::GROUP_PREPARE_WRITE.Start();
         v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, &Benchmark::GROUP_PREPARE_WRITE);
         uint64_t bandwidth = Benchmark::GROUP_PREPARE_WRITE.End();
-        benchmark->AddBandwidth(bandwidth);
+        benchmark.bandwidth_ += bandwidth;
     } else {
         v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, benchmark);
     }

@@ -63,7 +63,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
             D ans = inv_gadget::Inv(peer, is_0, v_sum, &Benchmark::GROUP_PREPARE_READ);
             uint64_t bandwidth = Benchmark::GROUP_PREPARE_READ.End();
             // Benchmark::GROUP_PREPARE_READ.Print();
-            benchmark->AddBandwidth(bandwidth);
+            benchmark.bandwidth_ += bandwidth;
             return ans;
         } else {
             return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
@@ -196,9 +196,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 exists[digest_uint]++;
                 collision_ct++;
             }
-        }
-        if (benchmark != NULL) {
-            Benchmark::KEY_TO_INDEX_COLLISION += collision_ct;
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {

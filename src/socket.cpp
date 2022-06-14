@@ -89,7 +89,7 @@ void Socket::Write(const uchar *data, uint data_size, Benchmark::Record *benchma
         offset += write_size;
     }
     if (benchmark != NULL) {
-        benchmark->AddBandwidth(data_size);
+        benchmark->bandwidth_ += data_size;
     }
     fflush(stream_);
 }

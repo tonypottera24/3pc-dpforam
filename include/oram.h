@@ -29,6 +29,7 @@ private:
     FSS1Bit fss_;
     Peer *peer_;
     uint n_;
+    bool is_top_level_;
 
     std::vector<K> key_array_13_;
     std::vector<std::vector<uchar>> key_array_digest_13_;
@@ -56,7 +57,7 @@ private:
     void Flush(Benchmark::Record *benchmark);
 
 public:
-    ORAM(const uint party, Peer peer[2], uint n, uint key_size, uint data_size);
+    ORAM(const uint party, Peer peer[2], uint n, uint key_size, uint data_size, bool is_top_level);
     ~ORAM();
 
     void SetKeyValueArray(std::vector<K> &key_array_13);
