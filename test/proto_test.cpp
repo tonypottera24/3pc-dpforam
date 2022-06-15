@@ -109,15 +109,15 @@ int main(int argc, char *argv[]) {
 
     // uint64_t start_time = timestamp();
     ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, 0, data_size, true);
-    // ORAM<BinaryData, ZpDebugData> oram = ORAM<BinaryData, ZpDebugData>(party, peer, n, 0, data_size);
-    // ORAM<ZpDebugData, BinaryData> oram = ORAM<ZpDebugData, BinaryData>(party, peer, n, ZpDebugData().Size(), data_size);
+    // ORAM<BinaryData, ZpDebugData> oram = ORAM<BinaryData, ZpDebugData>(party, peer, n, 0, data_size, true);
+    // ORAM<ZpDebugData, BinaryData> oram = ORAM<ZpDebugData, BinaryData>(party, peer, n, ZpDebugData().Size(), data_size, true);
 
-    // ORAM<BinaryData, ECData> oram = ORAM<BinaryData, ECData>(party, peer, n, 0, data_size);
-    // ORAM<BinaryData, ZpData> oram = ORAM<BinaryData, ZpData>(party, peer, n, 0, data_size);
-    // ORAM<ECData, BinaryData> oram = ORAM<ECData, BinaryData>(party, peer, n, data_size);
-    // ORAM<ECData, ECData> oram = ORAM<ECData, ECData>(party, peer, n, data_size);
-    // ORAM<ZpData, BinaryData> oram = ORAM<ZpData, BinaryData>(party, peer, n, ZpData().Size(), data_size);
-    // ORAM<ZpData, ZpData> oram = ORAM<ZpData, ZpData>(party, peer, n, ZpData().Size(), data_size);
+    // ORAM<BinaryData, ECData> oram = ORAM<BinaryData, ECData>(party, peer, n, 0, data_size, true);
+    // ORAM<BinaryData, ZpData> oram = ORAM<BinaryData, ZpData>(party, peer, n, 0, data_size, true);
+    // ORAM<ECData, BinaryData> oram = ORAM<ECData, BinaryData>(party, peer, n, data_size, true);
+    // ORAM<ECData, ECData> oram = ORAM<ECData, ECData>(party, peer, n, data_size, true);
+    // ORAM<ZpData, BinaryData> oram = ORAM<ZpData, BinaryData>(party, peer, n, ZpData().Size(), data_size, true);
+    // ORAM<ZpData, ZpData> oram = ORAM<ZpData, ZpData>(party, peer, n, ZpData().Size(), data_size, true);
 
     // uint64_t end_time = timestamp();
     // fprintf(stderr, "Time to initilize DPF ORAM: %llu\n", end_time - start_time);

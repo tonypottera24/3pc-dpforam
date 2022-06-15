@@ -201,9 +201,9 @@ BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only, Benchmar
     bool is_cached_23[2];
     if (this->position_map_ != NULL) {
         if (benchmark != NULL && this->is_top_level_) {
-            Benchmark::ORAM_ACCESS_POSITION_MAP.Start();
-            ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, &Benchmark::ORAM_ACCESS_POSITION_MAP);
-            Benchmark::ORAM_ACCESS_POSITION_MAP.End();
+            Benchmark::ORAM_POSITION_MAP.Start();
+            ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, &Benchmark::ORAM_POSITION_MAP);
+            Benchmark::ORAM_POSITION_MAP.End();
         } else {
             ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, benchmark);
         }
@@ -481,16 +481,37 @@ void ORAM<K, D>::Test(uint iterations) {
     fprintf(stderr, "n = %u\n", this->Size());
     fprintf(stderr, "\n");
 
+    Benchmark::ORAM_READ.duration_ -= Benchmark::ORAM_POSITION_MAP.duration_;
+
+    Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, iterations);
+    Benchmark::ORAM_READ.PrintTotal(this->peer_, iterations);
+    Benchmark::ORAM_WRITE.PrintTotal(this->peer_, iterations);
+    Benchmark::ORAM_POSITION_MAP.PrintTotal(this->peer_, iterations);
+    fprintf(stderr, "\n");
+
+    Benchmark::Record total = Benchmark::KEY_TO_INDEX + Benchmark::ORAM_READ + Benchmark::ORAM_WRITE + Benchmark::ORAM_POSITION_MAP;
+    total.name = "TOTAL";
+    total.PrintTotal(this->peer_, iterations);
+    fprintf(stderr, "\n");
+
 #ifdef BENCHMARK_DPF
     Benchmark::DPF_GEN.PrintTotal(this->peer_, iterations);
     Benchmark::DPF_EVAL.PrintTotal(this->peer_, iterations);
     Benchmark::DPF_EVAL_ALL.PrintTotal(this->peer_, iterations);
-    fprintf(stderr, "\n");
+    Benchmark::Record dpf_total = Benchmark::DPF_GEN + Benchmark::DPF_EVAL + Benchmark::DPF_EVAL_ALL;
+    dpf_total.name = "dpf_total";
+    dpf_total.PrintTotal(this->peer_, iterations);
 
     Benchmark::PSEUDO_DPF_GEN.PrintTotal(this->peer_, iterations);
     Benchmark::PSEUDO_DPF_EVAL.PrintTotal(this->peer_, iterations);
     Benchmark::PSEUDO_DPF_EVAL_ALL.PrintTotal(this->peer_, iterations);
-    fprintf(stderr, "\n");
+    Benchmark::Record pseudo_dpf_total = Benchmark::PSEUDO_DPF_GEN + Benchmark::PSEUDO_DPF_EVAL + Benchmark::PSEUDO_DPF_EVAL_ALL;
+    pseudo_dpf_total.name = "pseudo_dpf_total";
+    pseudo_dpf_total.PrintTotal(this->peer_, iterations);
+
+    Benchmark::Record dpf_pdpf_others = total - dpf_total - pseudo_dpf_total;
+    dpf_pdpf_others.name = "dpf_pdpf_others";
+    dpf_pdpf_others.PrintTotal(this->peer_, iterations);
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE
@@ -512,20 +533,6 @@ void ORAM<K, D>::Test(uint iterations) {
     Benchmark::GROUP_PREPARE_WRITE.PrintTotal(this->peer_, iterations);
     fprintf(stderr, "\n");
 #endif
-
-    Benchmark::ORAM_READ.duration_ -= Benchmark::ORAM_ACCESS_POSITION_MAP.duration_;
-
-    Benchmark::KEY_TO_INDEX.PrintTotal(this->peer_, iterations);
-    Benchmark::ORAM_READ.PrintTotal(this->peer_, iterations);
-    Benchmark::ORAM_WRITE.PrintTotal(this->peer_, iterations);
-    Benchmark::ORAM_ACCESS_POSITION_MAP.PrintTotal(this->peer_, iterations);
-    fprintf(stderr, "\n");
-
-    Benchmark::Record total = Benchmark::KEY_TO_INDEX + Benchmark::ORAM_READ + Benchmark::ORAM_WRITE + Benchmark::ORAM_ACCESS_POSITION_MAP;
-    total.name = "TOTAL";
-    total.PrintTotal(this->peer_, iterations);
-
-    fprintf(stderr, "\n");
 }
 
 template class ORAM<BinaryData, BinaryData>;

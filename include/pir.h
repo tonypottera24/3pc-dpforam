@@ -22,11 +22,11 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     bool is_0 = false;
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0);
+        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0, benchmark);
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].ReadData(query_23[0]);
     } else {
-        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0);
+        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0, benchmark);
 
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].WriteData(query_23[1], benchmark);
@@ -41,9 +41,9 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 
     for (uint b = 0; b < 2; b++) {
         if (pseudo) {
-            fss.PseudoEvalAll(query_23[b], n, dpf_out);
+            fss.PseudoEvalAll(query_23[b], n, dpf_out, benchmark);
         } else {
-            fss.EvalAll(query_23[b], log_n, dpf_out);
+            fss.EvalAll(query_23[b], log_n, dpf_out, benchmark);
         }
         for (uint i = 0; i < array_23[0].size(); i++) {
             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
@@ -161,7 +161,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             BinaryData query_23[2];
             bool is_0 = false;
 
-            fss.Gen(digest_uint, digest_size_log, true, query_23, is_0);
+            fss.Gen(digest_uint, digest_size_log, true, query_23, is_0, benchmark);
 
             peer[0].WriteUInt(query_23[0].Size(), benchmark);
             peer[1].WriteUInt(query_23[1].Size(), benchmark);
@@ -219,7 +219,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             peer[party].ReadData(query[b]);
             if (eval_all[b]) {
                 dpf_out[b].resize(digest_n);
-                fss.EvalAll(query[b], digest_size_log, dpf_out[b]);
+                fss.EvalAll(query[b], digest_size_log, dpf_out[b], benchmark);
             }
         }
 #ifdef BENCHMARK_KEY_VALUE
@@ -237,13 +237,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             uint64_t digest_uint = dpf_key_pir_ctx->key_array_digest_[i];
             if (exists[digest_uint] == 1) {
                 // debug_print("dpf i = %u, exists = 1\n", i);
-                if (eval_all[0] ? dpf_out[0][digest_uint] : fss.Eval(query[0], digest_uint)) {
+                if (eval_all[0] ? dpf_out[0][digest_uint] : fss.Eval(query[0], digest_uint, benchmark)) {
                     v_sum ^= i;
                 }
             } else {  // collision
                 // fprintf(stderr, "collision, i = %u\n", i);
                 uint64_t digest_uint = dpf_key_pir_ctx->Hash(1, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
-                if (eval_all[1] ? dpf_out[1][digest_uint] : fss.Eval(query[1], digest_uint)) {
+                if (eval_all[1] ? dpf_out[1][digest_uint] : fss.Eval(query[1], digest_uint, benchmark)) {
                     v_sum ^= i;
                 }
                 // collision can still happen...

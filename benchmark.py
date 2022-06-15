@@ -4,8 +4,20 @@ import argparse
 import subprocess
 import datetime
 import json
+import signal
+import sys
+
+JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
 criterias = []
+
+
+def signal_handler(sig, frame):
+    print_all()
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 
 class BenchmarkRecord():
@@ -28,10 +40,7 @@ class BenchmarkRecord():
 
 
 def start_benchmark(proto_test_args):
-    t1 = datetime.datetime.now()
     out = subprocess.run(proto_test_args, stderr=subprocess.PIPE)
-    t2 = datetime.datetime.now()
-    print(f'time elapsed: {t2 - t1}')
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
         return BenchmarkRecord(stderr)
@@ -41,26 +50,26 @@ def start_benchmark(proto_test_args):
         exit(1)
 
 
-def print_output(records, x_axis):
+def print_records(records, x_axis):
     for criteria in criterias:
         print(f"========== {criteria} ==========")
         print(f"{criteria} time")
-        for i, x in enumerate(x_axis):
+        for x, record in zip(x_axis, records):
             # convert microsecond (us) to millisecond (ms)
-            y = round(records[i].criteria[criteria]["time"] / 1000, 2)
+            y = round(record.criteria[criteria]["time"] / 1000, 2)
             print(f"({x}, {y})", end="")
         print()
 
         print(f"{criteria} ct")
-        for i, x in enumerate(x_axis):
-            y = records[i].criteria[criteria]["ct"]
+        for x, record in zip(x_axis, records):
+            y = record.criteria[criteria]["ct"]
             print(f"({x}, {y})", end="")
         print()
 
         print(f"{criteria} bandwidth")
-        for i, x in enumerate(x_axis):
+        for x, record in zip(x_axis, records):
             # convert B to KB
-            y = round(records[i].criteria[criteria]["bandwidth"] / 1000, 2)
+            y = round(record.criteria[criteria]["bandwidth"] / 1000, 2)
             print(f"({x}, {y})", end="")
         print("\n\n")
         #     print(f"{key} COLLISION")
@@ -68,6 +77,19 @@ def print_output(records, x_axis):
         #         y = round(records[i]["ct"] / pow(2, x) * 100, 2)
         #         print(f"({x}, {y})", end="")
         #     print("\n")
+
+
+def print_all():
+    if len(LOG_N) > 1:
+        print_records(records, LOG_N)
+    elif len(DATA_SIZE) > 1:
+        print_records(records, DATA_SIZE)
+    elif len(TAU) > 1:
+        print_records(records, TAU)
+    elif len(PSEUDO_DPF_THRESHOLD) > 1:
+        print_records(records, PSEUDO_DPF_THRESHOLD)
+    else:
+        raise NotImplementedError
 
 
 parser = argparse.ArgumentParser()
@@ -108,6 +130,9 @@ try:
         for data_size in DATA_SIZE:
             for tau in TAU:
                 for pdpf in PSEUDO_DPF_THRESHOLD:
+                    print("========== Benchmark start ==========")
+                    t1 = datetime.datetime.now(JST)
+                    print(f'{t1}')
                     print(
                         f"logn {logn}, data_size {data_size}, tau {tau}, pdpf {pdpf}")
                     proto_test_args = [
@@ -123,17 +148,10 @@ try:
                     record = start_benchmark(proto_test_args)
                     record.print()
                     records.append(record)
-                    print()
+                    t2 = datetime.datetime.now(JST)
+                    print(f'{t2}, duration: {t2 - t1}')
+                    print("========== Benchmark end ==========\n")
 except:
     print('failed')
-
-if len(LOG_N) > 1:
-    print_output(records, LOG_N)
-elif len(DATA_SIZE) > 1:
-    print_output(records, DATA_SIZE)
-elif len(TAU) > 1:
-    print_output(records, TAU)
-elif len(PSEUDO_DPF_THRESHOLD) > 1:
-    print_output(records, PSEUDO_DPF_THRESHOLD)
-else:
-    raise NotImplementedError
+finally:
+    print_all()

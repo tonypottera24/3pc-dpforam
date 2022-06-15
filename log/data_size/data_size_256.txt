@@ -1,6 +1,280 @@
 logn 1, data_size 256, tau 5, pdpf 5
-time elapsed: 0:00:00.094881
+start time 2022-06-14 12:14:40.892044
+end time 2022-06-14 12:14:46.103243, duration: 0:00:05.211199
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 76, ct = 1, bandwidth = 8196
+ORAM_WRITE, time = 36, ct = 1, bandwidth = 260
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 112, ct = 2, bandwidth = 8456
+
+logn 2, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:14:46.103317
+end time 2022-06-14 12:14:49.129830, duration: 0:00:03.026513
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 65, ct = 1, bandwidth = 8196
+ORAM_WRITE, time = 25, ct = 1, bandwidth = 260
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 90, ct = 2, bandwidth = 8456
+
+logn 3, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:14:49.129927
+end time 2022-06-14 12:14:52.158011, duration: 0:00:03.028084
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 69, ct = 1, bandwidth = 8196
+ORAM_WRITE, time = 27, ct = 1, bandwidth = 260
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 96, ct = 2, bandwidth = 8456
+
+logn 4, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:14:52.158091
+end time 2022-06-14 12:14:55.186293, duration: 0:00:03.028202
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 66, ct = 1, bandwidth = 8196
+ORAM_WRITE, time = 28, ct = 1, bandwidth = 260
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 95, ct = 2, bandwidth = 8456
+
+logn 5, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:14:55.186395
+end time 2022-06-14 12:14:58.214621, duration: 0:00:03.028226
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 70, ct = 1, bandwidth = 8196
+ORAM_WRITE, time = 28, ct = 1, bandwidth = 260
+ORAM_ACCESS_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 98, ct = 2, bandwidth = 8456
+
+logn 6, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:14:58.214721
+end time 2022-06-14 12:15:01.305536, duration: 0:00:03.090815
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 309, ct = 1, bandwidth = 19121
+ORAM_WRITE, time = 80, ct = 1, bandwidth = 24837
+ORAM_ACCESS_POSITION_MAP, time = 59, ct = 1, bandwidth = 42
+TOTAL, time = 450, ct = 3, bandwidth = 44000
+
+logn 7, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:01.305608
+end time 2022-06-14 12:15:04.417356, duration: 0:00:03.111748
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 417, ct = 1, bandwidth = 24583
+ORAM_WRITE, time = 80, ct = 1, bandwidth = 24837
+ORAM_ACCESS_POSITION_MAP, time = 60, ct = 1, bandwidth = 42
+TOTAL, time = 559, ct = 3, bandwidth = 49462
+
+logn 8, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:04.417429
+end time 2022-06-14 12:15:07.544643, duration: 0:00:03.127214
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 470, ct = 1, bandwidth = 27205
+ORAM_WRITE, time = 88, ct = 1, bandwidth = 24509
+ORAM_ACCESS_POSITION_MAP, time = 60, ct = 1, bandwidth = 42
+TOTAL, time = 619, ct = 3, bandwidth = 51756
+
+logn 9, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:07.544747
+end time 2022-06-14 12:15:10.678173, duration: 0:00:03.133426
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 515, ct = 1, bandwidth = 28517
+ORAM_WRITE, time = 89, ct = 1, bandwidth = 24510
+ORAM_ACCESS_POSITION_MAP, time = 62, ct = 1, bandwidth = 42
+TOTAL, time = 667, ct = 3, bandwidth = 53070
+
+logn 10, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:10.678270
+end time 2022-06-14 12:15:13.813272, duration: 0:00:03.135002
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 513, ct = 1, bandwidth = 29176
+ORAM_WRITE, time = 95, ct = 1, bandwidth = 24512
+ORAM_ACCESS_POSITION_MAP, time = 58, ct = 1, bandwidth = 42
+TOTAL, time = 668, ct = 3, bandwidth = 53730
+
+logn 11, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:13.813363
+end time 2022-06-14 12:15:16.985487, duration: 0:00:03.172124
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 592, ct = 1, bandwidth = 29699
+ORAM_WRITE, time = 119, ct = 1, bandwidth = 21954
+ORAM_ACCESS_POSITION_MAP, time = 181, ct = 1, bandwidth = 226
+TOTAL, time = 894, ct = 3, bandwidth = 51880
+
+logn 12, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:16.985645
+end time 2022-06-14 12:15:20.174133, duration: 0:00:03.188488
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 630, ct = 1, bandwidth = 29939
+ORAM_WRITE, time = 145, ct = 1, bandwidth = 16712
+ORAM_ACCESS_POSITION_MAP, time = 208, ct = 1, bandwidth = 442
+TOTAL, time = 984, ct = 3, bandwidth = 47094
+
+logn 13, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:20.174228
+end time 2022-06-14 12:15:23.402507, duration: 0:00:03.228279
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 722, ct = 1, bandwidth = 29975
+ORAM_WRITE, time = 257, ct = 1, bandwidth = 16748
+ORAM_ACCESS_POSITION_MAP, time = 223, ct = 1, bandwidth = 460
+TOTAL, time = 1203, ct = 3, bandwidth = 47184
+
+logn 14, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:23.402601
+end time 2022-06-14 12:15:26.727293, duration: 0:00:03.324692
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 999, ct = 1, bandwidth = 30011
+ORAM_WRITE, time = 505, ct = 1, bandwidth = 16784
+ORAM_ACCESS_POSITION_MAP, time = 258, ct = 1, bandwidth = 473
+TOTAL, time = 1762, ct = 3, bandwidth = 47269
+
+logn 15, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:26.727385
+end time 2022-06-14 12:15:30.221435, duration: 0:00:03.494050
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1500, ct = 1, bandwidth = 30047
+ORAM_WRITE, time = 997, ct = 1, bandwidth = 16820
+ORAM_ACCESS_POSITION_MAP, time = 320, ct = 1, bandwidth = 484
+TOTAL, time = 2818, ct = 3, bandwidth = 47352
+
+logn 16, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:30.221519
+end time 2022-06-14 12:15:34.088094, duration: 0:00:03.866575
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2427, ct = 1, bandwidth = 30083
+ORAM_WRITE, time = 2376, ct = 1, bandwidth = 16856
+ORAM_ACCESS_POSITION_MAP, time = 528, ct = 1, bandwidth = 801
+TOTAL, time = 5332, ct = 3, bandwidth = 47741
+
+logn 17, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:34.088185
+end time 2022-06-14 12:15:38.597678, duration: 0:00:04.509493
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 4214, ct = 1, bandwidth = 30119
+ORAM_WRITE, time = 4758, ct = 1, bandwidth = 16892
+ORAM_ACCESS_POSITION_MAP, time = 642, ct = 1, bandwidth = 1000
+TOTAL, time = 9614, ct = 3, bandwidth = 48012
+
+logn 18, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:38.597766
+end time 2022-06-14 12:15:44.388191, duration: 0:00:05.790425
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 7783, ct = 1, bandwidth = 30155
+ORAM_WRITE, time = 9586, ct = 1, bandwidth = 16928
+ORAM_ACCESS_POSITION_MAP, time = 871, ct = 1, bandwidth = 1091
+TOTAL, time = 18242, ct = 3, bandwidth = 48174
+
+logn 19, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:44.388284
+end time 2022-06-14 12:15:52.778472, duration: 0:00:08.390188
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 15038, ct = 1, bandwidth = 30191
+ORAM_WRITE, time = 19423, ct = 1, bandwidth = 16964
+ORAM_ACCESS_POSITION_MAP, time = 1287, ct = 1, bandwidth = 1175
+TOTAL, time = 35749, ct = 3, bandwidth = 48331
+
+logn 20, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:15:52.778570
+end time 2022-06-14 12:16:06.228456, duration: 0:00:13.449886
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 29205, ct = 1, bandwidth = 30227
+ORAM_WRITE, time = 38358, ct = 1, bandwidth = 17000
+ORAM_ACCESS_POSITION_MAP, time = 2138, ct = 1, bandwidth = 1440
+TOTAL, time = 69702, ct = 3, bandwidth = 48668
+
+logn 21, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:16:06.228568
+end time 2022-06-14 12:16:29.703946, duration: 0:00:23.475378
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 57064, ct = 1, bandwidth = 30263
+ORAM_WRITE, time = 76553, ct = 1, bandwidth = 17036
+ORAM_ACCESS_POSITION_MAP, time = 3705, ct = 1, bandwidth = 1830
+TOTAL, time = 137323, ct = 3, bandwidth = 49130
+
+logn 22, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:16:29.704123
+end time 2022-06-14 12:17:13.544756, duration: 0:00:43.840633
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 114235, ct = 1, bandwidth = 30299
+ORAM_WRITE, time = 154023, ct = 1, bandwidth = 17072
+ORAM_ACCESS_POSITION_MAP, time = 6569, ct = 1, bandwidth = 2101
+TOTAL, time = 274828, ct = 3, bandwidth = 49472
+
+logn 23, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:17:13.544863
+end time 2022-06-14 12:18:38.108564, duration: 0:01:24.563701
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 228031, ct = 1, bandwidth = 30335
+ORAM_WRITE, time = 307770, ct = 1, bandwidth = 17108
+ORAM_ACCESS_POSITION_MAP, time = 12591, ct = 1, bandwidth = 2263
+TOTAL, time = 548393, ct = 3, bandwidth = 49707
+
+logn 24, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:18:38.108643
+end time 2022-06-14 12:21:21.347802, duration: 0:02:43.239159
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 451015, ct = 1, bandwidth = 30371
+ORAM_WRITE, time = 606775, ct = 1, bandwidth = 17144
+ORAM_ACCESS_POSITION_MAP, time = 22235, ct = 1, bandwidth = 2420
+TOTAL, time = 1080026, ct = 3, bandwidth = 49936
+
+logn 25, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:21:21.347898
+end time 2022-06-14 12:26:53.449852, duration: 0:05:32.101954
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 898839, ct = 1, bandwidth = 30407
+ORAM_WRITE, time = 1210943, ct = 1, bandwidth = 17180
+ORAM_ACCESS_POSITION_MAP, time = 42855, ct = 1, bandwidth = 2757
+TOTAL, time = 2152638, ct = 3, bandwidth = 50345
+
+logn 26, data_size 256, tau 5, pdpf 5
+start time 2022-06-14 12:26:53.449947
+end time 2022-06-14 12:27:36.661965, duration: 0:00:43.212018
 Error
-terminate called after throwing an instance of 'boost::wrapexcept<boost::program_options::invalid_option_value>'
-  what():  the argument ('[0]') for option '--log_ssot_threshold' is invalid
+Pseudo DPF threshold 32
+Connecting to 127.0.0.1:9001...
+InitClient: connect failed, wait for 3 sec...
+Connecting to 127.0.0.1:9000 done.
+
+failed
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)
+KEY_TO_INDEX ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)
+KEY_TO_INDEX bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.08)(2, 0.07)(3, 0.07)(4, 0.07)(5, 0.07)(6, 0.31)(7, 0.42)(8, 0.47)(9, 0.52)(10, 0.51)(11, 0.59)(12, 0.63)(13, 0.72)(14, 1.0)(15, 1.5)(16, 2.43)(17, 4.21)(18, 7.78)(19, 15.04)(20, 29.2)(21, 57.06)(22, 114.23)(23, 228.03)(24, 451.01)(25, 898.84)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)
+ORAM_READ bandwidth
+(1, 8.2)(2, 8.2)(3, 8.2)(4, 8.2)(5, 8.2)(6, 19.12)(7, 24.58)(8, 27.2)(9, 28.52)(10, 29.18)(11, 29.7)(12, 29.94)(13, 29.98)(14, 30.01)(15, 30.05)(16, 30.08)(17, 30.12)(18, 30.16)(19, 30.19)(20, 30.23)(21, 30.26)(22, 30.3)(23, 30.34)(24, 30.37)(25, 30.41)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.04)(2, 0.03)(3, 0.03)(4, 0.03)(5, 0.03)(6, 0.08)(7, 0.08)(8, 0.09)(9, 0.09)(10, 0.1)(11, 0.12)(12, 0.14)(13, 0.26)(14, 0.51)(15, 1.0)(16, 2.38)(17, 4.76)(18, 9.59)(19, 19.42)(20, 38.36)(21, 76.55)(22, 154.02)(23, 307.77)(24, 606.77)(25, 1210.94)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)
+ORAM_WRITE bandwidth
+(1, 0.26)(2, 0.26)(3, 0.26)(4, 0.26)(5, 0.26)(6, 24.84)(7, 24.84)(8, 24.51)(9, 24.51)(10, 24.51)(11, 21.95)(12, 16.71)(13, 16.75)(14, 16.78)(15, 16.82)(16, 16.86)(17, 16.89)(18, 16.93)(19, 16.96)(20, 17.0)(21, 17.04)(22, 17.07)(23, 17.11)(24, 17.14)(25, 17.18)
+
+
+========== ORAM_ACCESS_POSITION_MAP ==========
+ORAM_ACCESS_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.06)(7, 0.06)(8, 0.06)(9, 0.06)(10, 0.06)(11, 0.18)(12, 0.21)(13, 0.22)(14, 0.26)(15, 0.32)(16, 0.53)(17, 0.64)(18, 0.87)(19, 1.29)(20, 2.14)(21, 3.71)(22, 6.57)(23, 12.59)(24, 22.23)(25, 42.85)
+ORAM_ACCESS_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)
+ORAM_ACCESS_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.04)(7, 0.04)(8, 0.04)(9, 0.04)(10, 0.04)(11, 0.23)(12, 0.44)(13, 0.46)(14, 0.47)(15, 0.48)(16, 0.8)(17, 1.0)(18, 1.09)(19, 1.18)(20, 1.44)(21, 1.83)(22, 2.1)(23, 2.26)(24, 2.42)(25, 2.76)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.11)(2, 0.09)(3, 0.1)(4, 0.1)(5, 0.1)(6, 0.45)(7, 0.56)(8, 0.62)(9, 0.67)(10, 0.67)(11, 0.89)(12, 0.98)(13, 1.2)(14, 1.76)(15, 2.82)(16, 5.33)(17, 9.61)(18, 18.24)(19, 35.75)(20, 69.7)(21, 137.32)(22, 274.83)(23, 548.39)(24, 1080.03)(25, 2152.64)
+TOTAL ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 3)(7, 3)(8, 3)(9, 3)(10, 3)(11, 3)(12, 3)(13, 3)(14, 3)(15, 3)(16, 3)(17, 3)(18, 3)(19, 3)(20, 3)(21, 3)(22, 3)(23, 3)(24, 3)(25, 3)
+TOTAL bandwidth
+(1, 8.46)(2, 8.46)(3, 8.46)(4, 8.46)(5, 8.46)(6, 44.0)(7, 49.46)(8, 51.76)(9, 53.07)(10, 53.73)(11, 51.88)(12, 47.09)(13, 47.18)(14, 47.27)(15, 47.35)(16, 47.74)(17, 48.01)(18, 48.17)(19, 48.33)(20, 48.67)(21, 49.13)(22, 49.47)(23, 49.71)(24, 49.94)(25, 50.34)
+
 

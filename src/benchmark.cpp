@@ -26,7 +26,7 @@ Benchmark::Record &Benchmark::Record::operator+=(const Benchmark::Record &rhs) {
 
 Benchmark::Record &Benchmark::Record::operator-=(const Benchmark::Record &rhs) {
     this->duration_ -= rhs.duration_;
-    this->count_ -= rhs.count_;
+    this->count_ = this->count_ < rhs.count_ ? 0 : this->count_ - rhs.count_;
     this->bandwidth_ -= rhs.bandwidth_;
     return *this;
 }
@@ -98,7 +98,7 @@ Benchmark::Record Benchmark::ORAM_READ("ORAM_READ");
 Benchmark::Record Benchmark::ORAM_WRITE("ORAM_WRITE");
 
 // Position map ORAM
-Benchmark::Record Benchmark::ORAM_ACCESS_POSITION_MAP("ORAM_ACCESS_POSITION_MAP");
+Benchmark::Record Benchmark::ORAM_POSITION_MAP("ORAM_POSITION_MAP");
 
 // BENCHMARK_KEY_VALUE
 Benchmark::Record Benchmark::KEY_VALUE_PREPARE("KEY_VALUE_PREPARE");

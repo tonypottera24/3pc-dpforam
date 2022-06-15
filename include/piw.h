@@ -89,11 +89,11 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0);
+        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0, benchmark);
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].ReadData(query_23[0]);
     } else {
-        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0);
+        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0, benchmark);
 
         peer[0].WriteData(query_23[0], benchmark);
         peer[1].WriteData(query_23[1], benchmark);
@@ -120,9 +120,9 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     std::vector<uchar> dpf_out(n);
     for (uint b = 0; b < 2; b++) {
         if (pseudo) {
-            fss.PseudoEvalAll(query_23[b], n, dpf_out);
+            fss.PseudoEvalAll(query_23[b], n, dpf_out, benchmark);
         } else {
-            fss.EvalAll(query_23[b], log_n, dpf_out);
+            fss.EvalAll(query_23[b], log_n, dpf_out, benchmark);
         }
         for (uint i = 0; i < array_13.size(); i++) {
             debug_print("[%lu]DPF_PIW, i = %u, ii = %u, dpf_out = %u\n", array_13.size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
