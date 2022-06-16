@@ -9,7 +9,13 @@ BinaryData::BinaryData(const uint size) {
 }
 
 BinaryData::BinaryData(const BinaryData &other) {
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_COPY.Start();
+#endif
     this->data_ = other.data_;
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_COPY.End();
+#endif
 }
 
 BinaryData::~BinaryData() {
@@ -19,24 +25,48 @@ BinaryData::~BinaryData() {
 BinaryData &BinaryData::operator=(const BinaryData &other) {
     // copy operation
     if (this == &other) return *this;
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_COPY.Start();
+#endif
     this->data_ = other.data_;
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_COPY.End();
+#endif
     return *this;
 }
 
 BinaryData BinaryData::operator-() {
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_ARITHMATIC.Start();
+#endif
     neg_bytes(this->data_.data(), this->data_.data(), this->data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_ARITHMATIC.End();
+#endif
     return *this;
 }
 
 BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
     // assert(this->data_.size() == rhs.data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_ARITHMATIC.Start();
+#endif
     xor_bytes(this->data_.data(), rhs.data_.data(), this->data_.data(), this->data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_ARITHMATIC.End();
+#endif
     return *this;
 }
 
 BinaryData &BinaryData::operator-=(const BinaryData &rhs) {
     // assert(this->data_.size() == rhs.data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_ARITHMATIC.Start();
+#endif
     xor_bytes(this->data_.data(), rhs.data_.data(), this->data_.data(), this->data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_ARITHMATIC.End();
+#endif
     return *this;
 }
 
@@ -46,7 +76,13 @@ bool BinaryData::operator==(const BinaryData &rhs) {
 }
 
 void BinaryData::DumpBuffer(uchar *buffer) {
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_DUMP_LOAD.Start();
+#endif
     memcpy(buffer, this->data_.data(), this->data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_DUMP_LOAD.End();
+#endif
 }
 
 std::vector<uchar> BinaryData::DumpVector() {
@@ -54,7 +90,13 @@ std::vector<uchar> BinaryData::DumpVector() {
 }
 
 void BinaryData::LoadBuffer(uchar *buffer) {
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_DUMP_LOAD.Start();
+#endif
     memcpy(this->data_.data(), buffer, this->data_.size());
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_DUMP_LOAD.End();
+#endif
 }
 
 void BinaryData::Reset() {
@@ -68,10 +110,16 @@ void BinaryData::Resize(const uint size) {
 }
 
 void BinaryData::Random(PRG *prg) {
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_RANDOM.Start();
+#endif
     if (prg == NULL) prg = this->prg_;
     if (this->data_.size() > 0) {
         prg->RandBytes(this->data_.data(), this->data_.size());
     }
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA_RANDOM.End();
+#endif
 }
 
 void BinaryData::Print(const char *title) {

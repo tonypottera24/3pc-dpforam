@@ -22,17 +22,9 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     bool is_0 = false;
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0, benchmark);
-        peer[0].WriteData(query_23[0], benchmark);
-        peer[1].ReadData(query_23[0]);
+        is_0 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, benchmark);
     } else {
-        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0, benchmark);
-
-        peer[0].WriteData(query_23[0], benchmark);
-        peer[1].WriteData(query_23[1], benchmark);
-
-        peer[0].ReadData(query_23[1]);
-        peer[1].ReadData(query_23[0]);
+        is_0 = fss.Gen(peer, index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), false, query_23, benchmark);
     }
 
     uint data_size = array_23[0][0].Size();
@@ -157,17 +149,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         for (uint b = 0; b < 2; b++) {
             uint64_t digest_uint = dpf_key_pir_ctx->Hash(b, digest_n, key_dump, benchmark);
             // debug_print("digest_uint = %lu\n", digest_uint);
-
             BinaryData query_23[2];
-            bool is_0 = false;
-
-            fss.Gen(digest_uint, digest_size_log, true, query_23, is_0, benchmark);
-
-            peer[0].WriteUInt(query_23[0].Size(), benchmark);
-            peer[1].WriteUInt(query_23[1].Size(), benchmark);
-
-            peer[0].WriteData(query_23[0], benchmark);
-            peer[1].WriteData(query_23[1], benchmark);
+            fss.Gen(peer, digest_uint, digest_size_log, true, true, query_23, benchmark);
         }
         v_sum = rand_uint(peer[P0].PRG()) % n;
     } else {  // party == 0 || party == 1

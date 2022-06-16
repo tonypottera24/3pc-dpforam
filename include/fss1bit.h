@@ -20,11 +20,11 @@ private:
 
 public:
     FSS1Bit();
-    void Gen(uint64_t index, const uint log_n, const bool is_symmetric, BinaryData query_23[2], bool &is_0, Benchmark::Record *benchmark);
+    bool Gen(Peer peer[2], uint64_t index, const uint log_n, const bool is_symmetric, bool send_only, BinaryData query_23[2], Benchmark::Record *benchmark);
     bool Eval(BinaryData &query, uint64_t index, Benchmark::Record *benchmark);
     void EvalAll(BinaryData &query_23, const uint log_n, std::vector<uchar> &dpf_out, Benchmark::Record *benchmark);
 
-    void PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric, BinaryData query_23[2], bool &is_0, Benchmark::Record *benchmark);
+    bool PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric, BinaryData query_23[2], Benchmark::Record *benchmark);
     bool PseudoEval(BinaryData &query, const uint index, Benchmark::Record *benchmark);
     void PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> &dpf_out, Benchmark::Record *benchmark);
 };

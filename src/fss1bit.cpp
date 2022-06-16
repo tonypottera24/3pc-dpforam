@@ -45,10 +45,12 @@ FSS1Bit::FSS1Bit() {
     AES_set_encrypt_key(userkey, &aes_key_);
 }
 
-void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, BinaryData query_23[2], bool &is_0, Benchmark::Record *benchmark) {
+bool FSS1Bit::Gen(Peer peer[2], uint64_t index, const uint log_n, const bool is_symmetric, bool send_only, BinaryData query_23[2], Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_DPF
+    uint old_bandwidth;
     if (benchmark != NULL) {
         Benchmark::DPF_GEN.Start();
+        old_bandwidth = benchmark->bandwidth_;
     }
 #endif
     uchar *query_23_bytes[2];
@@ -58,20 +60,34 @@ void FSS1Bit::Gen(uint64_t index, const uint log_n, const bool is_symmetric, Bin
         query_23[b].LoadBuffer(query_23_bytes[b]);
         delete[] query_23_bytes[b];
     }
+    bool is_0 = false;
     if (!is_symmetric) {
         is_0 = this->Eval(query_23[0], index, benchmark);
     }
+    if (send_only) {
+        peer[0].WriteUInt(query_23[0].Size(), benchmark);
+        peer[1].WriteUInt(query_23[1].Size(), benchmark);
+    }
+    peer[0].WriteData(query_23[0], benchmark);
+    peer[1].WriteData(query_23[1], benchmark);
+    if (!send_only) {
+        peer[0].ReadData(query_23[1]);
+        peer[1].ReadData(query_23[0]);
+    }
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
-        Benchmark::DPF_GEN.End();
+        Benchmark::DPF_GEN.End(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
+    return is_0;
 }
 
 bool FSS1Bit::Eval(BinaryData &query, uint64_t index, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_DPF
+    uint old_bandwidth;
     if (benchmark != NULL) {
         Benchmark::DPF_EVAL.Start();
+        old_bandwidth = benchmark->bandwidth_;
     }
 #endif
     uint128 dpf_out = EVAL(&aes_key_, query.DumpVector().data(), index);
@@ -80,7 +96,7 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index, Benchmark::Record *benchma
     bool result = (1ll << (index_mod % 64)) & val[index_mod / 64];
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
-        Benchmark::DPF_EVAL.End();
+        Benchmark::DPF_EVAL.End(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
     return result;
@@ -88,8 +104,10 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index, Benchmark::Record *benchma
 
 void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &dpf_out, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_DPF
+    uint old_bandwidth;
     if (benchmark != NULL) {
         Benchmark::DPF_EVAL_ALL.Start();
+        old_bandwidth = benchmark->bandwidth_;
     }
 #endif
     uint n = 1 << log_n;
@@ -106,15 +124,17 @@ void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &d
     free(res);
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
-        Benchmark::DPF_EVAL_ALL.End();
+        Benchmark::DPF_EVAL_ALL.End(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
 }
 
-void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric, BinaryData query_23[2], bool &is_0, Benchmark::Record *benchmark) {
+bool FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, const bool is_symmetric, BinaryData query_23[2], Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_PSEUDO_DPF
+    uint old_bandwidth;
     if (benchmark != NULL) {
         Benchmark::PSEUDO_DPF_GEN.Start();
+        old_bandwidth = benchmark->bandwidth_;
     }
 #endif
     for (uint b = 0; b < 2; b++) {
@@ -126,26 +146,32 @@ void FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
     uint index_bit = index & 7;
     dpf_out[index_byte] ^= 1 << index_bit;
     query_23[0].LoadBuffer(dpf_out.data());
+    bool is_0 = false;
     if (!is_symmetric) {
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
+    peer[0].WriteData(query_23[0], benchmark);
+    peer[1].ReadData(query_23[0]);
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
-        Benchmark::PSEUDO_DPF_GEN.End();
+        Benchmark::PSEUDO_DPF_GEN.End(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
+    return is_0;
 }
 
 bool FSS1Bit::PseudoEval(BinaryData &query, const uint index, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_PSEUDO_DPF
+    uint old_bandwidth;
     if (benchmark != NULL) {
         Benchmark::PSEUDO_DPF_EVAL.Start();
+        old_bandwidth = benchmark->bandwidth_;
     }
 #endif
     bool result = get_buffer_bit(query.DumpVector().data(), index);
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
-        Benchmark::PSEUDO_DPF_EVAL.End();
+        Benchmark::PSEUDO_DPF_EVAL.End(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
     return result;
@@ -153,8 +179,10 @@ bool FSS1Bit::PseudoEval(BinaryData &query, const uint index, Benchmark::Record 
 
 void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> &dpf_out, Benchmark::Record *benchmark) {
 #ifdef BENCHMARK_PSEUDO_DPF
+    uint old_bandwidth;
     if (benchmark != NULL) {
         Benchmark::PSEUDO_DPF_EVAL_ALL.Start();
+        old_bandwidth = benchmark->bandwidth_;
     }
 #endif
     // uint index_byte = 0, index_bit = 0;
@@ -164,7 +192,7 @@ void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> 
     }
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
-        Benchmark::PSEUDO_DPF_EVAL_ALL.End();
+        Benchmark::PSEUDO_DPF_EVAL_ALL.End(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
 }

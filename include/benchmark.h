@@ -20,7 +20,6 @@ typedef high_resolution_clock::time_point timestamp;
 class Record {
 private:
     timestamp last_start_time_;
-    uint64_t last_bandwidth_ = 0;
 
 public:
     std::string name;
@@ -44,8 +43,15 @@ public:
         return lhs;
     }
 
-    void Start();
-    uint64_t End();
+    void Start() {
+        this->last_start_time_ = high_resolution_clock::now();
+    }
+
+    void End(uint64_t extra_bandwidth = 0) {
+        this->duration_ += high_resolution_clock::now() - this->last_start_time_;
+        this->count_++;
+        this->bandwidth_ += extra_bandwidth;
+    }
 
     uint64_t GetTime();
 
@@ -82,15 +88,26 @@ extern Record KEY_VALUE_HASH[2];
 extern Record GROUP_PREPARE_READ;
 extern Record GROUP_PREPARE_WRITE;
 
-#define BENCHMARK_DPF
+// #define BENCHMARK_DPF
 extern Record DPF_GEN;
 extern Record DPF_EVAL;
 extern Record DPF_EVAL_ALL;
 
-#define BENCHMARK_PSEUDO_DPF
+// #define BENCHMARK_PSEUDO_DPF
 extern Record PSEUDO_DPF_GEN;
 extern Record PSEUDO_DPF_EVAL;
 extern Record PSEUDO_DPF_EVAL_ALL;
+
+#define BENCHMARK_BINARY_DATA
+extern Record BINARY_DATA_COPY;
+extern Record BINARY_DATA_ARITHMATIC;
+extern Record BINARY_DATA_DUMP_LOAD;
+extern Record BINARY_DATA_RANDOM;
+
+extern Record BINARY_DATA_COPY_CACHE;
+extern Record BINARY_DATA_ARITHMATIC_CACHE;
+extern Record BINARY_DATA_DUMP_LOAD_CACHE;
+extern Record BINARY_DATA_RANDOM_CACHE;
 
 };  // namespace Benchmark
 

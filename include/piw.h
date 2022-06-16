@@ -89,17 +89,9 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
 
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
-        fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, is_0, benchmark);
-        peer[0].WriteData(query_23[0], benchmark);
-        peer[1].ReadData(query_23[0]);
+        is_0 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, benchmark);
     } else {
-        fss.Gen(index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), query_23, is_0, benchmark);
-
-        peer[0].WriteData(query_23[0], benchmark);
-        peer[1].WriteData(query_23[1], benchmark);
-
-        peer[0].ReadData(query_23[1]);
-        peer[1].ReadData(query_23[0]);
+        is_0 = fss.Gen(peer, index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), false, query_23, benchmark);
     }
     debug_print("is_0 = %u\n", is_0);
 

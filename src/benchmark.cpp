@@ -31,17 +31,6 @@ Benchmark::Record &Benchmark::Record::operator-=(const Benchmark::Record &rhs) {
     return *this;
 }
 
-void Benchmark::Record::Start() {
-    this->last_start_time_ = high_resolution_clock::now();
-    this->last_bandwidth_ = this->bandwidth_;
-}
-
-uint64_t Benchmark::Record::End() {
-    this->duration_ += high_resolution_clock::now() - this->last_start_time_;
-    this->count_++;
-    return this->bandwidth_ - this->last_bandwidth_;
-}
-
 uint64_t Benchmark::Record::GetTime() {
     return duration_cast<microseconds>(this->duration_).count();
 }
@@ -120,3 +109,14 @@ Benchmark::Record Benchmark::DPF_EVAL_ALL("DPF_EVAL_ALL");
 Benchmark::Record Benchmark::PSEUDO_DPF_GEN("PSEUDO_DPF_GEN");
 Benchmark::Record Benchmark::PSEUDO_DPF_EVAL("PSEUDO_DPF_EVAL");
 Benchmark::Record Benchmark::PSEUDO_DPF_EVAL_ALL("PSEUDO_DPF_EVAL_ALL");
+
+// BENCHMARK_BINARY_DATA
+Benchmark::Record Benchmark::BINARY_DATA_COPY("BINARY_DATA_COPY");
+Benchmark::Record Benchmark::BINARY_DATA_ARITHMATIC("BINARY_DATA_ARITHMATIC");
+Benchmark::Record Benchmark::BINARY_DATA_DUMP_LOAD("BINARY_DATA_DUMP_LOAD");
+Benchmark::Record Benchmark::BINARY_DATA_RANDOM("BINARY_DATA_RANDOM");
+
+Benchmark::Record Benchmark::BINARY_DATA_COPY_CACHE("BINARY_DATA_COPY_CACHE");
+Benchmark::Record Benchmark::BINARY_DATA_ARITHMATIC_CACHE("BINARY_DATA_ARITHMATIC_CACHE");
+Benchmark::Record Benchmark::BINARY_DATA_DUMP_LOAD_CACHE("BINARY_DATA_DUMP_LOAD_CACHE");
+Benchmark::Record Benchmark::BINARY_DATA_RANDOM_CACHE("BINARY_DATA_RANDOM_CACHE");
