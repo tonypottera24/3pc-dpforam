@@ -8,10 +8,13 @@
 #include <cmath>
 #include <iostream>
 
-#include "binary_data.h"
-#include "bulk_data.h"
+#include "benchmark/constant.h"
 #include "constant.h"
-#include "ec_data.h"
+#include "data/binary_data.h"
+#include "data/bulk_data.h"
+#include "data/ec_data.h"
+#include "data/zp_data.h"
+#include "data/zp_debug_data.h"
 #include "fss1bit.h"
 #include "inv_gadget.h"
 #include "peer.h"
@@ -19,8 +22,6 @@
 #include "piw.h"
 #include "ssot.h"
 #include "util.h"
-#include "zp_data.h"
-#include "zp_debug_data.h"
 
 template <typename K, typename D>
 class ORAM {

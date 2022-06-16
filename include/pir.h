@@ -53,7 +53,7 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
             // Benchmark::GROUP_PREPARE_READ.Print();
             Benchmark::GROUP_PREPARE_READ.Start();
             D ans = inv_gadget::Inv(peer, is_0, v_sum, &Benchmark::GROUP_PREPARE_READ);
-            uint64_t bandwidth = Benchmark::GROUP_PREPARE_READ.End();
+            uint64_t bandwidth = Benchmark::GROUP_PREPARE_READ.Stop();
             // Benchmark::GROUP_PREPARE_READ.Print();
             benchmark.bandwidth_ += bandwidth;
             return ans;
@@ -116,7 +116,7 @@ public:
         memcpy(&digest_uint, this->aes_block_, std::min(sizeof(uint64_t), (unsigned long)aes_block_size));
 #ifdef BENCHMARK_KEY_VALUE_HASH
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_HASH[b].End();
+            Benchmark::KEY_VALUE_HASH[b].Stop();
         }
 #endif
         return digest_uint % digest_n;
@@ -182,7 +182,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_PREPARE.End();
+            Benchmark::KEY_VALUE_PREPARE.Stop();
         }
 #endif
 
@@ -207,7 +207,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_DPF.End();
+            Benchmark::KEY_VALUE_DPF.Stop();
         }
 #endif
 
@@ -234,7 +234,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_EVALUATE.End();
+            Benchmark::KEY_VALUE_EVALUATE.Stop();
         }
 #endif
 

@@ -76,7 +76,7 @@ bool FSS1Bit::Gen(Peer peer[2], uint64_t index, const uint log_n, const bool is_
     }
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
-        Benchmark::DPF_GEN.End(benchmark->bandwidth_ - old_bandwidth);
+        Benchmark::DPF_GEN.Stop(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
     return is_0;
@@ -96,7 +96,7 @@ bool FSS1Bit::Eval(BinaryData &query, uint64_t index, Benchmark::Record *benchma
     bool result = (1ll << (index_mod % 64)) & val[index_mod / 64];
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
-        Benchmark::DPF_EVAL.End(benchmark->bandwidth_ - old_bandwidth);
+        Benchmark::DPF_EVAL.Stop(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
     return result;
@@ -124,7 +124,7 @@ void FSS1Bit::EvalAll(BinaryData &query, const uint log_n, std::vector<uchar> &d
     free(res);
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
-        Benchmark::DPF_EVAL_ALL.End(benchmark->bandwidth_ - old_bandwidth);
+        Benchmark::DPF_EVAL_ALL.Stop(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
 }
@@ -154,7 +154,7 @@ bool FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
     peer[1].ReadData(query_23[0]);
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
-        Benchmark::PSEUDO_DPF_GEN.End(benchmark->bandwidth_ - old_bandwidth);
+        Benchmark::PSEUDO_DPF_GEN.Stop(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
     return is_0;
@@ -171,7 +171,7 @@ bool FSS1Bit::PseudoEval(BinaryData &query, const uint index, Benchmark::Record 
     bool result = get_buffer_bit(query.DumpVector().data(), index);
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
-        Benchmark::PSEUDO_DPF_EVAL.End(benchmark->bandwidth_ - old_bandwidth);
+        Benchmark::PSEUDO_DPF_EVAL.Stop(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
     return result;
@@ -192,7 +192,7 @@ void FSS1Bit::PseudoEvalAll(BinaryData &query, const uint n, std::vector<uchar> 
     }
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
-        Benchmark::PSEUDO_DPF_EVAL_ALL.End(benchmark->bandwidth_ - old_bandwidth);
+        Benchmark::PSEUDO_DPF_EVAL_ALL.Stop(benchmark->bandwidth_ - old_bandwidth);
     }
 #endif
 }

@@ -1,6 +1,6 @@
 #include "socket.h"
 
-#include "benchmark.h"
+#include "benchmark/constant.h"
 
 #define BUFF_BYTES 1024 * 16
 

@@ -8,6 +8,9 @@ LIBDPF_OBJ_DIR = $(OBJ_DIR)/libdpf
 DATA_SRC_DIR = $(SRC_DIR)/data
 DATA_OBJ_DIR = $(OBJ_DIR)/data
 
+BENCHMARK_SRC_DIR = $(SRC_DIR)/benchmark
+BENCHMARK_OBJ_DIR = $(OBJ_DIR)/benchmark
+
 TEST_SRC_DIR = test
 TEST_OBJ_DIR = $(OBJ_DIR)/test
 TEST_BIN_DIR = $(BIN_DIR)/test
@@ -22,6 +25,9 @@ LIBDPF_OBJ := $(LIBDPF_SRC:$(LIBDPF_SRC_DIR)/%.cpp=$(LIBDPF_OBJ_DIR)/%.o)
 DATA_SRC := $(wildcard $(DATA_SRC_DIR)/*.cpp)
 DATA_OBJ := $(DATA_SRC:$(DATA_SRC_DIR)/%.cpp=$(DATA_OBJ_DIR)/%.o)
 
+BENCHMARK_SRC := $(wildcard $(BENCHMARK_SRC_DIR)/*.cpp)
+BENCHMARK_OBJ := $(BENCHMARK_SRC:$(BENCHMARK_SRC_DIR)/%.cpp=$(BENCHMARK_OBJ_DIR)/%.o)
+
 TEST_SRC := $(wildcard $(TEST_SRC_DIR)/*.cpp)
 TEST_OBJ := $(TEST_SRC:$(TEST_SRC_DIR)/%.cpp=$(TEST_OBJ_DIR)/%.o)
 TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
@@ -29,7 +35,7 @@ TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
 
 CC = clang++
 CFLAGS = -Wall -g -O3 -Werror --std=c++17 -DSHA256_ASM -DAES_ENC
-CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -maes -msse2 -fopenmp -flto
+CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -Iinclude/benchmark -maes -msse2 -fopenmp -flto
 LDFLAGS = -L/opt/local/lib -Llib -pthread -lboost_program_options -flto
 LDLIBS = -lcrypto
 # -lboost_program_options-mt -lpbc -lgmp
@@ -47,8 +53,8 @@ LDLIBS = -lcrypto
 all: $(TEST_BIN)
 
 # link test
-$(TEST_BIN): $(LIBDPF_OBJ) $(DATA_OBJ) $(OBJ) $(TEST_OBJ) | $(TEST_BIN_DIR)
-	$(CC) $(LDFLAGS) $(LIBDPF_OBJ) $(DATA_OBJ) $(OBJ) $(TEST_OBJ_DIR)/$(notdir $@).o $(LDLIBS) -o $@
+$(TEST_BIN): $(LIBDPF_OBJ) $(DATA_OBJ) $(BENCHMARK_OBJ) $(OBJ) $(TEST_OBJ) | $(TEST_BIN_DIR)
+	$(CC) $(LDFLAGS) $(LIBDPF_OBJ) $(DATA_OBJ) $(BENCHMARK_OBJ) $(OBJ) $(TEST_OBJ_DIR)/$(notdir $@).o $(LDLIBS) -o $@
 
 # compile src/libdpf
 $(LIBDPF_OBJ_DIR)/%.o: $(LIBDPF_SRC_DIR)/%.cpp | $(LIBDPF_OBJ_DIR)
@@ -56,6 +62,10 @@ $(LIBDPF_OBJ_DIR)/%.o: $(LIBDPF_SRC_DIR)/%.cpp | $(LIBDPF_OBJ_DIR)
 
 # compile src/data
 $(DATA_OBJ_DIR)/%.o: $(DATA_SRC_DIR)/%.cpp | $(DATA_OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+# compile src/benchmark
+$(BENCHMARK_OBJ_DIR)/%.o: $(BENCHMARK_SRC_DIR)/%.cpp | $(BENCHMARK_OBJ_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 # compile src
@@ -72,8 +82,8 @@ $(TEST_OBJ_DIR)/%.o: $(TEST_SRC_DIR)/%.cpp | $(TEST_OBJ_DIR)
 # dpf: $(SRC_DIR)/%.cpp $(SRC_DIR)/%.h
 # 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -c $< -o $@ libdpf.o
 
-$(BIN_DIR) $(LIBDPF_OBJ_DIR) $(DATA_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR):
+$(BIN_DIR) $(LIBDPF_OBJ_DIR) $(DATA_OBJ_DIR) $(BENCHMARK_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR):
 	mkdir -p $@
 
 clean:
-	@$(RM) -rv $(BIN_DIR) $(LIBDPF_OBJ_DIR) $(DATA_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR) # The @ disables the echoing of the command
+	@$(RM) -rv $(BIN_DIR) $(LIBDPF_OBJ_DIR) $(DATA_OBJ_DIR) $(BENCHMARK_OBJ_DIR) $(OBJ_DIR) $(TEST_OBJ_DIR) $(TEST_BIN_DIR) # The @ disables the echoing of the command

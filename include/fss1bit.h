@@ -7,9 +7,9 @@
 #include <algorithm>
 #include <vector>
 
-#include "benchmark.h"
-#include "binary_data.h"
+#include "benchmark/constant.h"
 #include "constant.h"
+#include "data/binary_data.h"
 #include "libdpf/libdpf.h"
 #include "peer.h"
 #include "typedef.h"

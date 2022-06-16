@@ -12,7 +12,6 @@
 #include <cstring>
 #include <vector>
 
-// #include "benchmark.h"
 #include "typedef.h"
 
 namespace Benchmark {

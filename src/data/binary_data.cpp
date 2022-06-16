@@ -1,4 +1,4 @@
-#include "binary_data.h"
+#include "data/binary_data.h"
 
 BinaryData::BinaryData() {
 }
@@ -10,11 +10,11 @@ BinaryData::BinaryData(const uint size) {
 
 BinaryData::BinaryData(const BinaryData &other) {
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_COPY.Start();
+    Benchmark::BINARY_DATA.copy_.Start();
 #endif
     this->data_ = other.data_;
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_COPY.End();
+    Benchmark::BINARY_DATA.copy_.Stop();
 #endif
 }
 
@@ -26,22 +26,22 @@ BinaryData &BinaryData::operator=(const BinaryData &other) {
     // copy operation
     if (this == &other) return *this;
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_COPY.Start();
+    Benchmark::BINARY_DATA.copy_.Start();
 #endif
     this->data_ = other.data_;
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_COPY.End();
+    Benchmark::BINARY_DATA.copy_.Stop();
 #endif
     return *this;
 }
 
 BinaryData BinaryData::operator-() {
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_ARITHMATIC.Start();
+    Benchmark::BINARY_DATA.arithmatic_.Start();
 #endif
     neg_bytes(this->data_.data(), this->data_.data(), this->data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_ARITHMATIC.End();
+    Benchmark::BINARY_DATA.arithmatic_.Stop();
 #endif
     return *this;
 }
@@ -49,11 +49,11 @@ BinaryData BinaryData::operator-() {
 BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
     // assert(this->data_.size() == rhs.data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_ARITHMATIC.Start();
+    Benchmark::BINARY_DATA.arithmatic_.Start();
 #endif
     xor_bytes(this->data_.data(), rhs.data_.data(), this->data_.data(), this->data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_ARITHMATIC.End();
+    Benchmark::BINARY_DATA.arithmatic_.Stop();
 #endif
     return *this;
 }
@@ -61,27 +61,34 @@ BinaryData &BinaryData::operator+=(const BinaryData &rhs) {
 BinaryData &BinaryData::operator-=(const BinaryData &rhs) {
     // assert(this->data_.size() == rhs.data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_ARITHMATIC.Start();
+    Benchmark::BINARY_DATA.arithmatic_.Start();
 #endif
     xor_bytes(this->data_.data(), rhs.data_.data(), this->data_.data(), this->data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_ARITHMATIC.End();
+    Benchmark::BINARY_DATA.arithmatic_.Stop();
 #endif
     return *this;
 }
 
 bool BinaryData::operator==(const BinaryData &rhs) {
-    return this->data_.size() == rhs.data_.size() &&
-           memcmp(this->data_.data(), rhs.data_.data(), this->data_.size()) == 0;
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA.compare_.Start();
+#endif
+    bool cmp = this->data_.size() == rhs.data_.size() &&
+               memcmp(this->data_.data(), rhs.data_.data(), this->data_.size()) == 0;
+#ifdef BENCHMARK_BINARY_DATA
+    Benchmark::BINARY_DATA.compare_.Stop();
+#endif
+    return cmp;
 }
 
 void BinaryData::DumpBuffer(uchar *buffer) {
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_DUMP_LOAD.Start();
+    Benchmark::BINARY_DATA.dump_load_.Start();
 #endif
     memcpy(buffer, this->data_.data(), this->data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_DUMP_LOAD.End();
+    Benchmark::BINARY_DATA.dump_load_.Stop();
 #endif
 }
 
@@ -91,11 +98,11 @@ std::vector<uchar> BinaryData::DumpVector() {
 
 void BinaryData::LoadBuffer(uchar *buffer) {
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_DUMP_LOAD.Start();
+    Benchmark::BINARY_DATA.dump_load_.Start();
 #endif
     memcpy(this->data_.data(), buffer, this->data_.size());
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_DUMP_LOAD.End();
+    Benchmark::BINARY_DATA.dump_load_.Stop();
 #endif
 }
 
@@ -111,14 +118,14 @@ void BinaryData::Resize(const uint size) {
 
 void BinaryData::Random(PRG *prg) {
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_RANDOM.Start();
+    Benchmark::BINARY_DATA.random_.Start();
 #endif
     if (prg == NULL) prg = this->prg_;
     if (this->data_.size() > 0) {
         prg->RandBytes(this->data_.data(), this->data_.size());
     }
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_RANDOM.End();
+    Benchmark::BINARY_DATA.random_.Stop();
 #endif
 }
 

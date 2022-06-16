@@ -3,9 +3,9 @@
 
 #include <inttypes.h>
 
+#include "benchmark/constant.h"
 #include "typedef.h"
 #include "util.h"
-
 class ZpData {
 private:
     BIGNUM *data_ = NULL;

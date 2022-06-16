@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 
+#include "benchmark/constant.h"
 #include "prg.h"
 #include "typedef.h"
 #include "util.h"

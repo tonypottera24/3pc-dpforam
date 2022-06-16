@@ -10,7 +10,7 @@
 #include <cmath>
 #include <thread>
 
-#include "benchmark.h"
+#include "benchmark/constant.h"
 #include "libdpf/block.h"
 #include "peer.h"
 #include "typedef.h"

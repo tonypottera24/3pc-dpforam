@@ -1,7 +1,4 @@
-#include "benchmark.h"
-
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+#include "benchmark/record.h"
 
 Benchmark::Record::Record(std::string name) {
     this->name = name;
@@ -80,43 +77,3 @@ void Benchmark::Record::PrintTotal(Peer peer[2], uint64_t iteration) {
 
     // fprintf(stderr, "%s %lu %lu %lu\n", title, avg_time / iteration, avg_count / iteration, avg_bandwidth / iteration);
 }
-
-// Top Level ORAM
-Benchmark::Record Benchmark::KEY_TO_INDEX("KEY_TO_INDEX");
-Benchmark::Record Benchmark::ORAM_READ("ORAM_READ");
-Benchmark::Record Benchmark::ORAM_WRITE("ORAM_WRITE");
-
-// Position map ORAM
-Benchmark::Record Benchmark::ORAM_POSITION_MAP("ORAM_POSITION_MAP");
-
-// BENCHMARK_KEY_VALUE
-Benchmark::Record Benchmark::KEY_VALUE_PREPARE("KEY_VALUE_PREPARE");
-Benchmark::Record Benchmark::KEY_VALUE_DPF("KEY_VALUE_DPF");
-Benchmark::Record Benchmark::KEY_VALUE_EVALUATE("KEY_VALUE_EVALUATE");
-// BENCHMARK_KEY_VALUE_HASH
-Benchmark::Record Benchmark::KEY_VALUE_HASH[2] = {Benchmark::Record("KEY_VALUE_HASH[0]"), Benchmark::Record("KEY_VALUE_HASH[1]")};
-
-// BENCHMARK_GROUP_PREPARE
-Benchmark::Record Benchmark::GROUP_PREPARE_READ("GROUP_PREPARE_READ");
-Benchmark::Record Benchmark::GROUP_PREPARE_WRITE("GROUP_PREPARE_WRITE");
-
-// BENCHMARK_DPF
-Benchmark::Record Benchmark::DPF_GEN("DPF_GEN");
-Benchmark::Record Benchmark::DPF_EVAL("DPF_EVAL");
-Benchmark::Record Benchmark::DPF_EVAL_ALL("DPF_EVAL_ALL");
-
-// BENCHMARK_PSEUDO_DPF
-Benchmark::Record Benchmark::PSEUDO_DPF_GEN("PSEUDO_DPF_GEN");
-Benchmark::Record Benchmark::PSEUDO_DPF_EVAL("PSEUDO_DPF_EVAL");
-Benchmark::Record Benchmark::PSEUDO_DPF_EVAL_ALL("PSEUDO_DPF_EVAL_ALL");
-
-// BENCHMARK_BINARY_DATA
-Benchmark::Record Benchmark::BINARY_DATA_COPY("BINARY_DATA_COPY");
-Benchmark::Record Benchmark::BINARY_DATA_ARITHMATIC("BINARY_DATA_ARITHMATIC");
-Benchmark::Record Benchmark::BINARY_DATA_DUMP_LOAD("BINARY_DATA_DUMP_LOAD");
-Benchmark::Record Benchmark::BINARY_DATA_RANDOM("BINARY_DATA_RANDOM");
-
-Benchmark::Record Benchmark::BINARY_DATA_COPY_CACHE("BINARY_DATA_COPY_CACHE");
-Benchmark::Record Benchmark::BINARY_DATA_ARITHMATIC_CACHE("BINARY_DATA_ARITHMATIC_CACHE");
-Benchmark::Record Benchmark::BINARY_DATA_DUMP_LOAD_CACHE("BINARY_DATA_DUMP_LOAD_CACHE");
-Benchmark::Record Benchmark::BINARY_DATA_RANDOM_CACHE("BINARY_DATA_RANDOM_CACHE");

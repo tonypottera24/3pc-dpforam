@@ -76,10 +76,7 @@ void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *be
     debug_print("[%u]KeyToIndex\n", this->Size());
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) {
-        Benchmark::BINARY_DATA_COPY = Benchmark::BINARY_DATA_COPY_CACHE;
-        Benchmark::BINARY_DATA_ARITHMATIC = Benchmark::BINARY_DATA_ARITHMATIC_CACHE;
-        Benchmark::BINARY_DATA_DUMP_LOAD = Benchmark::BINARY_DATA_DUMP_LOAD_CACHE;
-        Benchmark::BINARY_DATA_RANDOM = Benchmark::BINARY_DATA_RANDOM_CACHE;
+        Benchmark::BINARY_DATA.Start();
     }
 #endif
     uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->dpf_key_pir_ctx_, benchmark);
@@ -87,10 +84,7 @@ void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *be
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) {
-        Benchmark::BINARY_DATA_COPY_CACHE = Benchmark::BINARY_DATA_COPY;
-        Benchmark::BINARY_DATA_ARITHMATIC_CACHE = Benchmark::BINARY_DATA_ARITHMATIC;
-        Benchmark::BINARY_DATA_DUMP_LOAD_CACHE = Benchmark::BINARY_DATA_DUMP_LOAD;
-        Benchmark::BINARY_DATA_RANDOM_CACHE = Benchmark::BINARY_DATA_RANDOM;
+        Benchmark::BINARY_DATA.Stop();
     }
 #endif
 }
@@ -179,10 +173,7 @@ D ORAM<K, D>::Read(const uint index_23[2], bool read_only, Benchmark::Record *be
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) {
-        Benchmark::BINARY_DATA_COPY = Benchmark::BINARY_DATA_COPY_CACHE;
-        Benchmark::BINARY_DATA_ARITHMATIC = Benchmark::BINARY_DATA_ARITHMATIC_CACHE;
-        Benchmark::BINARY_DATA_DUMP_LOAD = Benchmark::BINARY_DATA_DUMP_LOAD_CACHE;
-        Benchmark::BINARY_DATA_RANDOM = Benchmark::BINARY_DATA_RANDOM_CACHE;
+        Benchmark::BINARY_DATA.Start();
     }
 #endif
     uint block_index_23[2];
@@ -212,10 +203,7 @@ D ORAM<K, D>::Read(const uint index_23[2], bool read_only, Benchmark::Record *be
 
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) {
-        Benchmark::BINARY_DATA_COPY_CACHE = Benchmark::BINARY_DATA_COPY;
-        Benchmark::BINARY_DATA_ARITHMATIC_CACHE = Benchmark::BINARY_DATA_ARITHMATIC;
-        Benchmark::BINARY_DATA_DUMP_LOAD_CACHE = Benchmark::BINARY_DATA_DUMP_LOAD;
-        Benchmark::BINARY_DATA_RANDOM_CACHE = Benchmark::BINARY_DATA_RANDOM;
+        Benchmark::BINARY_DATA.Stop();
     }
 #endif
     return this->last_read_data_13_;
@@ -234,7 +222,7 @@ BulkData<D> ORAM<K, D>::DPFRead(const uint index_23[2], bool read_only, Benchmar
         if (benchmark != NULL && this->is_top_level_) {
             Benchmark::ORAM_POSITION_MAP.Start();
             ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, &Benchmark::ORAM_POSITION_MAP);
-            Benchmark::ORAM_POSITION_MAP.End();
+            Benchmark::ORAM_POSITION_MAP.Stop();
         } else {
             ReadPositionMap(index_23, cache_index_23, is_cached_23, read_only, benchmark);
         }
@@ -256,10 +244,7 @@ void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, Benchmark::Record *b
     debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) {
-        Benchmark::BINARY_DATA_COPY = Benchmark::BINARY_DATA_COPY_CACHE;
-        Benchmark::BINARY_DATA_ARITHMATIC = Benchmark::BINARY_DATA_ARITHMATIC_CACHE;
-        Benchmark::BINARY_DATA_DUMP_LOAD = Benchmark::BINARY_DATA_DUMP_LOAD_CACHE;
-        Benchmark::BINARY_DATA_RANDOM = Benchmark::BINARY_DATA_RANDOM_CACHE;
+        Benchmark::BINARY_DATA.Start();
     }
 #endif
 
@@ -288,10 +273,7 @@ void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, Benchmark::Record *b
     }
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) {
-        Benchmark::BINARY_DATA_COPY_CACHE = Benchmark::BINARY_DATA_COPY;
-        Benchmark::BINARY_DATA_ARITHMATIC_CACHE = Benchmark::BINARY_DATA_ARITHMATIC;
-        Benchmark::BINARY_DATA_DUMP_LOAD_CACHE = Benchmark::BINARY_DATA_DUMP_LOAD;
-        Benchmark::BINARY_DATA_RANDOM_CACHE = Benchmark::BINARY_DATA_RANDOM;
+        Benchmark::BINARY_DATA.Stop();
     }
 #endif
 }
@@ -443,7 +425,7 @@ void ORAM<K, D>::Test(uint iterations) {
 
             Benchmark::KEY_TO_INDEX.Start();
             KeyToIndex(key_23, index_23, &Benchmark::KEY_TO_INDEX);
-            Benchmark::KEY_TO_INDEX.End();
+            Benchmark::KEY_TO_INDEX.Stop();
             debug_print("index = %u, index_23 = (%u, %u)\n", index, index_23[0], index_23[1]);
         } else {
             index_23[0] = rand_uint(this->peer_[0].PRG()) % n;
@@ -465,7 +447,7 @@ void ORAM<K, D>::Test(uint iterations) {
         debug_print("\nTest, ========== Read old data ==========\n");
         Benchmark::ORAM_READ.Start();
         D old_data_13 = this->Read(index_23, false, &Benchmark::ORAM_READ);
-        Benchmark::ORAM_READ.End();
+        Benchmark::ORAM_READ.Stop();
 
         old_data_13.Print("old_data_13");
 
@@ -484,7 +466,7 @@ void ORAM<K, D>::Test(uint iterations) {
 
         Benchmark::ORAM_WRITE.Start();
         this->Write(index_23, new_data_13[2], &Benchmark::ORAM_WRITE);
-        Benchmark::ORAM_WRITE.End();
+        Benchmark::ORAM_WRITE.Stop();
         // printf("Write random data party_time = %llu\n", party_time);
 
         this->PrintMetadata();
@@ -592,19 +574,10 @@ void ORAM<K, D>::Test(uint iterations) {
 #endif
 
 #ifdef BENCHMARK_BINARY_DATA
-    Benchmark::BINARY_DATA_COPY = Benchmark::BINARY_DATA_COPY_CACHE;
-    Benchmark::BINARY_DATA_ARITHMATIC = Benchmark::BINARY_DATA_ARITHMATIC_CACHE;
-    Benchmark::BINARY_DATA_DUMP_LOAD = Benchmark::BINARY_DATA_DUMP_LOAD_CACHE;
-    Benchmark::BINARY_DATA_RANDOM = Benchmark::BINARY_DATA_RANDOM_CACHE;
-
-    Benchmark::BINARY_DATA_COPY.PrintTotal(this->peer_, iterations);
-    Benchmark::BINARY_DATA_ARITHMATIC.PrintTotal(this->peer_, iterations);
-    Benchmark::BINARY_DATA_DUMP_LOAD.PrintTotal(this->peer_, iterations);
-    Benchmark::BINARY_DATA_RANDOM.PrintTotal(this->peer_, iterations);
-
-    Benchmark::Record binary_data_others = total - Benchmark::BINARY_DATA_COPY - Benchmark::BINARY_DATA_ARITHMATIC - Benchmark::BINARY_DATA_DUMP_LOAD - Benchmark::BINARY_DATA_RANDOM;
-    binary_data_others.name = "binary_data_others";
-    binary_data_others.PrintTotal(this->peer_, iterations);
+    Benchmark::BINARY_DATA.PrintTotal(this->peer_, iterations, total);
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    Benchmark::ZP_DATA.PrintTotal(this->peer_, iterations, total);
 #endif
 }
 
