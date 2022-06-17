@@ -197,9 +197,9 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         BinaryData query[2];
         std::vector<uchar> dpf_out[2];
         for (uint b = 0; b < 2; b++) {
-            uint query_size = peer[party].ReadUInt();
+            uint query_size = peer[party].ReadUInt(benchmark);
             query[b].Resize(query_size);
-            peer[party].ReadData(query[b]);
+            peer[party].ReadData(query[b], benchmark);
             if (eval_all[b]) {
                 dpf_out[b].resize(digest_n);
                 fss.EvalAll(query[b], digest_size_log, dpf_out[b], benchmark);
@@ -264,7 +264,7 @@ D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_
         const uint P2 = 0, P1 = 1;
 
         std::vector<D> u(n, D(data_size));
-        peer[P2].ReadDataVector(u);
+        peer[P2].ReadDataVector(u, benchmark);
         for (uint i = 0; i < n; i++) {
             u[i] += array_13[i];
         }

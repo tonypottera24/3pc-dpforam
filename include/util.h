@@ -43,7 +43,7 @@ template <typename D>
 void ShareTwoThird(Peer peer[2], D &v_in_13, D v_out_23[2], Benchmark::Record *benchmark) {
     v_out_23[1] = v_in_13;
     peer[1].WriteData(v_in_13, benchmark);
-    peer[0].ReadData(v_out_23[0]);
+    peer[0].ReadData(v_out_23[0], benchmark);
 }
 
 template <typename D>
@@ -59,7 +59,7 @@ template <typename D>
 void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint index_23[2], Benchmark::Record *benchmark) {
     uint rand_range = n;
     peer[1].WriteUInt(index_13, benchmark);
-    index_23[0] = peer[0].ReadUInt() % rand_range;
+    index_23[0] = peer[0].ReadUInt(benchmark) % rand_range;
     index_23[1] = index_13 % rand_range;
 }
 
@@ -77,7 +77,7 @@ void write_read_data(Peer &write_peer, std::vector<D> &write_data, Peer &read_pe
         write_peer.WriteDataVector(write_buffer, benchmark);
 
         std::vector<D> read_buffer(end_index - start_index, D(data_size));
-        read_peer.ReadDataVector(read_buffer);
+        read_peer.ReadDataVector(read_buffer, benchmark);
         for (uint i = 0; i < read_buffer.size(); i++) {
             read_data[start_index + i] = read_buffer[i];
         }

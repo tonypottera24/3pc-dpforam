@@ -36,11 +36,11 @@ void P1(Peer peer[2], D m[2], const bool inv, Benchmark::Record *benchmark) {
     // debug_print("inv::P1 inv = %u\n", inv);
 
     uchar s;
-    peer[P0].Socket().Read(&s, 1);
+    peer[P0].Socket().Read(&s, 1, benchmark);
 
     uint data_size = m[0].Size();
     std::vector<D> p(2, D(data_size));
-    peer[P0].ReadDataVector(p);
+    peer[P0].ReadDataVector(p, benchmark);
 
     std::vector<D> mm(2);
     for (uint b = 0; b < 2; b++) {
@@ -57,11 +57,11 @@ D P2(Peer peer[2], const uint data_size, const bool inv, Benchmark::Record *benc
     // debug_print("inv::P2 inv = %u\n", inv);
 
     uchar bb;
-    peer[P0].Socket().Read(&bb, 1);
+    peer[P0].Socket().Read(&bb, 1, benchmark);
     D pb(data_size);
-    peer[P0].ReadData(pb);
+    peer[P0].ReadData(pb, benchmark);
     std::vector<D> mm(2, D(data_size));
-    peer[P1].ReadDataVector(mm);
+    peer[P1].ReadDataVector(mm, benchmark);
 
     return mm[bb] - pb;
 }

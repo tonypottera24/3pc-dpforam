@@ -6,6 +6,7 @@ import datetime
 import json
 import signal
 import sys
+import psutil
 
 JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
 
@@ -14,10 +15,16 @@ criterias = []
 
 def signal_handler(sig, frame):
     print_all()
+    print("========== TERMINATED ==========")
+    for proc in psutil.process_iter():
+        # check whether the process name matches
+        if proc.name() == "proto_test":
+            proc.kill()
     sys.exit(0)
 
 
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 
 class BenchmarkRecord():
@@ -100,22 +107,13 @@ PARTY = int(args.party)
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
-LOG_N = range(1, 31)  # data_size
-
-# LOG_N = range(10, 31)  # binary - binary 4
-# LOG_N = range(10, 31)  # binary - ZpDebugData
-# LOG_N = range(10, 23)  # ZpDebugData - binary
-
-# LOG_N = range(10, 29)  # binary - binary 32
-# LOG_N = range(10, 28)  # binary - P256
-# LOG_N = range(10, 23)  # P256 - binary
-# LOG_N = range(10, 23)  # P256 - P256
+LOG_N = range(1, 100)
 
 # LOG_N = 20
 # TAU = range(1, 20)
 
-DATA_SIZE = [4]
-# DATA_SIZE = [256]
+# DATA_SIZE = [4]
+DATA_SIZE = [256]
 # DATA_SIZE = range(4, 129, 4)
 
 TAU = [5]
@@ -155,3 +153,5 @@ except:
     print('failed')
 finally:
     print_all()
+
+print("========== FINISHED ==========")

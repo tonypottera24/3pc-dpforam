@@ -31,7 +31,7 @@ public:
     void InitClient(const char *ip, uint port);
     void SetNoDelay();
     void Write(const uchar *data, uint data_size, Benchmark::Record *benchmark);
-    void Read(uchar *data, uint data_size);
+    void Read(uchar *data, uint data_size, Benchmark::Record *benchmark);
     void Flush();
     void Close();
 };

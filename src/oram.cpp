@@ -108,11 +108,11 @@ BulkData<D> ORAM<K, D>::GetLatestData(BulkData<D> &read_block_13, BulkData<D> &c
     } else if (this->party_ == 0) {
         const uint P2 = 0, P1 = 1;
         BulkData<D> read_block_12(data_size);
-        this->peer_[P2].ReadData(read_block_12);
+        this->peer_[P2].ReadData(read_block_12, benchmark);
         read_block_12 += read_block_13;
 
         BulkData<D> cache_block_12(data_size);
-        this->peer_[P2].ReadData(cache_block_12);
+        this->peer_[P2].ReadData(cache_block_12, benchmark);
         cache_block_12 += cache_block_13;
 
         std::vector<BulkData<D>> u = {read_block_12, cache_block_12};
@@ -370,8 +370,8 @@ void ORAM<K, D>::Test(uint iterations) {
     // socket seems need extra setup at first read/write
     this->peer_[0].WriteUInt(0, NULL);
     this->peer_[1].WriteUInt(0, NULL);
-    this->peer_[0].ReadUInt();
-    this->peer_[1].ReadUInt();
+    this->peer_[0].ReadUInt(NULL);
+    this->peer_[1].ReadUInt(NULL);
 
     if (key_value) {
         uint key_size = K().Size();
@@ -407,8 +407,8 @@ void ORAM<K, D>::Test(uint iterations) {
             index_33[2] = rand_uint();
             this->peer_[0].WriteUInt(index_33[2], NULL);
             this->peer_[1].WriteUInt(index_33[2], NULL);
-            index_33[0] = this->peer_[0].ReadUInt();
-            index_33[1] = this->peer_[1].ReadUInt();
+            index_33[0] = this->peer_[0].ReadUInt(NULL);
+            index_33[1] = this->peer_[1].ReadUInt(NULL);
             uint index = (index_33[0] ^ index_33[1] ^ index_33[2]) % n;
             if (this->party_ == 2) {
                 key_23[0].Random(this->peer_[0].PRG());
@@ -417,7 +417,7 @@ void ORAM<K, D>::Test(uint iterations) {
                 key_23[this->party_].Random(this->peer_[this->party_].PRG());
                 this->peer_[1 - this->party_].WriteData(key_23[this->party_], NULL);
                 K k(key_size);
-                this->peer_[1 - this->party_].ReadData(k);
+                this->peer_[1 - this->party_].ReadData(k, NULL);
                 key_23[1 - this->party_] = this->key_array_13_[index] - key_23[this->party_] - k;
             }
             key_23[0].Print("key_23[0]");
@@ -437,8 +437,8 @@ void ORAM<K, D>::Test(uint iterations) {
 
         this->peer_[0].WriteUInt(0, NULL);
         this->peer_[1].WriteUInt(0, NULL);
-        this->peer_[0].ReadUInt();
-        this->peer_[1].ReadUInt();
+        this->peer_[0].ReadUInt(NULL);
+        this->peer_[1].ReadUInt(NULL);
 
         uint data_size = this->DataSize();
         // fprintf(stderr, "data_size = %u\n", data_size);
@@ -455,8 +455,8 @@ void ORAM<K, D>::Test(uint iterations) {
 
         this->peer_[0].WriteUInt(0, NULL);
         this->peer_[1].WriteUInt(0, NULL);
-        this->peer_[0].ReadUInt();
-        this->peer_[1].ReadUInt();
+        this->peer_[0].ReadUInt(NULL);
+        this->peer_[1].ReadUInt(NULL);
 
         // fprintf(stderr, "\nTest, ========== Write random data ==========\n");
         debug_print("\nTest, ========== Write random data ==========\n");
@@ -486,15 +486,15 @@ void ORAM<K, D>::Test(uint iterations) {
 
         this->peer_[0].WriteData(verify_data_13[2], NULL);
         this->peer_[1].WriteData(verify_data_13[2], NULL);
-        this->peer_[0].ReadData(verify_data_13[0]);
-        this->peer_[1].ReadData(verify_data_13[1]);
+        this->peer_[0].ReadData(verify_data_13[0], NULL);
+        this->peer_[1].ReadData(verify_data_13[1], NULL);
         D verify_data = verify_data_13[0] + verify_data_13[1] + verify_data_13[2];
         verify_data.Print("verify_data");
 
         this->peer_[0].WriteData(new_data_13[2], NULL);
         this->peer_[1].WriteData(new_data_13[2], NULL);
-        this->peer_[0].ReadData(new_data_13[0]);
-        this->peer_[1].ReadData(new_data_13[1]);
+        this->peer_[0].ReadData(new_data_13[0], NULL);
+        this->peer_[1].ReadData(new_data_13[1], NULL);
         D new_data = new_data_13[0] + new_data_13[1] + new_data_13[2];
         new_data.Print("new_data");
 
@@ -571,6 +571,11 @@ void ORAM<K, D>::Test(uint iterations) {
     Benchmark::GROUP_PREPARE_READ.PrintTotal(this->peer_, iterations);
     Benchmark::GROUP_PREPARE_WRITE.PrintTotal(this->peer_, iterations);
     fprintf(stderr, "\n");
+#endif
+
+#ifdef BENCHMARK_SOCKET
+    Benchmark::SOCKET_WRITE.PrintTotal(this->peer_, iterations);
+    Benchmark::SOCKET_READ.PrintTotal(this->peer_, iterations);
 #endif
 
 #ifdef BENCHMARK_BINARY_DATA

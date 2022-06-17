@@ -10,9 +10,6 @@ namespace Benchmark {
 extern Record KEY_TO_INDEX;
 extern Record ORAM_READ;
 extern Record ORAM_WRITE;
-
-// Position map ORAM
-#define BENCHMARK_POSITION_MAP
 extern Record ORAM_POSITION_MAP;
 
 // PIR
@@ -45,7 +42,11 @@ extern Record PSEUDO_DPF_GEN;
 extern Record PSEUDO_DPF_EVAL;
 extern Record PSEUDO_DPF_EVAL_ALL;
 
-#define BENCHMARK_BINARY_DATA
+#define BENCHMARK_SOCKET
+extern Record SOCKET_WRITE;
+extern Record SOCKET_READ;
+
+// #define BENCHMARK_BINARY_DATA
 extern DataRecord BINARY_DATA;
 
 // #define BENCHMARK_ZP_DATA

@@ -79,6 +79,11 @@ void Socket::SetNoDelay() {
 
 void Socket::Write(const uchar *data, uint data_size, Benchmark::Record *benchmark) {
     // fprintf(stderr, "Write, data_size = %u\n", data_size);
+#ifdef BENCHMARK_SOCKET
+    if (benchmark != NULL) {
+        Benchmark::SOCKET_WRITE.Start();
+    }
+#endif
     uint offset = 0;
     while (offset < data_size) {
         // fprintf(stderr, "Write, offset = %u\n", offset);
@@ -92,9 +97,19 @@ void Socket::Write(const uchar *data, uint data_size, Benchmark::Record *benchma
         benchmark->bandwidth_ += data_size;
     }
     fflush(stream_);
+#ifdef BENCHMARK_SOCKET
+    if (benchmark != NULL) {
+        Benchmark::SOCKET_WRITE.Stop(data_size);
+    }
+#endif
 }
 
-void Socket::Read(uchar *data, uint data_size) {
+void Socket::Read(uchar *data, uint data_size, Benchmark::Record *benchmark) {
+#ifdef BENCHMARK_SOCKET
+    if (benchmark != NULL) {
+        Benchmark::SOCKET_READ.Start();
+    }
+#endif
     uint offset = 0;
     while (offset < data_size) {
         int read_size = ::read(socket_fd_, data + offset, data_size - offset);
@@ -103,6 +118,11 @@ void Socket::Read(uchar *data, uint data_size) {
         }
         offset += read_size;
     }
+#ifdef BENCHMARK_SOCKET
+    if (benchmark != NULL) {
+        Benchmark::SOCKET_READ.Stop();
+    }
+#endif
 }
 
 void Socket::Flush() {

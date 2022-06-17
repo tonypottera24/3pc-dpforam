@@ -39,7 +39,7 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                 } else if (party_index == 0) {  // P0
                     uint P2 = 0, P1 = 1;
                     uchar is_02;
-                    peer[P2].Socket().Read(&is_02, 1);
+                    peer[P2].Socket().Read(&is_02, 1, benchmark);
                     debug_print("FindDeltaData, P0, is_02 = %u\n", is_02);
                     v_delta_33[1].Print("v_delta_33[1]");
                     (-v_delta_33[1]).Print("-v_delta_33[1]");
@@ -50,14 +50,14 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                         peer[P1].WriteData(w0, benchmark);
                     } else {
                         D w1(data_size);
-                        peer[P1].ReadData(w1);
+                        peer[P1].ReadData(w1, benchmark);
                         v_out_33[1] = w0 + w1;
                         v_out_33[1].Print("v_out_33[1]");
                     }
                 } else {  // P1
                     uint P0 = 0, P2 = 1;
                     uchar is_02;
-                    peer[P2].Socket().Read(&is_02, 1);
+                    peer[P2].Socket().Read(&is_02, 1, benchmark);
                     debug_print("FindDeltaData, P1, is_02 = %u\n", is_02);
                     v_delta_33[0].Print("v_delta_33[0]");
                     (-v_delta_33[0]).Print("-v_delta_33[0]");
@@ -66,7 +66,7 @@ std::vector<D> FindDeltaData(uint party, Peer peer[2], bool is_0, D &v_delta_13,
                     w1.Print("w1");
                     if (d == 0) {
                         D w0(data_size);
-                        peer[P0].ReadData(w0);
+                        peer[P0].ReadData(w0, benchmark);
                         v_out_33[0] = w0 + w1;
                         v_out_33[0].Print("v_out_33[0]");
                     } else {

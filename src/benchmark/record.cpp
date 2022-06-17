@@ -49,21 +49,21 @@ void Benchmark::Record::PrintTotal(Peer peer[2], uint64_t iteration) {
     uint64_t avg_time = this->GetTime();
     for (uint b = 0; b < 2; b++) {
         peer[b].WriteUInt64(this->GetTime(), NULL);
-        avg_time += peer[1 - b].ReadUInt64();
+        avg_time += peer[1 - b].ReadUInt64(NULL);
     }
     avg_time /= 3.0;
 
     uint64_t avg_count = this->count_;
     for (uint b = 0; b < 2; b++) {
         peer[b].WriteUInt64(this->count_, NULL);
-        avg_count += peer[1 - b].ReadUInt64();
+        avg_count += peer[1 - b].ReadUInt64(NULL);
     }
     avg_count /= 3.0;
 
     uint64_t avg_bandwidth = this->bandwidth_;
     for (uint b = 0; b < 2; b++) {
         peer[b].WriteUInt64(this->bandwidth_, NULL);
-        avg_bandwidth += peer[1 - b].ReadUInt64();
+        avg_bandwidth += peer[1 - b].ReadUInt64(NULL);
     }
     avg_bandwidth /= 3.0;
 

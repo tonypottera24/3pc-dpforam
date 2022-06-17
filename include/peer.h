@@ -27,9 +27,9 @@ public:
         this->socket_.Write((uchar *)&n, sizeof(uint), benchmark);
     }
 
-    uint ReadUInt() {
+    uint ReadUInt(Benchmark::Record *benchmark) {
         uint n;
-        this->socket_.Read((uchar *)&n, sizeof(uint));
+        this->socket_.Read((uchar *)&n, sizeof(uint), benchmark);
         return n;
     }
 
@@ -37,27 +37,27 @@ public:
         this->socket_.Write((uchar *)&n, sizeof(uint64_t), benchmark);
     }
 
-    uint64_t ReadUInt64() {
+    uint64_t ReadUInt64(Benchmark::Record *benchmark) {
         uint64_t n;
-        this->socket_.Read((uchar *)&n, sizeof(uint64_t));
+        this->socket_.Read((uchar *)&n, sizeof(uint64_t), benchmark);
         return n;
     }
 
     template <typename D>
-    void ReadData(D &data) {
+    void ReadData(D &data, Benchmark::Record *benchmark) {
         // fprintf(stderr, "ReadData, size = %u\n", size);
         uint data_size = data.Size();
         std::vector<uchar> buffer(data_size);
-        this->socket_.Read(buffer.data(), buffer.size());
+        this->socket_.Read(buffer.data(), buffer.size(), benchmark);
         data.LoadBuffer(buffer.data());
     }
 
     template <typename D>
-    void ReadDataVector(std::vector<D> &data) {
+    void ReadDataVector(std::vector<D> &data, Benchmark::Record *benchmark) {
         uint data_size = data[0].Size();
         uint buffer_size = data.size() * data_size;
         std::vector<uchar> buffer(buffer_size);
-        this->socket_.Read(buffer.data(), buffer.size());
+        this->socket_.Read(buffer.data(), buffer.size(), benchmark);
         for (uint i = 0; i < data.size(); i++) {
             data[i].LoadBuffer(buffer.data() + i * data_size);
         }

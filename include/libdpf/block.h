@@ -2,6 +2,7 @@
 #define LIBDPF_BLOCK_H
 
 #include <emmintrin.h>
+#include <immintrin.h>
 #include <openssl/rand.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,6 +11,7 @@
 #include <xmmintrin.h>
 
 typedef __m128i uint128;
+typedef __m256i uint256;
 
 #define uint128_xor(x, y) _mm_xor_si128(x, y)
 #define dpf_zero_block() _mm_setzero_si128()

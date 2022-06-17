@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     RAND_bytes(seed, PRG::SeedSize());
     peer[1].PRG()->SetSeed(seed);
     peer[1].Socket().Write(seed, PRG::SeedSize(), NULL);
-    peer[0].Socket().Read(seed, PRG::SeedSize());
+    peer[0].Socket().Read(seed, PRG::SeedSize(), NULL);
     peer[0].PRG()->SetSeed(seed);
 
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);

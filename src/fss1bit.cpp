@@ -71,8 +71,8 @@ bool FSS1Bit::Gen(Peer peer[2], uint64_t index, const uint log_n, const bool is_
     peer[0].WriteData(query_23[0], benchmark);
     peer[1].WriteData(query_23[1], benchmark);
     if (!send_only) {
-        peer[0].ReadData(query_23[1]);
-        peer[1].ReadData(query_23[0]);
+        peer[0].ReadData(query_23[1], benchmark);
+        peer[1].ReadData(query_23[0], benchmark);
     }
 #ifdef BENCHMARK_DPF
     if (benchmark != NULL) {
@@ -151,7 +151,7 @@ bool FSS1Bit::PseudoGen(Peer peer[2], const uint index, const uint byte_length, 
         is_0 = dpf_out[index_byte] & (1 << index_bit);
     }
     peer[0].WriteData(query_23[0], benchmark);
-    peer[1].ReadData(query_23[0]);
+    peer[1].ReadData(query_23[0], benchmark);
 #ifdef BENCHMARK_PSEUDO_DPF
     if (benchmark != NULL) {
         Benchmark::PSEUDO_DPF_GEN.Stop(benchmark->bandwidth_ - old_bandwidth);

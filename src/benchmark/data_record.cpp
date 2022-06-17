@@ -10,6 +10,12 @@ Benchmark::DataRecord::DataRecord(std::string name) {
 }
 
 void Benchmark::DataRecord::PrintTotal(Peer peer[2], uint iterations, Record total) {
+    copy_ = copy_cache_;
+    compare_ = compare_cache_;
+    arithmatic_ = arithmatic_cache_;
+    dump_load_ = dump_load_cache_;
+    random_ = random_cache_;
+
     this->copy_.PrintTotal(peer, iterations);
     this->compare_.PrintTotal(peer, iterations);
     this->arithmatic_.PrintTotal(peer, iterations);

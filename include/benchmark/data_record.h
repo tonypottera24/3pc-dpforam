@@ -25,19 +25,19 @@ public:
     DataRecord(std::string name = std::string());
 
     void Start() {
-        copy_cache_ = copy_;
-        compare_cache_ = compare_;
-        arithmatic_cache_ = arithmatic_;
-        dump_load_cache_ = dump_load_;
-        random_cache_ = random_;
-    }
-
-    void Stop() {
         copy_ = copy_cache_;
         compare_ = compare_cache_;
         arithmatic_ = arithmatic_cache_;
         dump_load_ = dump_load_cache_;
         random_ = random_cache_;
+    }
+
+    void Stop() {
+        copy_cache_ = copy_;
+        compare_cache_ = compare_;
+        arithmatic_cache_ = arithmatic_;
+        dump_load_cache_ = dump_load_;
+        random_cache_ = random_;
     }
 
     void PrintTotal(Peer peer[2], uint iterations, Record total);

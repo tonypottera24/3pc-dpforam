@@ -41,7 +41,7 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, Benchmark::Record* benchmar
     debug_print("SSOT::P0, b0 = %u, n = %u, data_size = %u\n", b0, n, data_size);
 
     D y(data_size);
-    peer[P2].ReadData(y);
+    peer[P2].ReadData(y, benchmark);
 
     uint alpha = rand_uint(peer[P2].PRG()) % n;
 
@@ -55,7 +55,7 @@ D P0(Peer peer[2], const uint b0, std::vector<D>& u, Benchmark::Record* benchmar
     peer[P1].WriteUInt(s, benchmark);
 
     // Receive t from P1
-    uint t = peer[P1].ReadUInt();
+    uint t = peer[P1].ReadUInt(benchmark);
 
     // Send u0' and u1' to P1
     std::vector<D> uu(n, D(data_size));
@@ -84,7 +84,7 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, Benchmark::Record* benchmar
     debug_print("SSOT::P1, b1 = %u, n = %u, data_size = %u\n", b1, n, data_size);
 
     D x(data_size);
-    peer[P2].ReadData(x);
+    peer[P2].ReadData(x, benchmark);
 
     uint beta = rand_uint(peer[P2].PRG()) % n;
 
@@ -98,7 +98,7 @@ D P1(Peer peer[2], const uint b1, std::vector<D>& v, Benchmark::Record* benchmar
     peer[P0].WriteUInt(t, benchmark);
 
     // Receive s from P0
-    uint s = peer[P0].ReadUInt();
+    uint s = peer[P0].ReadUInt(benchmark);
 
     // Send v0' and v1' to P0
     std::vector<D> vv(n, D(data_size));
