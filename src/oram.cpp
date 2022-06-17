@@ -574,8 +574,11 @@ void ORAM<K, D>::Test(uint iterations) {
 #endif
 
 #ifdef BENCHMARK_SOCKET
-    Benchmark::SOCKET_WRITE.PrintTotal(this->peer_, iterations);
     Benchmark::SOCKET_READ.PrintTotal(this->peer_, iterations);
+    Benchmark::SOCKET_WRITE.PrintTotal(this->peer_, iterations);
+    Benchmark::Record socket_others = total - Benchmark::SOCKET_READ - Benchmark::SOCKET_WRITE;
+    socket_others.name = "socket_others";
+    socket_others.PrintTotal(this->peer_, iterations);
 #endif
 
 #ifdef BENCHMARK_BINARY_DATA
