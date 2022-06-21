@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
         "log_n", po::value<uint>()->default_value(10), "number of data (log)")(
-        "data_size", po::value<uint>()->default_value(4), "data size (bytes)")(
+        "data_size", po::value<uint>()->default_value(32), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(5), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(0), "ssot threshold (log)")(
         "log_pseudo_dpf_threshold", po::value<uint>()->default_value(5), "pseudo dpf threshold (log)")(
@@ -108,12 +108,12 @@ int main(int argc, char *argv[]) {
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     // uint64_t start_time = timestamp();
-    ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, 0, data_size, true);
+    // ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, 0, data_size, true);
     // ORAM<BinaryData, ZpDebugData> oram = ORAM<BinaryData, ZpDebugData>(party, peer, n, 0, data_size, true);
     // ORAM<ZpDebugData, BinaryData> oram = ORAM<ZpDebugData, BinaryData>(party, peer, n, ZpDebugData().Size(), data_size, true);
 
     // ORAM<BinaryData, ECData> oram = ORAM<BinaryData, ECData>(party, peer, n, 0, data_size, true);
-    // ORAM<BinaryData, ZpData> oram = ORAM<BinaryData, ZpData>(party, peer, n, 0, data_size, true);
+    ORAM<BinaryData, ZpData> oram = ORAM<BinaryData, ZpData>(party, peer, n, 0, data_size, true);
     // ORAM<ECData, BinaryData> oram = ORAM<ECData, BinaryData>(party, peer, n, data_size, true);
     // ORAM<ECData, ECData> oram = ORAM<ECData, ECData>(party, peer, n, data_size, true);
     // ORAM<ZpData, BinaryData> oram = ORAM<ZpData, BinaryData>(party, peer, n, ZpData().Size(), data_size, true);

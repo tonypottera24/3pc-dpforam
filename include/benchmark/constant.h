@@ -42,7 +42,10 @@ extern Record PSEUDO_DPF_GEN;
 extern Record PSEUDO_DPF_EVAL;
 extern Record PSEUDO_DPF_EVAL_ALL;
 
-#define BENCHMARK_SOCKET
+#define BENCHMARK_SSOT
+extern Record SSOT;
+
+// #define BENCHMARK_SOCKET
 extern Record SOCKET_WRITE;
 extern Record SOCKET_READ;
 

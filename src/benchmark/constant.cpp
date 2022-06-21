@@ -29,6 +29,9 @@ Benchmark::Record Benchmark::PSEUDO_DPF_GEN("PSEUDO_DPF_GEN");
 Benchmark::Record Benchmark::PSEUDO_DPF_EVAL("PSEUDO_DPF_EVAL");
 Benchmark::Record Benchmark::PSEUDO_DPF_EVAL_ALL("PSEUDO_DPF_EVAL_ALL");
 
+// BENCHMARK_SSOT
+Benchmark::Record Benchmark::SSOT("SSOT");
+
 // BENCHMARK_SOCKET
 Benchmark::Record Benchmark::SOCKET_WRITE("SOCKET_WRITE");
 Benchmark::Record Benchmark::SOCKET_READ("SOCKET_READ");

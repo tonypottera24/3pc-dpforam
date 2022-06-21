@@ -247,39 +247,39 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     return v_sum % n;
 }
 
-template <typename D>
-D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], Benchmark::Record *benchmark) {
-    // TODO n may not be power of 2
-    uint n = array_13.size();
-    debug_print("[%lu]SSOT_PIR, n = %u, index_23 = (%u, %u)\n", array_13.size(), n, index_23[0], index_23[1]);
-    uint data_size = array_13[0].Size();
-    D v_out_13(data_size);
-    if (party == 2) {
-        // const uint P1 = 0, P0 = 1;
-        const uint P0 = 1;
-        peer[P0].WriteDataVector(array_13, benchmark);
-        SSOT::P2<D>(peer, n, data_size, benchmark);
-        v_out_13.Random(peer[P0].PRG());
-    } else if (party == 0) {
-        const uint P2 = 0, P1 = 1;
+// template <typename D>
+// D SSOT_PIR(uint party, Peer peer[2], std::vector<D> &array_13, const uint index_23[2], Benchmark::Record *benchmark) {
+//     // TODO n may not be power of 2
+//     uint n = array_13.size();
+//     debug_print("[%lu]SSOT_PIR, n = %u, index_23 = (%u, %u)\n", array_13.size(), n, index_23[0], index_23[1]);
+//     uint data_size = array_13[0].Size();
+//     D v_out_13(data_size);
+//     if (party == 2) {
+//         // const uint P1 = 0, P0 = 1;
+//         const uint P0 = 1;
+//         peer[P0].WriteDataVector(array_13, benchmark);
+//         SSOT::P2<D>(peer, n, data_size, benchmark);
+//         v_out_13.Random(peer[P0].PRG());
+//     } else if (party == 0) {
+//         const uint P2 = 0, P1 = 1;
 
-        std::vector<D> u(n, D(data_size));
-        peer[P2].ReadDataVector(u, benchmark);
-        for (uint i = 0; i < n; i++) {
-            u[i] += array_13[i];
-        }
-        v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, benchmark);
+//         std::vector<D> u(n, D(data_size));
+//         peer[P2].ReadDataVector(u, benchmark);
+//         for (uint i = 0; i < n; i++) {
+//             u[i] += array_13[i];
+//         }
+//         v_out_13 = SSOT::P0(peer, index_23[P1] ^ index_23[P2], u, benchmark);
 
-        D tmp(data_size);
-        tmp.Random(peer[P2].PRG());
-        v_out_13 -= tmp;
-    } else {  // this->party_ == 1
-        // const uint P0 = 0, P2 = 1;
-        const uint P2 = 1;
-        v_out_13 = SSOT::P1(peer, index_23[P2], array_13, benchmark);
-    }
-    return v_out_13;
-}
+//         D tmp(data_size);
+//         tmp.Random(peer[P2].PRG());
+//         v_out_13 -= tmp;
+//     } else {  // this->party_ == 1
+//         // const uint P0 = 0, P2 = 1;
+//         const uint P2 = 1;
+//         v_out_13 = SSOT::P1(peer, index_23[P2], array_13, benchmark);
+//     }
+//     return v_out_13;
+// }
 
 template <typename D>
 D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_23[2], Benchmark::Record *benchmark) {

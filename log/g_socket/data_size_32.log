@@ -1,0 +1,472 @@
+========== Benchmark start ==========
+2022-06-20 14:02:45.362658+09:00
+logn 1, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 38, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 33, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 71, ct = 2, bandwidth = 1064
+SOCKET_READ, time = 38, ct = 4, bandwidth = 0
+SOCKET_WRITE, time = 18, ct = 4, bandwidth = 1064
+socket_others, time = 14, ct = 0, bandwidth = 0
+2022-06-20 14:02:50.222514+09:00, duration: 0:00:04.859856
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:02:50.222543+09:00
+logn 2, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 29, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 23, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 53, ct = 2, bandwidth = 1064
+SOCKET_READ, time = 25, ct = 4, bandwidth = 0
+SOCKET_WRITE, time = 13, ct = 4, bandwidth = 1064
+socket_others, time = 14, ct = 0, bandwidth = 0
+2022-06-20 14:02:53.242907+09:00, duration: 0:00:03.020364
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:02:53.242939+09:00
+logn 3, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 22, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 19, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 42, ct = 2, bandwidth = 1064
+SOCKET_READ, time = 15, ct = 4, bandwidth = 0
+SOCKET_WRITE, time = 12, ct = 4, bandwidth = 1064
+socket_others, time = 13, ct = 0, bandwidth = 0
+2022-06-20 14:02:56.261424+09:00, duration: 0:00:03.018485
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:02:56.261487+09:00
+logn 4, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 29, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 23, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 53, ct = 2, bandwidth = 1064
+SOCKET_READ, time = 24, ct = 4, bandwidth = 0
+SOCKET_WRITE, time = 14, ct = 4, bandwidth = 1064
+socket_others, time = 14, ct = 0, bandwidth = 0
+2022-06-20 14:02:59.280402+09:00, duration: 0:00:03.018915
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:02:59.280433+09:00
+logn 5, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 26, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 24, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 51, ct = 2, bandwidth = 1064
+SOCKET_READ, time = 22, ct = 4, bandwidth = 0
+SOCKET_WRITE, time = 14, ct = 4, bandwidth = 1064
+socket_others, time = 14, ct = 0, bandwidth = 0
+2022-06-20 14:03:02.300464+09:00, duration: 0:00:03.020031
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:02.300497+09:00
+logn 6, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 93, ct = 1, bandwidth = 2395
+ORAM_WRITE, time = 62, ct = 1, bandwidth = 3109
+ORAM_POSITION_MAP, time = 76, ct = 1, bandwidth = 42
+TOTAL, time = 232, ct = 3, bandwidth = 5546
+SOCKET_READ, time = 115, ct = 14, bandwidth = 0
+SOCKET_WRITE, time = 62, ct = 14, bandwidth = 5546
+socket_others, time = 54, ct = 0, bandwidth = 0
+2022-06-20 14:03:05.347741+09:00, duration: 0:00:03.047244
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:05.347801+09:00
+logn 7, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 131, ct = 1, bandwidth = 3079
+ORAM_WRITE, time = 66, ct = 1, bandwidth = 3109
+ORAM_POSITION_MAP, time = 59, ct = 1, bandwidth = 42
+TOTAL, time = 256, ct = 3, bandwidth = 6230
+SOCKET_READ, time = 131, ct = 16, bandwidth = 0
+SOCKET_WRITE, time = 61, ct = 16, bandwidth = 6230
+socket_others, time = 63, ct = 0, bandwidth = 0
+2022-06-20 14:03:08.400929+09:00, duration: 0:00:03.053128
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:08.400983+09:00
+logn 8, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 142, ct = 1, bandwidth = 3407
+ORAM_WRITE, time = 53, ct = 1, bandwidth = 3068
+ORAM_POSITION_MAP, time = 58, ct = 1, bandwidth = 42
+TOTAL, time = 253, ct = 3, bandwidth = 6517
+SOCKET_READ, time = 124, ct = 16, bandwidth = 0
+SOCKET_WRITE, time = 60, ct = 16, bandwidth = 6517
+socket_others, time = 68, ct = 0, bandwidth = 0
+2022-06-20 14:03:11.454671+09:00, duration: 0:00:03.053688
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:11.454711+09:00
+logn 9, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 151, ct = 1, bandwidth = 3573
+ORAM_WRITE, time = 59, ct = 1, bandwidth = 3069
+ORAM_POSITION_MAP, time = 57, ct = 1, bandwidth = 42
+TOTAL, time = 268, ct = 3, bandwidth = 6684
+SOCKET_READ, time = 134, ct = 16, bandwidth = 0
+SOCKET_WRITE, time = 61, ct = 16, bandwidth = 6684
+socket_others, time = 72, ct = 0, bandwidth = 0
+2022-06-20 14:03:14.510875+09:00, duration: 0:00:03.056164
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:14.510922+09:00
+logn 10, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 147, ct = 1, bandwidth = 3658
+ORAM_WRITE, time = 67, ct = 1, bandwidth = 3071
+ORAM_POSITION_MAP, time = 59, ct = 1, bandwidth = 42
+TOTAL, time = 274, ct = 3, bandwidth = 6771
+SOCKET_READ, time = 132, ct = 16, bandwidth = 0
+SOCKET_WRITE, time = 65, ct = 16, bandwidth = 6771
+socket_others, time = 75, ct = 0, bandwidth = 0
+2022-06-20 14:03:17.568326+09:00, duration: 0:00:03.057404
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:17.568361+09:00
+logn 11, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 164, ct = 1, bandwidth = 3799
+ORAM_WRITE, time = 71, ct = 1, bandwidth = 2807
+ORAM_POSITION_MAP, time = 198, ct = 1, bandwidth = 226
+TOTAL, time = 434, ct = 3, bandwidth = 6832
+SOCKET_READ, time = 215, ct = 30, bandwidth = 0
+SOCKET_WRITE, time = 110, ct = 30, bandwidth = 6832
+socket_others, time = 108, ct = 0, bandwidth = 0
+2022-06-20 14:03:20.649614+09:00, duration: 0:00:03.081253
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:20.649708+09:00
+logn 12, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 182, ct = 1, bandwidth = 3848
+ORAM_WRITE, time = 68, ct = 1, bandwidth = 2152
+ORAM_POSITION_MAP, time = 204, ct = 1, bandwidth = 442
+TOTAL, time = 455, ct = 3, bandwidth = 6442
+SOCKET_READ, time = 222, ct = 31, bandwidth = 0
+SOCKET_WRITE, time = 115, ct = 31, bandwidth = 6442
+socket_others, time = 118, ct = 0, bandwidth = 0
+2022-06-20 14:03:23.737510+09:00, duration: 0:00:03.087802
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:23.737593+09:00
+logn 13, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 191, ct = 1, bandwidth = 3884
+ORAM_WRITE, time = 78, ct = 1, bandwidth = 2188
+ORAM_POSITION_MAP, time = 210, ct = 1, bandwidth = 460
+TOTAL, time = 479, ct = 3, bandwidth = 6533
+SOCKET_READ, time = 224, ct = 31, bandwidth = 0
+SOCKET_WRITE, time = 117, ct = 31, bandwidth = 6533
+socket_others, time = 137, ct = 0, bandwidth = 0
+2022-06-20 14:03:26.827986+09:00, duration: 0:00:03.090393
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:26.828067+09:00
+logn 14, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 206, ct = 1, bandwidth = 3920
+ORAM_WRITE, time = 93, ct = 1, bandwidth = 2224
+ORAM_POSITION_MAP, time = 203, ct = 1, bandwidth = 473
+TOTAL, time = 504, ct = 3, bandwidth = 6618
+SOCKET_READ, time = 207, ct = 31, bandwidth = 0
+SOCKET_WRITE, time = 121, ct = 31, bandwidth = 6618
+socket_others, time = 175, ct = 0, bandwidth = 0
+2022-06-20 14:03:29.923495+09:00, duration: 0:00:03.095428
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:29.923583+09:00
+logn 15, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 263, ct = 1, bandwidth = 3956
+ORAM_WRITE, time = 167, ct = 1, bandwidth = 2260
+ORAM_POSITION_MAP, time = 238, ct = 1, bandwidth = 484
+TOTAL, time = 669, ct = 3, bandwidth = 6700
+SOCKET_READ, time = 256, ct = 31, bandwidth = 0
+SOCKET_WRITE, time = 129, ct = 31, bandwidth = 6700
+socket_others, time = 284, ct = 0, bandwidth = 0
+2022-06-20 14:03:33.048596+09:00, duration: 0:00:03.125013
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:33.048679+09:00
+logn 16, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 464, ct = 1, bandwidth = 3992
+ORAM_WRITE, time = 372, ct = 1, bandwidth = 2296
+ORAM_POSITION_MAP, time = 390, ct = 1, bandwidth = 801
+TOTAL, time = 1226, ct = 3, bandwidth = 7090
+SOCKET_READ, time = 367, ct = 45, bandwidth = 0
+SOCKET_WRITE, time = 174, ct = 45, bandwidth = 7090
+socket_others, time = 684, ct = 0, bandwidth = 0
+2022-06-20 14:03:36.265542+09:00, duration: 0:00:03.216863
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:36.265576+09:00
+logn 17, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 975, ct = 1, bandwidth = 4028
+ORAM_WRITE, time = 788, ct = 1, bandwidth = 2332
+ORAM_POSITION_MAP, time = 516, ct = 1, bandwidth = 1000
+TOTAL, time = 2280, ct = 3, bandwidth = 7360
+SOCKET_READ, time = 476, ct = 46, bandwidth = 0
+SOCKET_WRITE, time = 198, ct = 46, bandwidth = 7360
+socket_others, time = 1605, ct = 0, bandwidth = 0
+2022-06-20 14:03:39.656735+09:00, duration: 0:00:03.391159
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:39.656772+09:00
+logn 18, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1850, ct = 1, bandwidth = 4064
+ORAM_WRITE, time = 1916, ct = 1, bandwidth = 2368
+ORAM_POSITION_MAP, time = 641, ct = 1, bandwidth = 1091
+TOTAL, time = 4408, ct = 3, bandwidth = 7523
+SOCKET_READ, time = 695, ct = 46, bandwidth = 0
+SOCKET_WRITE, time = 230, ct = 46, bandwidth = 7523
+socket_others, time = 3482, ct = 0, bandwidth = 0
+2022-06-20 14:03:43.369328+09:00, duration: 0:00:03.712556
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:43.369499+09:00
+logn 19, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 3588, ct = 1, bandwidth = 4100
+ORAM_WRITE, time = 3967, ct = 1, bandwidth = 2404
+ORAM_POSITION_MAP, time = 783, ct = 1, bandwidth = 1175
+TOTAL, time = 8339, ct = 3, bandwidth = 7680
+SOCKET_READ, time = 943, ct = 46, bandwidth = 0
+SOCKET_WRITE, time = 235, ct = 46, bandwidth = 7680
+socket_others, time = 7160, ct = 0, bandwidth = 0
+2022-06-20 14:03:47.674732+09:00, duration: 0:00:04.305233
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:47.674793+09:00
+logn 20, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 6806, ct = 1, bandwidth = 4136
+ORAM_WRITE, time = 7877, ct = 1, bandwidth = 2440
+ORAM_POSITION_MAP, time = 1146, ct = 1, bandwidth = 1440
+TOTAL, time = 15830, ct = 3, bandwidth = 8017
+SOCKET_READ, time = 1548, ct = 47, bandwidth = 0
+SOCKET_WRITE, time = 242, ct = 47, bandwidth = 8017
+socket_others, time = 14039, ct = 0, bandwidth = 0
+2022-06-20 14:03:53.107518+09:00, duration: 0:00:05.432725
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:03:53.107604+09:00
+logn 21, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 13318, ct = 1, bandwidth = 4172
+ORAM_WRITE, time = 15534, ct = 1, bandwidth = 2476
+ORAM_POSITION_MAP, time = 1956, ct = 1, bandwidth = 1830
+TOTAL, time = 30809, ct = 3, bandwidth = 8478
+SOCKET_READ, time = 2806, ct = 60, bandwidth = 0
+SOCKET_WRITE, time = 301, ct = 60, bandwidth = 8478
+socket_others, time = 27701, ct = 0, bandwidth = 0
+2022-06-20 14:04:00.821109+09:00, duration: 0:00:07.713505
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:04:00.821149+09:00
+logn 22, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 26123, ct = 1, bandwidth = 4208
+ORAM_WRITE, time = 31123, ct = 1, bandwidth = 2512
+ORAM_POSITION_MAP, time = 3240, ct = 1, bandwidth = 2101
+TOTAL, time = 60487, ct = 3, bandwidth = 8821
+SOCKET_READ, time = 5055, ct = 61, bandwidth = 0
+SOCKET_WRITE, time = 312, ct = 61, bandwidth = 8821
+socket_others, time = 55118, ct = 0, bandwidth = 0
+2022-06-20 14:04:13.014630+09:00, duration: 0:00:12.193481
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:04:13.014695+09:00
+logn 23, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 51118, ct = 1, bandwidth = 4244
+ORAM_WRITE, time = 61615, ct = 1, bandwidth = 2548
+ORAM_POSITION_MAP, time = 5819, ct = 1, bandwidth = 2263
+TOTAL, time = 118554, ct = 3, bandwidth = 9055
+SOCKET_READ, time = 9661, ct = 62, bandwidth = 0
+SOCKET_WRITE, time = 318, ct = 62, bandwidth = 9055
+socket_others, time = 108573, ct = 0, bandwidth = 0
+2022-06-20 14:04:33.963531+09:00, duration: 0:00:20.948836
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:04:33.963604+09:00
+logn 24, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 100971, ct = 1, bandwidth = 4280
+ORAM_WRITE, time = 122052, ct = 1, bandwidth = 2584
+ORAM_POSITION_MAP, time = 10663, ct = 1, bandwidth = 2420
+TOTAL, time = 233687, ct = 3, bandwidth = 9284
+SOCKET_READ, time = 18280, ct = 62, bandwidth = 0
+SOCKET_WRITE, time = 331, ct = 62, bandwidth = 9284
+socket_others, time = 215074, ct = 0, bandwidth = 0
+2022-06-20 14:05:12.174946+09:00, duration: 0:00:38.211342
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:05:12.175019+09:00
+logn 25, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 199161, ct = 1, bandwidth = 4316
+ORAM_WRITE, time = 240163, ct = 1, bandwidth = 2620
+ORAM_POSITION_MAP, time = 19989, ct = 1, bandwidth = 2757
+TOTAL, time = 459314, ct = 3, bandwidth = 9693
+SOCKET_READ, time = 34900, ct = 62, bandwidth = 0
+SOCKET_WRITE, time = 394, ct = 62, bandwidth = 9693
+socket_others, time = 424018, ct = 0, bandwidth = 0
+2022-06-20 14:06:24.428936+09:00, duration: 0:01:12.253917
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:06:24.428981+09:00
+logn 26, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 388575, ct = 1, bandwidth = 4352
+ORAM_WRITE, time = 464916, ct = 1, bandwidth = 2656
+ORAM_POSITION_MAP, time = 36138, ct = 1, bandwidth = 3218
+TOTAL, time = 889631, ct = 3, bandwidth = 10227
+SOCKET_READ, time = 62724, ct = 75, bandwidth = 0
+SOCKET_WRITE, time = 480, ct = 75, bandwidth = 10227
+socket_others, time = 826426, ct = 0, bandwidth = 0
+2022-06-20 14:08:41.677992+09:00, duration: 0:02:17.249011
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:08:41.678081+09:00
+logn 27, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 766587, ct = 1, bandwidth = 4388
+ORAM_WRITE, time = 914820, ct = 1, bandwidth = 2692
+ORAM_POSITION_MAP, time = 69100, ct = 1, bandwidth = 3561
+TOTAL, time = 1750509, ct = 3, bandwidth = 10641
+SOCKET_READ, time = 120474, ct = 76, bandwidth = 0
+SOCKET_WRITE, time = 495, ct = 76, bandwidth = 10641
+socket_others, time = 1629539, ct = 0, bandwidth = 0
+2022-06-20 14:13:08.742459+09:00, duration: 0:04:27.064378
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:13:08.742533+09:00
+logn 28, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1523825, ct = 1, bandwidth = 4424
+ORAM_WRITE, time = 1813680, ct = 1, bandwidth = 2728
+ORAM_POSITION_MAP, time = 136960, ct = 1, bandwidth = 3978
+TOTAL, time = 3474466, ct = 3, bandwidth = 11130
+SOCKET_READ, time = 232553, ct = 77, bandwidth = 0
+SOCKET_WRITE, time = 515, ct = 77, bandwidth = 11130
+socket_others, time = 3241398, ct = 0, bandwidth = 0
+2022-06-20 14:21:55.568594+09:00, duration: 0:08:46.826061
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 14:21:55.568638+09:00
+logn 29, data_size 32, tau 5, pdpf 5
+Error
+Pseudo DPF threshold 32
+Connecting to 127.0.0.1:9001...
+Connecting to 127.0.0.1:9000 done.
+
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)(28, 0.0)
+KEY_TO_INDEX ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)(28, 0)
+KEY_TO_INDEX bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)(28, 0.0)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.04)(2, 0.03)(3, 0.02)(4, 0.03)(5, 0.03)(6, 0.09)(7, 0.13)(8, 0.14)(9, 0.15)(10, 0.15)(11, 0.16)(12, 0.18)(13, 0.19)(14, 0.21)(15, 0.26)(16, 0.46)(17, 0.97)(18, 1.85)(19, 3.59)(20, 6.81)(21, 13.32)(22, 26.12)(23, 51.12)(24, 100.97)(25, 199.16)(26, 388.57)(27, 766.59)(28, 1523.83)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)(28, 1)
+ORAM_READ bandwidth
+(1, 1.03)(2, 1.03)(3, 1.03)(4, 1.03)(5, 1.03)(6, 2.4)(7, 3.08)(8, 3.41)(9, 3.57)(10, 3.66)(11, 3.8)(12, 3.85)(13, 3.88)(14, 3.92)(15, 3.96)(16, 3.99)(17, 4.03)(18, 4.06)(19, 4.1)(20, 4.14)(21, 4.17)(22, 4.21)(23, 4.24)(24, 4.28)(25, 4.32)(26, 4.35)(27, 4.39)(28, 4.42)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.03)(2, 0.02)(3, 0.02)(4, 0.02)(5, 0.02)(6, 0.06)(7, 0.07)(8, 0.05)(9, 0.06)(10, 0.07)(11, 0.07)(12, 0.07)(13, 0.08)(14, 0.09)(15, 0.17)(16, 0.37)(17, 0.79)(18, 1.92)(19, 3.97)(20, 7.88)(21, 15.53)(22, 31.12)(23, 61.62)(24, 122.05)(25, 240.16)(26, 464.92)(27, 914.82)(28, 1813.68)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)(28, 1)
+ORAM_WRITE bandwidth
+(1, 0.04)(2, 0.04)(3, 0.04)(4, 0.04)(5, 0.04)(6, 3.11)(7, 3.11)(8, 3.07)(9, 3.07)(10, 3.07)(11, 2.81)(12, 2.15)(13, 2.19)(14, 2.22)(15, 2.26)(16, 2.3)(17, 2.33)(18, 2.37)(19, 2.4)(20, 2.44)(21, 2.48)(22, 2.51)(23, 2.55)(24, 2.58)(25, 2.62)(26, 2.66)(27, 2.69)(28, 2.73)
+
+
+========== ORAM_POSITION_MAP ==========
+ORAM_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.08)(7, 0.06)(8, 0.06)(9, 0.06)(10, 0.06)(11, 0.2)(12, 0.2)(13, 0.21)(14, 0.2)(15, 0.24)(16, 0.39)(17, 0.52)(18, 0.64)(19, 0.78)(20, 1.15)(21, 1.96)(22, 3.24)(23, 5.82)(24, 10.66)(25, 19.99)(26, 36.14)(27, 69.1)(28, 136.96)
+ORAM_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)(28, 1)
+ORAM_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.04)(7, 0.04)(8, 0.04)(9, 0.04)(10, 0.04)(11, 0.23)(12, 0.44)(13, 0.46)(14, 0.47)(15, 0.48)(16, 0.8)(17, 1.0)(18, 1.09)(19, 1.18)(20, 1.44)(21, 1.83)(22, 2.1)(23, 2.26)(24, 2.42)(25, 2.76)(26, 3.22)(27, 3.56)(28, 3.98)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.07)(2, 0.05)(3, 0.04)(4, 0.05)(5, 0.05)(6, 0.23)(7, 0.26)(8, 0.25)(9, 0.27)(10, 0.27)(11, 0.43)(12, 0.46)(13, 0.48)(14, 0.5)(15, 0.67)(16, 1.23)(17, 2.28)(18, 4.41)(19, 8.34)(20, 15.83)(21, 30.81)(22, 60.49)(23, 118.55)(24, 233.69)(25, 459.31)(26, 889.63)(27, 1750.51)(28, 3474.47)
+TOTAL ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 3)(7, 3)(8, 3)(9, 3)(10, 3)(11, 3)(12, 3)(13, 3)(14, 3)(15, 3)(16, 3)(17, 3)(18, 3)(19, 3)(20, 3)(21, 3)(22, 3)(23, 3)(24, 3)(25, 3)(26, 3)(27, 3)(28, 3)
+TOTAL bandwidth
+(1, 1.06)(2, 1.06)(3, 1.06)(4, 1.06)(5, 1.06)(6, 5.55)(7, 6.23)(8, 6.52)(9, 6.68)(10, 6.77)(11, 6.83)(12, 6.44)(13, 6.53)(14, 6.62)(15, 6.7)(16, 7.09)(17, 7.36)(18, 7.52)(19, 7.68)(20, 8.02)(21, 8.48)(22, 8.82)(23, 9.05)(24, 9.28)(25, 9.69)(26, 10.23)(27, 10.64)(28, 11.13)
+
+
+========== SOCKET_READ ==========
+SOCKET_READ time
+(1, 0.04)(2, 0.03)(3, 0.01)(4, 0.02)(5, 0.02)(6, 0.12)(7, 0.13)(8, 0.12)(9, 0.13)(10, 0.13)(11, 0.21)(12, 0.22)(13, 0.22)(14, 0.21)(15, 0.26)(16, 0.37)(17, 0.48)(18, 0.69)(19, 0.94)(20, 1.55)(21, 2.81)(22, 5.05)(23, 9.66)(24, 18.28)(25, 34.9)(26, 62.72)(27, 120.47)(28, 232.55)
+SOCKET_READ ct
+(1, 4)(2, 4)(3, 4)(4, 4)(5, 4)(6, 14)(7, 16)(8, 16)(9, 16)(10, 16)(11, 30)(12, 31)(13, 31)(14, 31)(15, 31)(16, 45)(17, 46)(18, 46)(19, 46)(20, 47)(21, 60)(22, 61)(23, 62)(24, 62)(25, 62)(26, 75)(27, 76)(28, 77)
+SOCKET_READ bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)(28, 0.0)
+
+
+========== SOCKET_WRITE ==========
+SOCKET_WRITE time
+(1, 0.02)(2, 0.01)(3, 0.01)(4, 0.01)(5, 0.01)(6, 0.06)(7, 0.06)(8, 0.06)(9, 0.06)(10, 0.07)(11, 0.11)(12, 0.12)(13, 0.12)(14, 0.12)(15, 0.13)(16, 0.17)(17, 0.2)(18, 0.23)(19, 0.23)(20, 0.24)(21, 0.3)(22, 0.31)(23, 0.32)(24, 0.33)(25, 0.39)(26, 0.48)(27, 0.49)(28, 0.52)
+SOCKET_WRITE ct
+(1, 4)(2, 4)(3, 4)(4, 4)(5, 4)(6, 14)(7, 16)(8, 16)(9, 16)(10, 16)(11, 30)(12, 31)(13, 31)(14, 31)(15, 31)(16, 45)(17, 46)(18, 46)(19, 46)(20, 47)(21, 60)(22, 61)(23, 62)(24, 62)(25, 62)(26, 75)(27, 76)(28, 77)
+SOCKET_WRITE bandwidth
+(1, 1.06)(2, 1.06)(3, 1.06)(4, 1.06)(5, 1.06)(6, 5.55)(7, 6.23)(8, 6.52)(9, 6.68)(10, 6.77)(11, 6.83)(12, 6.44)(13, 6.53)(14, 6.62)(15, 6.7)(16, 7.09)(17, 7.36)(18, 7.52)(19, 7.68)(20, 8.02)(21, 8.48)(22, 8.82)(23, 9.05)(24, 9.28)(25, 9.69)(26, 10.23)(27, 10.64)(28, 11.13)
+
+
+========== socket_others ==========
+socket_others time
+(1, 0.01)(2, 0.01)(3, 0.01)(4, 0.01)(5, 0.01)(6, 0.05)(7, 0.06)(8, 0.07)(9, 0.07)(10, 0.07)(11, 0.11)(12, 0.12)(13, 0.14)(14, 0.17)(15, 0.28)(16, 0.68)(17, 1.6)(18, 3.48)(19, 7.16)(20, 14.04)(21, 27.7)(22, 55.12)(23, 108.57)(24, 215.07)(25, 424.02)(26, 826.43)(27, 1629.54)(28, 3241.4)
+socket_others ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)(28, 0)
+socket_others bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)(28, 0.0)
+
+

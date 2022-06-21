@@ -1,0 +1,567 @@
+========== Benchmark start ==========
+2022-06-20 16:06:25.533084+09:00
+logn 1, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 145, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 409, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 555, ct = 2, bandwidth = 1824
+ZP_DATA_COPY, time = 44, ct = 489, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 26, ct = 107, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 13, ct = 112, bandwidth = 0
+ZP_DATA_RANDOM, time = 14, ct = 25, bandwidth = 0
+ZP_DATA_OTHERS, time = 456, ct = 0, bandwidth = 1824
+2022-06-20 16:06:30.323327+09:00, duration: 0:00:04.790243
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:30.323363+09:00
+logn 2, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 148, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 462, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 611, ct = 2, bandwidth = 1824
+ZP_DATA_COPY, time = 44, ct = 489, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 27, ct = 106, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 13, ct = 112, bandwidth = 0
+ZP_DATA_RANDOM, time = 15, ct = 25, bandwidth = 0
+ZP_DATA_OTHERS, time = 510, ct = 0, bandwidth = 1824
+2022-06-20 16:06:33.412345+09:00, duration: 0:00:03.088982
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:33.412386+09:00
+logn 3, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 147, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 397, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 545, ct = 2, bandwidth = 1824
+ZP_DATA_COPY, time = 43, ct = 489, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 26, ct = 106, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 12, ct = 112, bandwidth = 0
+ZP_DATA_RANDOM, time = 14, ct = 25, bandwidth = 0
+ZP_DATA_OTHERS, time = 447, ct = 0, bandwidth = 1824
+2022-06-20 16:06:36.495491+09:00, duration: 0:00:03.083105
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:36.495574+09:00
+logn 4, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 145, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 405, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 551, ct = 2, bandwidth = 1824
+ZP_DATA_COPY, time = 43, ct = 489, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 26, ct = 107, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 13, ct = 112, bandwidth = 0
+ZP_DATA_RANDOM, time = 14, ct = 25, bandwidth = 0
+ZP_DATA_OTHERS, time = 453, ct = 0, bandwidth = 1824
+2022-06-20 16:06:39.577525+09:00, duration: 0:00:03.081951
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:39.577550+09:00
+logn 5, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 143, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 414, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 557, ct = 2, bandwidth = 1824
+ZP_DATA_COPY, time = 43, ct = 489, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 26, ct = 107, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 13, ct = 112, bandwidth = 0
+ZP_DATA_RANDOM, time = 14, ct = 25, bandwidth = 0
+ZP_DATA_OTHERS, time = 459, ct = 0, bandwidth = 1824
+2022-06-20 16:06:42.660593+09:00, duration: 0:00:03.083043
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:42.660617+09:00
+logn 6, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1132, ct = 1, bandwidth = 12963
+ORAM_WRITE, time = 3036, ct = 1, bandwidth = 16877
+ORAM_POSITION_MAP, time = 71, ct = 1, bandwidth = 42
+TOTAL, time = 4239, ct = 3, bandwidth = 29882
+ZP_DATA_COPY, time = 483, ct = 5588, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 237, ct = 1127, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 123, ct = 1221, bandwidth = 0
+ZP_DATA_RANDOM, time = 327, ct = 691, bandwidth = 0
+ZP_DATA_OTHERS, time = 3068, ct = 0, bandwidth = 29882
+2022-06-20 16:06:46.216552+09:00, duration: 0:00:03.555935
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:46.216585+09:00
+logn 7, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1677, ct = 1, bandwidth = 18769
+ORAM_WRITE, time = 3099, ct = 1, bandwidth = 16877
+ORAM_POSITION_MAP, time = 72, ct = 1, bandwidth = 42
+TOTAL, time = 4849, ct = 3, bandwidth = 35688
+ZP_DATA_COPY, time = 590, ct = 6474, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 323, ct = 1499, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 169, ct = 1584, bandwidth = 0
+ZP_DATA_RANDOM, time = 395, ct = 817, bandwidth = 0
+ZP_DATA_OTHERS, time = 3370, ct = 0, bandwidth = 35688
+2022-06-20 16:06:49.885214+09:00, duration: 0:00:03.668629
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:49.885303+09:00
+logn 8, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1935, ct = 1, bandwidth = 21556
+ORAM_WRITE, time = 3093, ct = 1, bandwidth = 16836
+ORAM_POSITION_MAP, time = 81, ct = 1, bandwidth = 42
+TOTAL, time = 5110, ct = 3, bandwidth = 38434
+ZP_DATA_COPY, time = 621, ct = 6894, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 387, ct = 1828, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 183, ct = 1755, bandwidth = 0
+ZP_DATA_RANDOM, time = 419, ct = 877, bandwidth = 0
+ZP_DATA_OTHERS, time = 3498, ct = 0, bandwidth = 38434
+2022-06-20 16:06:53.610019+09:00, duration: 0:00:03.724716
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:53.610118+09:00
+logn 9, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2293, ct = 1, bandwidth = 22951
+ORAM_WRITE, time = 3312, ct = 1, bandwidth = 16837
+ORAM_POSITION_MAP, time = 96, ct = 1, bandwidth = 42
+TOTAL, time = 5702, ct = 3, bandwidth = 39830
+ZP_DATA_COPY, time = 661, ct = 7112, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 477, ct = 2269, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 195, ct = 1842, bandwidth = 0
+ZP_DATA_RANDOM, time = 433, ct = 907, bandwidth = 0
+ZP_DATA_OTHERS, time = 3935, ct = 0, bandwidth = 39830
+2022-06-20 16:06:57.432554+09:00, duration: 0:00:03.822436
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:06:57.432619+09:00
+logn 10, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2489, ct = 1, bandwidth = 23650
+ORAM_WRITE, time = 3351, ct = 1, bandwidth = 16839
+ORAM_POSITION_MAP, time = 87, ct = 1, bandwidth = 42
+TOTAL, time = 5928, ct = 3, bandwidth = 40532
+ZP_DATA_COPY, time = 651, ct = 7228, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 639, ct = 3053, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 197, ct = 1886, bandwidth = 0
+ZP_DATA_RANDOM, time = 443, ct = 922, bandwidth = 0
+ZP_DATA_OTHERS, time = 3995, ct = 0, bandwidth = 40532
+2022-06-20 16:07:01.298482+09:00, duration: 0:00:03.865863
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:01.298520+09:00
+logn 11, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2837, ct = 1, bandwidth = 24201
+ORAM_WRITE, time = 3537, ct = 1, bandwidth = 16575
+ORAM_POSITION_MAP, time = 208, ct = 1, bandwidth = 226
+TOTAL, time = 6583, ct = 3, bandwidth = 41003
+ZP_DATA_COPY, time = 677, ct = 7258, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 887, ct = 4417, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 202, ct = 1894, bandwidth = 0
+ZP_DATA_RANDOM, time = 448, ct = 932, bandwidth = 0
+ZP_DATA_OTHERS, time = 4367, ct = 0, bandwidth = 41003
+2022-06-20 16:07:05.267159+09:00, duration: 0:00:03.968639
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:05.267244+09:00
+logn 12, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 3520, ct = 1, bandwidth = 24455
+ORAM_WRITE, time = 4044, ct = 1, bandwidth = 15920
+ORAM_POSITION_MAP, time = 224, ct = 1, bandwidth = 442
+TOTAL, time = 7789, ct = 3, bandwidth = 40818
+ZP_DATA_COPY, time = 694, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 1434, ct = 7160, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 199, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 449, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 5012, ct = 0, bandwidth = 40818
+2022-06-20 16:07:09.437618+09:00, duration: 0:00:04.170374
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:09.437706+09:00
+logn 13, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 4566, ct = 1, bandwidth = 24491
+ORAM_WRITE, time = 5111, ct = 1, bandwidth = 15956
+ORAM_POSITION_MAP, time = 230, ct = 1, bandwidth = 460
+TOTAL, time = 9908, ct = 3, bandwidth = 40908
+ZP_DATA_COPY, time = 691, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 2210, ct = 11223, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 201, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 446, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 6358, ct = 0, bandwidth = 40908
+2022-06-20 16:07:13.926190+09:00, duration: 0:00:04.488484
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:13.926274+09:00
+logn 14, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 6451, ct = 1, bandwidth = 24527
+ORAM_WRITE, time = 7239, ct = 1, bandwidth = 15992
+ORAM_POSITION_MAP, time = 253, ct = 1, bandwidth = 473
+TOTAL, time = 13944, ct = 3, bandwidth = 40993
+ZP_DATA_COPY, time = 693, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 3860, ct = 19352, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 202, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 452, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 8734, ct = 0, bandwidth = 40993
+2022-06-20 16:07:19.020220+09:00, duration: 0:00:05.093946
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:19.020323+09:00
+logn 15, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 10646, ct = 1, bandwidth = 24563
+ORAM_WRITE, time = 11715, ct = 1, bandwidth = 16028
+ORAM_POSITION_MAP, time = 275, ct = 1, bandwidth = 484
+TOTAL, time = 22637, ct = 3, bandwidth = 41075
+ZP_DATA_COPY, time = 701, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 7207, ct = 35617, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 203, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 457, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 14067, ct = 0, bandwidth = 41075
+2022-06-20 16:07:25.410751+09:00, duration: 0:00:06.390428
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:25.410821+09:00
+logn 16, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 18459, ct = 1, bandwidth = 24599
+ORAM_WRITE, time = 19995, ct = 1, bandwidth = 16064
+ORAM_POSITION_MAP, time = 403, ct = 1, bandwidth = 801
+TOTAL, time = 38858, ct = 3, bandwidth = 41465
+ZP_DATA_COPY, time = 693, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 13576, ct = 68207, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 202, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 451, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 23933, ct = 0, bandwidth = 41465
+2022-06-20 16:07:34.223252+09:00, duration: 0:00:08.812431
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:34.223329+09:00
+logn 17, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 34330, ct = 1, bandwidth = 24635
+ORAM_WRITE, time = 36756, ct = 1, bandwidth = 16100
+ORAM_POSITION_MAP, time = 465, ct = 1, bandwidth = 1000
+TOTAL, time = 71553, ct = 3, bandwidth = 41736
+ZP_DATA_COPY, time = 699, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 26546, ct = 133154, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 202, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 450, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 43654, ct = 0, bandwidth = 41736
+2022-06-20 16:07:47.936562+09:00, duration: 0:00:13.713233
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:07:47.936612+09:00
+logn 18, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 65458, ct = 1, bandwidth = 24671
+ORAM_WRITE, time = 70993, ct = 1, bandwidth = 16136
+ORAM_POSITION_MAP, time = 514, ct = 1, bandwidth = 1091
+TOTAL, time = 136966, ct = 3, bandwidth = 41898
+ZP_DATA_COPY, time = 708, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 52433, ct = 263685, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 203, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 453, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 83168, ct = 0, bandwidth = 41898
+2022-06-20 16:08:11.406494+09:00, duration: 0:00:23.469882
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:08:11.406578+09:00
+logn 19, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 128038, ct = 1, bandwidth = 24707
+ORAM_WRITE, time = 137397, ct = 1, bandwidth = 16172
+ORAM_POSITION_MAP, time = 509, ct = 1, bandwidth = 1175
+TOTAL, time = 265945, ct = 3, bandwidth = 42055
+ZP_DATA_COPY, time = 697, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 103036, ct = 522835, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 200, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 446, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 161563, ct = 0, bandwidth = 42055
+2022-06-20 16:08:54.149268+09:00, duration: 0:00:42.742690
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:08:54.149328+09:00
+logn 20, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 241855, ct = 1, bandwidth = 24743
+ORAM_WRITE, time = 261017, ct = 1, bandwidth = 16208
+ORAM_POSITION_MAP, time = 556, ct = 1, bandwidth = 1440
+TOTAL, time = 503428, ct = 3, bandwidth = 42392
+ZP_DATA_COPY, time = 683, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 199868, ct = 1042906, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 197, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 444, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 302235, ct = 0, bandwidth = 42392
+2022-06-20 16:10:12.351364+09:00, duration: 0:01:18.202036
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:10:12.351491+09:00
+logn 21, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 469756, ct = 1, bandwidth = 24779
+ORAM_WRITE, time = 505579, ct = 1, bandwidth = 16244
+ORAM_POSITION_MAP, time = 786, ct = 1, bandwidth = 1830
+TOTAL, time = 976122, ct = 3, bandwidth = 42853
+ZP_DATA_COPY, time = 692, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 388332, ct = 2084831, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 200, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 445, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 586450, ct = 0, bandwidth = 42853
+2022-06-20 16:12:41.224602+09:00, duration: 0:02:28.873111
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:12:41.224627+09:00
+logn 22, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 924591, ct = 1, bandwidth = 24815
+ORAM_WRITE, time = 994556, ct = 1, bandwidth = 16280
+ORAM_POSITION_MAP, time = 962, ct = 1, bandwidth = 2101
+TOTAL, time = 1920110, ct = 3, bandwidth = 43196
+ZP_DATA_COPY, time = 685, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 768386, ct = 4165678, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 199, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 447, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 1150391, ct = 0, bandwidth = 43196
+2022-06-20 16:17:31.090756+09:00, duration: 0:04:49.866129
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:17:31.090845+09:00
+logn 23, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1828295, ct = 1, bandwidth = 24851
+ORAM_WRITE, time = 1963641, ct = 1, bandwidth = 16316
+ORAM_POSITION_MAP, time = 1196, ct = 1, bandwidth = 2263
+TOTAL, time = 3793133, ct = 3, bandwidth = 43431
+ZP_DATA_COPY, time = 679, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 1518761, ct = 8326005, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 199, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 449, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 2273043, ct = 0, bandwidth = 43431
+2022-06-20 16:27:01.512079+09:00, duration: 0:09:30.421234
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:27:01.512153+09:00
+logn 24, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 3653323, ct = 1, bandwidth = 24887
+ORAM_WRITE, time = 3927918, ct = 1, bandwidth = 16352
+ORAM_POSITION_MAP, time = 1706, ct = 1, bandwidth = 2420
+TOTAL, time = 7582948, ct = 3, bandwidth = 43660
+ZP_DATA_COPY, time = 682, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 3044630, ct = 16648455, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 199, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 445, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 4536991, ct = 0, bandwidth = 43660
+2022-06-20 16:45:56.856777+09:00, duration: 0:18:55.344624
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 16:45:56.856836+09:00
+logn 25, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 7261818, ct = 1, bandwidth = 24923
+ORAM_WRITE, time = 7814480, ct = 1, bandwidth = 16388
+ORAM_POSITION_MAP, time = 2917, ct = 1, bandwidth = 2757
+TOTAL, time = 15079217, ct = 3, bandwidth = 44068
+ZP_DATA_COPY, time = 672, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 6054730, ct = 33297561, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 197, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 433, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 9023182, ct = 0, bandwidth = 44068
+2022-06-20 17:23:32.999509+09:00, duration: 0:37:36.142673
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 17:23:32.999586+09:00
+logn 26, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 14499609, ct = 1, bandwidth = 24959
+ORAM_WRITE, time = 15663522, ct = 1, bandwidth = 16424
+ORAM_POSITION_MAP, time = 5966, ct = 1, bandwidth = 3218
+TOTAL, time = 30169098, ct = 3, bandwidth = 44602
+ZP_DATA_COPY, time = 663, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 12175607, ct = 66589729, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 195, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 430, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 17992200, ct = 0, bandwidth = 44602
+2022-06-20 18:38:40.744784+09:00, duration: 1:15:07.745198
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 18:38:40.744856+09:00
+logn 27, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 29010154, ct = 1, bandwidth = 24995
+ORAM_WRITE, time = 31520477, ct = 1, bandwidth = 16460
+ORAM_POSITION_MAP, time = 11724, ct = 1, bandwidth = 3561
+TOTAL, time = 60542356, ct = 3, bandwidth = 45017
+ZP_DATA_COPY, time = 671, ct = 7212, bandwidth = 0
+ZP_DATA_COMPARE, time = 0, ct = 0, bandwidth = 0
+ZP_DATA_ARITHMATIC, time = 24472541, ct = 133183327, bandwidth = 0
+ZP_DATA_DUMP_LOAD, time = 198, ct = 1868, bandwidth = 0
+ZP_DATA_RANDOM, time = 440, ct = 937, bandwidth = 0
+ZP_DATA_OTHERS, time = 36068504, ct = 0, bandwidth = 45017
+2022-06-20 21:09:17.918215+09:00, duration: 2:30:37.173359
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-20 21:09:17.918252+09:00
+logn 28, data_size 32, tau 5, pdpf 5
+Error
+Pseudo DPF threshold 32
+Connecting to 127.0.0.1:9001...
+Connecting to 127.0.0.1:9000 done.
+Test, iterations = 100 
+
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+KEY_TO_INDEX ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)
+KEY_TO_INDEX bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.14)(2, 0.15)(3, 0.15)(4, 0.14)(5, 0.14)(6, 1.13)(7, 1.68)(8, 1.94)(9, 2.29)(10, 2.49)(11, 2.84)(12, 3.52)(13, 4.57)(14, 6.45)(15, 10.65)(16, 18.46)(17, 34.33)(18, 65.46)(19, 128.04)(20, 241.85)(21, 469.76)(22, 924.59)(23, 1828.3)(24, 3653.32)(25, 7261.82)(26, 14499.61)(27, 29010.15)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)
+ORAM_READ bandwidth
+(1, 1.35)(2, 1.35)(3, 1.35)(4, 1.35)(5, 1.35)(6, 12.96)(7, 18.77)(8, 21.56)(9, 22.95)(10, 23.65)(11, 24.2)(12, 24.45)(13, 24.49)(14, 24.53)(15, 24.56)(16, 24.6)(17, 24.64)(18, 24.67)(19, 24.71)(20, 24.74)(21, 24.78)(22, 24.82)(23, 24.85)(24, 24.89)(25, 24.92)(26, 24.96)(27, 25.0)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.41)(2, 0.46)(3, 0.4)(4, 0.41)(5, 0.41)(6, 3.04)(7, 3.1)(8, 3.09)(9, 3.31)(10, 3.35)(11, 3.54)(12, 4.04)(13, 5.11)(14, 7.24)(15, 11.71)(16, 20.0)(17, 36.76)(18, 70.99)(19, 137.4)(20, 261.02)(21, 505.58)(22, 994.56)(23, 1963.64)(24, 3927.92)(25, 7814.48)(26, 15663.52)(27, 31520.48)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)
+ORAM_WRITE bandwidth
+(1, 0.47)(2, 0.47)(3, 0.47)(4, 0.47)(5, 0.47)(6, 16.88)(7, 16.88)(8, 16.84)(9, 16.84)(10, 16.84)(11, 16.57)(12, 15.92)(13, 15.96)(14, 15.99)(15, 16.03)(16, 16.06)(17, 16.1)(18, 16.14)(19, 16.17)(20, 16.21)(21, 16.24)(22, 16.28)(23, 16.32)(24, 16.35)(25, 16.39)(26, 16.42)(27, 16.46)
+
+
+========== ORAM_POSITION_MAP ==========
+ORAM_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.07)(7, 0.07)(8, 0.08)(9, 0.1)(10, 0.09)(11, 0.21)(12, 0.22)(13, 0.23)(14, 0.25)(15, 0.28)(16, 0.4)(17, 0.47)(18, 0.51)(19, 0.51)(20, 0.56)(21, 0.79)(22, 0.96)(23, 1.2)(24, 1.71)(25, 2.92)(26, 5.97)(27, 11.72)
+ORAM_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)
+ORAM_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.04)(7, 0.04)(8, 0.04)(9, 0.04)(10, 0.04)(11, 0.23)(12, 0.44)(13, 0.46)(14, 0.47)(15, 0.48)(16, 0.8)(17, 1.0)(18, 1.09)(19, 1.18)(20, 1.44)(21, 1.83)(22, 2.1)(23, 2.26)(24, 2.42)(25, 2.76)(26, 3.22)(27, 3.56)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.56)(2, 0.61)(3, 0.55)(4, 0.55)(5, 0.56)(6, 4.24)(7, 4.85)(8, 5.11)(9, 5.7)(10, 5.93)(11, 6.58)(12, 7.79)(13, 9.91)(14, 13.94)(15, 22.64)(16, 38.86)(17, 71.55)(18, 136.97)(19, 265.94)(20, 503.43)(21, 976.12)(22, 1920.11)(23, 3793.13)(24, 7582.95)(25, 15079.22)(26, 30169.1)(27, 60542.36)
+TOTAL ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 3)(7, 3)(8, 3)(9, 3)(10, 3)(11, 3)(12, 3)(13, 3)(14, 3)(15, 3)(16, 3)(17, 3)(18, 3)(19, 3)(20, 3)(21, 3)(22, 3)(23, 3)(24, 3)(25, 3)(26, 3)(27, 3)
+TOTAL bandwidth
+(1, 1.82)(2, 1.82)(3, 1.82)(4, 1.82)(5, 1.82)(6, 29.88)(7, 35.69)(8, 38.43)(9, 39.83)(10, 40.53)(11, 41.0)(12, 40.82)(13, 40.91)(14, 40.99)(15, 41.08)(16, 41.47)(17, 41.74)(18, 41.9)(19, 42.05)(20, 42.39)(21, 42.85)(22, 43.2)(23, 43.43)(24, 43.66)(25, 44.07)(26, 44.6)(27, 45.02)
+
+
+========== ZP_DATA_COPY ==========
+ZP_DATA_COPY time
+(1, 0.04)(2, 0.04)(3, 0.04)(4, 0.04)(5, 0.04)(6, 0.48)(7, 0.59)(8, 0.62)(9, 0.66)(10, 0.65)(11, 0.68)(12, 0.69)(13, 0.69)(14, 0.69)(15, 0.7)(16, 0.69)(17, 0.7)(18, 0.71)(19, 0.7)(20, 0.68)(21, 0.69)(22, 0.69)(23, 0.68)(24, 0.68)(25, 0.67)(26, 0.66)(27, 0.67)
+ZP_DATA_COPY ct
+(1, 489)(2, 489)(3, 489)(4, 489)(5, 489)(6, 5588)(7, 6474)(8, 6894)(9, 7112)(10, 7228)(11, 7258)(12, 7212)(13, 7212)(14, 7212)(15, 7212)(16, 7212)(17, 7212)(18, 7212)(19, 7212)(20, 7212)(21, 7212)(22, 7212)(23, 7212)(24, 7212)(25, 7212)(26, 7212)(27, 7212)
+ZP_DATA_COPY bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ZP_DATA_COMPARE ==========
+ZP_DATA_COMPARE time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+ZP_DATA_COMPARE ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)
+ZP_DATA_COMPARE bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ZP_DATA_ARITHMATIC ==========
+ZP_DATA_ARITHMATIC time
+(1, 0.03)(2, 0.03)(3, 0.03)(4, 0.03)(5, 0.03)(6, 0.24)(7, 0.32)(8, 0.39)(9, 0.48)(10, 0.64)(11, 0.89)(12, 1.43)(13, 2.21)(14, 3.86)(15, 7.21)(16, 13.58)(17, 26.55)(18, 52.43)(19, 103.04)(20, 199.87)(21, 388.33)(22, 768.39)(23, 1518.76)(24, 3044.63)(25, 6054.73)(26, 12175.61)(27, 24472.54)
+ZP_DATA_ARITHMATIC ct
+(1, 107)(2, 106)(3, 106)(4, 107)(5, 107)(6, 1127)(7, 1499)(8, 1828)(9, 2269)(10, 3053)(11, 4417)(12, 7160)(13, 11223)(14, 19352)(15, 35617)(16, 68207)(17, 133154)(18, 263685)(19, 522835)(20, 1042906)(21, 2084831)(22, 4165678)(23, 8326005)(24, 16648455)(25, 33297561)(26, 66589729)(27, 133183327)
+ZP_DATA_ARITHMATIC bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ZP_DATA_DUMP_LOAD ==========
+ZP_DATA_DUMP_LOAD time
+(1, 0.01)(2, 0.01)(3, 0.01)(4, 0.01)(5, 0.01)(6, 0.12)(7, 0.17)(8, 0.18)(9, 0.2)(10, 0.2)(11, 0.2)(12, 0.2)(13, 0.2)(14, 0.2)(15, 0.2)(16, 0.2)(17, 0.2)(18, 0.2)(19, 0.2)(20, 0.2)(21, 0.2)(22, 0.2)(23, 0.2)(24, 0.2)(25, 0.2)(26, 0.2)(27, 0.2)
+ZP_DATA_DUMP_LOAD ct
+(1, 112)(2, 112)(3, 112)(4, 112)(5, 112)(6, 1221)(7, 1584)(8, 1755)(9, 1842)(10, 1886)(11, 1894)(12, 1868)(13, 1868)(14, 1868)(15, 1868)(16, 1868)(17, 1868)(18, 1868)(19, 1868)(20, 1868)(21, 1868)(22, 1868)(23, 1868)(24, 1868)(25, 1868)(26, 1868)(27, 1868)
+ZP_DATA_DUMP_LOAD bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ZP_DATA_RANDOM ==========
+ZP_DATA_RANDOM time
+(1, 0.01)(2, 0.01)(3, 0.01)(4, 0.01)(5, 0.01)(6, 0.33)(7, 0.4)(8, 0.42)(9, 0.43)(10, 0.44)(11, 0.45)(12, 0.45)(13, 0.45)(14, 0.45)(15, 0.46)(16, 0.45)(17, 0.45)(18, 0.45)(19, 0.45)(20, 0.44)(21, 0.45)(22, 0.45)(23, 0.45)(24, 0.45)(25, 0.43)(26, 0.43)(27, 0.44)
+ZP_DATA_RANDOM ct
+(1, 25)(2, 25)(3, 25)(4, 25)(5, 25)(6, 691)(7, 817)(8, 877)(9, 907)(10, 922)(11, 932)(12, 937)(13, 937)(14, 937)(15, 937)(16, 937)(17, 937)(18, 937)(19, 937)(20, 937)(21, 937)(22, 937)(23, 937)(24, 937)(25, 937)(26, 937)(27, 937)
+ZP_DATA_RANDOM bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ZP_DATA_OTHERS ==========
+ZP_DATA_OTHERS time
+(1, 0.46)(2, 0.51)(3, 0.45)(4, 0.45)(5, 0.46)(6, 3.07)(7, 3.37)(8, 3.5)(9, 3.94)(10, 4.0)(11, 4.37)(12, 5.01)(13, 6.36)(14, 8.73)(15, 14.07)(16, 23.93)(17, 43.65)(18, 83.17)(19, 161.56)(20, 302.24)(21, 586.45)(22, 1150.39)(23, 2273.04)(24, 4536.99)(25, 9023.18)(26, 17992.2)(27, 36068.5)
+ZP_DATA_OTHERS ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)
+ZP_DATA_OTHERS bandwidth
+(1, 1.82)(2, 1.82)(3, 1.82)(4, 1.82)(5, 1.82)(6, 29.88)(7, 35.69)(8, 38.43)(9, 39.83)(10, 40.53)(11, 41.0)(12, 40.82)(13, 40.91)(14, 40.99)(15, 41.08)(16, 41.47)(17, 41.74)(18, 41.9)(19, 42.05)(20, 42.39)(21, 42.85)(22, 43.2)(23, 43.43)(24, 43.66)(25, 44.07)(26, 44.6)(27, 45.02)
+
+

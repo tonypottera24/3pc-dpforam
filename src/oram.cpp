@@ -75,17 +75,19 @@ template <typename K, typename D>
 void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *benchmark) {
     debug_print("[%u]KeyToIndex\n", this->Size());
 #ifdef BENCHMARK_BINARY_DATA
-    if (benchmark != NULL) {
-        Benchmark::BINARY_DATA.Start();
-    }
+    if (benchmark != NULL) Benchmark::BINARY_DATA.Start();
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    if (benchmark != NULL) Benchmark::ZP_DATA.Start();
 #endif
     uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->dpf_key_pir_ctx_, benchmark);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, benchmark);
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
-    if (benchmark != NULL) {
-        Benchmark::BINARY_DATA.Stop();
-    }
+    if (benchmark != NULL) Benchmark::BINARY_DATA.Stop();
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    if (benchmark != NULL) Benchmark::ZP_DATA.Stop();
 #endif
 }
 
@@ -172,9 +174,10 @@ template <typename K, typename D>
 D ORAM<K, D>::Read(const uint index_23[2], bool read_only, Benchmark::Record *benchmark) {
     debug_print("[%u]Read, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
-    if (benchmark != NULL) {
-        Benchmark::BINARY_DATA.Start();
-    }
+    if (benchmark != NULL) Benchmark::BINARY_DATA.Start();
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    if (benchmark != NULL) Benchmark::ZP_DATA.Start();
 #endif
     uint block_index_23[2];
     uint data_index_23[2];
@@ -202,9 +205,10 @@ D ORAM<K, D>::Read(const uint index_23[2], bool read_only, Benchmark::Record *be
     this->last_read_data_13_.Print("this->last_read_data_13_");
 
 #ifdef BENCHMARK_BINARY_DATA
-    if (benchmark != NULL) {
-        Benchmark::BINARY_DATA.Stop();
-    }
+    if (benchmark != NULL) Benchmark::BINARY_DATA.Stop();
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    if (benchmark != NULL) Benchmark::ZP_DATA.Stop();
 #endif
     return this->last_read_data_13_;
 }
@@ -243,9 +247,10 @@ template <typename K, typename D>
 void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, Benchmark::Record *benchmark) {
     debug_print("[%u]Write, index_23 = (%u, %u)\n", this->Size(), index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
-    if (benchmark != NULL) {
-        Benchmark::BINARY_DATA.Start();
-    }
+    if (benchmark != NULL) Benchmark::BINARY_DATA.Start();
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    if (benchmark != NULL) Benchmark::ZP_DATA.Start();
 #endif
 
     uint block_index_23[2];
@@ -272,9 +277,10 @@ void ORAM<K, D>::Write(const uint index_23[2], D &v_new_13, Benchmark::Record *b
         DPFWrite(block_index_23, this->last_read_block_13_, new_block_13, benchmark);
     }
 #ifdef BENCHMARK_BINARY_DATA
-    if (benchmark != NULL) {
-        Benchmark::BINARY_DATA.Stop();
-    }
+    if (benchmark != NULL) Benchmark::BINARY_DATA.Stop();
+#endif
+#ifdef BENCHMARK_ZP_DATA
+    if (benchmark != NULL) Benchmark::ZP_DATA.Stop();
 #endif
 }
 
@@ -571,6 +577,13 @@ void ORAM<K, D>::Test(uint iterations) {
     Benchmark::GROUP_PREPARE_READ.PrintTotal(this->peer_, iterations);
     Benchmark::GROUP_PREPARE_WRITE.PrintTotal(this->peer_, iterations);
     fprintf(stderr, "\n");
+#endif
+
+#ifdef BENCHMARK_SSOT
+    Benchmark::SSOT.PrintTotal(this->peer_, iterations);
+    Benchmark::Record ssot_others = total - Benchmark::SSOT;
+    ssot_others.name = "ssot_others";
+    ssot_others.PrintTotal(this->peer_, iterations);
 #endif
 
 #ifdef BENCHMARK_SOCKET
