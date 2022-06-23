@@ -1,0 +1,532 @@
+========== Benchmark start ==========
+2022-06-22 11:19:53.210422+09:00
+logn 1, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 119, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 370, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 490, ct = 2, bandwidth = 1824
+PIR_GEN_DPF, time = 10, ct = 1, bandwidth = 4
+PIR_EVAL_DPF, time = 0, ct = 2, bandwidth = 0
+PIR_ADD_DATA, time = 5, ct = 2, bandwidth = 0
+PIR_GROUP_PREPARE, time = 70, ct = 1, bandwidth = 324
+pir_others, time = 403, ct = 0, bandwidth = 1496
+2022-06-22 11:19:58.038157+09:00, duration: 0:00:04.827735
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:19:58.038209+09:00
+logn 2, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 118, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 376, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 494, ct = 2, bandwidth = 1824
+PIR_GEN_DPF, time = 10, ct = 1, bandwidth = 4
+PIR_EVAL_DPF, time = 0, ct = 2, bandwidth = 0
+PIR_ADD_DATA, time = 5, ct = 2, bandwidth = 0
+PIR_GROUP_PREPARE, time = 68, ct = 1, bandwidth = 324
+pir_others, time = 409, ct = 0, bandwidth = 1496
+2022-06-22 11:20:01.112961+09:00, duration: 0:00:03.074752
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:01.112994+09:00
+logn 3, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 122, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 371, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 493, ct = 2, bandwidth = 1824
+PIR_GEN_DPF, time = 10, ct = 1, bandwidth = 4
+PIR_EVAL_DPF, time = 0, ct = 2, bandwidth = 0
+PIR_ADD_DATA, time = 5, ct = 2, bandwidth = 0
+PIR_GROUP_PREPARE, time = 72, ct = 1, bandwidth = 324
+pir_others, time = 405, ct = 0, bandwidth = 1496
+2022-06-22 11:20:04.187901+09:00, duration: 0:00:03.074907
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:04.187932+09:00
+logn 4, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 117, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 377, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 495, ct = 2, bandwidth = 1824
+PIR_GEN_DPF, time = 11, ct = 1, bandwidth = 4
+PIR_EVAL_DPF, time = 0, ct = 2, bandwidth = 0
+PIR_ADD_DATA, time = 5, ct = 2, bandwidth = 0
+PIR_GROUP_PREPARE, time = 67, ct = 1, bandwidth = 324
+pir_others, time = 410, ct = 0, bandwidth = 1496
+2022-06-22 11:20:07.261130+09:00, duration: 0:00:03.073198
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:07.261164+09:00
+logn 5, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 136, ct = 1, bandwidth = 1352
+ORAM_WRITE, time = 378, ct = 1, bandwidth = 472
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 514, ct = 2, bandwidth = 1824
+PIR_GEN_DPF, time = 10, ct = 1, bandwidth = 4
+PIR_EVAL_DPF, time = 0, ct = 2, bandwidth = 0
+PIR_ADD_DATA, time = 5, ct = 2, bandwidth = 0
+PIR_GROUP_PREPARE, time = 86, ct = 1, bandwidth = 324
+pir_others, time = 410, ct = 0, bandwidth = 1496
+2022-06-22 11:20:10.336402+09:00, duration: 0:00:03.075238
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:10.336475+09:00
+logn 6, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 851, ct = 1, bandwidth = 12963
+ORAM_WRITE, time = 2420, ct = 1, bandwidth = 16877
+ORAM_POSITION_MAP, time = 65, ct = 1, bandwidth = 42
+TOTAL, time = 3337, ct = 3, bandwidth = 29882
+PIR_GEN_DPF, time = 36, ct = 3, bandwidth = 9
+PIR_EVAL_DPF, time = 0, ct = 6, bandwidth = 0
+PIR_ADD_DATA, time = 18, ct = 6, bandwidth = 0
+PIR_GROUP_PREPARE, time = 600, ct = 2, bandwidth = 10568
+pir_others, time = 2682, ct = 0, bandwidth = 19305
+2022-06-22 11:20:13.773567+09:00, duration: 0:00:03.437092
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:13.773647+09:00
+logn 7, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1214, ct = 1, bandwidth = 18769
+ORAM_WRITE, time = 2462, ct = 1, bandwidth = 16877
+ORAM_POSITION_MAP, time = 66, ct = 1, bandwidth = 42
+TOTAL, time = 3742, ct = 3, bandwidth = 35688
+PIR_GEN_DPF, time = 47, ct = 3, bandwidth = 9
+PIR_EVAL_DPF, time = 1, ct = 7, bandwidth = 0
+PIR_ADD_DATA, time = 34, ct = 7, bandwidth = 0
+PIR_GROUP_PREPARE, time = 842, ct = 2, bandwidth = 15690
+pir_others, time = 2817, ct = 0, bandwidth = 19989
+2022-06-22 11:20:17.291517+09:00, duration: 0:00:03.517870
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:17.291580+09:00
+logn 8, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1437, ct = 1, bandwidth = 21556
+ORAM_WRITE, time = 2477, ct = 1, bandwidth = 16836
+ORAM_POSITION_MAP, time = 74, ct = 1, bandwidth = 42
+TOTAL, time = 3989, ct = 3, bandwidth = 38434
+PIR_GEN_DPF, time = 52, ct = 3, bandwidth = 9
+PIR_EVAL_DPF, time = 1, ct = 7, bandwidth = 0
+PIR_ADD_DATA, time = 68, ct = 7, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1022, ct = 2, bandwidth = 18148
+pir_others, time = 2845, ct = 0, bandwidth = 20276
+2022-06-22 11:20:20.857158+09:00, duration: 0:00:03.565578
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:20.857208+09:00
+logn 9, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1706, ct = 1, bandwidth = 22951
+ORAM_WRITE, time = 2615, ct = 1, bandwidth = 16837
+ORAM_POSITION_MAP, time = 92, ct = 1, bandwidth = 42
+TOTAL, time = 4415, ct = 3, bandwidth = 39830
+PIR_GEN_DPF, time = 62, ct = 3, bandwidth = 11
+PIR_EVAL_DPF, time = 1, ct = 7, bandwidth = 0
+PIR_ADD_DATA, time = 129, ct = 7, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1170, ct = 2, bandwidth = 19377
+pir_others, time = 3051, ct = 0, bandwidth = 20441
+2022-06-22 11:20:24.494089+09:00, duration: 0:00:03.636881
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:24.494203+09:00
+logn 10, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1765, ct = 1, bandwidth = 23650
+ORAM_WRITE, time = 2576, ct = 1, bandwidth = 16839
+ORAM_POSITION_MAP, time = 93, ct = 1, bandwidth = 42
+TOTAL, time = 4435, ct = 3, bandwidth = 40532
+PIR_GEN_DPF, time = 49, ct = 3, bandwidth = 14
+PIR_EVAL_DPF, time = 1, ct = 7, bandwidth = 0
+PIR_ADD_DATA, time = 243, ct = 7, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1158, ct = 2, bandwidth = 19992
+pir_others, time = 2983, ct = 0, bandwidth = 20525
+2022-06-22 11:20:28.137909+09:00, duration: 0:00:03.643706
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:28.137962+09:00
+logn 11, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1995, ct = 1, bandwidth = 24201
+ORAM_WRITE, time = 2747, ct = 1, bandwidth = 16575
+ORAM_POSITION_MAP, time = 196, ct = 1, bandwidth = 226
+TOTAL, time = 4939, ct = 3, bandwidth = 41003
+PIR_GEN_DPF, time = 81, ct = 5, bandwidth = 105
+PIR_EVAL_DPF, time = 2, ct = 11, bandwidth = 0
+PIR_ADD_DATA, time = 442, ct = 11, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1175, ct = 2, bandwidth = 20402
+pir_others, time = 3236, ct = 0, bandwidth = 20495
+2022-06-22 11:20:31.861846+09:00, duration: 0:00:03.723884
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:31.861955+09:00
+logn 12, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2457, ct = 1, bandwidth = 24455
+ORAM_WRITE, time = 3073, ct = 1, bandwidth = 15920
+ORAM_POSITION_MAP, time = 212, ct = 1, bandwidth = 442
+TOTAL, time = 5743, ct = 3, bandwidth = 40818
+PIR_GEN_DPF, time = 85, ct = 6, bandwidth = 127
+PIR_EVAL_DPF, time = 2, ct = 12, bandwidth = 0
+PIR_ADD_DATA, time = 827, ct = 12, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1209, ct = 2, bandwidth = 20607
+pir_others, time = 3618, ct = 0, bandwidth = 20083
+2022-06-22 11:20:35.724767+09:00, duration: 0:00:03.862812
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:35.724824+09:00
+logn 13, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 3141, ct = 1, bandwidth = 24491
+ORAM_WRITE, time = 3832, ct = 1, bandwidth = 15956
+ORAM_POSITION_MAP, time = 225, ct = 1, bandwidth = 460
+TOTAL, time = 7199, ct = 3, bandwidth = 40908
+PIR_GEN_DPF, time = 97, ct = 6, bandwidth = 164
+PIR_EVAL_DPF, time = 3, ct = 13, bandwidth = 0
+PIR_ADD_DATA, time = 1415, ct = 13, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1281, ct = 2, bandwidth = 20607
+pir_others, time = 4401, ct = 0, bandwidth = 20137
+2022-06-22 11:20:39.797567+09:00, duration: 0:00:04.072743
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:39.797619+09:00
+logn 14, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 4329, ct = 1, bandwidth = 24527
+ORAM_WRITE, time = 5206, ct = 1, bandwidth = 15992
+ORAM_POSITION_MAP, time = 232, ct = 1, bandwidth = 473
+TOTAL, time = 9768, ct = 3, bandwidth = 40993
+PIR_GEN_DPF, time = 96, ct = 6, bandwidth = 201
+PIR_EVAL_DPF, time = 3, ct = 13, bandwidth = 0
+PIR_ADD_DATA, time = 2531, ct = 13, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1398, ct = 2, bandwidth = 20607
+pir_others, time = 5737, ct = 0, bandwidth = 20184
+2022-06-22 11:20:44.257425+09:00, duration: 0:00:04.459806
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:44.257471+09:00
+logn 15, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 7057, ct = 1, bandwidth = 24563
+ORAM_WRITE, time = 8152, ct = 1, bandwidth = 16028
+ORAM_POSITION_MAP, time = 246, ct = 1, bandwidth = 484
+TOTAL, time = 15456, ct = 3, bandwidth = 41075
+PIR_GEN_DPF, time = 109, ct = 6, bandwidth = 240
+PIR_EVAL_DPF, time = 5, ct = 13, bandwidth = 0
+PIR_ADD_DATA, time = 4923, ct = 13, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1719, ct = 2, bandwidth = 20607
+pir_others, time = 8698, ct = 0, bandwidth = 20227
+2022-06-22 11:20:49.566189+09:00, duration: 0:00:05.308718
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:49.566233+09:00
+logn 16, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 12150, ct = 1, bandwidth = 24599
+ORAM_WRITE, time = 13922, ct = 1, bandwidth = 16064
+ORAM_POSITION_MAP, time = 398, ct = 1, bandwidth = 801
+TOTAL, time = 26472, ct = 3, bandwidth = 41465
+PIR_GEN_DPF, time = 136, ct = 8, bandwidth = 368
+PIR_EVAL_DPF, time = 8, ct = 17, bandwidth = 0
+PIR_ADD_DATA, time = 9597, ct = 17, bandwidth = 0
+PIR_GROUP_PREPARE, time = 2114, ct = 2, bandwidth = 20607
+pir_others, time = 14614, ct = 0, bandwidth = 20489
+2022-06-22 11:20:56.522776+09:00, duration: 0:00:06.956543
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:20:56.522846+09:00
+logn 17, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 22528, ct = 1, bandwidth = 24635
+ORAM_WRITE, time = 25337, ct = 1, bandwidth = 16100
+ORAM_POSITION_MAP, time = 419, ct = 1, bandwidth = 1000
+TOTAL, time = 48285, ct = 3, bandwidth = 41736
+PIR_GEN_DPF, time = 147, ct = 9, bandwidth = 426
+PIR_EVAL_DPF, time = 14, ct = 18, bandwidth = 0
+PIR_ADD_DATA, time = 19008, ct = 18, bandwidth = 0
+PIR_GROUP_PREPARE, time = 3069, ct = 2, bandwidth = 20607
+pir_others, time = 26044, ct = 0, bandwidth = 20702
+2022-06-22 11:21:06.719937+09:00, duration: 0:00:10.197091
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:21:06.719994+09:00
+logn 18, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 42942, ct = 1, bandwidth = 24671
+ORAM_WRITE, time = 48882, ct = 1, bandwidth = 16136
+ORAM_POSITION_MAP, time = 446, ct = 1, bandwidth = 1091
+TOTAL, time = 92271, ct = 3, bandwidth = 41898
+PIR_GEN_DPF, time = 149, ct = 9, bandwidth = 498
+PIR_EVAL_DPF, time = 24, ct = 19, bandwidth = 0
+PIR_ADD_DATA, time = 37599, ct = 19, bandwidth = 0
+PIR_GROUP_PREPARE, time = 4900, ct = 2, bandwidth = 20607
+pir_others, time = 49596, ct = 0, bandwidth = 20792
+2022-06-22 11:21:23.403313+09:00, duration: 0:00:16.683319
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:21:23.403349+09:00
+logn 19, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 83348, ct = 1, bandwidth = 24707
+ORAM_WRITE, time = 93523, ct = 1, bandwidth = 16172
+ORAM_POSITION_MAP, time = 507, ct = 1, bandwidth = 1175
+TOTAL, time = 177379, ct = 3, bandwidth = 42055
+PIR_GEN_DPF, time = 171, ct = 9, bandwidth = 572
+PIR_EVAL_DPF, time = 45, ct = 19, bandwidth = 0
+PIR_ADD_DATA, time = 74618, ct = 19, bandwidth = 0
+PIR_GROUP_PREPARE, time = 8290, ct = 2, bandwidth = 20607
+pir_others, time = 94254, ct = 0, bandwidth = 20876
+2022-06-22 11:21:52.729660+09:00, duration: 0:00:29.326311
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:21:52.729705+09:00
+logn 20, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 165796, ct = 1, bandwidth = 24743
+ORAM_WRITE, time = 182810, ct = 1, bandwidth = 16208
+ORAM_POSITION_MAP, time = 559, ct = 1, bandwidth = 1440
+TOTAL, time = 349166, ct = 3, bandwidth = 42392
+PIR_GEN_DPF, time = 182, ct = 9, bandwidth = 647
+PIR_EVAL_DPF, time = 80, ct = 19, bandwidth = 0
+PIR_ADD_DATA, time = 149505, ct = 19, bandwidth = 0
+PIR_GROUP_PREPARE, time = 15803, ct = 2, bandwidth = 20607
+pir_others, time = 183594, ct = 0, bandwidth = 21137
+2022-06-22 11:22:47.709259+09:00, duration: 0:00:54.979554
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:22:47.709338+09:00
+logn 21, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 321809, ct = 1, bandwidth = 24779
+ORAM_WRITE, time = 347430, ct = 1, bandwidth = 16244
+ORAM_POSITION_MAP, time = 793, ct = 1, bandwidth = 1830
+TOTAL, time = 670032, ct = 3, bandwidth = 42853
+PIR_GEN_DPF, time = 212, ct = 11, bandwidth = 810
+PIR_EVAL_DPF, time = 152, ct = 23, bandwidth = 0
+PIR_ADD_DATA, time = 294248, ct = 23, bandwidth = 0
+PIR_GROUP_PREPARE, time = 27055, ct = 2, bandwidth = 20607
+pir_others, time = 348363, ct = 0, bandwidth = 21435
+2022-06-22 11:24:30.791688+09:00, duration: 0:01:43.082350
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:24:30.791741+09:00
+logn 22, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 625483, ct = 1, bandwidth = 24815
+ORAM_WRITE, time = 680566, ct = 1, bandwidth = 16280
+ORAM_POSITION_MAP, time = 954, ct = 1, bandwidth = 2101
+TOTAL, time = 1307004, ct = 3, bandwidth = 43196
+PIR_GEN_DPF, time = 231, ct = 12, bandwidth = 904
+PIR_EVAL_DPF, time = 298, ct = 24, bandwidth = 0
+PIR_ADD_DATA, time = 576580, ct = 24, bandwidth = 0
+PIR_GROUP_PREPARE, time = 48298, ct = 2, bandwidth = 20607
+pir_others, time = 681595, ct = 0, bandwidth = 21684
+2022-06-22 11:27:48.740991+09:00, duration: 0:03:17.949250
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:27:48.741027+09:00
+logn 23, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 1236040, ct = 1, bandwidth = 24851
+ORAM_WRITE, time = 1345296, ct = 1, bandwidth = 16316
+ORAM_POSITION_MAP, time = 1216, ct = 1, bandwidth = 2263
+TOTAL, time = 2582553, ct = 3, bandwidth = 43431
+PIR_GEN_DPF, time = 241, ct = 12, bandwidth = 1013
+PIR_EVAL_DPF, time = 574, ct = 25, bandwidth = 0
+PIR_ADD_DATA, time = 1142919, ct = 25, bandwidth = 0
+PIR_GROUP_PREPARE, time = 92338, ct = 2, bandwidth = 20607
+pir_others, time = 1346478, ct = 0, bandwidth = 21810
+2022-06-22 11:34:16.415603+09:00, duration: 0:06:27.674576
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:34:16.415676+09:00
+logn 24, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 2497318, ct = 1, bandwidth = 24887
+ORAM_WRITE, time = 2674454, ct = 1, bandwidth = 16352
+ORAM_POSITION_MAP, time = 1733, ct = 1, bandwidth = 2420
+TOTAL, time = 5173505, ct = 3, bandwidth = 43660
+PIR_GEN_DPF, time = 281, ct = 12, bandwidth = 1122
+PIR_EVAL_DPF, time = 1144, ct = 25, bandwidth = 0
+PIR_ADD_DATA, time = 2305885, ct = 25, bandwidth = 0
+PIR_GROUP_PREPARE, time = 190288, ct = 2, bandwidth = 20607
+pir_others, time = 2675905, ct = 0, bandwidth = 21930
+2022-06-22 11:47:12.115536+09:00, duration: 0:12:55.699860
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 11:47:12.115580+09:00
+logn 25, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 4913101, ct = 1, bandwidth = 24923
+ORAM_WRITE, time = 5326277, ct = 1, bandwidth = 16388
+ORAM_POSITION_MAP, time = 2982, ct = 1, bandwidth = 2757
+TOTAL, time = 10242361, ct = 3, bandwidth = 44068
+PIR_GEN_DPF, time = 793, ct = 12, bandwidth = 1233
+PIR_EVAL_DPF, time = 2225, ct = 25, bandwidth = 0
+PIR_ADD_DATA, time = 4553373, ct = 25, bandwidth = 0
+PIR_GROUP_PREPARE, time = 357556, ct = 2, bandwidth = 20607
+pir_others, time = 5328411, ct = 0, bandwidth = 22228
+2022-06-22 12:12:42.418850+09:00, duration: 0:25:30.303270
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 12:12:42.418946+09:00
+logn 26, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 9820959, ct = 1, bandwidth = 24959
+ORAM_WRITE, time = 10747520, ct = 1, bandwidth = 16424
+ORAM_POSITION_MAP, time = 5804, ct = 1, bandwidth = 3218
+TOTAL, time = 20574284, ct = 3, bandwidth = 44602
+PIR_GEN_DPF, time = 1252, ct = 14, bandwidth = 1433
+PIR_EVAL_DPF, time = 4468, ct = 29, bandwidth = 0
+PIR_ADD_DATA, time = 9094468, ct = 29, bandwidth = 0
+PIR_GROUP_PREPARE, time = 722783, ct = 2, bandwidth = 20607
+pir_others, time = 10751310, ct = 0, bandwidth = 22561
+2022-06-22 13:03:52.179555+09:00, duration: 0:51:09.760609
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 13:03:52.179594+09:00
+logn 27, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 0, ct = 0, bandwidth = 0
+ORAM_READ, time = 19659359, ct = 1, bandwidth = 24995
+ORAM_WRITE, time = 21320450, ct = 1, bandwidth = 16460
+ORAM_POSITION_MAP, time = 10402, ct = 1, bandwidth = 3561
+TOTAL, time = 40990212, ct = 3, bandwidth = 45017
+PIR_GEN_DPF, time = 1663, ct = 15, bandwidth = 1563
+PIR_EVAL_DPF, time = 8905, ct = 30, bandwidth = 0
+PIR_ADD_DATA, time = 18219051, ct = 30, bandwidth = 0
+PIR_GROUP_PREPARE, time = 1433697, ct = 2, bandwidth = 20607
+pir_others, time = 21326893, ct = 0, bandwidth = 22846
+2022-06-22 14:45:52.530825+09:00, duration: 1:42:00.351231
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-22 14:45:52.530863+09:00
+logn 28, data_size 4, tau 5, pdpf 5
+Error
+Pseudo DPF threshold 32
+Connecting to 127.0.0.1:9001...
+InitClient: connect failed, wait for 3 sec...
+Connecting to 127.0.0.1:9000 done.
+Test, iterations = 100 
+
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+KEY_TO_INDEX ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)
+KEY_TO_INDEX bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.12)(2, 0.12)(3, 0.12)(4, 0.12)(5, 0.14)(6, 0.85)(7, 1.21)(8, 1.44)(9, 1.71)(10, 1.76)(11, 2.0)(12, 2.46)(13, 3.14)(14, 4.33)(15, 7.06)(16, 12.15)(17, 22.53)(18, 42.94)(19, 83.35)(20, 165.8)(21, 321.81)(22, 625.48)(23, 1236.04)(24, 2497.32)(25, 4913.1)(26, 9820.96)(27, 19659.36)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)
+ORAM_READ bandwidth
+(1, 1.35)(2, 1.35)(3, 1.35)(4, 1.35)(5, 1.35)(6, 12.96)(7, 18.77)(8, 21.56)(9, 22.95)(10, 23.65)(11, 24.2)(12, 24.45)(13, 24.49)(14, 24.53)(15, 24.56)(16, 24.6)(17, 24.64)(18, 24.67)(19, 24.71)(20, 24.74)(21, 24.78)(22, 24.82)(23, 24.85)(24, 24.89)(25, 24.92)(26, 24.96)(27, 25.0)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.37)(2, 0.38)(3, 0.37)(4, 0.38)(5, 0.38)(6, 2.42)(7, 2.46)(8, 2.48)(9, 2.62)(10, 2.58)(11, 2.75)(12, 3.07)(13, 3.83)(14, 5.21)(15, 8.15)(16, 13.92)(17, 25.34)(18, 48.88)(19, 93.52)(20, 182.81)(21, 347.43)(22, 680.57)(23, 1345.3)(24, 2674.45)(25, 5326.28)(26, 10747.52)(27, 21320.45)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)
+ORAM_WRITE bandwidth
+(1, 0.47)(2, 0.47)(3, 0.47)(4, 0.47)(5, 0.47)(6, 16.88)(7, 16.88)(8, 16.84)(9, 16.84)(10, 16.84)(11, 16.57)(12, 15.92)(13, 15.96)(14, 15.99)(15, 16.03)(16, 16.06)(17, 16.1)(18, 16.14)(19, 16.17)(20, 16.21)(21, 16.24)(22, 16.28)(23, 16.32)(24, 16.35)(25, 16.39)(26, 16.42)(27, 16.46)
+
+
+========== ORAM_POSITION_MAP ==========
+ORAM_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.07)(7, 0.07)(8, 0.07)(9, 0.09)(10, 0.09)(11, 0.2)(12, 0.21)(13, 0.23)(14, 0.23)(15, 0.25)(16, 0.4)(17, 0.42)(18, 0.45)(19, 0.51)(20, 0.56)(21, 0.79)(22, 0.95)(23, 1.22)(24, 1.73)(25, 2.98)(26, 5.8)(27, 10.4)
+ORAM_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)(18, 1)(19, 1)(20, 1)(21, 1)(22, 1)(23, 1)(24, 1)(25, 1)(26, 1)(27, 1)
+ORAM_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.04)(7, 0.04)(8, 0.04)(9, 0.04)(10, 0.04)(11, 0.23)(12, 0.44)(13, 0.46)(14, 0.47)(15, 0.48)(16, 0.8)(17, 1.0)(18, 1.09)(19, 1.18)(20, 1.44)(21, 1.83)(22, 2.1)(23, 2.26)(24, 2.42)(25, 2.76)(26, 3.22)(27, 3.56)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.49)(2, 0.49)(3, 0.49)(4, 0.49)(5, 0.51)(6, 3.34)(7, 3.74)(8, 3.99)(9, 4.42)(10, 4.43)(11, 4.94)(12, 5.74)(13, 7.2)(14, 9.77)(15, 15.46)(16, 26.47)(17, 48.28)(18, 92.27)(19, 177.38)(20, 349.17)(21, 670.03)(22, 1307.0)(23, 2582.55)(24, 5173.51)(25, 10242.36)(26, 20574.28)(27, 40990.21)
+TOTAL ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 3)(7, 3)(8, 3)(9, 3)(10, 3)(11, 3)(12, 3)(13, 3)(14, 3)(15, 3)(16, 3)(17, 3)(18, 3)(19, 3)(20, 3)(21, 3)(22, 3)(23, 3)(24, 3)(25, 3)(26, 3)(27, 3)
+TOTAL bandwidth
+(1, 1.82)(2, 1.82)(3, 1.82)(4, 1.82)(5, 1.82)(6, 29.88)(7, 35.69)(8, 38.43)(9, 39.83)(10, 40.53)(11, 41.0)(12, 40.82)(13, 40.91)(14, 40.99)(15, 41.08)(16, 41.47)(17, 41.74)(18, 41.9)(19, 42.05)(20, 42.39)(21, 42.85)(22, 43.2)(23, 43.43)(24, 43.66)(25, 44.07)(26, 44.6)(27, 45.02)
+
+
+========== PIR_GEN_DPF ==========
+PIR_GEN_DPF time
+(1, 0.01)(2, 0.01)(3, 0.01)(4, 0.01)(5, 0.01)(6, 0.04)(7, 0.05)(8, 0.05)(9, 0.06)(10, 0.05)(11, 0.08)(12, 0.09)(13, 0.1)(14, 0.1)(15, 0.11)(16, 0.14)(17, 0.15)(18, 0.15)(19, 0.17)(20, 0.18)(21, 0.21)(22, 0.23)(23, 0.24)(24, 0.28)(25, 0.79)(26, 1.25)(27, 1.66)
+PIR_GEN_DPF ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 3)(7, 3)(8, 3)(9, 3)(10, 3)(11, 5)(12, 6)(13, 6)(14, 6)(15, 6)(16, 8)(17, 9)(18, 9)(19, 9)(20, 9)(21, 11)(22, 12)(23, 12)(24, 12)(25, 12)(26, 14)(27, 15)
+PIR_GEN_DPF bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.01)(7, 0.01)(8, 0.01)(9, 0.01)(10, 0.01)(11, 0.1)(12, 0.13)(13, 0.16)(14, 0.2)(15, 0.24)(16, 0.37)(17, 0.43)(18, 0.5)(19, 0.57)(20, 0.65)(21, 0.81)(22, 0.9)(23, 1.01)(24, 1.12)(25, 1.23)(26, 1.43)(27, 1.56)
+
+
+========== PIR_EVAL_DPF ==========
+PIR_EVAL_DPF time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.01)(16, 0.01)(17, 0.01)(18, 0.02)(19, 0.04)(20, 0.08)(21, 0.15)(22, 0.3)(23, 0.57)(24, 1.14)(25, 2.23)(26, 4.47)(27, 8.9)
+PIR_EVAL_DPF ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 6)(7, 7)(8, 7)(9, 7)(10, 7)(11, 11)(12, 12)(13, 13)(14, 13)(15, 13)(16, 17)(17, 18)(18, 19)(19, 19)(20, 19)(21, 23)(22, 24)(23, 25)(24, 25)(25, 25)(26, 29)(27, 30)
+PIR_EVAL_DPF bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== PIR_ADD_DATA ==========
+PIR_ADD_DATA time
+(1, 0.01)(2, 0.01)(3, 0.01)(4, 0.01)(5, 0.01)(6, 0.02)(7, 0.03)(8, 0.07)(9, 0.13)(10, 0.24)(11, 0.44)(12, 0.83)(13, 1.42)(14, 2.53)(15, 4.92)(16, 9.6)(17, 19.01)(18, 37.6)(19, 74.62)(20, 149.5)(21, 294.25)(22, 576.58)(23, 1142.92)(24, 2305.89)(25, 4553.37)(26, 9094.47)(27, 18219.05)
+PIR_ADD_DATA ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 6)(7, 7)(8, 7)(9, 7)(10, 7)(11, 11)(12, 12)(13, 13)(14, 13)(15, 13)(16, 17)(17, 18)(18, 19)(19, 19)(20, 19)(21, 23)(22, 24)(23, 25)(24, 25)(25, 25)(26, 29)(27, 30)
+PIR_ADD_DATA bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)(18, 0.0)(19, 0.0)(20, 0.0)(21, 0.0)(22, 0.0)(23, 0.0)(24, 0.0)(25, 0.0)(26, 0.0)(27, 0.0)
+
+
+========== PIR_GROUP_PREPARE ==========
+PIR_GROUP_PREPARE time
+(1, 0.07)(2, 0.07)(3, 0.07)(4, 0.07)(5, 0.09)(6, 0.6)(7, 0.84)(8, 1.02)(9, 1.17)(10, 1.16)(11, 1.18)(12, 1.21)(13, 1.28)(14, 1.4)(15, 1.72)(16, 2.11)(17, 3.07)(18, 4.9)(19, 8.29)(20, 15.8)(21, 27.05)(22, 48.3)(23, 92.34)(24, 190.29)(25, 357.56)(26, 722.78)(27, 1433.7)
+PIR_GROUP_PREPARE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 2)(7, 2)(8, 2)(9, 2)(10, 2)(11, 2)(12, 2)(13, 2)(14, 2)(15, 2)(16, 2)(17, 2)(18, 2)(19, 2)(20, 2)(21, 2)(22, 2)(23, 2)(24, 2)(25, 2)(26, 2)(27, 2)
+PIR_GROUP_PREPARE bandwidth
+(1, 0.32)(2, 0.32)(3, 0.32)(4, 0.32)(5, 0.32)(6, 10.57)(7, 15.69)(8, 18.15)(9, 19.38)(10, 19.99)(11, 20.4)(12, 20.61)(13, 20.61)(14, 20.61)(15, 20.61)(16, 20.61)(17, 20.61)(18, 20.61)(19, 20.61)(20, 20.61)(21, 20.61)(22, 20.61)(23, 20.61)(24, 20.61)(25, 20.61)(26, 20.61)(27, 20.61)
+
+
+========== pir_others ==========
+pir_others time
+(1, 0.4)(2, 0.41)(3, 0.41)(4, 0.41)(5, 0.41)(6, 2.68)(7, 2.82)(8, 2.85)(9, 3.05)(10, 2.98)(11, 3.24)(12, 3.62)(13, 4.4)(14, 5.74)(15, 8.7)(16, 14.61)(17, 26.04)(18, 49.6)(19, 94.25)(20, 183.59)(21, 348.36)(22, 681.6)(23, 1346.48)(24, 2675.91)(25, 5328.41)(26, 10751.31)(27, 21326.89)
+pir_others ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)(18, 0)(19, 0)(20, 0)(21, 0)(22, 0)(23, 0)(24, 0)(25, 0)(26, 0)(27, 0)
+pir_others bandwidth
+(1, 1.5)(2, 1.5)(3, 1.5)(4, 1.5)(5, 1.5)(6, 19.3)(7, 19.99)(8, 20.28)(9, 20.44)(10, 20.52)(11, 20.5)(12, 20.08)(13, 20.14)(14, 20.18)(15, 20.23)(16, 20.49)(17, 20.7)(18, 20.79)(19, 20.88)(20, 21.14)(21, 21.43)(22, 21.68)(23, 21.81)(24, 21.93)(25, 22.23)(26, 22.56)(27, 22.85)
+
+

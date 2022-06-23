@@ -84,9 +84,16 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     debug_print("[%lu]DPF_PIW, index_23 = (%u, %u), n = %lu, log_n = %u, new n = %u\n", array_13.size(), index_23[0], index_23[1], array_13.size(), log_n, n);
     v_delta_13.Print("v_delta_13");
 
+#ifdef BENCHMARK_PIW
+    uint old_bandwidth;
+    if (benchmark != NULL) {
+        Benchmark::PIW_GEN_DPF.Start();
+        old_bandwidth = benchmark->bandwidth_;
+    }
+#endif
+
     BinaryData query_23[2];
     bool is_0 = false;
-
     if (pseudo) {
         uint data_length = divide_ceil(n, 8);
         is_0 = fss.PseudoGen(peer, index_23[0] ^ index_23[1], data_length, D::IsSymmetric(), query_23, benchmark);
@@ -95,33 +102,54 @@ void DPF_PIW(uint party, Peer peer[2], FSS1Bit &fss, std::vector<D> &array_13, c
     }
     debug_print("is_0 = %u\n", is_0);
 
-#ifdef BENCHMARK_GROUP_PREPARE
-    std::vector<D> v_delta_33;
-    if (benchmark != NULL && !D::IsSymmetric()) {
-        Benchmark::GROUP_PREPARE_WRITE.Start();
-        v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, &Benchmark::GROUP_PREPARE_WRITE);
-        uint64_t bandwidth = Benchmark::GROUP_PREPARE_WRITE.Stop();
-        benchmark.bandwidth_ += bandwidth;
-    } else {
-        v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, benchmark);
+#ifdef BENCHMARK_PIW
+    if (benchmark != NULL) {
+        Benchmark::PIW_GEN_DPF.Stop(benchmark->bandwidth_ - old_bandwidth);
+
+        old_bandwidth = benchmark->bandwidth_;
+        Benchmark::PIW_GROUP_PREPARE.Start();
     }
-#else
+#endif
     std::vector<D> v_delta_33 = FindDeltaData(party, peer, is_0, v_delta_13, benchmark);
+#ifdef BENCHMARK_PIW
+    if (benchmark != NULL) {
+        Benchmark::PIW_GROUP_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
+    }
 #endif
 
     std::vector<uchar> dpf_out(n);
     for (uint b = 0; b < 2; b++) {
+#ifdef BENCHMARK_PIW
+        uint old_bandwidth;
+        if (benchmark != NULL) {
+            Benchmark::PIW_EVAL_DPF.Start();
+            old_bandwidth = benchmark->bandwidth_;
+        }
+#endif
         if (pseudo) {
             fss.PseudoEvalAll(query_23[b], n, dpf_out, benchmark);
         } else {
             fss.EvalAll(query_23[b], log_n, dpf_out, benchmark);
         }
+#ifdef BENCHMARK_PIW
+        if (benchmark != NULL) {
+            Benchmark::PIW_EVAL_DPF.Stop(benchmark->bandwidth_ - old_bandwidth);
+
+            old_bandwidth = benchmark->bandwidth_;
+            Benchmark::PIW_ADD_DATA.Start();
+        }
+#endif
         for (uint i = 0; i < array_13.size(); i++) {
             debug_print("[%lu]DPF_PIW, i = %u, ii = %u, dpf_out = %u\n", array_13.size(), i, i ^ index_23[b], dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
                 array_13[i] += v_delta_33[b];
             }
         }
+#ifdef BENCHMARK_PIW
+        if (benchmark != NULL) {
+            Benchmark::PIW_ADD_DATA.Stop(benchmark->bandwidth_ - old_bandwidth);
+        }
+#endif
     }
 }
 

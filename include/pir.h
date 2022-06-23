@@ -18,6 +18,14 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     // only accept power of 2 n
     // fprintf(stderr, "[%u]DPF_PIR, index_23 = (%u, %u), log_n = %u\n", n, index_23[0], index_23[1], log_n);
 
+#ifdef BENCHMARK_PIR
+    uint old_bandwidth;
+    if (benchmark != NULL) {
+        Benchmark::PIR_GEN_DPF.Start();
+        old_bandwidth = benchmark->bandwidth_;
+    }
+#endif
+
     BinaryData query_23[2];
     bool is_0 = false;
     if (pseudo) {
@@ -27,42 +35,67 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
         is_0 = fss.Gen(peer, index_23[0] ^ index_23[1], log_n, D::IsSymmetric(), false, query_23, benchmark);
     }
 
+#ifdef BENCHMARK_PIR
+    if (benchmark != NULL) {
+        Benchmark::PIR_GEN_DPF.Stop(benchmark->bandwidth_ - old_bandwidth);
+    }
+#endif
+
     uint data_size = array_23[0][0].Size();
     D v_sum[2] = {D(data_size), D(data_size)};
     std::vector<uchar> dpf_out(n);
 
     for (uint b = 0; b < 2; b++) {
+#ifdef BENCHMARK_PIR
+        uint old_bandwidth;
+        if (benchmark != NULL) {
+            Benchmark::PIR_EVAL_DPF.Start();
+            old_bandwidth = benchmark->bandwidth_;
+        }
+#endif
         if (pseudo) {
             fss.PseudoEvalAll(query_23[b], n, dpf_out, benchmark);
         } else {
             fss.EvalAll(query_23[b], log_n, dpf_out, benchmark);
         }
+#ifdef BENCHMARK_PIR
+        if (benchmark != NULL) {
+            Benchmark::PIR_EVAL_DPF.Stop(benchmark->bandwidth_ - old_bandwidth);
+
+            old_bandwidth = benchmark->bandwidth_;
+            Benchmark::PIR_ADD_DATA.Start();
+        }
+#endif
         for (uint i = 0; i < array_23[0].size(); i++) {
             // debug_print("[%u]DPF_PIR, i = %u, ii = %u, dpf_out = %u\n", n, i, i ^ index_23[b], (uint)dpf_out[i ^ index_23[b]]);
             if (dpf_out[i ^ index_23[b]]) {
                 v_sum[b] += array_23[b][i];
             }
         }
+#ifdef BENCHMARK_PIR
+        if (benchmark != NULL) {
+            Benchmark::PIR_ADD_DATA.Stop(benchmark->bandwidth_ - old_bandwidth);
+        }
+#endif
     }
 
     if (D::IsSymmetric()) {
         return v_sum[0] + v_sum[1];
     } else {
-#ifdef BENCHMARK_GROUP_PREPARE
+#ifdef BENCHMARK_PIR
+        uint old_bandwidth;
         if (benchmark != NULL) {
-            // Benchmark::GROUP_PREPARE_READ.Print();
-            Benchmark::GROUP_PREPARE_READ.Start();
-            D ans = inv_gadget::Inv(peer, is_0, v_sum, &Benchmark::GROUP_PREPARE_READ);
-            uint64_t bandwidth = Benchmark::GROUP_PREPARE_READ.Stop();
-            // Benchmark::GROUP_PREPARE_READ.Print();
-            benchmark.bandwidth_ += bandwidth;
-            return ans;
-        } else {
-            return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
+            Benchmark::PIR_GROUP_PREPARE.Start();
+            old_bandwidth = benchmark->bandwidth_;
         }
-#else
-        return inv_gadget::Inv(peer, is_0, v_sum, benchmark);
 #endif
+        D ans = inv_gadget::Inv(peer, is_0, v_sum, benchmark);
+#ifdef BENCHMARK_PIR
+        if (benchmark != NULL) {
+            Benchmark::PIR_GROUP_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
+        }
+#endif
+        return ans;
     }
 }
 
@@ -155,8 +188,10 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         v_sum = rand_uint(peer[P0].PRG()) % n;
     } else {  // party == 0 || party == 1
 #ifdef BENCHMARK_KEY_VALUE
+        uint old_bandwidth;
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_PREPARE.Start();
+            old_bandwidth = benchmark->bandwidth_;
         }
 #endif
         std::unordered_map<uint64_t, uint> exists;
@@ -182,13 +217,14 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_PREPARE.Stop();
+            Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
         }
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_DPF.Start();
+            old_bandwidth = benchmark->bandwidth_;
         }
 #endif
         // eval_all[1] = collision_ct > n / 10;
@@ -207,13 +243,14 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_DPF.Stop();
+            Benchmark::KEY_VALUE_DPF.Stop(benchmark->bandwidth_ - old_bandwidth);
         }
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_EVALUATE.Start();
+            old_bandwidth = benchmark->bandwidth_;
         }
 #endif
         for (uint i = 0; i < n; i++) {
@@ -234,7 +271,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_EVALUATE.Stop();
+            Benchmark::KEY_VALUE_EVALUATE.Stop(benchmark->bandwidth_ - old_bandwidth);
         }
 #endif
 

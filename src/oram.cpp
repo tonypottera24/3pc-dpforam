@@ -529,6 +529,26 @@ void ORAM<K, D>::Test(uint iterations) {
     total.PrintTotal(this->peer_, iterations);
     fprintf(stderr, "\n");
 
+#ifdef BENCHMARK_PIR
+    Benchmark::PIR_GEN_DPF.PrintTotal(this->peer_, iterations);
+    Benchmark::PIR_EVAL_DPF.PrintTotal(this->peer_, iterations);
+    Benchmark::PIR_ADD_DATA.PrintTotal(this->peer_, iterations);
+    Benchmark::PIR_GROUP_PREPARE.PrintTotal(this->peer_, iterations);
+    Benchmark::Record pir_others = total - Benchmark::PIR_GEN_DPF - Benchmark::PIR_EVAL_DPF - Benchmark::PIR_ADD_DATA - Benchmark::PIR_GROUP_PREPARE;
+    pir_others.name = "pir_others";
+    pir_others.PrintTotal(this->peer_, iterations);
+#endif
+
+#ifdef BENCHMARK_PIW
+    Benchmark::PIW_GEN_DPF.PrintTotal(this->peer_, iterations);
+    Benchmark::PIW_EVAL_DPF.PrintTotal(this->peer_, iterations);
+    Benchmark::PIW_ADD_DATA.PrintTotal(this->peer_, iterations);
+    Benchmark::PIW_GROUP_PREPARE.PrintTotal(this->peer_, iterations);
+    Benchmark::Record piw_others = total - Benchmark::PIW_GEN_DPF - Benchmark::PIW_EVAL_DPF - Benchmark::PIW_ADD_DATA - Benchmark::PIW_GROUP_PREPARE;
+    piw_others.name = "piw_others";
+    piw_others.PrintTotal(this->peer_, iterations);
+#endif
+
 #ifdef BENCHMARK_DPF
     Benchmark::DPF_GEN.PrintTotal(this->peer_, iterations);
     Benchmark::DPF_EVAL.PrintTotal(this->peer_, iterations);
@@ -563,20 +583,15 @@ void ORAM<K, D>::Test(uint iterations) {
     Benchmark::KEY_VALUE_PREPARE.PrintTotal(this->peer_, iterations);
     Benchmark::KEY_VALUE_DPF.PrintTotal(this->peer_, iterations);
     Benchmark::KEY_VALUE_EVALUATE.PrintTotal(this->peer_, iterations);
-    fprintf(stderr, "\n");
+    Benchmark::Record key_value_others = Benchmark::KEY_TO_INDEX - Benchmark::KEY_VALUE_PREPARE - Benchmark::KEY_VALUE_DPF - Benchmark::KEY_VALUE_EVALUATE;
+    key_value_others.name = "key_value_others";
+    key_value_others.PrintTotal(this->peer_, iterations);
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE_HASH
     for (uint b = 0; b < 2; b++) {
         Benchmark::KEY_VALUE_HASH[b].PrintTotal(this->peer_, iterations);
     }
-    fprintf(stderr, "\n");
-#endif
-
-#ifdef BENCHMARK_GROUP_PREPARE
-    Benchmark::GROUP_PREPARE_READ.PrintTotal(this->peer_, iterations);
-    Benchmark::GROUP_PREPARE_WRITE.PrintTotal(this->peer_, iterations);
-    fprintf(stderr, "\n");
 #endif
 
 #ifdef BENCHMARK_SSOT

@@ -112,8 +112,8 @@ LOG_N = range(1, 100)
 # LOG_N = 20
 # TAU = range(1, 20)
 
-# DATA_SIZE = [4]
-DATA_SIZE = [32]  # 256 bit
+DATA_SIZE = [4]
+# DATA_SIZE = [32]  # 256 bit
 # DATA_SIZE = range(4, 129, 4)
 
 TAU = [5]

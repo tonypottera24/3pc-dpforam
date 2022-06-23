@@ -15,9 +15,17 @@ Benchmark::Record Benchmark::KEY_VALUE_EVALUATE("KEY_VALUE_EVALUATE");
 // BENCHMARK_KEY_VALUE_HASH
 Benchmark::Record Benchmark::KEY_VALUE_HASH[2] = {Benchmark::Record("KEY_VALUE_HASH[0]"), Benchmark::Record("KEY_VALUE_HASH[1]")};
 
-// BENCHMARK_GROUP_PREPARE
-Benchmark::Record Benchmark::GROUP_PREPARE_READ("GROUP_PREPARE_READ");
-Benchmark::Record Benchmark::GROUP_PREPARE_WRITE("GROUP_PREPARE_WRITE");
+// BENCHMARK_PIR
+Benchmark::Record Benchmark::PIR_GEN_DPF("PIR_GEN_DPF");
+Benchmark::Record Benchmark::PIR_EVAL_DPF("PIR_EVAL_DPF");
+Benchmark::Record Benchmark::PIR_ADD_DATA("PIR_ADD_DATA");
+Benchmark::Record Benchmark::PIR_GROUP_PREPARE("PIR_GROUP_PREPARE");
+
+// BENCHMARK_PIW
+Benchmark::Record Benchmark::PIW_GEN_DPF("PIW_GEN_DPF");
+Benchmark::Record Benchmark::PIW_EVAL_DPF("PIW_EVAL_DPF");
+Benchmark::Record Benchmark::PIW_ADD_DATA("PIW_ADD_DATA");
+Benchmark::Record Benchmark::PIW_GROUP_PREPARE("PIW_GROUP_PREPARE");
 
 // BENCHMARK_DPF
 Benchmark::Record Benchmark::DPF_GEN("DPF_GEN");

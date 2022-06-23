@@ -1,0 +1,134 @@
+========== Benchmark start ==========
+2022-06-23 10:18:40.397897+09:00
+logn 1, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 31, ct = 1, bandwidth = 462
+ORAM_READ, time = 33, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 27, ct = 1, bandwidth = 8
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 92, ct = 3, bandwidth = 602
+KEY_VALUE_PREPARE, time = 1, ct = 0, bandwidth = 0
+KEY_VALUE_DPF, time = 8, ct = 0, bandwidth = 0
+KEY_VALUE_EVALUATE, time = 0, ct = 0, bandwidth = 0
+key_value_others, time = 20, ct = 0, bandwidth = 462
+2022-06-23 10:18:45.313114+09:00, duration: 0:00:04.915217
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-23 10:18:45.313155+09:00
+logn 2, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 42, ct = 1, bandwidth = 462
+ORAM_READ, time = 29, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 24, ct = 1, bandwidth = 8
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 96, ct = 3, bandwidth = 602
+KEY_VALUE_PREPARE, time = 2, ct = 0, bandwidth = 0
+KEY_VALUE_DPF, time = 17, ct = 0, bandwidth = 0
+KEY_VALUE_EVALUATE, time = 1, ct = 0, bandwidth = 0
+key_value_others, time = 21, ct = 0, bandwidth = 462
+2022-06-23 10:18:48.345949+09:00, duration: 0:00:03.032794
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-23 10:18:48.345981+09:00
+logn 3, data_size 4, tau 5, pdpf 5
+KEY_TO_INDEX, time = 46, ct = 1, bandwidth = 462
+ORAM_READ, time = 29, ct = 1, bandwidth = 132
+ORAM_WRITE, time = 23, ct = 1, bandwidth = 8
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 99, ct = 3, bandwidth = 602
+KEY_VALUE_PREPARE, time = 3, ct = 0, bandwidth = 0
+KEY_VALUE_DPF, time = 15, ct = 0, bandwidth = 0
+KEY_VALUE_EVALUATE, time = 3, ct = 0, bandwidth = 0
+key_value_others, time = 23, ct = 0, bandwidth = 462
+2022-06-23 10:18:51.379236+09:00, duration: 0:00:03.033255
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-06-23 10:18:51.379272+09:00
+logn 4, data_size 4, tau 5, pdpf 5
+Error
+Pseudo DPF threshold 32
+Connecting to 127.0.0.1:9001...
+Connecting to 127.0.0.1:9000 done.
+
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.03)(2, 0.04)(3, 0.05)
+KEY_TO_INDEX ct
+(1, 1)(2, 1)(3, 1)
+KEY_TO_INDEX bandwidth
+(1, 0.46)(2, 0.46)(3, 0.46)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.03)(2, 0.03)(3, 0.03)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)
+ORAM_READ bandwidth
+(1, 0.13)(2, 0.13)(3, 0.13)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.03)(2, 0.02)(3, 0.02)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)
+ORAM_WRITE bandwidth
+(1, 0.01)(2, 0.01)(3, 0.01)
+
+
+========== ORAM_POSITION_MAP ==========
+ORAM_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)
+ORAM_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)
+ORAM_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.09)(2, 0.1)(3, 0.1)
+TOTAL ct
+(1, 3)(2, 3)(3, 3)
+TOTAL bandwidth
+(1, 0.6)(2, 0.6)(3, 0.6)
+
+
+========== KEY_VALUE_PREPARE ==========
+KEY_VALUE_PREPARE time
+(1, 0.0)(2, 0.0)(3, 0.0)
+KEY_VALUE_PREPARE ct
+(1, 0)(2, 0)(3, 0)
+KEY_VALUE_PREPARE bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)
+
+
+========== KEY_VALUE_DPF ==========
+KEY_VALUE_DPF time
+(1, 0.01)(2, 0.02)(3, 0.01)
+KEY_VALUE_DPF ct
+(1, 0)(2, 0)(3, 0)
+KEY_VALUE_DPF bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)
+
+
+========== KEY_VALUE_EVALUATE ==========
+KEY_VALUE_EVALUATE time
+(1, 0.0)(2, 0.0)(3, 0.0)
+KEY_VALUE_EVALUATE ct
+(1, 0)(2, 0)(3, 0)
+KEY_VALUE_EVALUATE bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)
+
+
+========== key_value_others ==========
+key_value_others time
+(1, 0.02)(2, 0.02)(3, 0.02)
+key_value_others ct
+(1, 0)(2, 0)(3, 0)
+key_value_others bandwidth
+(1, 0.46)(2, 0.46)(3, 0.46)
+
+
