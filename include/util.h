@@ -59,7 +59,24 @@ template <typename D>
 void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint index_23[2], Benchmark::Record *benchmark) {
     uint rand_range = n;
     peer[1].WriteUInt(index_13, benchmark);
+
+#ifdef BENCHMARK_KEY_VALUE
+    uint old_bandwidth;
+    if (benchmark != NULL) {
+        Benchmark::KEY_VALUE_SHARE_TWO_THIRD_DEBUG.Start();
+        old_bandwidth = benchmark->bandwidth_;
+        fprintf(stderr, );
+    }
+#endif
+
     index_23[0] = peer[0].ReadUInt(benchmark) % rand_range;
+
+#ifdef BENCHMARK_KEY_VALUE
+    if (benchmark != NULL) {
+        Benchmark::KEY_VALUE_SHARE_TWO_THIRD_DEBUG.Stop(benchmark->bandwidth_ - old_bandwidth);
+    }
+#endif
+
     index_23[1] = index_13 % rand_range;
 }
 

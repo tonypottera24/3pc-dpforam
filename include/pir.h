@@ -158,6 +158,13 @@ public:
 
 template <typename K>
 uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], DPFKeyPIRCTX *dpf_key_pir_ctx, Benchmark::Record *benchmark) {
+#ifdef BENCHMARK_KEY_VALUE
+    uint old_bandwidth;
+    if (benchmark != NULL) {
+        Benchmark::KEY_VALUE_PREPARE.Start();
+        old_bandwidth = benchmark->bandwidth_;
+    }
+#endif
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
@@ -172,18 +179,58 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     std::vector<uchar> key_dump(key_size);
 
     uint v_sum = 0;
+#ifdef BENCHMARK_KEY_VALUE
+    if (benchmark != NULL) {
+        Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
+    }
+#endif
+
     if (party == 2) {
+#ifdef BENCHMARK_KEY_VALUE
+        uint old_bandwidth;
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_PREPARE.Start();
+            old_bandwidth = benchmark->bandwidth_;
+        }
+#endif
         const uint P0 = 1;
         K key = key_23[0] + key_23[1];
         key.Print("key");
         key.DumpBuffer(key_dump.data());
         print_bytes(key_dump.data(), key_dump.size(), "key_dump");
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
+        }
+#endif
 
         for (uint b = 0; b < 2; b++) {
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_PREPARE.Start();
+                old_bandwidth = benchmark->bandwidth_;
+            }
+#endif
             uint64_t digest_uint = dpf_key_pir_ctx->Hash(b, digest_n, key_dump, benchmark);
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
+            }
+#endif
             // debug_print("digest_uint = %lu\n", digest_uint);
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_DPF_GEN.Start();
+                old_bandwidth = benchmark->bandwidth_;
+            }
+#endif
             BinaryData query_23[2];
             fss.Gen(peer, digest_uint, digest_size_log, true, true, query_23, benchmark);
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_DPF_GEN.Stop(benchmark->bandwidth_ - old_bandwidth);
+            }
+#endif
         }
         v_sum = rand_uint(peer[P0].PRG()) % n;
     } else {  // party == 0 || party == 1
@@ -223,7 +270,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_DPF.Start();
+            Benchmark::KEY_VALUE_DPF_EVAL.Start();
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
@@ -243,13 +290,13 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_DPF.Stop(benchmark->bandwidth_ - old_bandwidth);
+            Benchmark::KEY_VALUE_DPF_EVAL.Stop(benchmark->bandwidth_ - old_bandwidth);
         }
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_EVALUATE.Start();
+            Benchmark::KEY_VALUE_ADD_INDEX.Start();
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
@@ -271,7 +318,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_EVALUATE.Stop(benchmark->bandwidth_ - old_bandwidth);
+            Benchmark::KEY_VALUE_ADD_INDEX.Stop(benchmark->bandwidth_ - old_bandwidth);
         }
 #endif
 

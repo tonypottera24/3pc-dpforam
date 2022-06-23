@@ -11,9 +11,9 @@ void error(const char *msg) {
 
 void Socket::SetStream() {
     stream_ = fdopen(socket_fd_, "wb+");
-    buffer_ = new char[BUFF_BYTES];
-    memset(buffer_, 0, BUFF_BYTES);
-    setvbuf(stream_, buffer_, _IOFBF, BUFF_BYTES);
+    // buffer_ = new char[BUFF_BYTES];
+    // memset(buffer_, 0, BUFF_BYTES);
+    // setvbuf(stream_, buffer_, _IOFBF, BUFF_BYTES);
 }
 
 void Socket::InitServer(const char *ip, const uint port) {
@@ -96,7 +96,7 @@ void Socket::Write(const uchar *data, uint data_size, Benchmark::Record *benchma
     if (benchmark != NULL) {
         benchmark->bandwidth_ += data_size;
     }
-    fflush(stream_);
+    // fflush(stream_);
 #ifdef BENCHMARK_SOCKET
     if (benchmark != NULL) {
         Benchmark::SOCKET_WRITE.Stop(data_size);
@@ -131,6 +131,6 @@ void Socket::Flush() {
 
 void Socket::Close() {
     fclose(stream_);
-    delete[] buffer_;
+    // delete[] buffer_;
     ::close(socket_fd_);
 }

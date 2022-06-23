@@ -22,7 +22,7 @@ class Socket {
 private:
     int socket_fd_;
     FILE *stream_;
-    char *buffer_;
+    // char *buffer_;
 
     void SetStream();
 

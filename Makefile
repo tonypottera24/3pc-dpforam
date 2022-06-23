@@ -34,7 +34,7 @@ TEST_BIN := $(TEST_OBJ:$(TEST_OBJ_DIR)/%.o=$(TEST_BIN_DIR)/%)
 
 
 CC = clang++
-CFLAGS = -Wall -g -O3 -Werror --std=c++17 -DSHA256_ASM -DAES_ENC
+CFLAGS = -Wall -O2 -g -Werror --std=c++17 -DSHA256_ASM -DAES_ENC
 CPPFLAGS = -I/opt/local/include -Iinclude -Iinclude/libdpf -Iinclude/data -Iinclude/benchmark -maes -msse2 -fopenmp -flto
 LDFLAGS = -L/opt/local/lib -Llib -pthread -lboost_program_options -flto
 LDLIBS = -lcrypto

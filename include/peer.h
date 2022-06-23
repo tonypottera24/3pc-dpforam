@@ -25,6 +25,7 @@ public:
 
     void WriteUInt(uint n, Benchmark::Record *benchmark) {
         this->socket_.Write((uchar *)&n, sizeof(uint), benchmark);
+        this->socket_.Flush();
     }
 
     uint ReadUInt(Benchmark::Record *benchmark) {
@@ -35,6 +36,7 @@ public:
 
     void WriteUInt64(uint64_t n, Benchmark::Record *benchmark) {
         this->socket_.Write((uchar *)&n, sizeof(uint64_t), benchmark);
+        this->socket_.Flush();
     }
 
     uint64_t ReadUInt64(Benchmark::Record *benchmark) {
@@ -71,6 +73,7 @@ public:
             data[i].DumpBuffer(buffer.data() + i * data_size);
         }
         this->socket_.Write(buffer.data(), buffer.size(), benchmark);
+        this->socket_.Flush();
     }
 
     template <typename D>
@@ -78,6 +81,7 @@ public:
         // fprintf(stderr, "WriteData, size = %u\n", data.Size());
         const std::vector<uchar> dump = data.DumpVector();
         this->socket_.Write(dump.data(), dump.size(), benchmark);
+        this->socket_.Flush();
     }
 
     void Close() {
