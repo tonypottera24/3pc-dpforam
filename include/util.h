@@ -65,7 +65,6 @@ void ShareIndexTwoThird(Peer peer[2], const uint index_13, const uint n, uint in
     if (benchmark != NULL) {
         Benchmark::KEY_VALUE_SHARE_TWO_THIRD_DEBUG.Start();
         old_bandwidth = benchmark->bandwidth_;
-        fprintf(stderr, );
     }
 #endif
 
