@@ -2,7 +2,7 @@
 
 #include "benchmark/constant.h"
 
-// #define BUFF_BYTES 1024 * 16
+#define BUFF_BYTES 1024 * 16
 
 void error(const char *msg) {
     perror(msg);
