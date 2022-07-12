@@ -13,6 +13,7 @@
 #include "data/binary_data.h"
 #include "data/bulk_data.h"
 #include "data/ec_data.h"
+#include "data/zp_boost_data.h"
 #include "data/zp_data.h"
 #include "data/zp_debug_data.h"
 #include "fss1bit.h"

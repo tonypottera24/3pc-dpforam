@@ -283,6 +283,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             uint query_size = peer[party].ReadUInt(benchmark);
             query[b].Resize(query_size);
             peer[party].ReadData(query[b], benchmark);
+        }
+        for (uint b = 0; b < 2; b++) {
             if (eval_all[b]) {
                 dpf_out[b].resize(digest_n);
                 fss.EvalAll(query[b], digest_size_log, dpf_out[b], benchmark);

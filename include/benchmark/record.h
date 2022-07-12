@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <iostream>

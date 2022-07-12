@@ -13,8 +13,6 @@ Benchmark::Record Benchmark::KEY_VALUE_PREPARE("KEY_VALUE_PREPARE");
 Benchmark::Record Benchmark::KEY_VALUE_DPF_GEN("KEY_VALUE_DPF_GEN");
 Benchmark::Record Benchmark::KEY_VALUE_DPF_EVAL("KEY_VALUE_DPF_EVAL");
 Benchmark::Record Benchmark::KEY_VALUE_ADD_INDEX("KEY_VALUE_ADD_INDEX");
-Benchmark::Record Benchmark::KEY_VALUE_SHARE_TWO_THIRD("KEY_VALUE_SHARE_TWO_THIRD");
-Benchmark::Record Benchmark::KEY_VALUE_SHARE_TWO_THIRD_DEBUG("KEY_VALUE_SHARE_TWO_THIRD_DEBUG");
 // BENCHMARK_KEY_VALUE_HASH
 Benchmark::Record Benchmark::KEY_VALUE_HASH[2] = {Benchmark::Record("KEY_VALUE_HASH[0]"), Benchmark::Record("KEY_VALUE_HASH[1]")};
 

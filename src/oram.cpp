@@ -81,19 +81,7 @@ void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *be
     if (benchmark != NULL) Benchmark::ZP_DATA.Start();
 #endif
     uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->dpf_key_pir_ctx_, benchmark);
-#ifdef BENCHMARK_KEY_VALUE
-    uint old_bandwidth;
-    if (benchmark != NULL) {
-        Benchmark::KEY_VALUE_SHARE_TWO_THIRD.Start();
-        old_bandwidth = benchmark->bandwidth_;
-    }
-#endif
     ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, benchmark);
-#ifdef BENCHMARK_KEY_VALUE
-    if (benchmark != NULL) {
-        Benchmark::KEY_VALUE_SHARE_TWO_THIRD.Stop(benchmark->bandwidth_ - old_bandwidth);
-    }
-#endif
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA
     if (benchmark != NULL) Benchmark::BINARY_DATA.Stop();
@@ -596,9 +584,7 @@ void ORAM<K, D>::Test(uint iterations) {
     Benchmark::KEY_VALUE_DPF_GEN.PrintTotal(this->peer_, iterations);
     Benchmark::KEY_VALUE_DPF_EVAL.PrintTotal(this->peer_, iterations);
     Benchmark::KEY_VALUE_ADD_INDEX.PrintTotal(this->peer_, iterations);
-    Benchmark::KEY_VALUE_SHARE_TWO_THIRD.PrintTotal(this->peer_, iterations);
-    Benchmark::KEY_VALUE_SHARE_TWO_THIRD_DEBUG.PrintTotal(this->peer_, iterations);
-    Benchmark::Record key_value_others = Benchmark::KEY_TO_INDEX - Benchmark::KEY_VALUE_PREPARE - Benchmark::KEY_VALUE_DPF_GEN - Benchmark::KEY_VALUE_DPF_EVAL - Benchmark::KEY_VALUE_ADD_INDEX - Benchmark::KEY_VALUE_SHARE_TWO_THIRD - Benchmark::KEY_VALUE_SHARE_TWO_THIRD_DEBUG;
+    Benchmark::Record key_value_others = Benchmark::KEY_TO_INDEX - Benchmark::KEY_VALUE_PREPARE - Benchmark::KEY_VALUE_DPF_GEN - Benchmark::KEY_VALUE_DPF_EVAL - Benchmark::KEY_VALUE_ADD_INDEX;
     key_value_others.name = "key_value_others";
     key_value_others.PrintTotal(this->peer_, iterations);
 #endif
@@ -635,19 +621,29 @@ void ORAM<K, D>::Test(uint iterations) {
 template class ORAM<BinaryData, BinaryData>;
 template class ORAM<BinaryData, ECData>;
 template class ORAM<BinaryData, ZpData>;
+template class ORAM<BinaryData, ZpBoostData>;
 template class ORAM<BinaryData, ZpDebugData>;
 
 template class ORAM<ZpData, BinaryData>;
 template class ORAM<ZpData, ECData>;
 template class ORAM<ZpData, ZpData>;
+template class ORAM<ZpData, ZpBoostData>;
 template class ORAM<ZpData, ZpDebugData>;
+
+template class ORAM<ZpBoostData, BinaryData>;
+template class ORAM<ZpBoostData, ECData>;
+template class ORAM<ZpBoostData, ZpData>;
+template class ORAM<ZpBoostData, ZpBoostData>;
+template class ORAM<ZpBoostData, ZpDebugData>;
 
 template class ORAM<ECData, BinaryData>;
 template class ORAM<ECData, ECData>;
 template class ORAM<ECData, ZpData>;
+template class ORAM<ECData, ZpBoostData>;
 template class ORAM<ECData, ZpDebugData>;
 
 template class ORAM<ZpDebugData, BinaryData>;
 template class ORAM<ZpDebugData, ECData>;
 template class ORAM<ZpDebugData, ZpData>;
+template class ORAM<ZpDebugData, ZpBoostData>;
 template class ORAM<ZpDebugData, ZpDebugData>;
