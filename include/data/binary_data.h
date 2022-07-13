@@ -42,6 +42,8 @@ public:
     std::vector<uchar> DumpVector();
     void LoadBuffer(uchar *buffer);
 
+    uint64_t hash(uint64_t digest_n, int b);
+
     void Reset();
     void Resize(const uint size);
     void Random(PRG *prg = NULL);

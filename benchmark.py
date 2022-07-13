@@ -28,7 +28,8 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 
 class BenchmarkRecord():
-    def __init__(self, stderr):
+    def __init__(self, proto_test_args, stderr):
+        self.proto_test_args = proto_test_args
         self.criteria = {}
         for log in stderr:
             if log.startswith('{'):
@@ -42,15 +43,14 @@ class BenchmarkRecord():
         for criteria in criterias:
             log = self.criteria[criteria]
             # print(f'log {log}', flush=True)
-            print(
-                f'{criteria}, time = {log["time"]}, ct = {log["ct"]}, bandwidth = {log["bandwidth"]}', flush=True)
+            print(f'{criteria}, time = {log["time"]}, ct = {log["ct"]}, bandwidth = {log["bandwidth"]}', flush=True)
 
 
 def start_benchmark(proto_test_args):
     out = subprocess.run(proto_test_args, stderr=subprocess.PIPE)
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
-        return BenchmarkRecord(stderr)
+        return BenchmarkRecord(proto_test_args, stderr)
     else:
         print('Error', flush=True)
         print(out.stderr.decode("utf-8"), flush=True)
@@ -70,6 +70,8 @@ def print_records(records, x_axis):
         print(f"{criteria} ct", flush=True)
         for x, record in zip(x_axis, records):
             y = record.criteria[criteria]["ct"]
+            if criteria in ['KEY_VALUE_HASH[0]', 'KEY_VALUE_HASH[1]']:
+                y = (y / pow(2, x)) * 100
             print(f"({x}, {y})", end="", flush=True)
         print("", flush=True)
 

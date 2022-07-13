@@ -14,10 +14,7 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint key_size, uint dat
     // fprintf(stderr, "ORAM, array.size = %lu, array[0].Size = %u\n", this->write_array_13_.size(), this->write_array_13_[0].Size());
     // fprintf(stderr, "ORAM, total size = %lu\n", this->write_array_13_.size() * this->write_array_13_[0].Size() * 4);
     // fprintf(stderr, "\n");
-    bool key_value = !std::is_same<K, BinaryData>::value;
-    if (key_value) {
-        this->dpf_key_pir_ctx_ = new PIR::DPFKeyPIRCTX(n, key_size);
-    }
+    // bool key_value = !std::is_same<K, BinaryData>::value;
 
     if (n > DATA_PER_BLOCK) {
         for (uint b = 0; b < 2; b++) {
@@ -32,9 +29,6 @@ ORAM<K, D>::ORAM(const uint party, Peer peer[2], uint n, uint key_size, uint dat
 
 template <typename K, typename D>
 ORAM<K, D>::~ORAM() {
-    if (this->dpf_key_pir_ctx_ != NULL) {
-        delete this->dpf_key_pir_ctx_;
-    }
     if (this->position_map_ != NULL) {
         delete this->position_map_;
     }
@@ -80,7 +74,7 @@ void ORAM<K, D>::KeyToIndex(K key_23[2], uint index_23[2], Benchmark::Record *be
 #ifdef BENCHMARK_ZP_DATA
     if (benchmark != NULL) Benchmark::ZP_DATA.Start();
 #endif
-    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, this->dpf_key_pir_ctx_, benchmark);
+    uint index_13 = PIR::DPF_KEY_PIR<K>(this->party_, this->peer_, this->fss_, this->key_array_13_, key_23, benchmark);
     ShareIndexTwoThird<K>(this->peer_, index_13, this->key_array_13_.size(), index_23, benchmark);
     // debug_print("[%u]KeyToIndex index_13 = %u, index_23 = (%u, %u)\n", this->Size(), index_13, index_23[0], index_23[1]);
 #ifdef BENCHMARK_BINARY_DATA

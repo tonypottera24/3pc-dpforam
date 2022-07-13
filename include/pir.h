@@ -99,184 +99,53 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
     }
 }
 
-class DPFKeyPIRCTX {
-private:
-    const uchar *aes_key_[2] = {(uchar *)"01234567890123456789012345678901", (uchar *)"67890123456789010123456789012345"};
-    const uchar *aes_iv_[2] = {(uchar *)"0123456789012345", (uchar *)"8901234501234567"};
-    EVP_CIPHER_CTX *cipher_ctx_[2];
-    const EVP_CIPHER *evp_cipher_ = NULL;
-    uchar *aes_block_ = NULL;
-
-public:
-    std::vector<std::vector<uchar>> key_dump_array_;
-    std::vector<uint64_t> key_array_digest_;
-    // std::unordered_map<uint, uint> exists_;
-
-public:
-    DPFKeyPIRCTX(uint n, uint key_size) {
-        this->evp_cipher_ = EVP_aes_128_cbc();
-        for (uint b = 0; b < 2; b++) {
-            this->cipher_ctx_[b] = EVP_CIPHER_CTX_new();
-            EVP_EncryptInit_ex2(this->cipher_ctx_[b], this->evp_cipher_, this->aes_key_[b], this->aes_iv_[b], NULL);
-        }
-        uint aes_block_size = EVP_CIPHER_get_block_size(this->evp_cipher_);
-        uint block_ct = divide_ceil(key_size, aes_block_size);
-        this->aes_block_ = (unsigned char *)OPENSSL_malloc(block_ct * aes_block_size);
-
-        this->key_dump_array_.resize(n);
-        this->key_array_digest_.resize(n);
-    }
-
-    ~DPFKeyPIRCTX() {
-        for (uint b = 0; b < 2; b++) {
-            EVP_CIPHER_CTX_free(this->cipher_ctx_[b]);
-        }
-        OPENSSL_free(this->aes_block_);
-    }
-
-    uint64_t Hash(uint b, uint64_t digest_n, std::vector<uchar> data, Benchmark::Record *benchmark) {
-#ifdef BENCHMARK_KEY_VALUE_HASH
-        if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_HASH[b].Start();
-        }
-#endif
-        int aes_block_size;
-        EVP_EncryptInit_ex2(this->cipher_ctx_[b], NULL, NULL, NULL, NULL);
-        EVP_EncryptUpdate(this->cipher_ctx_[b], this->aes_block_, &aes_block_size, data.data(), data.size());
-        EVP_EncryptFinal_ex(this->cipher_ctx_[b], this->aes_block_, &aes_block_size);
-
-        uint64_t digest_uint;
-        memcpy(&digest_uint, this->aes_block_, std::min(sizeof(uint64_t), (unsigned long)aes_block_size));
-#ifdef BENCHMARK_KEY_VALUE_HASH
-        if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_HASH[b].Stop();
-        }
-#endif
-        return digest_uint % digest_n;
-    }
-};
-
 template <typename K>
-uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], DPFKeyPIRCTX *dpf_key_pir_ctx, Benchmark::Record *benchmark) {
-#ifdef BENCHMARK_KEY_VALUE
-    uint old_bandwidth;
-    if (benchmark != NULL) {
-        Benchmark::KEY_VALUE_PREPARE.Start();
-        old_bandwidth = benchmark->bandwidth_;
-    }
-#endif
+uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], Benchmark::Record *benchmark) {
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
-    // const uint64_t digest_size = 2;
-    const uint64_t digest_size = 3;
+    const uint64_t digest_size = 2;
+    // const uint64_t digest_size = 3;
     const uint64_t digest_size_log = digest_size * 8;
     const uint64_t digest_n = 1ULL << digest_size_log;
-    bool eval_all[2] = {n > KEY_VALUE_EVALALL_THRESHOLD, false};
-    // bool eval_all[2] = {false, false};
-
-    uint key_size = key_array_13[0].Size();
-    std::vector<uchar> key_dump(key_size);
+    // bool eval_all[2] = {n > KEY_VALUE_EVALALL_THRESHOLD, false};
+    bool eval_all[2] = {false, false};
+    std::vector<uint64_t> key_array_digest_(n);
+    // uint key_size = key_array_13[0].Size();
 
     uint v_sum = 0;
-#ifdef BENCHMARK_KEY_VALUE
-    if (benchmark != NULL) {
-        Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
-    }
-#endif
 
     if (party == 2) {
+        const uint P0 = 1;
+        K key = key_23[0] + key_23[1];
+        // key.Print("key");
 #ifdef BENCHMARK_KEY_VALUE
-        uint old_bandwidth;
+        uint old_bandwidth = 0;
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_PREPARE.Start();
+            Benchmark::KEY_VALUE_DPF_GEN.Start();
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
-        const uint P0 = 1;
-        K key = key_23[0] + key_23[1];
-        key.Print("key");
-        key.DumpBuffer(key_dump.data());
-        print_bytes(key_dump.data(), key_dump.size(), "key_dump");
-#ifdef BENCHMARK_KEY_VALUE
-        if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
-        }
-#endif
-
         for (uint b = 0; b < 2; b++) {
-#ifdef BENCHMARK_KEY_VALUE
-            if (benchmark != NULL) {
-                Benchmark::KEY_VALUE_PREPARE.Start();
-                old_bandwidth = benchmark->bandwidth_;
-            }
-#endif
-            uint64_t digest_uint = dpf_key_pir_ctx->Hash(b, digest_n, key_dump, benchmark);
-#ifdef BENCHMARK_KEY_VALUE
-            if (benchmark != NULL) {
-                Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
-            }
-#endif
+            uint64_t digest_uint = key.hash(digest_n, b);
             // debug_print("digest_uint = %lu\n", digest_uint);
-#ifdef BENCHMARK_KEY_VALUE
-            if (benchmark != NULL) {
-                Benchmark::KEY_VALUE_DPF_GEN.Start();
-                old_bandwidth = benchmark->bandwidth_;
-            }
-#endif
             BinaryData query_23[2];
             fss.Gen(peer, digest_uint, digest_size_log, true, true, query_23, benchmark);
-#ifdef BENCHMARK_KEY_VALUE
-            if (benchmark != NULL) {
-                Benchmark::KEY_VALUE_DPF_GEN.Stop(benchmark->bandwidth_ - old_bandwidth);
-            }
-#endif
         }
+#ifdef BENCHMARK_KEY_VALUE
+        if (benchmark != NULL) {
+            Benchmark::KEY_VALUE_DPF_GEN.Stop(benchmark->bandwidth_ - old_bandwidth);
+        }
+#endif
         v_sum = rand_uint(peer[P0].PRG()) % n;
     } else {  // party == 0 || party == 1
 #ifdef BENCHMARK_KEY_VALUE
-        uint old_bandwidth;
-        if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_PREPARE.Start();
-            old_bandwidth = benchmark->bandwidth_;
-        }
-#endif
-        std::unordered_map<uint64_t, uint> exists;
-        uint collision_ct = 0;
-        K key(key_size);
-        for (uint i = 0; i < n; i++) {
-            K key = key_array_13[i] - key_23[1 - party];
-            key.DumpBuffer(key_dump.data());
-            dpf_key_pir_ctx->key_dump_array_[i] = key_dump;
-
-            // print_bytes(dpf_key_pir_ctx->key_dump_array_[i].data(), dpf_key_pir_ctx->key_dump_array_[i].size(), "key_dump_array_");
-            uint64_t digest_uint = dpf_key_pir_ctx->Hash(0, digest_n, key_dump, benchmark);
-            // debug_print("digest_uint = %lu\n", digest_uint);
-
-            dpf_key_pir_ctx->key_array_digest_[i] = digest_uint;
-
-            if (exists.find(digest_uint) == exists.end()) {
-                exists[digest_uint] = 1;
-            } else {
-                exists[digest_uint]++;
-                collision_ct++;
-            }
-        }
-#ifdef BENCHMARK_KEY_VALUE
-        if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
-        }
-#endif
-
-#ifdef BENCHMARK_KEY_VALUE
+        uint old_bandwidth = 0;
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_DPF_EVAL.Start();
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
-        // eval_all[1] = collision_ct > n / 10;
-        // fprintf(stderr, "collision_ct = %u\n", collision_ct);
-
         BinaryData query[2];
         std::vector<uchar> dpf_out[2];
         for (uint b = 0; b < 2; b++) {
@@ -296,28 +165,38 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #endif
 
+        std::unordered_map<uint64_t, uint> exists;
+        uint collision_ct = 0;
+
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_ADD_INDEX.Start();
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
+
         for (uint i = 0; i < n; i++) {
-            uint64_t digest_uint = dpf_key_pir_ctx->key_array_digest_[i];
-            if (exists[digest_uint] == 1) {
+            K key = key_array_13[i] - key_23[1 - party];
+            uint64_t digest_uint = key.hash(digest_n, 0);
+            if (exists.find(digest_uint) == exists.end()) {
                 // debug_print("dpf i = %u, exists = 1\n", i);
                 if (eval_all[0] ? dpf_out[0][digest_uint] : fss.Eval(query[0], digest_uint, benchmark)) {
                     v_sum ^= i;
                 }
+                exists[digest_uint] = 1;
             } else {  // collision
                 // fprintf(stderr, "collision, i = %u\n", i);
-                uint64_t digest_uint = dpf_key_pir_ctx->Hash(1, digest_n, dpf_key_pir_ctx->key_dump_array_[i], benchmark);
+                uint64_t digest_uint = key.hash(digest_n, 1);
                 if (eval_all[1] ? dpf_out[1][digest_uint] : fss.Eval(query[1], digest_uint, benchmark)) {
                     v_sum ^= i;
                 }
+                exists[digest_uint]++;
+                collision_ct++;
                 // collision can still happen...
             }
         }
+        // fprintf(stderr, "collision_ct = %u\n", collision_ct);
+
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
             Benchmark::KEY_VALUE_ADD_INDEX.Stop(benchmark->bandwidth_ - old_bandwidth);

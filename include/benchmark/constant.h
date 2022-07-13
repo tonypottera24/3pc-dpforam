@@ -13,7 +13,7 @@ extern Record ORAM_WRITE;
 extern Record ORAM_POSITION_MAP;
 
 // KEY_VALUE
-// #define BENCHMARK_KEY_VALUE
+#define BENCHMARK_KEY_VALUE
 extern Record KEY_VALUE_PREPARE;
 extern Record KEY_VALUE_DPF_GEN;
 extern Record KEY_VALUE_DPF_EVAL;
@@ -53,7 +53,7 @@ extern Record SOCKET_READ;
 // #define BENCHMARK_BINARY_DATA
 extern DataRecord BINARY_DATA;
 
-#define BENCHMARK_ZP_DATA
+// #define BENCHMARK_ZP_DATA
 extern DataRecord ZP_DATA;
 
 };  // namespace Benchmark

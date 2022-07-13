@@ -34,7 +34,6 @@ private:
     bool is_top_level_;
 
     std::vector<K> key_array_13_;
-    std::vector<std::vector<uchar>> key_array_digest_13_;
     std::vector<BulkData<D>> read_array_23_[2];
     std::vector<BulkData<D>> write_array_13_;
     std::vector<BulkData<D>> cache_array_23_[2];
@@ -42,8 +41,6 @@ private:
 
     D last_read_data_13_;
     BulkData<D> last_read_block_13_;
-
-    PIR::DPFKeyPIRCTX *dpf_key_pir_ctx_ = NULL;
 
 private:
     void Init();

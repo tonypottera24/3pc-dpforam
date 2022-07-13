@@ -109,9 +109,8 @@ int main(int argc, char *argv[]) {
 
     // uint64_t start_time = timestamp();
     // ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, 0, data_size, true);
-    // ORAM<BinaryData, ZpData> oram = ORAM<BinaryData, ZpData>(party, peer, n, 0, data_size, true);
-    ORAM<BinaryData, ZpBoostData> oram = ORAM<BinaryData, ZpBoostData>(party, peer, n, 0, data_size, true);
-    // ORAM<ZpData, BinaryData> oram = ORAM<ZpData, BinaryData>(party, peer, n, ZpData().Size(), data_size, true);
+    // ORAM<BinaryData, ZpBoostData> oram = ORAM<BinaryData, ZpBoostData>(party, peer, n, 0, data_size, true);
+    ORAM<ZpBoostData, BinaryData> oram = ORAM<ZpBoostData, BinaryData>(party, peer, n, ZpBoostData().Size(), data_size, true);
     // ORAM<ZpData, ZpData> oram = ORAM<ZpData, ZpData>(party, peer, n, ZpData().Size(), data_size, true);
 
     // uint64_t end_time = timestamp();

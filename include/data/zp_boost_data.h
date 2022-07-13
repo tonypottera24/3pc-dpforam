@@ -13,11 +13,11 @@ using namespace boost::multiprecision;
 
 class ZpBoostData {
 private:
-    uint512_t data_ = uint512_t(0);
-    static const inline uint512_t p_ = uint512_t("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
-    // static const inline uint512_t p_ = uint512_t(11);
-    // const static inline uint size_ = uint512_t("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff").backend().size();
-    // const static inline uint size_ = sizeof(uint512_t);
+    uint256_t data_ = uint256_t(0);
+    static const inline uint256_t p_ = uint256_t("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
+    // static const inline uint256_t p_ = uint256_t(11);
+    // const static inline uint size_ = uint256_t("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff").backend().size();
+    // const static inline uint size_ = sizeof(uint256_t);
     const static inline uint size_ = 32;
     static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
@@ -46,6 +46,8 @@ public:
     void DumpBuffer(uchar *buffer);
     std::vector<uchar> DumpVector();
     void LoadBuffer(uchar *buffer);
+
+    uint64_t hash(uint64_t digest_n, int b);
 
     void Reset();
     void Resize(const uint size);

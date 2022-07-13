@@ -46,7 +46,13 @@ ZpBoostData &ZpBoostData::operator+=(const ZpBoostData &rhs) {
 #ifdef BENCHMARK_ZP_DATA
     Benchmark::ZP_DATA.arithmatic_.Start();
 #endif
-    this->data_ = (this->data_ + rhs.data_) % this->p_;
+    // this->data_ = (this->data_ + rhs.data_) % this->p_;
+    if (this->data_ >= this->p_ - rhs.data_) {
+        this->data_ += rhs.data_;
+        this->data_ -= this->p_;
+    } else {
+        this->data_ += rhs.data_;
+    }
 #ifdef BENCHMARK_ZP_DATA
     Benchmark::ZP_DATA.arithmatic_.Stop();
 #endif
@@ -57,8 +63,15 @@ ZpBoostData &ZpBoostData::operator-=(const ZpBoostData &rhs) {
 #ifdef BENCHMARK_ZP_DATA
     Benchmark::ZP_DATA.arithmatic_.Start();
 #endif
-    uint512_t neg = this->p_ - rhs.data_;
-    this->data_ = (this->data_ + neg) % this->p_;
+    // this->data_ = (this->data_ + (this->p_ - rhs.data_)) % this->p_;
+    uint256_t tmp = this->p_ - rhs.data_;
+
+    if (this->data_ >= this->p_ - tmp) {
+        this->data_ += tmp;
+        this->data_ -= this->p_;
+    } else {
+        this->data_ += tmp;
+    }
 #ifdef BENCHMARK_ZP_DATA
     Benchmark::ZP_DATA.arithmatic_.Stop();
 #endif
@@ -89,6 +102,7 @@ void ZpBoostData::DumpBuffer(uchar *buffer) {
     // export_bits(this->data_, std::back_inserter(v), 8, false);
     // print_bytes(v.data(), v.size(), "v");
     // debug_print("v.size = %zu\n", v.size());
+    // fprintf(stderr, "v.size = %zu\n", v.size());
 
     // uint512_t v_tmp;
     // import_bits(v_tmp, v.begin(), v.end());
@@ -125,6 +139,16 @@ void ZpBoostData::LoadBuffer(uchar *buffer) {
 #endif
 }
 
+uint64_t ZpBoostData::hash(uint64_t digest_n, int b) {
+    // TODO check hash output
+    // fprintf(stderr, "%lu\n", static_cast<uint64_t>(this->data_) % digest_n);
+    if (b == 0) {
+        return static_cast<uint64_t>(this->data_) % digest_n;
+    } else {
+        return static_cast<uint64_t>(this->p_ - this->data_) % digest_n;
+    }
+}
+
 void ZpBoostData::Reset() {
     this->data_ = 0;
 }
@@ -136,9 +160,9 @@ void ZpBoostData::Random(PRG *prg) {
     Benchmark::ZP_DATA.random_.Start();
 #endif
     if (prg == NULL) prg = this->prg_;
-    uchar r[this->Size()];
-    prg->RandBytes(r, this->Size());
-    LoadBuffer(r);
+    uchar buffer[this->Size()];
+    prg->RandBytes(buffer, this->Size());
+    import_bits(this->data_, buffer, buffer + this->Size(), 8, false);
     this->data_ %= this->p_;
 #ifdef BENCHMARK_ZP_DATA
     Benchmark::ZP_DATA.random_.Stop();
