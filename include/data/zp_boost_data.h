@@ -6,6 +6,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include "benchmark/constant.h"
+#include "constant.h"
 #include "typedef.h"
 #include "util.h"
 
@@ -47,7 +48,7 @@ public:
     std::vector<uchar> DumpVector();
     void LoadBuffer(uchar *buffer);
 
-    uint64_t hash(uint64_t digest_n, int b);
+    uint64_t hash(uint64_t digest_n, uint round);
 
     void Reset();
     void Resize(const uint size);

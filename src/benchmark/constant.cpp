@@ -14,7 +14,7 @@ Benchmark::Record Benchmark::KEY_VALUE_DPF_GEN("KEY_VALUE_DPF_GEN");
 Benchmark::Record Benchmark::KEY_VALUE_DPF_EVAL("KEY_VALUE_DPF_EVAL");
 Benchmark::Record Benchmark::KEY_VALUE_ADD_INDEX("KEY_VALUE_ADD_INDEX");
 // BENCHMARK_KEY_VALUE_HASH
-Benchmark::Record Benchmark::KEY_VALUE_HASH[2] = {Benchmark::Record("KEY_VALUE_HASH[0]"), Benchmark::Record("KEY_VALUE_HASH[1]")};
+std::vector<Benchmark::Record> Benchmark::KEY_VALUE_HASH;
 
 // BENCHMARK_PIR
 Benchmark::Record Benchmark::PIR_GEN_DPF("PIR_GEN_DPF");

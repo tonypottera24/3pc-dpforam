@@ -2,18 +2,25 @@
 
 void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len) {
     uint offset = 0;
-    for (uint i = offset; i + sizeof(uint256) <= len; i += sizeof(uint256)) {
-        uint256 *aa = (uint256 *)&a[offset];
-        uint256 *bb = (uint256 *)&b[offset];
-        uint256 *rr = (uint256 *)&r[offset];
-        (*rr) = (*aa) ^ (*bb);
-        offset = i + sizeof(uint256);
-    }
+    // for (uint i = offset; i + sizeof(uint512) <= len; i += sizeof(uint512)) {
+    //     uint512 *aa = (uint512 *)&a[offset];
+    //     uint512 *bb = (uint512 *)&b[offset];
+    //     uint512 *rr = (uint512 *)&r[offset];
+    //     (*rr) = _mm512_xor_epi64(*aa, *bb);
+    //     offset = i + sizeof(uint512);
+    // }
+    // for (uint i = offset; i + sizeof(uint256) <= len; i += sizeof(uint256)) {
+    //     uint256 *aa = (uint256 *)&a[offset];
+    //     uint256 *bb = (uint256 *)&b[offset];
+    //     uint256 *rr = (uint256 *)&r[offset];
+    //     (*rr) = _mm256_xor_epi64(*aa, *bb);
+    //     offset = i + sizeof(uint256);
+    // }
     for (uint i = offset; i + sizeof(uint128) <= len; i += sizeof(uint128)) {
         uint128 *aa = (uint128 *)&a[offset];
         uint128 *bb = (uint128 *)&b[offset];
         uint128 *rr = (uint128 *)&r[offset];
-        (*rr) = (*aa) ^ (*bb);
+        (*rr) = _mm_xor_si128(*aa,*bb);
         offset = i + sizeof(uint128);
     }
     for (uint i = offset; i + sizeof(uint64_t) <= len; i += sizeof(uint64_t)) {
@@ -44,14 +51,22 @@ void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len) {
 
 void xor_bytes(const uchar *a, const uchar *b, const uchar *c, uchar *r, const uint len) {
     uint offset = 0;
-    for (uint i = offset; i + sizeof(uint256) <= len; i += sizeof(uint256)) {
-        uint256 *aa = (uint256 *)&a[offset];
-        uint256 *bb = (uint256 *)&b[offset];
-        uint256 *cc = (uint256 *)&c[offset];
-        uint256 *rr = (uint256 *)&r[offset];
-        (*rr) = (*aa) ^ (*bb) ^ (*cc);
-        offset = i + sizeof(uint256);
-    }
+    // for (uint i = offset; i + sizeof(uint512) <= len; i += sizeof(uint512)) {
+    //     uint512 *aa = (uint512 *)&a[offset];
+    //     uint512 *bb = (uint512 *)&b[offset];
+    //     uint512 *cc = (uint512 *)&c[offset];
+    //     uint512 *rr = (uint512 *)&r[offset];
+    //     (*rr) = (*aa) ^ (*bb) ^ (*cc);
+    //     offset = i + sizeof(uint512);
+    // }
+    // for (uint i = offset; i + sizeof(uint256) <= len; i += sizeof(uint256)) {
+    //     uint256 *aa = (uint256 *)&a[offset];
+    //     uint256 *bb = (uint256 *)&b[offset];
+    //     uint256 *cc = (uint256 *)&c[offset];
+    //     uint256 *rr = (uint256 *)&r[offset];
+    //     (*rr) = (*aa) ^ (*bb) ^ (*cc);
+    //     offset = i + sizeof(uint256);
+    // }
     for (uint i = offset; i + sizeof(uint128) <= len; i += sizeof(uint128)) {
         uint128 *aa = (uint128 *)&a[offset];
         uint128 *bb = (uint128 *)&b[offset];

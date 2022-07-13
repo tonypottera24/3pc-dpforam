@@ -16,13 +16,22 @@ void Benchmark::DataRecord::PrintTotal(Peer peer[2], uint iterations, Record tot
     dump_load_ = dump_load_cache_;
     random_ = random_cache_;
 
-    this->copy_.PrintTotal(peer, iterations);
-    this->compare_.PrintTotal(peer, iterations);
-    this->arithmatic_.PrintTotal(peer, iterations);
-    this->dump_load_.PrintTotal(peer, iterations);
-    this->random_.PrintTotal(peer, iterations);
+    this->copy_.Sync(peer);
+    this->copy_.PrintTotal(iterations);
+
+    this->compare_.Sync(peer);
+    this->compare_.PrintTotal(iterations);
+
+    this->arithmatic_.Sync(peer);
+    this->arithmatic_.PrintTotal(iterations);
+
+    this->dump_load_.Sync(peer);
+    this->dump_load_.PrintTotal(iterations);
+
+    this->random_.Sync(peer);
+    this->random_.PrintTotal(iterations);
 
     Record others = total - this->copy_ - this->compare_ - this->arithmatic_ - this->dump_load_ - this->random_;
     others.name = this->name_ + "_OTHERS";
-    others.PrintTotal(peer, iterations);
+    others.PrintTotal(iterations);
 }

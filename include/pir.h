@@ -104,13 +104,14 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
 
-    const uint64_t digest_size = 2;
+    const uint64_t digest_size = 3;
     // const uint64_t digest_size = 3;
     const uint64_t digest_size_log = digest_size * 8;
     const uint64_t digest_n = 1ULL << digest_size_log;
+    // const uint64_t digest_n = 16777127;
     // bool eval_all[2] = {n > KEY_VALUE_EVALALL_THRESHOLD, false};
-    bool eval_all[2] = {false, false};
-    std::vector<uint64_t> key_array_digest_(n);
+    bool eval_all[KEY_VALUE_ROUNDS];
+    memset(eval_all, 0, sizeof(bool) * KEY_VALUE_ROUNDS);
     // uint key_size = key_array_13[0].Size();
 
     uint v_sum = 0;
@@ -126,8 +127,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
-        for (uint b = 0; b < 2; b++) {
-            uint64_t digest_uint = key.hash(digest_n, b);
+        for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
+            uint64_t digest_uint = key.hash(digest_n, round);
             // debug_print("digest_uint = %lu\n", digest_uint);
             BinaryData query_23[2];
             fss.Gen(peer, digest_uint, digest_size_log, true, true, query_23, benchmark);
@@ -146,17 +147,15 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
-        BinaryData query[2];
-        std::vector<uchar> dpf_out[2];
-        for (uint b = 0; b < 2; b++) {
+        BinaryData query[KEY_VALUE_ROUNDS];
+        std::vector<uchar> dpf_out[KEY_VALUE_ROUNDS];
+        for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
             uint query_size = peer[party].ReadUInt(benchmark);
-            query[b].Resize(query_size);
-            peer[party].ReadData(query[b], benchmark);
-        }
-        for (uint b = 0; b < 2; b++) {
-            if (eval_all[b]) {
-                dpf_out[b].resize(digest_n);
-                fss.EvalAll(query[b], digest_size_log, dpf_out[b], benchmark);
+            query[round].Resize(query_size);
+            peer[party].ReadData(query[round], benchmark);
+            if (eval_all[round]) {
+                dpf_out[round].resize(1 << digest_size_log);
+                fss.EvalAll(query[round], digest_size_log, dpf_out[round], benchmark);
             }
         }
 #ifdef BENCHMARK_KEY_VALUE
@@ -165,43 +164,85 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #endif
 
-        std::unordered_map<uint64_t, uint> exists;
-        uint collision_ct = 0;
-
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_ADD_INDEX.Start();
+            Benchmark::KEY_VALUE_PREPARE.Start();
             old_bandwidth = benchmark->bandwidth_;
         }
 #endif
-
+        typename std::unordered_map<uint64_t, K> delta_key_array;
         for (uint i = 0; i < n; i++) {
-            K key = key_array_13[i] - key_23[1 - party];
-            uint64_t digest_uint = key.hash(digest_n, 0);
-            if (exists.find(digest_uint) == exists.end()) {
-                // debug_print("dpf i = %u, exists = 1\n", i);
-                if (eval_all[0] ? dpf_out[0][digest_uint] : fss.Eval(query[0], digest_uint, benchmark)) {
-                    v_sum ^= i;
-                }
-                exists[digest_uint] = 1;
-            } else {  // collision
-                // fprintf(stderr, "collision, i = %u\n", i);
-                uint64_t digest_uint = key.hash(digest_n, 1);
-                if (eval_all[1] ? dpf_out[1][digest_uint] : fss.Eval(query[1], digest_uint, benchmark)) {
-                    v_sum ^= i;
-                }
-                exists[digest_uint]++;
-                collision_ct++;
-                // collision can still happen...
-            }
+            delta_key_array[i] = key_array_13[i] - key_23[1 - party];
         }
-        // fprintf(stderr, "collision_ct = %u\n", collision_ct);
-
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
-            Benchmark::KEY_VALUE_ADD_INDEX.Stop(benchmark->bandwidth_ - old_bandwidth);
+            Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
         }
 #endif
+
+        typename std::unordered_map<uint64_t, K>::iterator it;
+        for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_PREPARE.Start();
+                old_bandwidth = benchmark->bandwidth_;
+            }
+#endif
+            std::unordered_map<uint64_t, uint> exists;
+            std::vector<uint64_t> digest(n);
+            it = delta_key_array.begin();
+            while (it != delta_key_array.end()) {
+#ifdef BENCHMARK_KEY_VALUE_HASH
+                if (benchmark != NULL) {
+                    Benchmark::KEY_VALUE_HASH[round].Start();
+                    old_bandwidth = benchmark->bandwidth_;
+                }
+#endif
+                uint64_t digest_uint = it->second.hash(digest_n, round);
+#ifdef BENCHMARK_KEY_VALUE_HASH
+                if (benchmark != NULL) {
+                    Benchmark::KEY_VALUE_HASH[round].Stop(benchmark->bandwidth_ - old_bandwidth);
+                }
+#endif
+                digest[it->first] = digest_uint;
+                if (exists.find(digest_uint) == exists.end()) {
+                    exists[digest_uint] = 1;
+                } else {
+                    exists[digest_uint]++;
+                }
+                it++;
+            }
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_PREPARE.Stop(benchmark->bandwidth_ - old_bandwidth);
+            }
+#endif
+
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_ADD_INDEX.Start();
+                old_bandwidth = benchmark->bandwidth_;
+            }
+#endif
+            it = delta_key_array.begin();
+            while (it != delta_key_array.end()) {
+                uint64_t digest_uint = digest[it->first];
+                if (exists[digest_uint] == 1) {
+                    if (eval_all[round] ? dpf_out[round][digest_uint] : fss.Eval(query[round], digest_uint, benchmark)) {
+                        v_sum ^= it->first;
+                    }
+                    it = delta_key_array.erase(it);
+                } else {
+                    it++;
+                }
+            }
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_ADD_INDEX.Stop(benchmark->bandwidth_ - old_bandwidth);
+            }
+#endif
+        }
+        // fprintf(stderr, "collision_ct = %u\n", collision_ct);
 
         if (party == 0) {
             const uint P2 = 0;

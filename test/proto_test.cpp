@@ -26,11 +26,12 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint>()->default_value(10), "number of data (log)")(
+        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
         "data_size", po::value<uint>()->default_value(32), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(5), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(0), "ssot threshold (log)")(
         "log_pseudo_dpf_threshold", po::value<uint>()->default_value(5), "pseudo dpf threshold (log)")(
+        "key_value_rounds", po::value<uint>()->default_value(8), "key-value rounds")(
         "key_value_evalall_threshold", po::value<uint>()->default_value(15), "key-value EvalAll threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
@@ -78,6 +79,14 @@ int main(int argc, char *argv[]) {
     LOG_PSEUDO_DPF_THRESHOLD = vm["log_pseudo_dpf_threshold"].as<uint>();
     PSEUDO_DPF_THRESHOLD = 1 << LOG_PSEUDO_DPF_THRESHOLD;
     fprintf(stderr, "Pseudo DPF threshold %u\n", PSEUDO_DPF_THRESHOLD);
+
+    KEY_VALUE_ROUNDS = vm["key_value_rounds"].as<uint>();
+#ifdef BENCHMARK_KEY_VALUE_HASH
+    for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
+        std::string title = std::string("KEY_VALUE_HASH[") + std::to_string(round) + std::string("]");
+        Benchmark::KEY_VALUE_HASH.push_back(Benchmark::Record(title));
+    }
+#endif
 
     uint key_value_evalall_threshold = vm["key_value_evalall_threshold"].as<uint>();
     KEY_VALUE_EVALALL_THRESHOLD = 1 << key_value_evalall_threshold;

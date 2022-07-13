@@ -18,8 +18,8 @@ extern Record KEY_VALUE_PREPARE;
 extern Record KEY_VALUE_DPF_GEN;
 extern Record KEY_VALUE_DPF_EVAL;
 extern Record KEY_VALUE_ADD_INDEX;
-// #define BENCHMARK_KEY_VALUE_HASH
-extern Record KEY_VALUE_HASH[2];
+#define BENCHMARK_KEY_VALUE_HASH
+extern std::vector<Record> KEY_VALUE_HASH;
 
 // #define BENCHMARK_PIR
 extern Record PIR_GEN_DPF;

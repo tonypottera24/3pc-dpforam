@@ -58,8 +58,10 @@ public:
 
     uint64_t GetTime();
 
+    void Sync(Peer peer[2]);
+
     void Print();
-    void PrintTotal(Peer peer[2], uint64_t iteration = 1);
+    void PrintTotal(uint64_t iteration = 1);
 };
 
 };  // namespace Benchmark

@@ -32,6 +32,33 @@ uint64_t Benchmark::Record::GetTime() {
     return duration_cast<microseconds>(this->duration_).count();
 }
 
+void Benchmark::Record::Sync(Peer peer[2]) {
+    uint64_t time[3], count[3], bandwidth[3];
+    time[2] = this->GetTime();
+    for (uint b = 0; b < 2; b++) {
+        peer[b].WriteUInt64(this->GetTime(), NULL);
+        time[b] = peer[1 - b].ReadUInt64(NULL);
+    }
+    std::sort(time, time + 3);
+    this->duration_ = duration<long long, std::micro>(time[2]);
+
+    count[2] = this->count_;
+    for (uint b = 0; b < 2; b++) {
+        peer[b].WriteUInt64(this->count_, NULL);
+        count[b] = peer[1 - b].ReadUInt64(NULL);
+    }
+    std::sort(count, count + 3);
+    this->count_ = count[2];
+
+    bandwidth[2] = this->bandwidth_;
+    for (uint b = 0; b < 2; b++) {
+        peer[b].WriteUInt64(this->bandwidth_, NULL);
+        bandwidth[b] = peer[1 - b].ReadUInt64(NULL);
+    }
+    std::sort(bandwidth, bandwidth + 3);
+    this->bandwidth_ = bandwidth[2];
+}
+
 void Benchmark::Record::Print() {
     json j = {
         {"name", this->name},
@@ -45,38 +72,12 @@ void Benchmark::Record::Print() {
     // fprintf(stderr, "bandwidth: %lu\n", this->bandwidth_);
 }
 
-void Benchmark::Record::PrintTotal(Peer peer[2], uint64_t iteration) {
-    uint64_t time[3], count[3], bandwidth[3];
-    time[2] = this->GetTime();
-    for (uint b = 0; b < 2; b++) {
-        peer[b].WriteUInt64(this->GetTime(), NULL);
-        time[b] = peer[1 - b].ReadUInt64(NULL);
-    }
-    std::sort(time, time + 3);
-    uint64_t mid_time = time[1];
-    // uint64_t mid_time = (time[0] + time[1] + time[2]) / 3;
-
-    count[2] = this->count_;
-    for (uint b = 0; b < 2; b++) {
-        peer[b].WriteUInt64(this->count_, NULL);
-        count[b] = peer[1 - b].ReadUInt64(NULL);
-    }
-    uint64_t mid_count = count[1];
-    // uint64_t mid_count = (count[0] + count[1] + count[2]) / 3;
-
-    bandwidth[2] = this->bandwidth_;
-    for (uint b = 0; b < 2; b++) {
-        peer[b].WriteUInt64(this->bandwidth_, NULL);
-        bandwidth[b] = peer[1 - b].ReadUInt64(NULL);
-    }
-    uint64_t mid_bandwidth = bandwidth[1];
-    // uint64_t mid_bandwidth = (bandwidth[0] + bandwidth[1] + bandwidth[2]) / 3;
-
+void Benchmark::Record::PrintTotal(uint64_t iteration) {
     json j = {
         {"name", this->name},
-        {"time", mid_time / iteration},
-        {"ct", mid_count / iteration},
-        {"bandwidth", mid_bandwidth / iteration},
+        {"time", this->GetTime() / iteration},
+        {"ct", this->count_ / iteration},
+        {"bandwidth", this->bandwidth_ / iteration},
     };
     std::cerr << j.dump() << std::endl;
 

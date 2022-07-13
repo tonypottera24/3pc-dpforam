@@ -139,14 +139,10 @@ void ZpBoostData::LoadBuffer(uchar *buffer) {
 #endif
 }
 
-uint64_t ZpBoostData::hash(uint64_t digest_n, int b) {
-    // TODO check hash output
-    // fprintf(stderr, "%lu\n", static_cast<uint64_t>(this->data_) % digest_n);
-    if (b == 0) {
-        return static_cast<uint64_t>(this->data_) % digest_n;
-    } else {
-        return static_cast<uint64_t>(this->p_ - this->data_) % digest_n;
-    }
+uint64_t ZpBoostData::hash(uint64_t digest_n, uint round) {
+    boost::hash<uint256_t> h;
+    uint64_t digest = h(this->data_ * uint256_t(round + 1)) % digest_n;
+    return digest;
 }
 
 void ZpBoostData::Reset() {
