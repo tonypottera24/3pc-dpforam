@@ -7,6 +7,7 @@
 
 #include "benchmark/constant.h"
 #include "constant.h"
+#include "libdpf/aes.h"
 #include "typedef.h"
 #include "util.h"
 
@@ -14,7 +15,7 @@ using namespace boost::multiprecision;
 
 class ZpBoostData {
 private:
-    uint256_t data_ = uint256_t(0);
+    uint256_t data_ = 0;
     static const inline uint256_t p_ = uint256_t("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff");
     // static const inline uint256_t p_ = uint256_t(11);
     // const static inline uint size_ = uint256_t("0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff").backend().size();
@@ -22,6 +23,16 @@ private:
     const static inline uint size_ = 32;
     static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
+    static inline boost::hash<uint256_t> boost_hash;
+
+    static inline AES_KEY aes_key_[2];
+
+public:
+    static void initAESKey() {
+        for (uint i = 0; i < KEY_VALUE_ROUNDS; i++) {
+            AES_set_encrypt_key(dpf_make_block(597349ULL + i, 121379ULL + i), &aes_key_[i]);
+        }
+    }
 
 public:
     ZpBoostData();
@@ -48,7 +59,7 @@ public:
     std::vector<uchar> DumpVector();
     void LoadBuffer(uchar *buffer);
 
-    uint64_t hash(uint64_t digest_n, uint round);
+    uint64_t hash(uint64_t digest_n, uint64_t round);
 
     void Reset();
     void Resize(const uint size);

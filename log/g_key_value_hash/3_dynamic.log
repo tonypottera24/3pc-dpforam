@@ -1,0 +1,631 @@
+========== Benchmark start ==========
+2022-09-03 22:31:54.632889+09:00
+logn 1, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 125, ct = 1, bandwidth = 232
+ORAM_READ, time = 98, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 91, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 314, ct = 3, bandwidth = 1296
+KEY_VALUE_PREPARE1, time = 0, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 0, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 52, ct = 1, bandwidth = 228
+KEY_VALUE_DPF_EVAL, time = 109, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 72, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 0, ct = 2, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:01.014523+09:00, duration: 0:00:06.381634
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:01.014557+09:00
+logn 2, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 75, ct = 1, bandwidth = 232
+ORAM_READ, time = 40, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 34, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 149, ct = 3, bandwidth = 1296
+KEY_VALUE_PREPARE1, time = 0, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 1, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 65, ct = 1, bandwidth = 228
+KEY_VALUE_DPF_EVAL, time = 57, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 21, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 0, ct = 4, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:04.060522+09:00, duration: 0:00:03.045965
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:04.060566+09:00
+logn 3, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 79, ct = 1, bandwidth = 340
+ORAM_READ, time = 40, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 32, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 151, ct = 3, bandwidth = 1404
+KEY_VALUE_PREPARE1, time = 1, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 1, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 68, ct = 1, bandwidth = 336
+KEY_VALUE_DPF_EVAL, time = 62, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 19, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 0, ct = 8, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:07.107959+09:00, duration: 0:00:03.047393
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:07.108021+09:00
+logn 4, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 87, ct = 1, bandwidth = 448
+ORAM_READ, time = 42, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 35, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 165, ct = 3, bandwidth = 1512
+KEY_VALUE_PREPARE1, time = 2, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 2, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 62, ct = 1, bandwidth = 444
+KEY_VALUE_DPF_EVAL, time = 53, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 24, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 1, ct = 16, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:10.155675+09:00, duration: 0:00:03.047654
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:10.155712+09:00
+logn 5, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 171, ct = 1, bandwidth = 556
+ORAM_READ, time = 116, ct = 1, bandwidth = 1028
+ORAM_WRITE, time = 131, ct = 1, bandwidth = 36
+ORAM_POSITION_MAP, time = 0, ct = 0, bandwidth = 0
+TOTAL, time = 419, ct = 3, bandwidth = 1620
+KEY_VALUE_PREPARE1, time = 4, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 6, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 42, ct = 1, bandwidth = 552
+KEY_VALUE_DPF_EVAL, time = 64, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 0, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 127, ct = 1, bandwidth = 4
+key_value_others, time = 52, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 2, ct = 32, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 1, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:13.256369+09:00, duration: 0:00:03.100657
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:13.256451+09:00
+logn 6, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 105, ct = 1, bandwidth = 664
+ORAM_READ, time = 115, ct = 1, bandwidth = 3077
+ORAM_WRITE, time = 79, ct = 1, bandwidth = 3109
+ORAM_POSITION_MAP, time = 74, ct = 1, bandwidth = 42
+TOTAL, time = 375, ct = 4, bandwidth = 6892
+KEY_VALUE_PREPARE1, time = 9, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 12, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 65, ct = 1, bandwidth = 660
+KEY_VALUE_DPF_EVAL, time = 55, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 2, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 39, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 4, ct = 64, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 1, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:16.336051+09:00, duration: 0:00:03.079600
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:16.336154+09:00
+logn 7, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 123, ct = 1, bandwidth = 772
+ORAM_READ, time = 171, ct = 1, bandwidth = 4101
+ORAM_WRITE, time = 101, ct = 1, bandwidth = 3109
+ORAM_POSITION_MAP, time = 66, ct = 1, bandwidth = 42
+TOTAL, time = 463, ct = 4, bandwidth = 8024
+KEY_VALUE_PREPARE1, time = 17, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 24, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 61, ct = 1, bandwidth = 768
+KEY_VALUE_DPF_EVAL, time = 51, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 5, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 61, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 8, ct = 128, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 3, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:19.434404+09:00, duration: 0:00:03.098250
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:19.435078+09:00
+logn 8, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 213, ct = 1, bandwidth = 880
+ORAM_READ, time = 197, ct = 1, bandwidth = 4593
+ORAM_WRITE, time = 117, ct = 1, bandwidth = 3068
+ORAM_POSITION_MAP, time = 103, ct = 1, bandwidth = 42
+TOTAL, time = 631, ct = 4, bandwidth = 8583
+KEY_VALUE_PREPARE1, time = 34, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 47, ct = 1, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 50, ct = 1, bandwidth = 876
+KEY_VALUE_DPF_EVAL, time = 61, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 13, ct = 0, bandwidth = 0
+KEY_VALUE_NETWORK, time = 162, ct = 1, bandwidth = 4
+key_value_others, time = 5, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 16, ct = 256, bandwidth = 0
+KEY_VALUE_HASH[1], time = 0, ct = 7, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:22.568216+09:00, duration: 0:00:03.133138
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:22.568290+09:00
+logn 9, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 274, ct = 1, bandwidth = 988
+ORAM_READ, time = 225, ct = 1, bandwidth = 4840
+ORAM_WRITE, time = 94, ct = 1, bandwidth = 3069
+ORAM_POSITION_MAP, time = 84, ct = 1, bandwidth = 42
+TOTAL, time = 678, ct = 4, bandwidth = 8939
+KEY_VALUE_PREPARE1, time = 65, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 92, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 51, ct = 1, bandwidth = 984
+KEY_VALUE_DPF_EVAL, time = 52, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 26, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 184, ct = 1, bandwidth = 4
+key_value_others, time = 0, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 32, ct = 512, bandwidth = 0
+KEY_VALUE_HASH[1], time = 1, ct = 16, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:25.700953+09:00, duration: 0:00:03.132663
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:25.701050+09:00
+logn 10, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 503, ct = 1, bandwidth = 1096
+ORAM_READ, time = 244, ct = 1, bandwidth = 4966
+ORAM_WRITE, time = 111, ct = 1, bandwidth = 3071
+ORAM_POSITION_MAP, time = 102, ct = 1, bandwidth = 42
+TOTAL, time = 962, ct = 4, bandwidth = 9175
+KEY_VALUE_PREPARE1, time = 115, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 169, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 44, ct = 1, bandwidth = 1092
+KEY_VALUE_DPF_EVAL, time = 84, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 53, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 458, ct = 1, bandwidth = 4
+key_value_others, time = 36, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 61, ct = 1024, bandwidth = 0
+KEY_VALUE_HASH[1], time = 2, ct = 32, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:28.889891+09:00, duration: 0:00:03.188841
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:28.889979+09:00
+logn 11, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 801, ct = 1, bandwidth = 1204
+ORAM_READ, time = 224, ct = 1, bandwidth = 5134
+ORAM_WRITE, time = 100, ct = 1, bandwidth = 2807
+ORAM_POSITION_MAP, time = 251, ct = 1, bandwidth = 246
+TOTAL, time = 1377, ct = 4, bandwidth = 9392
+KEY_VALUE_PREPARE1, time = 177, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 284, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 53, ct = 1, bandwidth = 1200
+KEY_VALUE_DPF_EVAL, time = 140, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 91, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 747, ct = 1, bandwidth = 4
+key_value_others, time = 53, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 107, ct = 2048, bandwidth = 0
+KEY_VALUE_HASH[1], time = 3, ct = 62, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:32.163553+09:00, duration: 0:00:03.273574
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:32.163622+09:00
+logn 12, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 1611, ct = 1, bandwidth = 1312
+ORAM_READ, time = 247, ct = 1, bandwidth = 5197
+ORAM_WRITE, time = 101, ct = 1, bandwidth = 2152
+ORAM_POSITION_MAP, time = 287, ct = 1, bandwidth = 504
+TOTAL, time = 2248, ct = 4, bandwidth = 9165
+KEY_VALUE_PREPARE1, time = 368, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 612, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 53, ct = 1, bandwidth = 1308
+KEY_VALUE_DPF_EVAL, time = 249, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 190, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 1556, ct = 1, bandwidth = 4
+key_value_others, time = 136, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 211, ct = 4096, bandwidth = 0
+KEY_VALUE_HASH[1], time = 7, ct = 122, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:35.611541+09:00, duration: 0:00:03.447919
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:35.611618+09:00
+logn 13, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 4209, ct = 1, bandwidth = 1420
+ORAM_READ, time = 262, ct = 1, bandwidth = 5233
+ORAM_WRITE, time = 134, ct = 1, bandwidth = 2188
+ORAM_POSITION_MAP, time = 327, ct = 1, bandwidth = 532
+TOTAL, time = 4934, ct = 4, bandwidth = 9374
+KEY_VALUE_PREPARE1, time = 1018, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 1586, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 45, ct = 1, bandwidth = 1416
+KEY_VALUE_DPF_EVAL, time = 602, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 529, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 3886, ct = 1, bandwidth = 4
+key_value_others, time = 426, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 514, ct = 8192, bandwidth = 0
+KEY_VALUE_HASH[1], time = 18, ct = 253, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:39.616939+09:00, duration: 0:00:04.005321
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:39.616979+09:00
+logn 14, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 6896, ct = 1, bandwidth = 1528
+ORAM_READ, time = 336, ct = 1, bandwidth = 5269
+ORAM_WRITE, time = 176, ct = 1, bandwidth = 2224
+ORAM_POSITION_MAP, time = 333, ct = 1, bandwidth = 550
+TOTAL, time = 7743, ct = 4, bandwidth = 9572
+KEY_VALUE_PREPARE1, time = 1556, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 2609, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 54, ct = 1, bandwidth = 1524
+KEY_VALUE_DPF_EVAL, time = 1000, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 906, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 6824, ct = 1, bandwidth = 4
+key_value_others, time = 769, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 868, ct = 16384, bandwidth = 0
+KEY_VALUE_HASH[1], time = 31, ct = 504, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:44.347071+09:00, duration: 0:00:04.730092
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:44.347249+09:00
+logn 15, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 13508, ct = 1, bandwidth = 1636
+ORAM_READ, time = 570, ct = 1, bandwidth = 5305
+ORAM_WRITE, time = 360, ct = 1, bandwidth = 2260
+ORAM_POSITION_MAP, time = 474, ct = 1, bandwidth = 563
+TOTAL, time = 14913, ct = 4, bandwidth = 9765
+KEY_VALUE_PREPARE1, time = 2830, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 5144, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 43, ct = 1, bandwidth = 1632
+KEY_VALUE_DPF_EVAL, time = 1877, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 1926, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 13393, ct = 1, bandwidth = 4
+key_value_others, time = 1686, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 1667, ct = 32768, bandwidth = 0
+KEY_VALUE_HASH[1], time = 61, ct = 1008, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 0, bandwidth = 0
+2022-09-03 22:32:51.234947+09:00, duration: 0:00:06.887698
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:32:51.235009+09:00
+logn 16, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 41328, ct = 1, bandwidth = 1744
+ORAM_READ, time = 910, ct = 1, bandwidth = 5341
+ORAM_WRITE, time = 557, ct = 1, bandwidth = 2296
+ORAM_POSITION_MAP, time = 905, ct = 1, bandwidth = 902
+TOTAL, time = 43702, ct = 4, bandwidth = 10284
+KEY_VALUE_PREPARE1, time = 8044, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 14663, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 46, ct = 1, bandwidth = 1740
+KEY_VALUE_DPF_EVAL, time = 5225, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 7991, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 40881, ct = 1, bandwidth = 4
+key_value_others, time = 5356, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 4174, ct = 65536, bandwidth = 0
+KEY_VALUE_HASH[1], time = 194, ct = 2018, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 2, bandwidth = 0
+2022-09-03 22:33:06.548028+09:00, duration: 0:00:15.313019
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:33:06.548133+09:00
+logn 17, data_size 32, tau 5, pdpf 5
+KEY_TO_INDEX, time = 68186, ct = 1, bandwidth = 1852
+ORAM_READ, time = 1318, ct = 1, bandwidth = 5377
+ORAM_WRITE, time = 876, ct = 1, bandwidth = 2332
+ORAM_POSITION_MAP, time = 897, ct = 1, bandwidth = 1144
+TOTAL, time = 71277, ct = 4, bandwidth = 10705
+KEY_VALUE_PREPARE1, time = 11648, ct = 2, bandwidth = 0
+KEY_VALUE_PREPARE2, time = 24581, ct = 2, bandwidth = 0
+KEY_VALUE_DPF_GEN, time = 52, ct = 1, bandwidth = 1848
+KEY_VALUE_DPF_EVAL, time = 7872, ct = 1, bandwidth = 0
+KEY_VALUE_ADD_INDEX, time = 14244, ct = 1, bandwidth = 0
+KEY_VALUE_NETWORK, time = 65068, ct = 1, bandwidth = 4
+key_value_others, time = 9786, ct = 0, bandwidth = 4
+KEY_VALUE_HASH[0], time = 6673, ct = 131072, bandwidth = 0
+KEY_VALUE_HASH[1], time = 355, ct = 4049, bandwidth = 0
+KEY_VALUE_HASH[2], time = 0, ct = 3, bandwidth = 0
+2022-09-03 22:33:42.489271+09:00, duration: 0:00:35.941138
+========== Benchmark end ==========
+
+========== Benchmark start ==========
+2022-09-03 22:33:42.489371+09:00
+logn 18, data_size 32, tau 5, pdpf 5
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.12)(2, 0.07)(3, 0.08)(4, 0.09)(5, 0.17)(6, 0.1)(7, 0.12)(8, 0.21)(9, 0.27)(10, 0.5)(11, 0.8)(12, 1.61)(13, 4.21)(14, 6.9)(15, 13.51)(16, 41.33)(17, 68.19)
+KEY_TO_INDEX ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_TO_INDEX bandwidth
+(1, 0.23)(2, 0.23)(3, 0.34)(4, 0.45)(5, 0.56)(6, 0.66)(7, 0.77)(8, 0.88)(9, 0.99)(10, 1.1)(11, 1.2)(12, 1.31)(13, 1.42)(14, 1.53)(15, 1.64)(16, 1.74)(17, 1.85)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.1)(2, 0.04)(3, 0.04)(4, 0.04)(5, 0.12)(6, 0.12)(7, 0.17)(8, 0.2)(9, 0.23)(10, 0.24)(11, 0.22)(12, 0.25)(13, 0.26)(14, 0.34)(15, 0.57)(16, 0.91)(17, 1.32)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+ORAM_READ bandwidth
+(1, 1.03)(2, 1.03)(3, 1.03)(4, 1.03)(5, 1.03)(6, 3.08)(7, 4.1)(8, 4.59)(9, 4.84)(10, 4.97)(11, 5.13)(12, 5.2)(13, 5.23)(14, 5.27)(15, 5.3)(16, 5.34)(17, 5.38)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.09)(2, 0.03)(3, 0.03)(4, 0.04)(5, 0.13)(6, 0.08)(7, 0.1)(8, 0.12)(9, 0.09)(10, 0.11)(11, 0.1)(12, 0.1)(13, 0.13)(14, 0.18)(15, 0.36)(16, 0.56)(17, 0.88)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+ORAM_WRITE bandwidth
+(1, 0.04)(2, 0.04)(3, 0.04)(4, 0.04)(5, 0.04)(6, 3.11)(7, 3.11)(8, 3.07)(9, 3.07)(10, 3.07)(11, 2.81)(12, 2.15)(13, 2.19)(14, 2.22)(15, 2.26)(16, 2.3)(17, 2.33)
+
+
+========== ORAM_POSITION_MAP ==========
+ORAM_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.07)(7, 0.07)(8, 0.1)(9, 0.08)(10, 0.1)(11, 0.25)(12, 0.29)(13, 0.33)(14, 0.33)(15, 0.47)(16, 0.91)(17, 0.9)
+ORAM_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+ORAM_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.04)(7, 0.04)(8, 0.04)(9, 0.04)(10, 0.04)(11, 0.25)(12, 0.5)(13, 0.53)(14, 0.55)(15, 0.56)(16, 0.9)(17, 1.14)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.31)(2, 0.15)(3, 0.15)(4, 0.17)(5, 0.42)(6, 0.38)(7, 0.46)(8, 0.63)(9, 0.68)(10, 0.96)(11, 1.38)(12, 2.25)(13, 4.93)(14, 7.74)(15, 14.91)(16, 43.7)(17, 71.28)
+TOTAL ct
+(1, 3)(2, 3)(3, 3)(4, 3)(5, 3)(6, 4)(7, 4)(8, 4)(9, 4)(10, 4)(11, 4)(12, 4)(13, 4)(14, 4)(15, 4)(16, 4)(17, 4)
+TOTAL bandwidth
+(1, 1.3)(2, 1.3)(3, 1.4)(4, 1.51)(5, 1.62)(6, 6.89)(7, 8.02)(8, 8.58)(9, 8.94)(10, 9.18)(11, 9.39)(12, 9.16)(13, 9.37)(14, 9.57)(15, 9.77)(16, 10.28)(17, 10.71)
+
+
+========== KEY_VALUE_PREPARE1 ==========
+KEY_VALUE_PREPARE1 time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.01)(7, 0.02)(8, 0.03)(9, 0.07)(10, 0.12)(11, 0.18)(12, 0.37)(13, 1.02)(14, 1.56)(15, 2.83)(16, 8.04)(17, 11.65)
+KEY_VALUE_PREPARE1 ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 2)(7, 2)(8, 2)(9, 2)(10, 2)(11, 2)(12, 2)(13, 2)(14, 2)(15, 2)(16, 2)(17, 2)
+KEY_VALUE_PREPARE1 bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_PREPARE2 ==========
+KEY_VALUE_PREPARE2 time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.01)(6, 0.01)(7, 0.02)(8, 0.05)(9, 0.09)(10, 0.17)(11, 0.28)(12, 0.61)(13, 1.59)(14, 2.61)(15, 5.14)(16, 14.66)(17, 24.58)
+KEY_VALUE_PREPARE2 ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 2)(10, 2)(11, 2)(12, 2)(13, 2)(14, 2)(15, 2)(16, 2)(17, 2)
+KEY_VALUE_PREPARE2 bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_DPF_GEN ==========
+KEY_VALUE_DPF_GEN time
+(1, 0.05)(2, 0.07)(3, 0.07)(4, 0.06)(5, 0.04)(6, 0.07)(7, 0.06)(8, 0.05)(9, 0.05)(10, 0.04)(11, 0.05)(12, 0.05)(13, 0.04)(14, 0.05)(15, 0.04)(16, 0.05)(17, 0.05)
+KEY_VALUE_DPF_GEN ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_DPF_GEN bandwidth
+(1, 0.23)(2, 0.23)(3, 0.34)(4, 0.44)(5, 0.55)(6, 0.66)(7, 0.77)(8, 0.88)(9, 0.98)(10, 1.09)(11, 1.2)(12, 1.31)(13, 1.42)(14, 1.52)(15, 1.63)(16, 1.74)(17, 1.85)
+
+
+========== KEY_VALUE_DPF_EVAL ==========
+KEY_VALUE_DPF_EVAL time
+(1, 0.11)(2, 0.06)(3, 0.06)(4, 0.05)(5, 0.06)(6, 0.06)(7, 0.05)(8, 0.06)(9, 0.05)(10, 0.08)(11, 0.14)(12, 0.25)(13, 0.6)(14, 1.0)(15, 1.88)(16, 5.22)(17, 7.87)
+KEY_VALUE_DPF_EVAL ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_DPF_EVAL bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_ADD_INDEX ==========
+KEY_VALUE_ADD_INDEX time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.01)(8, 0.01)(9, 0.03)(10, 0.05)(11, 0.09)(12, 0.19)(13, 0.53)(14, 0.91)(15, 1.93)(16, 7.99)(17, 14.24)
+KEY_VALUE_ADD_INDEX ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_ADD_INDEX bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_NETWORK ==========
+KEY_VALUE_NETWORK time
+(1, 0.07)(2, 0.02)(3, 0.02)(4, 0.02)(5, 0.13)(6, 0.04)(7, 0.06)(8, 0.16)(9, 0.18)(10, 0.46)(11, 0.75)(12, 1.56)(13, 3.89)(14, 6.82)(15, 13.39)(16, 40.88)(17, 65.07)
+KEY_VALUE_NETWORK ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_NETWORK bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== key_value_others ==========
+key_value_others time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.05)(6, 0.0)(7, 0.0)(8, 0.01)(9, 0.0)(10, 0.04)(11, 0.05)(12, 0.14)(13, 0.43)(14, 0.77)(15, 1.69)(16, 5.36)(17, 9.79)
+key_value_others ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)
+key_value_others bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_HASH[0] ==========
+KEY_VALUE_HASH[0] time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.01)(8, 0.02)(9, 0.03)(10, 0.06)(11, 0.11)(12, 0.21)(13, 0.51)(14, 0.87)(15, 1.67)(16, 4.17)(17, 6.67)
+KEY_VALUE_HASH[0] ct
+(1, 100.0)(2, 100.0)(3, 100.0)(4, 100.0)(5, 100.0)(6, 100.0)(7, 100.0)(8, 100.0)(9, 100.0)(10, 100.0)(11, 100.0)(12, 100.0)(13, 100.0)(14, 100.0)(15, 100.0)(16, 100.0)(17, 100.0)
+KEY_VALUE_HASH[0] bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_HASH[1] ==========
+KEY_VALUE_HASH[1] time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.01)(13, 0.02)(14, 0.03)(15, 0.06)(16, 0.19)(17, 0.35)
+KEY_VALUE_HASH[1] ct
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 3.125)(6, 1.5625)(7, 2.34375)(8, 2.734375)(9, 3.125)(10, 3.125)(11, 3.02734375)(12, 2.978515625)(13, 3.08837890625)(14, 3.076171875)(15, 3.076171875)(16, 3.0792236328125)(17, 3.089141845703125)
+KEY_VALUE_HASH[1] bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_HASH[2] ==========
+KEY_VALUE_HASH[2] time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+KEY_VALUE_HASH[2] ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 2)(17, 3)
+KEY_VALUE_HASH[2] bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== TERMINATED ==========
+========== KEY_TO_INDEX ==========
+KEY_TO_INDEX time
+(1, 0.12)(2, 0.07)(3, 0.08)(4, 0.09)(5, 0.17)(6, 0.1)(7, 0.12)(8, 0.21)(9, 0.27)(10, 0.5)(11, 0.8)(12, 1.61)(13, 4.21)(14, 6.9)(15, 13.51)(16, 41.33)(17, 68.19)
+KEY_TO_INDEX ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_TO_INDEX bandwidth
+(1, 0.23)(2, 0.23)(3, 0.34)(4, 0.45)(5, 0.56)(6, 0.66)(7, 0.77)(8, 0.88)(9, 0.99)(10, 1.1)(11, 1.2)(12, 1.31)(13, 1.42)(14, 1.53)(15, 1.64)(16, 1.74)(17, 1.85)
+
+
+========== ORAM_READ ==========
+ORAM_READ time
+(1, 0.1)(2, 0.04)(3, 0.04)(4, 0.04)(5, 0.12)(6, 0.12)(7, 0.17)(8, 0.2)(9, 0.23)(10, 0.24)(11, 0.22)(12, 0.25)(13, 0.26)(14, 0.34)(15, 0.57)(16, 0.91)(17, 1.32)
+ORAM_READ ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+ORAM_READ bandwidth
+(1, 1.03)(2, 1.03)(3, 1.03)(4, 1.03)(5, 1.03)(6, 3.08)(7, 4.1)(8, 4.59)(9, 4.84)(10, 4.97)(11, 5.13)(12, 5.2)(13, 5.23)(14, 5.27)(15, 5.3)(16, 5.34)(17, 5.38)
+
+
+========== ORAM_WRITE ==========
+ORAM_WRITE time
+(1, 0.09)(2, 0.03)(3, 0.03)(4, 0.04)(5, 0.13)(6, 0.08)(7, 0.1)(8, 0.12)(9, 0.09)(10, 0.11)(11, 0.1)(12, 0.1)(13, 0.13)(14, 0.18)(15, 0.36)(16, 0.56)(17, 0.88)
+ORAM_WRITE ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+ORAM_WRITE bandwidth
+(1, 0.04)(2, 0.04)(3, 0.04)(4, 0.04)(5, 0.04)(6, 3.11)(7, 3.11)(8, 3.07)(9, 3.07)(10, 3.07)(11, 2.81)(12, 2.15)(13, 2.19)(14, 2.22)(15, 2.26)(16, 2.3)(17, 2.33)
+
+
+========== ORAM_POSITION_MAP ==========
+ORAM_POSITION_MAP time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.07)(7, 0.07)(8, 0.1)(9, 0.08)(10, 0.1)(11, 0.25)(12, 0.29)(13, 0.33)(14, 0.33)(15, 0.47)(16, 0.91)(17, 0.9)
+ORAM_POSITION_MAP ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+ORAM_POSITION_MAP bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.04)(7, 0.04)(8, 0.04)(9, 0.04)(10, 0.04)(11, 0.25)(12, 0.5)(13, 0.53)(14, 0.55)(15, 0.56)(16, 0.9)(17, 1.14)
+
+
+========== TOTAL ==========
+TOTAL time
+(1, 0.31)(2, 0.15)(3, 0.15)(4, 0.17)(5, 0.42)(6, 0.38)(7, 0.46)(8, 0.63)(9, 0.68)(10, 0.96)(11, 1.38)(12, 2.25)(13, 4.93)(14, 7.74)(15, 14.91)(16, 43.7)(17, 71.28)
+TOTAL ct
+(1, 3)(2, 3)(3, 3)(4, 3)(5, 3)(6, 4)(7, 4)(8, 4)(9, 4)(10, 4)(11, 4)(12, 4)(13, 4)(14, 4)(15, 4)(16, 4)(17, 4)
+TOTAL bandwidth
+(1, 1.3)(2, 1.3)(3, 1.4)(4, 1.51)(5, 1.62)(6, 6.89)(7, 8.02)(8, 8.58)(9, 8.94)(10, 9.18)(11, 9.39)(12, 9.16)(13, 9.37)(14, 9.57)(15, 9.77)(16, 10.28)(17, 10.71)
+
+
+========== KEY_VALUE_PREPARE1 ==========
+KEY_VALUE_PREPARE1 time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.01)(7, 0.02)(8, 0.03)(9, 0.07)(10, 0.12)(11, 0.18)(12, 0.37)(13, 1.02)(14, 1.56)(15, 2.83)(16, 8.04)(17, 11.65)
+KEY_VALUE_PREPARE1 ct
+(1, 2)(2, 2)(3, 2)(4, 2)(5, 2)(6, 2)(7, 2)(8, 2)(9, 2)(10, 2)(11, 2)(12, 2)(13, 2)(14, 2)(15, 2)(16, 2)(17, 2)
+KEY_VALUE_PREPARE1 bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_PREPARE2 ==========
+KEY_VALUE_PREPARE2 time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.01)(6, 0.01)(7, 0.02)(8, 0.05)(9, 0.09)(10, 0.17)(11, 0.28)(12, 0.61)(13, 1.59)(14, 2.61)(15, 5.14)(16, 14.66)(17, 24.58)
+KEY_VALUE_PREPARE2 ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 2)(10, 2)(11, 2)(12, 2)(13, 2)(14, 2)(15, 2)(16, 2)(17, 2)
+KEY_VALUE_PREPARE2 bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_DPF_GEN ==========
+KEY_VALUE_DPF_GEN time
+(1, 0.05)(2, 0.07)(3, 0.07)(4, 0.06)(5, 0.04)(6, 0.07)(7, 0.06)(8, 0.05)(9, 0.05)(10, 0.04)(11, 0.05)(12, 0.05)(13, 0.04)(14, 0.05)(15, 0.04)(16, 0.05)(17, 0.05)
+KEY_VALUE_DPF_GEN ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_DPF_GEN bandwidth
+(1, 0.23)(2, 0.23)(3, 0.34)(4, 0.44)(5, 0.55)(6, 0.66)(7, 0.77)(8, 0.88)(9, 0.98)(10, 1.09)(11, 1.2)(12, 1.31)(13, 1.42)(14, 1.52)(15, 1.63)(16, 1.74)(17, 1.85)
+
+
+========== KEY_VALUE_DPF_EVAL ==========
+KEY_VALUE_DPF_EVAL time
+(1, 0.11)(2, 0.06)(3, 0.06)(4, 0.05)(5, 0.06)(6, 0.06)(7, 0.05)(8, 0.06)(9, 0.05)(10, 0.08)(11, 0.14)(12, 0.25)(13, 0.6)(14, 1.0)(15, 1.88)(16, 5.22)(17, 7.87)
+KEY_VALUE_DPF_EVAL ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_DPF_EVAL bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_ADD_INDEX ==========
+KEY_VALUE_ADD_INDEX time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.01)(8, 0.01)(9, 0.03)(10, 0.05)(11, 0.09)(12, 0.19)(13, 0.53)(14, 0.91)(15, 1.93)(16, 7.99)(17, 14.24)
+KEY_VALUE_ADD_INDEX ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_ADD_INDEX bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_NETWORK ==========
+KEY_VALUE_NETWORK time
+(1, 0.07)(2, 0.02)(3, 0.02)(4, 0.02)(5, 0.13)(6, 0.04)(7, 0.06)(8, 0.16)(9, 0.18)(10, 0.46)(11, 0.75)(12, 1.56)(13, 3.89)(14, 6.82)(15, 13.39)(16, 40.88)(17, 65.07)
+KEY_VALUE_NETWORK ct
+(1, 1)(2, 1)(3, 1)(4, 1)(5, 1)(6, 1)(7, 1)(8, 1)(9, 1)(10, 1)(11, 1)(12, 1)(13, 1)(14, 1)(15, 1)(16, 1)(17, 1)
+KEY_VALUE_NETWORK bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== key_value_others ==========
+key_value_others time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.05)(6, 0.0)(7, 0.0)(8, 0.01)(9, 0.0)(10, 0.04)(11, 0.05)(12, 0.14)(13, 0.43)(14, 0.77)(15, 1.69)(16, 5.36)(17, 9.79)
+key_value_others ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 0)(17, 0)
+key_value_others bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_HASH[0] ==========
+KEY_VALUE_HASH[0] time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.01)(8, 0.02)(9, 0.03)(10, 0.06)(11, 0.11)(12, 0.21)(13, 0.51)(14, 0.87)(15, 1.67)(16, 4.17)(17, 6.67)
+KEY_VALUE_HASH[0] ct
+(1, 100.0)(2, 100.0)(3, 100.0)(4, 100.0)(5, 100.0)(6, 100.0)(7, 100.0)(8, 100.0)(9, 100.0)(10, 100.0)(11, 100.0)(12, 100.0)(13, 100.0)(14, 100.0)(15, 100.0)(16, 100.0)(17, 100.0)
+KEY_VALUE_HASH[0] bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_HASH[1] ==========
+KEY_VALUE_HASH[1] time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.01)(13, 0.02)(14, 0.03)(15, 0.06)(16, 0.19)(17, 0.35)
+KEY_VALUE_HASH[1] ct
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 3.125)(6, 1.5625)(7, 2.34375)(8, 2.734375)(9, 3.125)(10, 3.125)(11, 3.02734375)(12, 2.978515625)(13, 3.08837890625)(14, 3.076171875)(15, 3.076171875)(16, 3.0792236328125)(17, 3.089141845703125)
+KEY_VALUE_HASH[1] bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+
+========== KEY_VALUE_HASH[2] ==========
+KEY_VALUE_HASH[2] time
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+KEY_VALUE_HASH[2] ct
+(1, 0)(2, 0)(3, 0)(4, 0)(5, 0)(6, 0)(7, 0)(8, 0)(9, 0)(10, 0)(11, 0)(12, 0)(13, 0)(14, 0)(15, 0)(16, 2)(17, 3)
+KEY_VALUE_HASH[2] bandwidth
+(1, 0.0)(2, 0.0)(3, 0.0)(4, 0.0)(5, 0.0)(6, 0.0)(7, 0.0)(8, 0.0)(9, 0.0)(10, 0.0)(11, 0.0)(12, 0.0)(13, 0.0)(14, 0.0)(15, 0.0)(16, 0.0)(17, 0.0)
+
+

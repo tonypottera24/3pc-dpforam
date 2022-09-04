@@ -29,8 +29,7 @@ static int getbit(const uint64_t x, const int n, const int b) {
     return (x >> (n - b)) & 1;
 }
 
-void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *bit1,
-         int *bit2) {
+void PRG(AES_KEY *key, uint128 input, uint128 *output1, uint128 *output2, int *bit1, int *bit2) {
     input = dpf_set_lsb_zero(input);
 
     uint128 stash[2];

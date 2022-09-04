@@ -22,7 +22,7 @@ Benchmark::Record &Benchmark::Record::operator+=(const Benchmark::Record &rhs) {
 }
 
 Benchmark::Record &Benchmark::Record::operator-=(const Benchmark::Record &rhs) {
-    this->duration_ -= rhs.duration_;
+    this->duration_ = this->duration_ < rhs.duration_ ? duration<long long, std::nano>::zero() : this->duration_ - rhs.duration_;
     this->count_ = this->count_ < rhs.count_ ? 0 : this->count_ - rhs.count_;
     this->bandwidth_ = this->bandwidth_ < rhs.bandwidth_ ? 0 : this->bandwidth_ - rhs.bandwidth_;
     return *this;

@@ -26,12 +26,12 @@ int main(int argc, char *argv[]) {
         "port", po::value<uint>()->default_value(8080), "server port")(
         "next_party_ip", po::value<std::string>()->default_value("127.0.0.1"), "next party's ip")(
         "next_party_port", po::value<uint>()->default_value(8080), "next party's port")(
-        "log_n", po::value<uint>()->default_value(15), "number of data (log)")(
+        "log_n", po::value<uint>()->default_value(17), "number of data (log)")(
         "data_size", po::value<uint>()->default_value(32), "data size (bytes)")(
         "tau", po::value<uint>()->default_value(5), "tau, number of data included in a block (log)")(
         "log_ssot_threshold", po::value<uint>()->default_value(0), "ssot threshold (log)")(
         "log_pseudo_dpf_threshold", po::value<uint>()->default_value(5), "pseudo dpf threshold (log)")(
-        "key_value_rounds", po::value<uint>()->default_value(8), "key-value rounds")(
+        "key_value_rounds", po::value<uint>()->default_value(3), "key-value rounds")(
         "key_value_evalall_threshold", po::value<uint>()->default_value(15), "key-value EvalAll threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
         "iterations", po::value<uint>()->default_value(100), "number of iterations");
@@ -114,12 +114,15 @@ int main(int argc, char *argv[]) {
     peer[0].Socket().Read(seed, PRG::SeedSize(), NULL);
     peer[0].PRG()->SetSeed(seed);
 
+    ZpBoostData::initAESKey();
+
     // fprintf(stderr, "Initilizing PRG done. (%u, %u) (%u, %u)\n", offset[(party + 2) % 3], offset[(party + 2) % 3] + 16, offset[party], offset[party] + 16);
 
     // uint64_t start_time = timestamp();
     // ORAM<BinaryData, BinaryData> oram = ORAM<BinaryData, BinaryData>(party, peer, n, 0, data_size, true);
     // ORAM<BinaryData, ZpBoostData> oram = ORAM<BinaryData, ZpBoostData>(party, peer, n, 0, data_size, true);
     ORAM<ZpBoostData, BinaryData> oram = ORAM<ZpBoostData, BinaryData>(party, peer, n, ZpBoostData().Size(), data_size, true);
+    // ORAM<ZpBoostData, ZpBoostData> oram = ORAM<ZpBoostData, ZpBoostData>(party, peer, n, ZpBoostData().Size(), data_size, true);
     // ORAM<ZpData, ZpData> oram = ORAM<ZpData, ZpData>(party, peer, n, ZpData().Size(), data_size, true);
 
     // uint64_t end_time = timestamp();
