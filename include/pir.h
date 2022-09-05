@@ -4,8 +4,9 @@
 #include <openssl/evp.h>
 
 #include <algorithm>
-#include <boost/unordered_map.hpp>
+#include <sparsehash/dense_hash_map>
 #include <string>
+#include <unordered_map>
 
 #include "ssot.h"
 
@@ -114,7 +115,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 
     // const uint64_t digest_size = 3;
     // const uint64_t digest_size_log = digest_size * 8;
-    const uint64_t digest_size_log = log2(n) + 5;
+    const uint64_t digest_size_log = log2(n) + 6;
     const uint64_t digest_n = 1ULL << digest_size_log;
     // const uint64_t digest_n = 16777127;
     // bool eval_all[2] = {n > KEY_VALUE_EVALALL_THRESHOLD, false};
@@ -189,7 +190,10 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #endif
 
-        typename boost::unordered_map<uint64_t, K> delta_key_array;
+        std::unordered_map<uint64_t, K> delta_key_array;
+
+        // std::unordered_map<uint64_t, K> delta_key_array;
+
         for (uint i = 0; i < n; i++) {
             delta_key_array[i] = key_array_13[i] - key_23[1 - party];
         }
@@ -209,7 +213,8 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 old_bandwidth = benchmark->bandwidth_;
             }
 #endif
-            boost::unordered_map<uint64_t, uint> exists;
+            // google::dense_hash_map<uint64_t, uint> exists;
+            // if (digest.size() < n) digest.resize(n);
             for (auto &&delta_key_item : delta_key_array) {
 #ifdef BENCHMARK_KEY_VALUE_HASH
                 if (benchmark != NULL) {
@@ -224,12 +229,29 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 }
 #endif
                 digest[delta_key_item.first] = digest_uint;
-                exists[digest_uint]++;
+                // exists[digest_uint]++;
             }
 
 #ifdef BENCHMARK_KEY_VALUE
             if (benchmark != NULL) {
                 Benchmark::KEY_VALUE_PREPARE2.Stop(benchmark->bandwidth_ - old_bandwidth);
+            }
+#endif
+
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_PREPARE3.Start();
+                old_bandwidth = benchmark->bandwidth_;
+            }
+#endif
+            std::unordered_map<uint64_t, uint> exists;
+            std::vector<uint> exists(digest_n);
+            for (auto &&delta_key_item : delta_key_array) {
+                exists[digest[delta_key_item.first]]++;
+            }
+#ifdef BENCHMARK_KEY_VALUE
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_PREPARE3.Stop(benchmark->bandwidth_ - old_bandwidth);
             }
 #endif
 
@@ -244,26 +266,7 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
             for (auto &&delta_key_item : delta_key_array) {
                 uint64_t digest_uint = digest[delta_key_item.first];
                 if (exists[digest_uint] == 1) {
-                    bool hit = false;
-                    // if (eval_all[round]) {
-                    hit = dpf_out[round][digest_uint];
-                    // } else {
-                    // #ifdef BENCHMARK_KEY_VALUE
-                    //                         if (benchmark != NULL) {
-                    //                             Benchmark::KEY_VALUE_DPF_EVAL.Start();
-                    //                             old_bandwidth = benchmark->bandwidth_;
-                    //                         }
-                    // #endif
-                    // hit = fss.Eval(query[round], digest_uint, benchmark);
-                    // #ifdef BENCHMARK_KEY_VALUE
-                    //                         if (benchmark != NULL) {
-                    //                             Benchmark::KEY_VALUE_DPF_EVAL.Stop(benchmark->bandwidth_ - old_bandwidth);
-                    //                         }
-                    // #endif
-                    // }
-                    if (hit) {
-                        v_sum ^= delta_key_item.first;
-                    }
+                    if (dpf_out[round][digest_uint]) v_sum ^= delta_key_item.first;
                     wait_to_remove.emplace_back(delta_key_item.first);
                 }
             }

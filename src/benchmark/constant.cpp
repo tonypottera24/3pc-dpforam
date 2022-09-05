@@ -11,6 +11,7 @@ Benchmark::Record Benchmark::ORAM_POSITION_MAP("ORAM_POSITION_MAP");
 // BENCHMARK_KEY_VALUE
 Benchmark::Record Benchmark::KEY_VALUE_PREPARE1("KEY_VALUE_PREPARE1");
 Benchmark::Record Benchmark::KEY_VALUE_PREPARE2("KEY_VALUE_PREPARE2");
+Benchmark::Record Benchmark::KEY_VALUE_PREPARE3("KEY_VALUE_PREPARE3");
 Benchmark::Record Benchmark::KEY_VALUE_DPF_GEN("KEY_VALUE_DPF_GEN");
 Benchmark::Record Benchmark::KEY_VALUE_DPF_EVAL("KEY_VALUE_DPF_EVAL");
 Benchmark::Record Benchmark::KEY_VALUE_ADD_INDEX("KEY_VALUE_ADD_INDEX");

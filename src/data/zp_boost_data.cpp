@@ -142,6 +142,8 @@ void ZpBoostData::LoadBuffer(uchar *buffer) {
 uint64_t ZpBoostData::hash(uint64_t digest_n, uint64_t round) {
     // return this->boost_hash(this->data_ * uint256_t(round + 1)) % digest_n;
 
+    // return (uint64_t)(this->data_ * uint256_t(round + 1)) % digest_n;
+
     uint256_t data = this->data_;
     // uint128 stash[2];
     // DumpBuffer((uchar *)stash);
