@@ -9,7 +9,14 @@
 #include <string>
 #include <unordered_map>
 
+#include "constant.h"
+#include "data/binary_data.h"
+#include "fss1bit.h"
+#include "inv_gadget.h"
+#include "key_index_const.h"
+#include "peer.h"
 #include "ssot.h"
+#include "typedef.h"
 
 namespace PIR {
 
@@ -102,6 +109,43 @@ D DPF_PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint n, 
 }
 
 template <typename K>
+class KeyItem {
+public:
+    uint i_;
+    K key_;
+    uint64_t digest_;
+
+public:
+    KeyItem() {}
+    KeyItem(uint i, const K &key) {
+        this->i_ = i;
+        this->key_ = key;
+    }
+
+    KeyItem(const KeyItem &other) {
+        this->i_ = other.i_;
+        this->key_ = other.key_;
+        this->digest_ = other.digest_;
+    }
+
+    KeyItem &operator=(const KeyItem &other) {
+        if (this == &other) return *this;
+        this->i_ = other.i_;
+        this->key_ = other.key_;
+        this->digest_ = other.digest_;
+        return *this;
+    }
+
+    void hash(uint64_t digest_n, uint round) {
+        this->digest_ = this->key_.hash(digest_n, round);
+    }
+
+    bool operator<(const KeyItem &b) {
+        return this->digest_ < b.digest_;
+    }
+};
+
+template <typename K>
 uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_array_13, const K key_23[2], Benchmark::Record *benchmark) {
     uint n = key_array_13.size();
     debug_print("[%u]DPF_KEY_PIR\n", n);
@@ -167,13 +211,18 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 #endif
 
         BinaryData query[KEY_VALUE_ROUNDS];
-        std::vector<uchar> dpf_out[KEY_VALUE_ROUNDS];
+        static std::vector<std::vector<uchar>> dpf_out;
+        if (dpf_out.size() != KEY_VALUE_ROUNDS) {
+            dpf_out.resize(KEY_VALUE_ROUNDS);
+        }
         for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
             uint query_size = peer[party].ReadUInt(benchmark);
             query[round].Resize(query_size);
             peer[party].ReadData(query[round], benchmark);
             if (eval_all[round]) {
-                dpf_out[round].resize(digest_n);
+                if (dpf_out[round].size() != digest_n) {
+                    dpf_out[round].resize(digest_n);
+                }
                 fss.EvalAll(query[round], digest_size_log, dpf_out[round], benchmark);
             }
         }
@@ -191,17 +240,17 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
         }
 #endif
 
-        // std::unordered_map<uint64_t, K> delta_key_array;
-        // google::dense_hash_map<int64_t, K> delta_key_array;
-        // delta_key_array.set_empty_key(-1);
-        // std::unordered_map<uint64_t, K> delta_key_array;
-
-        std::vector<std::pair<uint64_t, K>> delta_key_array;
-        for (uint i = 0; i < n; i++) {
-            delta_key_array.emplace_back(i, key_array_13[i] - key_23[1 - party]);
+        static std::vector<std::vector<KeyItem<K>>> delta_key_array;
+        if (delta_key_array.size() != KEY_VALUE_ROUNDS) {
+            delta_key_array.resize(KEY_VALUE_ROUNDS);
         }
-
-        // std::vector<uint64_t> digest(n);
+        if (delta_key_array[0].size() != key_array_13.size()) {
+            delta_key_array[0].resize(key_array_13.size());
+        }
+        for (uint i = 0; i < key_array_13.size(); i++) {
+            delta_key_array[0][i].i_ = i;
+            delta_key_array[0][i].key_ = key_array_13[i] - key_23[1 - party];
+        }
 
 #ifdef BENCHMARK_KEY_VALUE
         if (benchmark != NULL) {
@@ -210,31 +259,31 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
 #endif
 
         for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
+            if (delta_key_array[round].size() == 0) break;
+            if (round < KEY_VALUE_ROUNDS - 1 && delta_key_array[round + 1].size() > 0) {
+                delta_key_array[round + 1].clear();
+            }
 #ifdef BENCHMARK_KEY_VALUE
             if (benchmark != NULL) {
                 Benchmark::KEY_VALUE_PREPARE2.Start();
                 old_bandwidth = benchmark->bandwidth_;
             }
 #endif
-            // google::dense_hash_map<uint64_t, uint> exists;
-            std::vector<uint64_t> digest;
-            for (auto &&delta_key_item : delta_key_array) {
 #ifdef BENCHMARK_KEY_VALUE_HASH
-                if (benchmark != NULL) {
-                    Benchmark::KEY_VALUE_HASH[round].Start();
-                    old_bandwidth = benchmark->bandwidth_;
-                }
-#endif
-                uint64_t digest_uint = delta_key_item.second.hash(digest_n, round);
-#ifdef BENCHMARK_KEY_VALUE_HASH
-                if (benchmark != NULL) {
-                    Benchmark::KEY_VALUE_HASH[round].Stop(benchmark->bandwidth_ - old_bandwidth);
-                }
-#endif
-                digest.push_back(digest_uint);
-                // exists[digest_uint]++;
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_HASH[round].Start();
+                old_bandwidth = benchmark->bandwidth_;
             }
-
+#endif
+            for (auto &delta_key_item : delta_key_array[round]) {
+                delta_key_item.hash(digest_n, round);
+            }
+#ifdef BENCHMARK_KEY_VALUE_HASH
+            if (benchmark != NULL) {
+                Benchmark::KEY_VALUE_HASH[round].Stop(benchmark->bandwidth_ - old_bandwidth);
+                Benchmark::KEY_VALUE_HASH[round].count_ += delta_key_array[round].size();
+            }
+#endif
 #ifdef BENCHMARK_KEY_VALUE
             if (benchmark != NULL) {
                 Benchmark::KEY_VALUE_PREPARE2.Stop(benchmark->bandwidth_ - old_bandwidth);
@@ -247,13 +296,12 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 old_bandwidth = benchmark->bandwidth_;
             }
 #endif
-            google::dense_hash_map<int64_t, uint> exists;
-            exists.set_empty_key(-1);
-            for (uint i = 0; i < digest.size(); i++) {
-                exists[digest[i]]++;
-            }
-
-            // std::vector<uint> exists(digest.size());
+            // google::dense_hash_map<int64_t, uint> exists;
+            // exists.set_empty_key(-1);
+            // for (uint i = 0; i < digest.size(); i++) {
+            //     exists[digest[i]]++;
+            // }
+            sort(delta_key_array[round].begin(), delta_key_array[round].end());
 #ifdef BENCHMARK_KEY_VALUE
             if (benchmark != NULL) {
                 Benchmark::KEY_VALUE_PREPARE3.Stop(benchmark->bandwidth_ - old_bandwidth);
@@ -266,14 +314,18 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                 old_bandwidth = benchmark->bandwidth_;
             }
 #endif
-
-            // std::vector<uint64_t> wait_to_remove;
-            for (uint i = 0; i < delta_key_array.size(); i++) {
-                uint64_t digest_uint = digest[i];
-                if (exists[digest_uint] == 1) {
+            uint i = 0, j = 0;
+            while (i < delta_key_array[round].size() && j < delta_key_array[round].size()) {
+                while (j < delta_key_array[round].size() && delta_key_array[round][j].digest_ == delta_key_array[round][i].digest_) j++;
+                if (i < j - 1) {
+                    if (round < KEY_VALUE_ROUNDS - 1) {
+                        delta_key_array[round + 1].insert(delta_key_array[round + 1].end(), delta_key_array[round].begin() + i, delta_key_array[round].begin() + j);
+                    }
+                } else {
+                    uint64_t digest = delta_key_array[round][i].digest_;
                     bool hit = false;
                     if (eval_all[round]) {
-                        hit = dpf_out[round][digest_uint];
+                        hit = dpf_out[round][digest];
                     } else {
 #ifdef BENCHMARK_KEY_VALUE
                         if (benchmark != NULL) {
@@ -281,31 +333,17 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                             old_bandwidth = benchmark->bandwidth_;
                         }
 #endif
-                        hit = fss.Eval(query[round], digest_uint, benchmark);
+                        hit = fss.Eval(query[round], digest, benchmark);
 #ifdef BENCHMARK_KEY_VALUE
                         if (benchmark != NULL) {
                             Benchmark::KEY_VALUE_DPF_EVAL.Stop(benchmark->bandwidth_ - old_bandwidth);
                         }
 #endif
                     }
-                    if (hit) v_sum ^= delta_key_array[i].first;
-                    // wait_to_remove.push_back(i);
-                    if (i != delta_key_array.size() - 1) {
-                        delta_key_array[i] = delta_key_array.back();
-                        digest[i] = digest.back();
-                    }
-                    delta_key_array.pop_back();
-                    digest.pop_back();
-                    i--;
+                    if (hit) v_sum ^= delta_key_array[round][i].i_;
                 }
+                i = j;
             }
-            // for (uint64_t i : wait_to_remove) {
-            //     // delta_key_array.erase(i);
-            //     // delta_key_array.set_deleted_key(i);
-            //     delta_key_array[i] = delta_key_array.back();
-            //     delta_key_array.pop_back();
-            // }
-            if (delta_key_array.size() == 0) break;
 #ifdef BENCHMARK_KEY_VALUE
             if (benchmark != NULL) {
                 Benchmark::KEY_VALUE_ADD_INDEX.Stop(benchmark->bandwidth_ - old_bandwidth);
@@ -370,7 +408,6 @@ D PIR(Peer peer[2], FSS1Bit &fss, std::vector<D> array_23[2], const uint index_2
         return DPF_PIR(peer, fss, array_23, n, log_n, clean_index_23, pseudo, benchmark);
     }
 }
-
 };  // namespace PIR
 
 #endif /* PIR_H_ */
