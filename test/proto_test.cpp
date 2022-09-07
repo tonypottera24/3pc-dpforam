@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
         "key_value_rounds", po::value<uint>()->default_value(3), "key-value rounds")(
         "key_value_evalall_threshold", po::value<uint>()->default_value(15), "key-value EvalAll threshold (log)")(
         "threads", po::value<uint>()->default_value(1), "number of threads")(
-        "iterations", po::value<uint>()->default_value(100), "number of iterations");
+        "iterations", po::value<uint>()->default_value(10), "number of iterations");
 
     po::variables_map vm;
     try {

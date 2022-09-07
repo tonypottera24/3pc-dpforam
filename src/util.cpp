@@ -13,14 +13,15 @@ void xor_bytes(const uchar *a, const uchar *b, uchar *r, const uint len) {
     //     uint256 *aa = (uint256 *)&a[offset];
     //     uint256 *bb = (uint256 *)&b[offset];
     //     uint256 *rr = (uint256 *)&r[offset];
-    //     (*rr) = _mm256_xor_epi64(*aa, *bb);
+    //     // (*rr) = _mm256_xor_epi64(*aa, *bb);
+    //     (*rr) = _mm256_xor_si256(*aa, *bb);
     //     offset = i + sizeof(uint256);
     // }
     for (uint i = offset; i + sizeof(uint128) <= len; i += sizeof(uint128)) {
         uint128 *aa = (uint128 *)&a[offset];
         uint128 *bb = (uint128 *)&b[offset];
         uint128 *rr = (uint128 *)&r[offset];
-        (*rr) = _mm_xor_si128(*aa,*bb);
+        (*rr) = _mm_xor_si128(*aa, *bb);
         offset = i + sizeof(uint128);
     }
     for (uint i = offset; i + sizeof(uint64_t) <= len; i += sizeof(uint64_t)) {
