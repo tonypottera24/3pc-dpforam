@@ -1,9 +1,10 @@
 #include "constant.h"
 
+uint LOG_N;
 uint DATA_PER_BLOCK;
 uint SSOT_THRESHOLD;
 
-uint KEY_VALUE_ROUNDS;
+// uint KEY_VALUE_ROUNDS;
 uint KEY_VALUE_EVALALL_THRESHOLD;
 
 uint LOG_PSEUDO_DPF_THRESHOLD;

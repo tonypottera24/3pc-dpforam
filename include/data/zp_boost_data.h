@@ -23,15 +23,22 @@ private:
     const static inline uint size_ = 32;
     static const bool is_symmetric_ = false;
     static inline PRG *prg_ = new PRG();
-    static inline boost::hash<uint256_t> boost_hash;
 
-    static inline AES_KEY aes_key_[2];
+    static inline AES_KEY aes_key_[100];
 
 public:
     static void initAESKey() {
-        for (uint i = 0; i < KEY_VALUE_ROUNDS; i++) {
+        // uint rounds = 100;
+        for (uint i = 0; i < 100; i++) {
             AES_set_encrypt_key(dpf_make_block(597349ULL + i, 121379ULL + i), &aes_key_[i]);
         }
+        // if (aes_key_.size() < rounds) {
+        //     uint old_size = aes_key_.size();
+        //     aes_key_.resize(rounds);
+        //     for (uint i = old_size; i < rounds; i++) {
+        //         AES_set_encrypt_key(dpf_make_block(597349ULL + i, 121379ULL + i), &aes_key_[i]);
+        //     }
+        // }
     }
 
 public:

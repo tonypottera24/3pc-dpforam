@@ -143,11 +143,11 @@ uint64_t ZpBoostData::hash(uint64_t digest_n, uint64_t round) {
     // return this->boost_hash(this->data_ * uint256_t(round + 1)) % digest_n;
 
     // return (uint64_t)(this->data_ * uint256_t(round + 1)) % digest_n;
-
+    // initAESKey(round);
     uint256_t data = this->data_;
     // uint128 stash[2];
     // DumpBuffer((uchar *)stash);
-    AES_ecb_encrypt_blks((uint128 *)&data, 2, &ZpBoostData::aes_key_[round]);
+    AES_ecb_encrypt_blks((uint128 *)&data, 2, &(ZpBoostData::aes_key_[round]));
     // import_bits(data, (uchar *)stash, (uchar *)stash + this->Size(), 8, false);
 
     return (uint64_t)data % digest_n;

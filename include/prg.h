@@ -13,6 +13,7 @@
 #include "typedef.h"
 
 class PRG {
+    // TODO use AVX aes
 private:
     uchar *seed_;
     uint used_bytes_ = 0;

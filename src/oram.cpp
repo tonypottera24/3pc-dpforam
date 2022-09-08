@@ -623,7 +623,7 @@ void ORAM<K, D>::Test(uint iterations) {
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE_HASH
-    for (uint round = 0; round < KEY_VALUE_ROUNDS; round++) {
+    for (uint round = 0; round < Benchmark::KEY_VALUE_HASH.size(); round++) {
         Benchmark::KEY_VALUE_HASH[round].Sync(this->peer_);
         Benchmark::KEY_VALUE_HASH[round].PrintTotal(iterations);
     }
