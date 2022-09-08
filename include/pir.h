@@ -138,10 +138,6 @@ public:
     void hash(uint64_t digest_n, uint round) {
         this->digest_ = this->key_.hash(digest_n, round);
     }
-
-    bool operator<(const KeyItem &b) {
-        return this->digest_ < b.digest_;
-    }
 };
 
 template <typename K>
@@ -325,7 +321,6 @@ uint DPF_KEY_PIR(uint party, Peer peer[2], FSS1Bit &fss, std::vector<K> &key_arr
                     if (dpf_out[round][digest]) {
                         v_sum ^= delta_key_array[i].i_;
                     }
-                } else {
                     delta_key_array[i] = delta_key_array.back();
                     delta_key_array.pop_back();
                     i--;
