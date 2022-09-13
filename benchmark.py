@@ -71,7 +71,7 @@ def print_records(records, x_axis):
         for x, record in zip(x_axis, records):
             y = record.criteria[criteria]["ct"]
             if criteria in ['KEY_VALUE_HASH[0]', 'KEY_VALUE_HASH[1]']:
-                y = (y / pow(2, x)) * 100
+                y = round((y / pow(2, x)) * 100, 2)
             print(f"({x}, {y})", end="", flush=True)
         print("", flush=True)
 

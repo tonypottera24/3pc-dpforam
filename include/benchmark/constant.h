@@ -14,9 +14,9 @@ extern Record ORAM_POSITION_MAP;
 
 // KEY_VALUE
 #define BENCHMARK_KEY_VALUE
-extern Record KEY_VALUE_PREPARE1;
-extern Record KEY_VALUE_PREPARE2;
-extern Record KEY_VALUE_PREPARE3;
+extern Record KEY_VALUE_PREPARE_SUBTRACT;
+extern Record KEY_VALUE_PREPARE_HASH;
+extern Record KEY_VALUE_PREPARE_EXISTS;
 extern Record KEY_VALUE_DPF_GEN;
 extern Record KEY_VALUE_DPF_EVAL;
 extern Record KEY_VALUE_ADD_INDEX;

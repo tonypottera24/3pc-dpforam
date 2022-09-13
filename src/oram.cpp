@@ -602,12 +602,12 @@ void ORAM<K, D>::Test(uint iterations) {
 #endif
 
 #ifdef BENCHMARK_KEY_VALUE
-    Benchmark::KEY_VALUE_PREPARE1.Sync(this->peer_);
-    Benchmark::KEY_VALUE_PREPARE1.PrintTotal(iterations);
-    Benchmark::KEY_VALUE_PREPARE2.Sync(this->peer_);
-    Benchmark::KEY_VALUE_PREPARE2.PrintTotal(iterations);
-    Benchmark::KEY_VALUE_PREPARE3.Sync(this->peer_);
-    Benchmark::KEY_VALUE_PREPARE3.PrintTotal(iterations);
+    Benchmark::KEY_VALUE_PREPARE_SUBTRACT.Sync(this->peer_);
+    Benchmark::KEY_VALUE_PREPARE_SUBTRACT.PrintTotal(iterations);
+    Benchmark::KEY_VALUE_PREPARE_HASH.Sync(this->peer_);
+    Benchmark::KEY_VALUE_PREPARE_HASH.PrintTotal(iterations);
+    Benchmark::KEY_VALUE_PREPARE_EXISTS.Sync(this->peer_);
+    Benchmark::KEY_VALUE_PREPARE_EXISTS.PrintTotal(iterations);
     Benchmark::KEY_VALUE_DPF_GEN.Sync(this->peer_);
     Benchmark::KEY_VALUE_DPF_GEN.PrintTotal(iterations);
     Benchmark::KEY_VALUE_DPF_EVAL.Sync(this->peer_);
@@ -616,7 +616,7 @@ void ORAM<K, D>::Test(uint iterations) {
     Benchmark::KEY_VALUE_ADD_INDEX.PrintTotal(iterations);
     Benchmark::KEY_VALUE_NETWORK.Sync(this->peer_);
     Benchmark::KEY_VALUE_NETWORK.PrintTotal(iterations);
-    Benchmark::Record key_value_others = Benchmark::KEY_TO_INDEX - Benchmark::KEY_VALUE_PREPARE1 - Benchmark::KEY_VALUE_PREPARE2 - Benchmark::KEY_VALUE_PREPARE3 - Benchmark::KEY_VALUE_DPF_GEN - Benchmark::KEY_VALUE_DPF_EVAL - Benchmark::KEY_VALUE_ADD_INDEX;
+    Benchmark::Record key_value_others = Benchmark::KEY_TO_INDEX - Benchmark::KEY_VALUE_PREPARE_SUBTRACT - Benchmark::KEY_VALUE_PREPARE_HASH - Benchmark::KEY_VALUE_PREPARE_EXISTS - Benchmark::KEY_VALUE_DPF_GEN - Benchmark::KEY_VALUE_DPF_EVAL - Benchmark::KEY_VALUE_ADD_INDEX;
     //  - Benchmark::KEY_VALUE_NETWORK;
     key_value_others.name = "key_value_others";
     key_value_others.PrintTotal(iterations);
