@@ -28,8 +28,8 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 
 class BenchmarkRecord():
-    def __init__(self, proto_test_args, stderr):
-        self.proto_test_args = proto_test_args
+    def __init__(self, args, stderr):
+        self.args = args
         self.criteria = {}
         for log in stderr:
             if log.startswith('{'):
@@ -46,11 +46,11 @@ class BenchmarkRecord():
             print(f'{criteria}, time = {log["time"]}, ct = {log["ct"]}, bandwidth = {log["bandwidth"]}', flush=True)
 
 
-def start_benchmark(proto_test_args):
-    out = subprocess.run(proto_test_args, stderr=subprocess.PIPE)
+def start_benchmark(args):
+    out = subprocess.run(args, stderr=subprocess.PIPE)
     if out.returncode == 0:
         stderr = out.stderr.decode("utf-8").splitlines()
-        return BenchmarkRecord(proto_test_args, stderr)
+        return BenchmarkRecord(args, stderr)
     else:
         print('Error', flush=True)
         print(out.stderr.decode("utf-8"), flush=True)
@@ -102,10 +102,10 @@ def print_all():
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--party")
+parser.add_argument("--party", type=int)
 args = parser.parse_args()
 
-PARTY = int(args.party)
+PARTY = args.party
 PORT = 9000 + PARTY
 NEXT_PORT = 9000 + (PARTY + 1) % 3
 
@@ -135,7 +135,7 @@ try:
                     print(f'{t1}', flush=True)
                     print(
                         f"logn {logn}, data_size {data_size}, tau {tau}, pdpf {pdpf}", flush=True)
-                    proto_test_args = [
+                    args = [
                         "./bin/test/proto_test",
                         "--party", str(PARTY),
                         "--port", str(PORT),
@@ -145,7 +145,7 @@ try:
                         "--tau", str(tau),
                         "--log_pseudo_dpf_threshold", str(pdpf),
                     ]
-                    record = start_benchmark(proto_test_args)
+                    record = start_benchmark(args)
                     record.print()
                     records.append(record)
                     t2 = datetime.datetime.now(JST)
