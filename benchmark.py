@@ -102,7 +102,7 @@ def print_all():
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--party", type=int)
+parser.add_argument("--party", type=int, required=True)
 args = parser.parse_args()
 
 PARTY = args.party

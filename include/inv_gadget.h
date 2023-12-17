@@ -22,6 +22,7 @@ void P0(Peer peer[2], const bool b, const uint data_size, const bool inv, Benchm
     uchar s = rand_bool();
     uchar bb = b ^ s;
 
+    // TODO: can use PRG to gen s, don't need to send by socket.
     peer[P1].Socket().Write(&s, 1, benchmark);
     peer[P1].WriteDataVector(p, benchmark);
 
@@ -35,6 +36,7 @@ void P1(Peer peer[2], D m[2], const bool inv, Benchmark::Record *benchmark) {
     const uint P0 = inv ? 1 : 0;
     // debug_print("inv::P1 inv = %u\n", inv);
 
+    // TODO: can use PRG to gen s, don't need to receive by socket.
     uchar s;
     peer[P0].Socket().Read(&s, 1, benchmark);
 
